@@ -10,7 +10,7 @@ def setup_logger(log_file, level=logging.INFO, StdOut=False) -> None:
     handlers.append(logging.FileHandler(log_file, encoding='utf-8', mode='w'))
     handlers.append(logging.StreamHandler(sys.stdout))
 
-    logging.basicConfig(filename=log_file, format='%(asctime)s %(levelname)s %(message)s',
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.INFO, handlers=handlers)
 
 def main():
@@ -37,8 +37,8 @@ def main():
     except FileNotFoundError as e:
         log.error(f'{e}: This means the bot could not find your BotSecrets Json File')
         sys.exit(0)
-    except Exception as e:
-        log.error(f'CONFIG ERROR: {e} ON STARTUP')
+    except KeyError as e:
+        log.error(f'{e} is not a valid key in BotSecrets')
         sys.exit(0)
 
     log.info('Bot Starting Up')

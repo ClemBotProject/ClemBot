@@ -11,14 +11,14 @@ class ClemBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self.load_cogs()
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         log.info(f'Logged on as {self.user}')
 
-    async def on_message(self, message):
+    async def on_message(self, message: str) -> None:
         log.info(f'Message from {message.author}: {message.content}')
         await self.process_commands(message)
 
-    def load_cogs(self):
+    def load_cogs(self) -> None:
         log.info('Loading cogs')
         self.load_extension("Bot.Cogs.manageClasses")
 

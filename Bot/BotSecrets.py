@@ -10,9 +10,9 @@ class BotSecrets:
     DatabaseName = None
 
     @staticmethod
-    def load_secrets(json):
-        secrets = json.loads(json)
-        log.botlog.info('Bot Secrets Loaded')
+    def load_secrets(lines: str) -> None:
+        secrets = json.loads(lines)
+        log.info('Bot Secrets Loaded')
         
         BotSecrets.ClientToken = secrets['ClientToken']
         BotSecrets.ClientSecret = secrets['ClientSecret']
