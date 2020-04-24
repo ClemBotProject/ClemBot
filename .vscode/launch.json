@@ -8,7 +8,7 @@
             "name": "ClemBot",
             "type": "python",
             "request": "launch",
-            "program": "main.py",
+            "program": "Bot/main.py",
             "console": "integratedTerminal"
         }
     ]
