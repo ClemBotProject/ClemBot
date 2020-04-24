@@ -14,7 +14,7 @@ class ClemBot(commands.Bot):
         log.info(f'Logged on as {self.user}')
 
     async def on_message(self, message):
-        log.info('Message from {0.author}: {0.content}'.format(message))
+        log.info(f'Message from {message.author}: {message.content}')
         await self.process_commands(message)
 
     def load_cogs(self):
