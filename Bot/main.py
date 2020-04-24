@@ -1,31 +1,48 @@
 import discord
-import ClemBot
-import json
+from Bot.ClemBot import ClemBot as ClemBot
 import logging
 import sys
-import logger as log
+from Bot.BotSecrets import BotSecrets
+
+def setup_logger(log_file, level=logging.INFO, StdOut=False) -> None:
+
+    handlers = []
+    handlers.append(logging.FileHandler(log_file, encoding='utf-8', mode='w'))
+    handlers.append(logging.StreamHandler(sys.stdout))
+
+    logging.basicConfig(filename=log_file, format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.INFO, handlers=handlers)
 
 def main():
 
-    log.setup_dis_py_log()
+    #creates the logger for the Bot Itself
+    setup_logger('Logs/bot.log', logging.INFO, True)
+
+    log = logging.getLogger('main')
+
+    #sets up the logging for discord.py
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(filename='Logs/discord.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
 
     secrets = {}
 
     try:
-        log.botlog.info('Attempting to load BotSecrets.json')
+        log.info('Attempting to load BotSecrets.json')
         with open("BotSecrets.json") as f:
-            lines = f.read()
-            secrets = json.loads(lines)
-            log.botlog.info('Bot Secrets Loaded')
+            BotSecrets.load_secrets(f.read())
+
     except FileNotFoundError as e:
-        log.botlog.error(f'{e}: This means the bot could not find your BotSecrets Json File')
+        log.error(f'{e}: This means the bot could not find your BotSecrets Json File')
         sys.exit(0)
     except Exception as e:
-        log.botlog.error(f'CONFIG ERROR: {e} ON STARTUP')
+        log.error(f'CONFIG ERROR: {e} ON STARTUP')
         sys.exit(0)
 
-    log.botlog.info('Bot Starting Up')
-    ClemBot.ClemBot(command_prefix = ':').run(secrets["BotToken"])
+    log.info('Bot Starting Up')
+    ClemBot(command_prefix = ':').run(secrets["BotToken"])
 
 
 if __name__ == "__main__":

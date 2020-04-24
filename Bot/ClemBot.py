@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from Bot.Cogs.manageClasses import ManageClasses
-from logger import botlog as log
+import logging
+log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
 
