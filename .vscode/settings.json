@@ -1,6 +1,6 @@
 {
     "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
-    "python.pythonPath": "clembot-env/bin/python",
+    "python.pythonPath": "/Users/JayMadden/ClemBot/clembot-env/bin/python3",
     "python.linting.banditEnabled": true,
 }
