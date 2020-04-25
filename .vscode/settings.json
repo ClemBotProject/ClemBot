@@ -1,5 +1,6 @@
 {
-    "python.linting.pylintEnabled": true,
+    "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
-    "python.pythonPath": "clembot-env/bin/python"
+    "python.pythonPath": "clembot-env/bin/python",
+    "python.linting.banditEnabled": true,
 }
