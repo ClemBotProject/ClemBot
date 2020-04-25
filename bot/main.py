@@ -2,6 +2,7 @@ import discord
 from bot.clem_bot import ClemBot as ClemBot
 import logging
 import sys
+import os
 from bot.bot_secrets import BotSecrets
 
 def setup_logger() -> None:
@@ -14,6 +15,8 @@ def setup_logger() -> None:
 
 def main():
 
+    if not os.path.exists('Logs'):
+        os.makedirs('Logs')
     #sets up the logging for discord.py
     logger = logging.getLogger('discord')
     logger.setLevel(logging.DEBUG)
@@ -23,7 +26,7 @@ def main():
     
     #creates the logger for the Bot Itself
     setup_logger()
-    bot_log = logging.getLogger('Bot')
+    bot_log = logging.getLogger('bot')
     bot_file_handle = logging.FileHandler('Logs/bot.log', encoding='utf-8', mode='w')
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
