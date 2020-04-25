@@ -1,4 +1,3 @@
-import sqlite3
 import logging
 log = logging.getLogger(__name__)
 

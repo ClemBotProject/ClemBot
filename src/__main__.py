@@ -1,9 +1,9 @@
 import discord
-from clem_bot import ClemBot as ClemBot
+from bot.clem_bot import ClemBot as ClemBot
 import logging
 import sys
 import os
-from bot_secrets import BotSecrets
+from bot.bot_secrets import BotSecrets
 
 def setup_logger() -> None:
 
@@ -34,7 +34,8 @@ def main():
     try:
         bot_log.info('Attempting to load BotSecrets.json')
         with open("BotSecrets.json") as f:
-            BotSecrets.load_secrets(f.read())
+            BotSecrets.get_instance().load_secrets(f.read())
+            s = BotSecrets.get_instance().client_token
 
     except FileNotFoundError as e:
         bot_log.error(f'{e}: This means the bot could not find your BotSecrets Json File')
@@ -42,9 +43,11 @@ def main():
     except KeyError as e:
         bot_log.error(f'{e} is not a valid key in BotSecrets')
         sys.exit(0)
+    except Exception as e:
+        bot_log.error(e)
 
     bot_log.info('Bot Starting Up')
-    ClemBot(command_prefix = ':').run(BotSecrets.BotToken)
+    ClemBot(command_prefix = ':').run(BotSecrets.get_instance().bot_token)
 
 
 if __name__ == "__main__":

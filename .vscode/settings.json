@@ -1,6 +1,6 @@
 {
-    "python.linting.pylintEnabled": true,
+    "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
     "python.pythonPath": "venv/bin/python",
-    "python.linting.banditEnabled": false,
+    "python.linting.banditEnabled": true,
 }
