@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "Bot/main.py",
-            "console": "integratedTerminal"
+            "console": "externalTerminal"
         }
     ]
 }

@@ -3,7 +3,7 @@ import importlib
 import typing as t
 from types import ModuleType
 import pkgutil
-from Bot import Cogs
+from bot import cogs
 from discord.ext import commands
 import logging
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class ClemBot(commands.Bot):
         def on_error(name: str) -> t.NoReturn:
             raise ImportError(name=name)
 
-        for module in pkgutil.walk_packages(Cogs.__path__, "bot.cogs.", onerror=on_error):
+        for module in pkgutil.walk_packages(cogs.__path__, "bot.cogs.", onerror=on_error):
             if not module.ispkg:
                 yield importlib.import_module(module.name)
 
