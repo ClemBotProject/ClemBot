@@ -1,7 +1,7 @@
 import json
 import logging
 
-from bot.defined_exceptions.config_access_error import ConfigAccessError
+from bot.exceptions.config_access_error import ConfigAccessError
 log = logging.getLogger(__name__)
 
 class BotSecrets:
@@ -9,7 +9,7 @@ class BotSecrets:
     __instance = None
 
     @staticmethod 
-    def get_instance():
+    def get_instance() -> 'BotSecrets':
         """ Static access method. """
         if BotSecrets.__instance == None:
             BotSecrets()
@@ -34,7 +34,7 @@ class BotSecrets:
             return self._clientToken
 
     @client_token.setter
-    def client_token(self, value: str):
+    def client_token(self, value: str) -> None:
         if self._clientToken:
             raise ConfigAccessError(f'client_token has already been initialized')
         else:
@@ -47,7 +47,7 @@ class BotSecrets:
         return self._clientToken
 
     @client_secret.setter
-    def client_secret(self, value: str):
+    def client_secret(self, value: str) -> None:
         if self._clientSecret:
             raise ConfigAccessError(f'client_secret has already been initialized')
         self._clientSecret = value
@@ -59,7 +59,7 @@ class BotSecrets:
         return self._botToken
 
     @bot_token.setter
-    def bot_token(self, value: str):
+    def bot_token(self, value: str) -> None:
         if self._botToken:
             raise ConfigAccessError(f'bot_token has already been initialized')
         self._botToken = value
@@ -71,7 +71,7 @@ class BotSecrets:
         return self._databaseName
 
     @database_name.setter
-    def database_name(self, value: str):
+    def database_name(self, value: str) -> None:
         if self._databaseName:
             raise ConfigAccessError(f'database_name has already been initialized')
         self._databaseName = value
@@ -85,8 +85,3 @@ class BotSecrets:
         self.client_secret = secrets['ClientSecret']
         self.bot_token = secrets['BotToken']
         self.database_name = secrets['DatabaseName']
-
-
-
-        
-

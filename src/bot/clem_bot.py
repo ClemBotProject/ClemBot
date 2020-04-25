@@ -29,6 +29,7 @@ class ClemBot(commands.Bot):
         #self.load_extension("Cogs.manage_classes")
         for m in ClemBot.walk_modules():
             for c in ClemBot.walk_cogs(m):
+                log.info(f'Loading Cog: {c.__module__}')
                 self.load_extension(c.__module__)
 
     @staticmethod

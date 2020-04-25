@@ -1,6 +1,6 @@
 import logging
 
-from bot.defined_exceptions.error import Error
+from bot.exceptions.error import Error
 log = logging.getLogger(__name__)
 
 class ConfigAccessError(Error):
