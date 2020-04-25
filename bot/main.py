@@ -1,9 +1,9 @@
 import discord
-from bot.clem_bot import ClemBot as ClemBot
+from clem_bot import ClemBot as ClemBot
 import logging
 import sys
 import os
-from bot.bot_secrets import BotSecrets
+from bot_secrets import BotSecrets
 
 def setup_logger() -> None:
 
