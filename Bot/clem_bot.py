@@ -31,11 +31,11 @@ class ClemBot(commands.Bot):
 
     @staticmethod
     def walk_modules() -> t.Iterator[ModuleType]:
-        """Yield imported modules from the Bot.Cogs subpackage."""
+        """Yield imported modules from the bot.cogs subpackage."""
         def on_error(name: str) -> t.NoReturn:
             raise ImportError(name=name)
 
-        for module in pkgutil.walk_packages(Cogs.__path__, "Bot.Cogs.", onerror=on_error):
+        for module in pkgutil.walk_packages(Cogs.__path__, "bot.cogs.", onerror=on_error):
             if not module.ispkg:
                 yield importlib.import_module(module.name)
 
