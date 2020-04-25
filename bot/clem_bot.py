@@ -3,7 +3,7 @@ import importlib
 import typing as t
 from types import ModuleType
 import pkgutil
-from bot import cogs
+import cogs
 from discord.ext import commands
 import logging
 log = logging.getLogger(__name__)
@@ -24,18 +24,18 @@ class ClemBot(commands.Bot):
 
     def load_cogs(self) -> None:
         log.info('Loading cogs')
-        #self.load_extension("Bot.Cogs.manage_classes")
+        #self.load_extension("Cogs.manage_classes")
         for m in ClemBot.walk_modules():
             for c in ClemBot.walk_cogs(m):
                 self.load_extension(c.__module__)
 
     @staticmethod
     def walk_modules() -> t.Iterator[ModuleType]:
-        """Yield imported modules from the bot.cogs subpackage."""
+        """Yield imported modules from the cogs subpackage."""
         def on_error(name: str) -> t.NoReturn:
             raise ImportError(name=name)
 
-        for module in pkgutil.walk_packages(cogs.__path__, "bot.cogs.", onerror=on_error):
+        for module in pkgutil.walk_packages(cogs.__path__, "cogs.", onerror=on_error):
             if not module.ispkg:
                 yield importlib.import_module(module.name)
 
@@ -47,4 +47,3 @@ class ClemBot(commands.Bot):
             is_cog = isinstance(obj, type) and issubclass(obj, commands.Cog)
             if is_cog and obj.__module__ == module.__name__:
                 yield obj
-
