@@ -1,11 +1,13 @@
-import discord
 import importlib
+import logging
 import typing as t
 from types import ModuleType
 import pkgutil
-import bot.cogs as cogs
+
+import discord
 from discord.ext import commands
-import logging
+
+import bot.cogs as cogs
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):

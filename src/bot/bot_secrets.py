@@ -1,6 +1,7 @@
 import json
-from bot.defined_exceptions.config_access_error import ConfigAccessError
 import logging
+
+from bot.defined_exceptions.config_access_error import ConfigAccessError
 log = logging.getLogger(__name__)
 
 class BotSecrets:
