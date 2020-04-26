@@ -3,6 +3,7 @@ import logging
 from bot.exceptions.error import Error
 log = logging.getLogger(__name__)
 
+
 class ConfigAccessError(Error):
     """Exception raised for errors in the input.
 

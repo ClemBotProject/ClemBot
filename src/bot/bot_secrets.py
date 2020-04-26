@@ -11,13 +11,13 @@ class BotSecrets:
     @staticmethod 
     def get_instance() -> 'BotSecrets':
         """ Static access method. """
-        if BotSecrets.__instance == None:
+        if BotSecrets.__instance is None:
             BotSecrets()
         return BotSecrets.__instance
 
     def __init__(self):
         """ Virtually private constructor. """
-        if BotSecrets.__instance != None:
+        if BotSecrets.__instance is not None:
             raise Exception("BotSecrets is in singleton scope")
         else:
             BotSecrets.__instance = self
@@ -25,7 +25,7 @@ class BotSecrets:
         self._clientSecret = None
         self._botToken = None
         self._databaseName = None
-    
+
     @property
     def client_token(self) -> str:
         if not self._clientToken:
@@ -75,7 +75,6 @@ class BotSecrets:
         if self._databaseName:
             raise ConfigAccessError(f'database_name has already been initialized')
         self._databaseName = value
-
 
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)

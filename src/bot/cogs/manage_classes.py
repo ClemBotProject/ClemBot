@@ -5,6 +5,7 @@ import discord.ext.commands as commands
 
 log = logging.getLogger(__name__)
 
+
 class ManageClasses(commands.Cog):
 
     def __init__(self, bot):

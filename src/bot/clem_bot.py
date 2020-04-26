@@ -8,14 +8,19 @@ import discord
 from discord.ext import commands
 
 import bot.cogs as cogs
+import bot.services as services
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
+
 
     def __init__(self, *args, **kwargs):
         #this super call is to pass the prefix up to the super class
         super().__init__(*args, **kwargs)
         self.load_cogs()
+
+        self.load_services()
+
 
     async def on_ready(self) -> None:
         log.info(f'Logged on as {self.user}')
@@ -23,6 +28,12 @@ class ClemBot(commands.Bot):
     async def on_message(self, message: str) -> None:
         log.info(f'Message from {message.author}: {message.content}')
         await self.process_commands(message)
+    
+    def load_services(self, services) -> None:
+        pass
+        
+
+
 
     def load_cogs(self) -> None:
         log.info('Loading cogs')
@@ -33,7 +44,7 @@ class ClemBot(commands.Bot):
                 self.load_extension(c.__module__)
 
     @staticmethod
-    def walk_modules() -> t.Iterator[ModuleType]:
+    def walk_modules(module: str) -> t.Iterator[ModuleType]:
         """Yield imported modules from the cogs subpackage."""
         def on_error(name: str) -> t.NoReturn:
             raise ImportError(name=name)
