@@ -2,6 +2,7 @@ import aiosqlite
 from typing import Iterator
 
 
+
 class Database:
 
     def __init__(self, name):
