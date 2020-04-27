@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Users (
     id          INTEGER     PRIMARY KEY,
     fk_guildId  INTEGER     NOT NULL,
     name        TEXT        NOT NULL,
-    isBanned    BOOLEAN     DEFAULT false
+    isBanned    BOOLEAN     DEFAULT false,
     misc        TEXT        
 );
 
@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS Channels (
     id          INTEGER     PRIMARY KEY,
     fk_guildId  INTEGER     NOT NULL,
     name        TEXT        NOT NULL,
-    isDeleted   BOOLEAN     DEFAULT false
-    misc        TEXT        
+    isDeleted   BOOLEAN     DEFAULT false,
+    misc        TEXT,        
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id)
 );
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS Messages (
     fk_authorId     INTEGER     NOT NULL,
     content         TEXT        NOT NULL,
     isDeleted       BOOLEAN     NOT NULL DEFAULT False,
-    misc            TEXT        
+    misc            TEXT,       
     FOREIGN KEY(fk_authorId)
         REFERENCES Users (id),
     FOREIGN KEY(fk_guildId)

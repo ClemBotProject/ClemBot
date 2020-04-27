@@ -1,4 +1,4 @@
-from bot.data import base_repository
+from bot.data.base_repository import BaseRepository
 
 class MessageRepository(BaseRepository):
     pass
