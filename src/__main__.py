@@ -7,6 +7,7 @@ import discord
 from bot.bot_secrets import BotSecrets
 from bot.clem_bot import ClemBot as ClemBot
 
+
 def setup_logger() -> None:
 
     handlers = []

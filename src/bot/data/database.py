@@ -1,9 +1,15 @@
-import aiosqlite as aiosqlite
+import aiosqlite
+from typing import Iterator
 
 
 class Database:
 
     def __init__(self, name):
-        pass
+        self.database_name = f'{name}.sqlite'
 
-   # def CreateTables():
+    async def create_database(self) -> bool:
+        async with aiosqlite.connect(self.database_name) as db:
+            with open('src/bot/data/CreateTables.sql') as f:
+                await db.executescript(f.read())
+                await db.commit()
+
