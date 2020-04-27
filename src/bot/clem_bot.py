@@ -11,6 +11,8 @@ from pubsub import pub as pub
 import bot.cogs as cogs
 import bot.services as services
 from bot.events import Events
+from bot.data.database import Database
+from bot.bot_secrets import BotSecrets
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
@@ -27,6 +29,7 @@ class ClemBot(commands.Bot):
 
 
     async def on_ready(self) -> None:
+        await Database(BotSecrets.get_instance().database_name).create_database()
         log.info(f'Logged on as {self.user}')
 
     async def on_message(self, message: str) -> None:
