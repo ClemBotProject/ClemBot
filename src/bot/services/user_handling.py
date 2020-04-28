@@ -1,4 +1,4 @@
-from pubsub import pub as pub
+from pubsub import pub
 
 from bot.events import Events
 from bot.services.base_service import BaseService
