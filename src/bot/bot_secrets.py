@@ -1,7 +1,7 @@
 import json
 import logging
 
-from bot.exceptions.config_access_error import ConfigAccessError
+from bot.errors import ConfigAccessError
 log = logging.getLogger(__name__)
 
 class BotSecrets:
@@ -74,7 +74,7 @@ class BotSecrets:
     def database_name(self, value: str) -> None:
         if self._databaseName:
             raise ConfigAccessError(f'database_name has already been initialized')
-        self._databaseName = value
+        self._databaseName = f'{value}.sqlite'
 
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)

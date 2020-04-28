@@ -13,6 +13,7 @@ import bot.services as services
 from bot.events import Events
 from bot.data.database import Database
 from bot.bot_secrets import BotSecrets
+from bot.errors import PrimaryKeyError
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
@@ -30,12 +31,28 @@ class ClemBot(commands.Bot):
 
     async def on_ready(self) -> None:
         await Database(BotSecrets.get_instance().database_name).create_database()
+
+        log.info('Initializing guilds')
+        for guild in self.guilds:
+            try:
+                await services.guild_handling.GuildHandling().add_guild(guild)
+            except PrimaryKeyError as e:
+                log.info(f'"{guild.name}" already known')
+
+            log.info(f'Initializing members of {guild.name}')
+            for user in guild.members:
+                await services.user_handling.UserHandling().add_existing_user(user, guild.id)
+
         log.info(f'Logged on as {self.user}')
 
     async def on_message(self, message: str) -> None:
         log.info(f'Message from {message.author}: {message.content}')
-        pub.sendMessage(Events.on_message_recieved)
+        
+        await services.message_handling.MessageHandling().on_message_recieved(message)
         await self.process_commands(message)
+
+    async def on_guild_join(self, guild):
+        pub.sendMessage(Events.on_guild_joined, guild)
     
     def load_services(self) -> None:
         log.info('Loading Services')
