@@ -1,13 +1,9 @@
+from bot.bot_secrets import BotSecrets
 import logging
 log = logging.getLogger(__name__)
 
 class BaseRepository:
 
     def __init__(self):
-        pass
+        self.database_name = BotSecrets.get_instance().database_name
 
-    def __enter__(self):
-        pass
-
-    def __exit__(self, type, value, traceback):
-        pass

@@ -38,7 +38,6 @@ def main():
         bot_log.info('Attempting to load BotSecrets.json')
         with open("BotSecrets.json") as f:
             BotSecrets.get_instance().load_secrets(f.read())
-            s = BotSecrets.get_instance().client_token
 
     except FileNotFoundError as e:
         bot_log.error(f'{e}: This means the bot could not find your BotSecrets Json File')

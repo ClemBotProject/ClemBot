@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS Users (
     fk_guildId  INTEGER     NOT NULL,
     name        TEXT        NOT NULL,
     isBanned    BOOLEAN     DEFAULT false,
-    misc        TEXT        
+    misc        TEXT,        
+    FOREIGN KEY(fk_guildId)
+        REFERENCES Guilds (id)
 );
 
 CREATE TABLE IF NOT EXISTS Users_Guilds (
