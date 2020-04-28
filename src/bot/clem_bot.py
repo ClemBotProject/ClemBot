@@ -47,7 +47,7 @@ class ClemBot(commands.Bot):
 
     async def on_message(self, message: str) -> None:
         log.info(f'Message from {message.author}: {message.content}')
-        #pub.sendMessage(Events.on_message_recieved)
+        
         await services.message_handling.MessageHandling().on_message_recieved(message)
         await self.process_commands(message)
 
