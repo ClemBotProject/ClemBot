@@ -8,7 +8,7 @@
             "name": "ClemBot",
             "type": "python",
             "request": "launch",
-            "program": "src/__main__.py",
+            "program": "bot/__main__.py",
             "console": "externalTerminal"
         }
     ]

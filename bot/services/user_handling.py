@@ -1,5 +1,5 @@
 
-from src.bot.events import Events
+from bot.events import Events
 from bot.services.base_service import BaseService
 from bot.data.user_repository import UserRepository
 
