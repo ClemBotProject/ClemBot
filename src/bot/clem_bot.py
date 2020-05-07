@@ -6,7 +6,6 @@ import pkgutil
 
 import discord
 from discord.ext import commands
-from pubsub import pub as pub
 
 import bot.cogs as cogs
 import bot.services as services
@@ -52,7 +51,7 @@ class ClemBot(commands.Bot):
         await self.process_commands(message)
 
     async def on_guild_join(self, guild):
-        pub.sendMessage(Events.on_guild_joined, guild)
+        pass
     
     def load_services(self) -> None:
         log.info('Loading Services')
@@ -61,7 +60,6 @@ class ClemBot(commands.Bot):
             for c in ClemBot.walk_types(m, services.base_service.BaseService):
                 log.info(f'Loading service: {c.__module__}')
                 self.active_services.append(c())
-
 
     def load_cogs(self) -> None:
         log.info('Loading cogs')

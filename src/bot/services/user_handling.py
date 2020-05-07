@@ -1,13 +1,12 @@
-from pubsub import pub
 
-from bot.events import Events
+from src.bot.events import Events
 from bot.services.base_service import BaseService
 from bot.data.user_repository import UserRepository
 
 class UserHandling(BaseService):
 
     def __init__(self):
-        pub.subscribe(self.on_user_joined, Events.on_user_joined)
+        pass
 
     def on_user_joined(self, user) -> None:
         pass

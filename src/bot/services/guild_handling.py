@@ -1,4 +1,3 @@
-from pubsub import pub
 
 from bot.events import Events
 from bot.services.base_service import BaseService
@@ -7,7 +6,7 @@ from bot.data.guild_repository import GuildRepository
 class GuildHandling(BaseService):
 
     def __init__(self):
-        pub.subscribe(self.on_guild_joined, Events.on_guild_joined)
+        pass
 
     async def on_guild_joined(self, guild) -> None:
         await GuildRepository().add_guild(guild)
