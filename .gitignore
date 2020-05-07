@@ -1,5 +1,4 @@
 #ignore the database
-*.sqlite
 
 #Bot Secrets
 BotSecrets.json
