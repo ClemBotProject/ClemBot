@@ -13,6 +13,7 @@ from bot.events import Events
 from bot.data.database import Database
 from bot.bot_secrets import BotSecrets
 from bot.errors import PrimaryKeyError
+import bot.messaging.messenger as messenger
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
@@ -44,14 +45,20 @@ class ClemBot(commands.Bot):
 
         log.info(f'Logged on as {self.user}')
 
-    async def on_message(self, message: str) -> None:
-        log.info(f'Message from {message.author}: {message.content}')
-        
-        await services.message_handling.MessageHandling().on_message_recieved(message)
-        await self.process_commands(message)
+    async def on_message(self, message) -> None:
+        try:
+            log.info(f'Message from {message.auhor}: {message.content} in guild {message.guild.id}')
+            
+            await messenger.publish(Events.on_message_recieved, message)
+            await self.process_commands(message)
+        except Exception as e:
+            log.error(e)
 
     async def on_guild_join(self, guild):
         pass
+
+    async def on_raw_reaction_add(self, reaction) -> None:
+        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
     
     def load_services(self) -> None:
         log.info('Loading Services')
@@ -62,11 +69,11 @@ class ClemBot(commands.Bot):
                 self.active_services.append(c())
 
     def load_cogs(self) -> None:
-        log.info('Loading cogs')
+        log.info('Loading Cogs')
         #self.load_extension("Cogs.manage_classes")
         for m in ClemBot.walk_modules('cogs', cogs): 
             for c in ClemBot.walk_types(m, commands.Cog):
-                log.info(f'Loading Cog: {c.__module__}')
+                log.info(f'Loading cog: {c.__module__}')
                 self.load_extension(c.__module__)
 
     @staticmethod

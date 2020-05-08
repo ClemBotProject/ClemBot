@@ -21,7 +21,6 @@ pbr==5.4.5
 pycodestyle==2.5.0
 pyflakes==2.1.1
 pylint==2.4.4
-Pypubsub==4.0.3
 PyYAML==5.3.1
 six==1.14.0
 smmap==3.0.2
