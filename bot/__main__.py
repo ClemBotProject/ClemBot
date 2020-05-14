@@ -40,7 +40,7 @@ def main():
             BotSecrets.get_instance().load_secrets(f.read())
 
     except FileNotFoundError as e:
-        bot_log.error(f'{e}: This means the bot could not find your BotSecrets Json File')
+        bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
         sys.exit(0)
     except KeyError as e:
         bot_log.error(f'{e} is not a valid key in BotSecrets')

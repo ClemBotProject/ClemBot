@@ -17,7 +17,10 @@ import bot.messaging.messenger as messenger
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
-
+    """
+    This is the base level bot class for clem bot. this handles the sending of all api events
+    as well as the dynamic loading of services and cogs
+    """
 
     def __init__(self, *args, **kwargs):
         #this super call is to pass the prefix up to the super class
@@ -28,8 +31,12 @@ class ClemBot(commands.Bot):
         self.active_services = []
         self.load_services()
 
-
     async def on_ready(self) -> None:
+        """
+        This is the entry point of the bot that is run when discord.py has finished its startup procedures.
+        This is where the bot checks to see if its in any new guilds and acts accordingly
+        """
+
         await Database(BotSecrets.get_instance().database_name).create_database()
 
         log.info('Initializing guilds')
@@ -47,7 +54,7 @@ class ClemBot(commands.Bot):
 
     async def on_message(self, message) -> None:
         try:
-            log.info(f'Message from {message.auhor}: {message.content} in guild {message.guild.id}')
+            log.info(f'Message from {message.author}: {message.content} in guild {message.guild.id}')
             
             await messenger.publish(Events.on_message_recieved, message)
             await self.process_commands(message)

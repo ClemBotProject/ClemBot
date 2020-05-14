@@ -7,10 +7,8 @@ class Error(Exception):
 
 
 class ConfigAccessError(Error):
-    """Exception raised for errors in the input.
-
-    Attributes:
-        message -- explanation of the error
+    """
+    Exception raised for errors in the input.
     """
 
     def __init__(self,  message: str):
@@ -18,10 +16,8 @@ class ConfigAccessError(Error):
 
 
 class PrimaryKeyError(Error):
-    """Raised if the primary key fails on insert
-
-    Attributes:
-        message -- explanation of the error
+    """
+    Raised if the primary key fails on insert
     """
 
     def __init__(self,  message: str):
