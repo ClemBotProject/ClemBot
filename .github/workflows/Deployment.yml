@@ -36,12 +36,10 @@ jobs:
               run: |
                 python3 -m pip install --upgrade pip
                 pip3 install virtualenv
-                sudo /usr/bin/easy_install virtualenv
-                virtualenv venv
+                python3 -m virtualenv venv
                 source venv/bin/activate
             - name: Install dependencies
               run: | 
                 pip3 install -r requirements.txt
             - name: Startup bot
               run: python3 bot/main.py
-              
