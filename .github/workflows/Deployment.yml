@@ -42,4 +42,4 @@ jobs:
               run: | 
                 pip3 install -r requirements.txt
             - name: Startup bot
-              run: python3 ClemBotProdction/ClemBot/ClemBot/bot/__main__.py
+              run: python3 ~/actions-runner/ClemBotProdction/ClemBot/ClemBot/bot/__main__.py
