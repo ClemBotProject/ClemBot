@@ -37,9 +37,10 @@ ping @Jayy#6249 for permissions to add bots
 * `git clone` your fork to wherever you want to work on this bot
 * Rename `BotSecrets.json.template` to `BotSecrets.json`
 * Copy/paste the token from the Discord page into the `BotToken` empty string
+* Create a database name (Whatever you want it doesnt matter)
 
 
-## setting up the build environment
+## Setting up the build environment
 Setup a virtual environment:  
 `pip3 install virtualenv`
 `virtualenv venv`
