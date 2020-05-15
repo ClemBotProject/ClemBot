@@ -33,4 +33,13 @@ jobs:
         steps:
             - name: Setup Python
               uses: actions/setup-python@v2
+            - name: Install dependencies
+              run: | 
+                pip3 install virtualenv
+                virtualenv venv
+                source venv/bin/activate
+                pip3 install -r requirements.txt
+            - name: Startup bot
+              run: python3 bot/main.py
+
           
