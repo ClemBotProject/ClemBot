@@ -32,14 +32,5 @@ jobs:
     
         steps:
             - uses: actions/checkout@v2
-            - name: Set up virtual enviroment 
-              run: |
-                python3 -m pip install --upgrade pip
-                pip3 install virtualenv
-                python3 -m virtualenv venv
-                source venv/bin/activate
-            - name: Install dependencies
-              run: | 
-                pip3 install -r requirements.txt
-            - name: Startup bot
-              run: python3 ~/actions-runner/ClemBotProduction/ClemBot/ClemBot/bot/__main__.py
+            - name: Run Deploy Script
+              run: ./deploy.bat
