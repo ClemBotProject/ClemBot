@@ -1,5 +1,7 @@
 FROM python:3
 
+LABEL Name=ClemBot Version=0.1.0
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./

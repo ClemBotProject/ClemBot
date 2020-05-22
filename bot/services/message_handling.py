@@ -11,5 +11,3 @@ class MessageHandling(BaseService):
 
     async def on_message_recieved(self, message) -> None:
         await MessageRepository().add_message(message)
-
-
