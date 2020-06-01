@@ -1,12 +1,22 @@
-FROM python:3
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.8-slim-buster
 
-LABEL Name=ClemBot Version=0.1.0
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE 1
 
-WORKDIR /usr/src/app
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Install pip requirements
+ADD requirements.txt .
+RUN python -m pip install -r requirements.txt
 
-COPY . .
+WORKDIR /app
+ADD . /app
 
-CMD [ "python", "./bot/__main__.py" ]
+# Switching to a non-root user, please refer to https://aka.ms/vscode-docker-python-user-rights
+RUN useradd appuser && chown -R appuser /app
+USER appuser
+
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+CMD ["python", "src/__main__.py"]

@@ -38,7 +38,6 @@ def main():
         bot_log.info('Attempting to load BotSecrets.json')
         with open("BotSecrets.json") as f:
             BotSecrets.get_instance().load_secrets(f.read())
-
     except FileNotFoundError as e:
         bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
         sys.exit(0)
@@ -47,6 +46,11 @@ def main():
         sys.exit(0)
     except Exception as e:
         bot_log.error(e)
+
+    token = os.environ.get('BotToken', None) 
+
+    if token != None:
+        BotSecrets.get_instance().bot_token = token
 
     bot_log.info('Bot Starting Up')
     ClemBot(command_prefix = ':').run(BotSecrets.get_instance().bot_token)
