@@ -12,4 +12,3 @@ class Database:
             with open('bot/data/CreateTables.sql') as f:
                 await db.executescript(f.read())
                 await db.commit()
-
