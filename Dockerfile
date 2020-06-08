@@ -7,6 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED 1
 
+# Set up and activate virtual environment
+ENV VIRTUAL_ENV "/venv"
+RUN python -m venv $VIRTUAL_ENV
+ENV PATH "$VIRTUAL_ENV/bin:$PATH"
+
 # Install pip requirements
 ADD requirements.txt .
 RUN python -m pip install -r requirements.txt
@@ -19,4 +24,4 @@ RUN useradd appuser && chown -R appuser /app
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "bot/__main__.py"]
+CMD ["python","-m", "bot"]
