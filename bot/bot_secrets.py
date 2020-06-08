@@ -82,5 +82,5 @@ class BotSecrets:
         
         self.client_token = secrets['ClientToken']
         self.client_secret = secrets['ClientSecret']
-        self.bot_token = secrets['BotToken'] if secrets['BotToken'] == None else 'ClemBot'
-        self.database_name = secrets['DatabaseName']
+        self.bot_token = secrets['BotToken']
+        self.database_name = secrets['DatabaseName'] if secrets['DatabaseName'] == None else 'ClemBot'
