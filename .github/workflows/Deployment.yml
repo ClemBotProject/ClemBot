@@ -33,4 +33,4 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Run Deploy Script
-              run: ./deploy.bat
+              run: ~/deploy.bat
