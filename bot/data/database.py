@@ -8,7 +8,7 @@ class Database:
         self.database_name = name
 
     async def create_database(self) -> bool:
-        async with aiosqlite.connect(self.database_name) as db:
+        async with aiosqlite.connect(f'database/{self.database_name}') as db:
             with open('bot/data/CreateTables.sql') as f:
                 await db.executescript(f.read())
                 await db.commit()

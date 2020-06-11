@@ -6,7 +6,7 @@ from bot.data.base_repository import BaseRepository
 class MessageRepository(BaseRepository):
 
     async def add_message(self, message):
-        async with aiosqlite.connect(self.database_name) as db:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
                 INSERT INTO Messages
