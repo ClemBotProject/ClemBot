@@ -9,7 +9,7 @@ class UserRepository(BaseRepository):
 
     async def add_user(self, user: str, guild_id: int) -> None:
         try:
-            async with aiosqlite.connect(self.database_name) as db:
+            async with aiosqlite.connect(self.resolved_db_path) as db:
                 await db.execute('INSERT INTO Users (id, fk_guildId, name) VALUES (?, ?, ?)', (user.id, guild_id, user.name))
                 await db.execute('INSERT INTO Users_Guilds VALUES (?, ?)', (guild_id, user.id))
                 await db.commit()

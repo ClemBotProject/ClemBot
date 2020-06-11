@@ -11,7 +11,7 @@ class GuildRepository(BaseRepository):
 
     async def add_guild(self, guild):
         try:
-            async with aiosqlite.connect(self.database_name) as db:
+            async with aiosqlite.connect(self.resolved_db_path) as db:
                 await db.execute('INSERT INTO Guilds VALUES (?, ?)', (guild.id, guild.name))
                 await db.commit()
 
@@ -22,7 +22,7 @@ class GuildRepository(BaseRepository):
             raise PrimaryKeyError(f'Failed to insert guild, primary key failure, id: {guild.id}')
     
     async def add_channel(self, channel, guild_id):
-        async with aiosqlite.connect(self.database_name) as db:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
             values = (channel.id, guild_id, channel.name)
             await db.execute('INSERT INTO Channels (id, fk_guildId, name) VALUES (?, ?, ?)', values)
             await db.commit()
