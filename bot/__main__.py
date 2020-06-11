@@ -54,7 +54,7 @@ def main():
         BotSecrets.get_instance().bot_token = token
 
     bot_log.info('Bot Starting Up')
-    ClemBot(command_prefix = ':').run(BotSecrets.get_instance().bot_token)
+    ClemBot(command_prefix = '$').run(BotSecrets.get_instance().bot_token)
 
 
 if __name__ == "__main__":
