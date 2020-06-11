@@ -6,7 +6,6 @@ on:
 
 jobs:
     deploy:
-        needs: build
         name: Deploy
         runs-on: [self-hosted]
     
