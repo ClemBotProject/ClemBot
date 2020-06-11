@@ -34,6 +34,7 @@ def main():
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
 
+
     try:
         bot_log.info('Attempting to load BotSecrets.json')
         with open("BotSecrets.json") as f:
