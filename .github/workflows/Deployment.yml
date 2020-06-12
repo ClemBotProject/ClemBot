@@ -12,7 +12,6 @@ jobs:
             - uses: actions/checkout@v2
             - name: Run Deploy Script
               run: ~/deploy.sh
-            - uses: actions/setup-ruby@v1
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
