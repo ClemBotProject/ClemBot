@@ -1,0 +1,7 @@
+version: "2.0"
+services:
+  clembot:
+    build: .
+    user: root
+    volumes:
+      - ~/database:/ClemBot/database
