@@ -36,7 +36,7 @@ def main():
 
 
     try:
-        bot_log.info('Attempting to load BotSecrets.json')
+        bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
         with open("BotSecrets.json") as f:
             BotSecrets.get_instance().load_secrets(f.read())
     except FileNotFoundError as e:
