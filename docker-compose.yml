@@ -2,6 +2,7 @@ version: "2.0"
 services:
   clembot:
     build: .
+    restart: always
     user: root
     volumes:
       - ~/database:/ClemBot/database
