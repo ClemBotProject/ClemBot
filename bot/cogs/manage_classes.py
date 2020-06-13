@@ -21,5 +21,9 @@ class ManageClasses(commands.Cog):
             await ctx.send('Hello {0.name}... This feels familiar.'.format(member))
         self._last_member = member
 
+    @commands.command()
+    async def echo(self, ctx, *message, member: discord.Member = None):
+        await ctx.send(' '.join(message))
+
 def setup(bot): 
     bot.add_cog(ManageClasses(bot))
