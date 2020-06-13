@@ -8,3 +8,6 @@ A Discord bot for server management with a focus on school related commands. We 
 
 # Development
 To start developing and contributing to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md)
+
+# Acknowledgements
+We would like to thank those at OSU for paving the way as they've stoically defined the meaning of excellence for universities. We wouldn't be where we are without them.
