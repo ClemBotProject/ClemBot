@@ -19,7 +19,7 @@ class MessageRepository(BaseRepository):
                 """, (message.id, message.guild.id, message.channel.id, message.author.id, message.content))
             await db.commit()
 
-    async def check_message(self, message: int) -> bool:
+    async def check_message(self, message_id: int) -> bool:
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute('SELECT * FROM Messages WHERE id = ?', (guild_id,)) as c:
+            async with db.execute('SELECT * FROM Messages WHERE id = ?', (message_id,)) as c:
                 return await c.fetchone() is not None
