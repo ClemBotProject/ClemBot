@@ -23,7 +23,9 @@ class ManageClasses(commands.Cog):
 
     @commands.command()
     async def echo(self, ctx, *message, member: discord.Member = None):
-        await ctx.send(' '.join(message))
+        embed = discord.Embed(title="Echo", color=0x522D80)
+        embed.add_field(name=ctx.author, value=' '.join(message))
+        await ctx.send(embed=embed)
 
 def setup(bot): 
     bot.add_cog(ManageClasses(bot))
