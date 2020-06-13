@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 
 class GuildRepository(BaseRepository):
 
-
     async def add_guild(self, guild) -> None:
         if await self.check_guild(guild.id): 
             return 
@@ -20,7 +19,7 @@ class GuildRepository(BaseRepository):
 
             for c in guild.channels:
                 await self.add_channel(c, guild.id)
-    
+
     async def add_channel(self, channel, guild_id) -> None:
         if await self.check_channel(channel.id):
             return
