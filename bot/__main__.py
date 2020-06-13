@@ -34,7 +34,6 @@ def main():
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
 
-
     try:
         bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
         with open("BotSecrets.json") as f:
@@ -50,7 +49,7 @@ def main():
 
     token = os.environ.get('BotToken', None) 
 
-    if token != None:
+    if token is not None:
         BotSecrets.get_instance().bot_token = token
 
     bot_log.info('Bot Starting Up')

@@ -1,6 +1,8 @@
 #ignore the database
 *.sqlite
 
+settings.json
+
 #Bot Secrets
 BotSecrets.json
 
