@@ -55,6 +55,8 @@ class ClemBot(commands.Bot):
     async def on_message(self, message) -> None:
         try:
             log.info(f'Message from {message.author}: {message.content} in guild {message.guild.id}')
+            if f'<@!{self.user.id}>' in message.content.split():
+                await message.channel.send('Hello there everyone!!')
             
             await messenger.publish(Events.on_message_recieved, message)
             await self.process_commands(message)
