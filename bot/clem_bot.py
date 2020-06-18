@@ -13,6 +13,7 @@ from bot.events import Events
 from bot.data.database import Database
 from bot.bot_secrets import BotSecrets
 from bot.errors import PrimaryKeyError
+from bot.consts import Colors
 import bot.messaging.messenger as messenger
 log = logging.getLogger(__name__)
 
@@ -55,19 +56,35 @@ class ClemBot(commands.Bot):
     async def on_message(self, message) -> None:
         try:
             log.info(f'Message from {message.author}: {message.content} in guild {message.guild.id}')
-            if f'<@!{self.user.id}>' in message.content.split():
+
+            if self.user.mentioned_in(message) and message.mention_everyone is False:
                 await message.channel.send('Hello there everyone!!')
             
             await messenger.publish(Events.on_message_recieved, message)
             await self.process_commands(message)
         except Exception as e:
-            log.error(e)
+            self.global_error_hander(e)
 
     async def on_guild_join(self, guild):
         pass
 
+    async def on_command_error(self, ctx, e):
+        embed = discord.Embed(title="ERROR: unhandled command exception", color=Colors.Error)
+        embed.add_field(name=ctx.author, value= e)
+        await ctx.channel.send(embed= embed)
+        self.global_error_hander(e)
+
     async def on_raw_reaction_add(self, reaction) -> None:
         log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+
+    def global_error_hander(self, e):
+        """
+        This is the global error handler for all uncaught exceptions, if an exception is 
+        thrown and not handled it will end up here
+        Args:
+            e (Str): The unhandled exception
+        """        
+        log.exception(e)
     
     def load_services(self) -> None:
         log.info('Loading Services')
