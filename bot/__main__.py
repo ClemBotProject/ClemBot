@@ -1,6 +1,7 @@
 import logging
 import sys
 import os
+from datetime import datetime
 
 import discord
 
@@ -23,14 +24,15 @@ def main():
     #sets up the logging for discord.py
     logger = logging.getLogger('discord')
     logger.setLevel(logging.DEBUG)
-    handler = logging.FileHandler(filename='Logs/discord.log', encoding='utf-8', mode='w')
+    disc_log_name = f'Logs/{datetime.now().strftime("%m-%d-%Y-%H:%M:%S")}_discord.log'
+    handler = logging.FileHandler(filename= disc_log_name, encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-    logger.addHandler(handler)
-    
+
     #creates the logger for the Bot Itself
     setup_logger()
     bot_log = logging.getLogger('bot')
-    bot_file_handle = logging.FileHandler('Logs/bot.log', encoding='utf-8', mode='w')
+    bot_log_name = f'Logs/{datetime.now().strftime("%m-%d-%Y-%H:%M:%S")}_bot.log'
+    bot_file_handle = logging.FileHandler(filename= bot_log_name, encoding='utf-8', mode='w')
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
 
