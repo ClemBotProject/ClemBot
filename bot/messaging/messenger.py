@@ -38,4 +38,3 @@ def getWeakRef(obj, notifyDead: DeadRefObserver = None):
     else:
         createRef = wr.ref
     return createRef(obj)
-
