@@ -6,3 +6,4 @@ services:
     user: root
     volumes:
       - ~/database:/ClemBot/database
+      - ~/Logs:/ClemBot/Logs
