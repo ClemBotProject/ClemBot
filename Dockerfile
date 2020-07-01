@@ -16,8 +16,8 @@ ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 ADD requirements.txt .
 RUN python -m pip install -r requirements.txt
 
-WORKDIR /app
-ADD . /app
+WORKDIR /ClemBot
+ADD . /ClemBot
 
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
