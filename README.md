@@ -3,8 +3,23 @@
 # ClemBot - A Discord Bot for the Clemson CPSC Discord Server
 A Discord bot for server management with a focus on school related commands. We are a community focused on learning and acceptance and anyone is welcome. If you have an idea or a feature you would like to contribute feel free to open an issue and we as a community can begin discussion. 
 ## Server Invite:  
-[![Discord](https://img.shields.io/discord/463752820026376202.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/QNRbC6k)
 
+<div align="center">
+  <br>
+
+  <a href="https://discord.gg/QNRbC6k">
+    <img src="https://img.shields.io/discord/515071617815019520.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge" alt="Support">
+  </a>
+  
+  <a href="https://www.python.org/downloads/">
+    <img src="https://img.shields.io/badge/Made%20With-Python%203.7-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.7">
+  </a>
+  
+  <a href="https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-mit-e74c3c.svg?style=for-the-badge&logo=appveyor" alt="MIT License">
+  </a>
+  </br>
+</div>
 
 # Development
 To start developing and contributing to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md)
