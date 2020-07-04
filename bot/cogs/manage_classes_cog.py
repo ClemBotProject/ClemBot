@@ -6,7 +6,7 @@ import discord.ext.commands as commands
 log = logging.getLogger(__name__)
 
 
-class ManageClasses(commands.Cog):
+class ManageClassesCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,9 +23,9 @@ class ManageClasses(commands.Cog):
 
     @commands.command()
     async def echo(self, ctx, *message, member: discord.Member = None):
-        embed = discord.Embed(title="Echo", color=0x522D80)
+        embed = discord.Embed(title="Echo", color= 0x522D80)
         embed.add_field(name=ctx.author, value=' '.join(message))
         await ctx.send(embed=embed)
 
 def setup(bot): 
-    bot.add_cog(ManageClasses(bot))
+    bot.add_cog(ManageClassesCog(bot))

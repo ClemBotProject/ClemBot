@@ -56,3 +56,23 @@ CREATE TABLE IF NOT EXISTS Messages (
     FOREIGN KEY(fk_channelId)
         REFERENCES Channels (id)
 );
+
+CREATE TABLE IF NOT EXISTS LogoutDates (
+    id              INTEGER     PRIMARY KEY,
+    date            TEXT        NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS DesignatedChannels (
+    id              INTEGER     PRIMARY KEY,
+    name            TEXT        NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS DesignatedChannels_Channels (
+    fk_designatedChannelsId INTEGER     NOT NULL,
+    fk_channelsId           INTEGER     NOT NULL,
+    FOREIGN KEY(fk_channelsId)
+        REFERENCES Channels (id),
+    FOREIGN KEY(fk_designatedChannelsId)
+        REFERENCES DesignatedChannels (id)
+);
+
