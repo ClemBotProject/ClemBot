@@ -79,7 +79,8 @@ class ClemBot(commands.Bot):
             await messenger.publish(Events.on_message_edit, before, after)
     
     async def on_message_delete(self, message):
-        await messenger.publish(Events.on_message_delete, message)
+        if message.author.id != self.user.id:
+            await messenger.publish(Events.on_message_delete, message)
 
     async def on_command_error(self, ctx, e):
         """
