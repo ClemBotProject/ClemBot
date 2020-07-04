@@ -28,6 +28,16 @@ class BotSecrets:
 
     @property
     def client_token(self) -> str:
+        """
+        The client api token defined in your developer page
+
+        Raises:
+            ConfigAccessError: Raised if the token has not been set
+
+        Returns:
+            str: The API Token
+        """
+
         if not self._clientToken:
             raise ConfigAccessError(f'client_token has not been initialized')
         else:
@@ -54,6 +64,15 @@ class BotSecrets:
 
     @property
     def bot_token(self) -> str:
+        """
+        The discord api token defined in your discord developer page
+
+        Raises:
+            ConfigAccessError: Raised if the token has not been set
+
+        Returns:
+            str: The api Token
+        """
         if not self._botToken:
             raise ConfigAccessError(f'bot_token has not been intialized')
         return self._botToken

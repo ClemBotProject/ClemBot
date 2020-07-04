@@ -3,6 +3,7 @@ import logging
 import typing as t
 from types import ModuleType
 import pkgutil
+import datetime
 
 import discord
 from discord.ext import commands
@@ -15,6 +16,7 @@ from bot.data.database import Database
 from bot.bot_secrets import BotSecrets
 from bot.errors import PrimaryKeyError
 from bot.consts import Colors
+from bot.data.logout_repository import LogoutRepository
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
@@ -41,6 +43,11 @@ class ClemBot(commands.Bot):
 
         log.info(f'Logged on as {self.user}')
 
+    async def close(self) -> None:
+        log.info('Shut downstarted: logging close time')
+        await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
+        await super().close()
+
     async def on_message(self, message) -> None:
         """
         Primary entry point for on_message events, all this serves to do is 
@@ -56,10 +63,23 @@ class ClemBot(commands.Bot):
             self.global_error_hander(e)
 
     async def on_guild_join(self, guild):
-        pass
+        await messenger.publish(Events.on_guild_joined, guild)
 
     async def on_guild_role_create(self, role):
-        pass
+        await messenger.publish(Events.on_guild_role_create, role)
+
+    async def on_guild_role_update(self, before, after):
+        await messenger.publish(Events.on_guild_role_update, before, after)
+
+    async def on_guild_role_delete(self, role):
+        await messenger.publish(Events.on_guild_role_delete, role)
+
+    async def on_message_edit(self, before, after):
+        if before.author.id != self.user.id:
+            await messenger.publish(Events.on_message_edit, before, after)
+    
+    async def on_message_delete(self, message):
+        await messenger.publish(Events.on_message_delete, message)
 
     async def on_command_error(self, ctx, e):
         """
@@ -70,7 +90,8 @@ class ClemBot(commands.Bot):
             ctx ([type]): The context that the command that errored was sent from
             e ([type]): The unhandled exception
         """
-        embed = discord.Embed(title="ERROR: unhandled command exception", color=Colors.Error)
+
+        embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
         embed.add_field(name=ctx.author, value= e)
         await ctx.channel.send(embed= embed)
         self.global_error_hander(e)

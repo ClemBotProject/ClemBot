@@ -9,10 +9,10 @@ log = logging.getLogger(__name__)
 
 class Database:
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.database_name = name
 
-    async def create_database(self) -> bool:
+    async def create_database(self):
         if not os.path.exists('database'):
             log.info('Database Folder not found: Creating one')
             os.makedirs('database')

@@ -23,3 +23,11 @@ class PrimaryKeyError(Error):
 
     def __init__(self, message: str):
         self.message = message
+
+class DesignatedChannelError(Error):
+    """
+    Raised if a channel is set to a designated channel type the doesnt exist
+    """
+
+    def __init__(self, message: str):
+        self.message = message
