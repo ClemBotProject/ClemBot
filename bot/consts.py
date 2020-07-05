@@ -11,3 +11,4 @@ class DesignatedChannels(Enum):
 
     message_log = auto()
     moderation_log = auto()
+    error_log = auto()
