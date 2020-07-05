@@ -75,7 +75,7 @@ class ClemBot(commands.Bot):
         await messenger.publish(Events.on_guild_role_delete, role)
 
     async def on_message_edit(self, before, after):
-        if before.author.id != self.user.id:
+        if before.author.id != self.user.id and len(before.embeds) == 0:
             await messenger.publish(Events.on_message_edit, before, after)
     
     async def on_message_delete(self, message):
