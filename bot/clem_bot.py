@@ -4,6 +4,7 @@ import typing as t
 from types import ModuleType
 import pkgutil
 import datetime
+import traceback
 
 import discord
 from discord.ext import commands
@@ -15,7 +16,7 @@ import bot.messaging.messenger as messenger
 from bot.data.database import Database
 from bot.bot_secrets import BotSecrets
 from bot.errors import PrimaryKeyError
-from bot.consts import Colors
+from bot.consts import Colors, DesignatedChannels
 from bot.data.logout_repository import LogoutRepository
 log = logging.getLogger(__name__)
 
@@ -60,27 +61,34 @@ class ClemBot(commands.Bot):
         try:
             await messenger.publish(Events.on_message_recieved, message)
         except Exception as e:
-            self.global_error_hander(e)
+            await self.global_error_handler(e)
 
     async def on_guild_join(self, guild):
-        await messenger.publish(Events.on_guild_joined, guild)
+        await self.publish_with_error(Events.on_guild_joined, guild)
 
     async def on_guild_role_create(self, role):
-        await messenger.publish(Events.on_guild_role_create, role)
+        await self.publish_with_error(Events.on_guild_role_create, role)
 
     async def on_guild_role_update(self, before, after):
-        await messenger.publish(Events.on_guild_role_update, before, after)
+        await self.publish_with_error(Events.on_guild_role_update, before, after)
 
     async def on_guild_role_delete(self, role):
-        await messenger.publish(Events.on_guild_role_delete, role)
+        await self.publish_with_error(Events.on_guild_role_delete, role)
 
     async def on_message_edit(self, before, after):
         if before.author.id != self.user.id and len(before.embeds) == 0:
-            await messenger.publish(Events.on_message_edit, before, after)
+            await self.publish_with_error(Events.on_message_edit, before, after)
     
     async def on_message_delete(self, message):
         if message.author.id != self.user.id:
-            await messenger.publish(Events.on_message_delete, message)
+            await self.publish_with_error(Events.on_message_delete, message)
+        
+    async def publish_with_error(self, *args, **kwargs):
+        try:
+            await messenger.publish(*args, **kwargs)
+        except Exception as e:
+            tb = traceback.format_exc()
+            await self.global_error_handler(e, traceback= tb)
 
     async def on_command_error(self, ctx, e):
         """
@@ -95,19 +103,26 @@ class ClemBot(commands.Bot):
         embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
         embed.add_field(name=ctx.author, value= e)
         await ctx.channel.send(embed= embed)
-        self.global_error_hander(e)
+        await self.global_error_handler(e)
 
     async def on_raw_reaction_add(self, reaction) -> None:
         log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
 
-    def global_error_hander(self, e):
+    async def global_error_handler(self, e, *, traceback: str = None):
         """
         This is the global error handler for all uncaught exceptions, if an exception is 
         thrown and not handled it will end up here
 
         Args:
-            e (Str): The unhandled exception
+            e (Error): The unhandled exception
+            traceback (str): The string traceback of the throw error
         """        
+
+        if traceback:
+            embed = discord.Embed(title= 'Unhandled Exception Thrown', color= Colors.Error)
+            embed.add_field(name= 'Traceback:', value= f'```{traceback}```')
+            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.error_log, embed)
+
         log.exception(e)
 
     """
@@ -124,7 +139,7 @@ class ClemBot(commands.Bot):
         try:
             await s.load_service()
         except Exception as e:
-            self.global_error_hander(e)
+            await self.global_error_handler(e)
         self.active_services[service.__name__] = s
     
     async def load_services(self) -> None:
