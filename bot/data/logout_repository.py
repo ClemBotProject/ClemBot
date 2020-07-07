@@ -1,5 +1,4 @@
 import aiosqlite
-import datetime
 
 from bot.data.base_repository import BaseRepository
 

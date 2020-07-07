@@ -1,6 +1,6 @@
-from bot.messaging.events import Events
-from bot.services.base_service import BaseService
 from bot.data.guild_repository import GuildRepository
+from bot.services.base_service import BaseService
+
 
 class GuildHandling(BaseService):
 
@@ -16,4 +16,3 @@ class GuildHandling(BaseService):
     async def load_service(self):
         for guild in self.bot.guilds:
             await self.add_guild(guild)
-

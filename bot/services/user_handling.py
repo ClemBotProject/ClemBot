@@ -1,9 +1,8 @@
 import logging
 
+from bot.data.user_repository import UserRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-from bot.data.user_repository import UserRepository
-import bot.messaging.messenger as messenger
 
 log = logging.getLogger(__name__)
 

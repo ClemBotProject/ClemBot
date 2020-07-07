@@ -2,6 +2,7 @@ import json
 import logging
 
 from bot.errors import ConfigAccessError
+
 log = logging.getLogger(__name__)
 
 class BotSecrets:

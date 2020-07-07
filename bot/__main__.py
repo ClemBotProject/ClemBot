@@ -1,9 +1,7 @@
 import logging
-import sys
 import os
+import sys
 from datetime import datetime
-
-import discord
 
 from bot.bot_secrets import BotSecrets
 from bot.clem_bot import ClemBot as ClemBot
@@ -54,12 +52,10 @@ def main():
 
     if token is not None:
         BotSecrets.get_instance().bot_token = token
-
+    
     bot_log.info('Bot Starting Up')
     ClemBot(command_prefix = '$', max_messages= 5000).run(BotSecrets.get_instance().bot_token)
 
 
 if __name__ == "__main__":
     main()
-
-

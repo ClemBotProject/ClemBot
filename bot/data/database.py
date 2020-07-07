@@ -1,6 +1,5 @@
-import os
-from typing import Iterator
 import logging
+import os
 
 import aiosqlite
 

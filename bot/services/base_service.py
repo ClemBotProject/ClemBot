@@ -3,6 +3,7 @@ import inspect
 
 import bot.messaging.messenger as messenger
 
+
 class BaseService(abc.ABC):
     """
     This is the base service class that all services must inherit from

@@ -3,10 +3,11 @@ from typing import Union
 
 import discord
 
-from bot.services.base_service import BaseService
 from bot.consts import DesignatedChannels
-from bot.messaging.events import Events
 from bot.data.designated_channel_repository import DesignatedChannelRepository
+from bot.messaging.events import Events
+from bot.services.base_service import BaseService
+
 log = logging.getLogger(__name__)
 
 class DesignatedChannelService(BaseService):
