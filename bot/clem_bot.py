@@ -58,10 +58,8 @@ class ClemBot(commands.Bot):
             message ([type]): The d.py message object
         """
 
-        try:
-            await messenger.publish(Events.on_message_recieved, message)
-        except Exception as e:
-            await self.global_error_handler(e)
+        if message.author.id != self.user.id:
+            await self.publish_with_error(Events.on_message_recieved, message)
 
     async def on_guild_join(self, guild):
         await self.publish_with_error(Events.on_guild_joined, guild)
