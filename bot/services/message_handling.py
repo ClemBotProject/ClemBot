@@ -60,7 +60,8 @@ class MessageHandling(BaseService):
             message (discord.Message): the original message containing the link
         """
 
-        pattern = r'^https:\/\/discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})$'
+        pattern = r'^http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})$'
+        
         result = re.search(pattern, message.content)
         if result:
             matches = result.groupdict()
