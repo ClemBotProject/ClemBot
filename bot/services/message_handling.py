@@ -66,17 +66,18 @@ class MessageHandling(BaseService):
             matches = result.groupdict()
             avi = message.author.avatar_url
 
-            channel = await self.bot.fetch_channel(matches['channel_id'])
-            link_message = await channel.fetch_message(matches['message_id'])
+            source_channel = message.channel
+            link_channel = await self.bot.fetch_channel(matches['channel_id'])
+            link_message = await link_channel.fetch_message(matches['message_id'])
 
-            embed = discord.Embed(title=f'Message linked from #{channel.name}', color= Colors.ClemsonOrange)
+            embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color= Colors.ClemsonOrange)
             embed.set_author(name= f'Quoted by: {self.get_full_name(message.author)}', icon_url= avi)
             embed.add_field(name= 'Content', value= f'`{link_message.content}`', inline= False)
             embed.add_field(name= 'Author', value= f'{self.get_full_name(link_message.author)}', inline= True)
             embed.add_field(name= 'Message Link', value= f'[Click Me]({link_message.jump_url})', inline= True)
 
             await message.delete()
-            await channel.send(embed= embed)
+            await source_channel.send(embed= embed)
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
