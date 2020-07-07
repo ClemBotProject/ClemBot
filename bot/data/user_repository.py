@@ -1,9 +1,9 @@
-import aiosqlite
-import sqlite3
 import logging
 
+import aiosqlite
+
 from bot.data.base_repository import BaseRepository
-from bot.errors import PrimaryKeyError
+
 log = logging.getLogger(__name__)
 class UserRepository(BaseRepository):
 

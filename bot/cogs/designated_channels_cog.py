@@ -3,8 +3,9 @@ import logging
 import discord
 import discord.ext.commands as commands
 
-from bot.data.designated_channel_repository import DesignatedChannelRepository
 from bot.consts import Colors
+from bot.data.designated_channel_repository import DesignatedChannelRepository
+
 log = logging.getLogger(__name__)
 
 class DesignatedChannelsCog(commands.Cog):

@@ -1,8 +1,10 @@
-import aiosqlite
 from typing import List
+
+import aiosqlite
 
 from bot.data.base_repository import BaseRepository
 from bot.errors import DesignatedChannelError
+
 
 class DesignatedChannelRepository(BaseRepository):
 

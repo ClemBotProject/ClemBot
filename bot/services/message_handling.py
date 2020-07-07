@@ -2,11 +2,11 @@ import logging
 
 import discord
 
+import bot.messaging.messenger as messenger
+from bot.consts import Colors, DesignatedChannels
+from bot.data.message_repository import MessageRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-from bot.consts import DesignatedChannels, Colors
-from bot.data.message_repository import MessageRepository
-import bot.messaging.messenger as messenger
 
 log = logging.getLogger(__name__)
 

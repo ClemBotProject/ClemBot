@@ -1,23 +1,23 @@
+import datetime
 import importlib
 import logging
+import pkgutil
+import traceback
 import typing as t
 from types import ModuleType
-import pkgutil
-import datetime
-import traceback
 
 import discord
 from discord.ext import commands
 
 import bot.cogs as cogs
-import bot.services as services
-from bot.messaging.events import Events
 import bot.messaging.messenger as messenger
-from bot.data.database import Database
+import bot.services as services
 from bot.bot_secrets import BotSecrets
-from bot.errors import PrimaryKeyError
 from bot.consts import Colors, DesignatedChannels
+from bot.data.database import Database
 from bot.data.logout_repository import LogoutRepository
+from bot.messaging.events import Events
+
 log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):

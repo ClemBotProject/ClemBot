@@ -1,8 +1,6 @@
-import asyncio
+import weakref as wr
 from inspect import ismethod
 from typing import Callable, Union
-
-import weakref as wr
 
 """This is the global message bus that handles all application level events"""
 

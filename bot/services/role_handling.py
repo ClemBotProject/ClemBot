@@ -1,9 +1,9 @@
 import logging
 
+from bot.data.role_repository import RoleRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-from bot.data.role_repository import RoleRepository
-from bot.messaging import messenger
+
 log = logging.getLogger(__name__)
 
 class RoleHandling(BaseService):
