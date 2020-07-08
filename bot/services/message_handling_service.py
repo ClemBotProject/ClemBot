@@ -11,7 +11,7 @@ from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
-class MessageHandling(BaseService):
+class MessageHandlingService(BaseService):
 
     def __init__(self, *, bot):
         super().__init__(bot)
