@@ -56,6 +56,7 @@ class ClemBot(commands.Bot):
         embed.set_thumbnail(url= self.user.avatar_url)
         await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.startup_log, embed)
 
+
         log.info('Shutdown started: logging close time')
         await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
         await super().close()
