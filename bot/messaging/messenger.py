@@ -11,7 +11,7 @@ WeakObjOrMethod = Union[wr.WeakMethod, wr.ref]
 DeadRefObserver = Callable[[WeakObjOrMethod], None]
 
 async def publish(event: str, *args) -> None:
-    """publishes an event onto the global message queue with accompanying arguements  """
+    """publishes an event onto the global message queue with accompanying arguements"""
     if event in events.keys():
         for sub in events[event]:
             await sub()(*args)
