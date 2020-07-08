@@ -42,10 +42,21 @@ class ClemBot(commands.Bot):
         await Database(BotSecrets.get_instance().database_name).create_database()
         await self.load_services()
 
+        #Send the ready event AFTER services have been loaded so that the designated channel service is there
+        embed = discord.Embed(title='Bot Ready', color= Colors.ClemsonOrange)
+        embed.add_field(name= 'Startup Time', value= datetime.datetime.utcnow())
+        embed.set_thumbnail(url= self.user.avatar_url)
+        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.startup_log, embed)
+
         log.info(f'Logged on as {self.user}')
 
     async def close(self) -> None:
-        log.info('Shut downstarted: logging close time')
+        embed = discord.Embed(title='Bot Shutting down', color= Colors.ClemsonOrange)
+        embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
+        embed.set_thumbnail(url= self.user.avatar_url)
+        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.startup_log, embed)
+
+        log.info('Shutdown started: logging close time')
         await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
         await super().close()
 
@@ -109,11 +120,12 @@ class ClemBot(commands.Bot):
     async def global_error_handler(self, e, *, traceback: str = None):
         """
         This is the global error handler for all uncaught exceptions, if an exception is 
-        thrown and not handled it will end up here
+        thrown and not handled it will end up here. If a traceback is included in the call then
+        that traceback will also be logged in a designated error channel
 
         Args:
             e (Error): The unhandled exception
-            traceback (str): The string traceback of the throw error
+            traceback (str) default= None: The string traceback of the throw error
         """        
 
         if traceback:
