@@ -2,7 +2,7 @@ from bot.data.guild_repository import GuildRepository
 from bot.services.base_service import BaseService
 
 
-class GuildHandling(BaseService):
+class GuildHandlingService(BaseService):
 
     def __init__(self, *, bot):
         super().__init__(bot)

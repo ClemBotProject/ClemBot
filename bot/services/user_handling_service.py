@@ -6,7 +6,7 @@ from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
-class UserHandling(BaseService):
+class UserHandlingService(BaseService):
 
     def __init__(self, *, bot):
         super().__init__(bot)
