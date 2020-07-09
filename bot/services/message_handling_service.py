@@ -65,7 +65,7 @@ class MessageHandlingService(BaseService):
         result = re.search(pattern, message.content)
         if result:
             matches = result.groupdict()
-            avi = message.author.avatar_url
+            avi = message.author.avatar_url_as(static_format= 'png')
 
             source_channel = message.channel
             link_channel = await self.bot.fetch_channel(matches['channel_id'])

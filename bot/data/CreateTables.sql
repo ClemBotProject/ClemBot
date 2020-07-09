@@ -33,10 +33,11 @@ CREATE TABLE IF NOT EXISTS Channels (
 );
 
 CREATE TABLE IF NOT EXISTS Roles (
-	id          INTEGER     PRIMARY KEY,
-    fk_guildId  INTEGER     NOT NULL,
-  	name        TEXT        NOT NULL,
-  	position    INTEGER     NOT NULL,
+	id                  INTEGER     PRIMARY KEY,
+    fk_guildId          INTEGER     NOT NULL,
+  	name                TEXT        NOT NULL,
+  	position            INTEGER     NOT NULL,
+    isRoleAssignable    BOOlEAN     DEFAULT false,     
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id)
 );
