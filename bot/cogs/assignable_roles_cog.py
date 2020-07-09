@@ -30,7 +30,7 @@ class AssignableRolesCog(commands.Cog):
             else:
                 names = 'No currently assignable channels'
 
-            embed = discord.Embed(title= 'Assignable Channels', color= Colors.ClemsonOrange)
+            embed = discord.Embed(title= 'Assignable Roles', color= Colors.ClemsonOrange)
             embed.add_field(name= 'Available:', value= names)
 
             await ctx.send(embed= embed)
