@@ -17,7 +17,7 @@ class RoleHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_role_delete)
     async def on_role_delete(self, role):
-        await RoleRepository().role_role(role, role.guild.id)
+        await RoleRepository().delete_role(role.id)
         await self.refresh_roles(role)
 
     @BaseService.Listener(Events.on_guild_role_update)
