@@ -3,12 +3,14 @@ import re
 
 import discord
 import discord.ext.commands as commands
+
 from bot.errors import ParserError
+from bot.consts import Colors
 
 log = logging.getLogger(__name__)
 
 
-class Calculator(commands.Cog):
+class CalculatorCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,12 +25,19 @@ class Calculator(commands.Cog):
 
     @commands.command()
     async def calc(self, ctx, *args):
-
-        embed = discord.Embed(title="🧮Calculator", color=0x0080ff)
-
+        """
+        A simple casculator that supports pemdas.
+        Examples:
+            $calc 3(5+4)
+            $calc -4*-3^5
+            $calc (-10-4)/5
+        """
+        
         expression = " ".join(args)
 
         try:
+
+            embed = discord.Embed(title="🧮Calculator", color=Colors.ClemsonOrange)
 
             result = self.parse_postfix(self.parse_expression(expression))
             
@@ -37,7 +46,7 @@ class Calculator(commands.Cog):
             embed.add_field(name="Result", value=result, inline=False)
             
         except ParserError as error:
-            embed = discord.Embed(title="🧮Calculator", color=0x0080ff)
+            embed = discord.Embed(title="🧮Calculator", color=Colors.Error)
 
             embed.add_field(name="Error", value=error)
     
@@ -156,7 +165,7 @@ class Calculator(commands.Cog):
         expression = self.preprocess(expression)
         
         # parse expression into a list of numbers and symbols
-        tokens = re.findall("-?\d*\.?\d*|[+^/*()-]", expression)
+        tokens = re.findall(r"-?\d*\.?\d*|[+^/*()-]", expression)
 
         if self.validateExpression(tokens) is False:
             raise ParserError(f"Equation not properly balanced")
@@ -252,4 +261,4 @@ class Calculator(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Calculator(bot))
+    bot.add_cog(CalculatorCog(bot))
