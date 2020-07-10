@@ -128,12 +128,22 @@ class ClemBot(commands.Bot):
             traceback (str) default= None: The string traceback of the throw error
         """        
 
+        #log the exception first thing so we can be sure we got it
+        log.exception(e)
+
         if traceback:
             embed = discord.Embed(title= 'Unhandled Exception Thrown', color= Colors.Error)
-            embed.add_field(name= 'Traceback:', value= f'```{traceback}```')
-            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.error_log, embed)
+            field_length = 1000
 
-        log.exception(e)
+            #this code will split the traceback into 1000 char chunks because 
+            # the embed will fail if we attempt to send more then that
+            tb_split = [traceback[i:i + field_length] for i in range(0, len(traceback), field_length)]
+
+            for i, field in enumerate(tb_split):
+                field_name = 'Traceback' if i == 0 else 'Continued'
+                embed.add_field(name= field_name, value= f'```{field}```', inline= False)
+
+            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.error_log, embed)
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.
