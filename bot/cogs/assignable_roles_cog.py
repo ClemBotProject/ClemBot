@@ -4,6 +4,7 @@ import discord
 from discord.colour import Color
 import discord.ext.commands as commands
 from discord.ext.commands.converter import RoleConverter
+from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
 from bot.consts import Colors
@@ -17,23 +18,33 @@ class AssignableRolesCog(commands.Cog):
         self.bot = bot
     
     @commands.group(pass_context= True, invoke_without_command= True, aliases= ['role'])
-    async def roles(self, ctx, *, role: discord.Role = None) -> None:
+    async def roles(self, ctx, *, input_role: str = None) -> None:
 
-        if role:
-            await self.set_role(ctx, role)
+        if input_role is None:
+            await self.send_channel_list(ctx, 'Assignable Roles')
+            return
+        
+        try:
+            role = await commands.RoleConverter().convert(ctx, input_role)
+        except BadArgument:
+            await self.send_channel_list(ctx, f'@{input_role} not found')
+            return
+        
+        await self.set_role(ctx, role)
+
+    async def send_channel_list(self, ctx, title: str):
+        role_repo = RoleRepository()
+        results = await role_repo.get_assignable_roles(ctx.guild.id)
+
+        if results:
+            names = '\n'.join([role['name'] for role in results])
         else:
-            role_repo = RoleRepository()
-            results = await role_repo.get_assignable_roles(ctx.guild.id)
+            names = 'No currently assignable channels'
 
-            if results:
-                names = '\n'.join([role['name'] for role in results])
-            else:
-                names = 'No currently assignable channels'
+        embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
+        embed.add_field(name= 'Available:', value= names)
 
-            embed = discord.Embed(title= 'Assignable Roles', color= Colors.ClemsonOrange)
-            embed.add_field(name= 'Available:', value= names)
-
-            await ctx.send(embed= embed)
+        await ctx.send(embed= embed)
 
     async def set_role(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
