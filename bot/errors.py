@@ -31,3 +31,10 @@ class DesignatedChannelError(Error):
 
     def __init__(self, message: str):
         self.message = message
+
+class ParserError(Error):
+    """
+    Raised if user inputs bad data
+    """
+    def __init__(self, message: str):
+        self.message = message
