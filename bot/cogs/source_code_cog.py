@@ -38,11 +38,13 @@ class SourceCodeCog(commands.Cog):
             for chunk in self.chunk_iterable(file_tree, 1980):
                 await ctx.send(f'```yaml\n{chunk}```')
             return
-
         elif file == 'BotSecrets.json':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)
             await ctx.send(embed= embed)
             return
+        else:
+            file = file.replace('\\', '')
+            file = file.replace('`', '')
         
         if line_start is not None and line_stop is not None:
             if line_start >= line_stop:
