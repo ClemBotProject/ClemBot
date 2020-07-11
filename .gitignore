@@ -2,6 +2,7 @@
 *.sqlite
 
 settings.json
+Logs/
 
 #Bot Secrets
 BotSecrets.json
