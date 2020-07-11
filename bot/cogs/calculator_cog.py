@@ -13,8 +13,6 @@ log = logging.getLogger(__name__)
 class CalculatorCog(commands.Cog):
 
     def __init__(self, bot):
-        self.bot = bot
-        self._last_member = None
         self.operators = [
             {'symbol': "+", 'precedence': 0, 'assoc': "L"},
             {'symbol': "-", 'precedence': 0, 'assoc': "L"},
@@ -26,7 +24,7 @@ class CalculatorCog(commands.Cog):
     @commands.command()
     async def calc(self, ctx, *args):
         """
-        A simple casculator that supports pemdas.
+        A simple calculator that supports pemdas.
         Examples:
             $calc 3(5+4)
             $calc -4*-3^5
