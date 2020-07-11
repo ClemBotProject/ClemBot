@@ -10,25 +10,28 @@ log = logging.getLogger(__name__)
 
 
 class SourceCodeCog(commands.Cog):
+    """
+    A cog to allow the bot to print its own source code given a file name
+    """
 
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs/', 'venv/', '__pycache__/']
+        self.ignored = ['Logs/', 'venv/', '__pycache__/', 'BotSecrets.json']
 
-        """
-        with open('ClemBot/.gitignore') as f:
-            self.ignored = list(filter(None, [line.replace('\n', '') for line in f.readlines()]))
-        """
         for root, dirs, files in os.walk(os.getcwd(), topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             if not any(folder in f'{root}/' for folder in self.ignored):
                 for f in files:
                     self.bot_files[f] = os.path.join(root, f)
-        del self.bot_files['BotSecrets.json']
 
     @commands.command()
     async def source(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
+        """
+        Either prints the bots file structure as a tree or, if given a file, 
+        prints out the source code of that file. the beginning and ending line numbers to be 
+        printed can also be specified
+        """
 
         if file is None:
             file_tree = self.list_files(os.getcwd(), self.ignored)
