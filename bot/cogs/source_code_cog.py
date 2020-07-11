@@ -14,11 +14,12 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = []
+        self.ignored = ['Logs/', 'venv/', '__pycache__/']
 
-        with open('.gitignore') as f:
+        """
+        with open('ClemBot/.gitignore') as f:
             self.ignored = list(filter(None, [line.replace('\n', '') for line in f.readlines()]))
-
+        """
         for root, dirs, files in os.walk(os.getcwd(), topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             if not any(folder in f'{root}/' for folder in self.ignored):
