@@ -26,7 +26,7 @@ ping @Jayy#6249 for permissions to add bots
 ## Prepare bot for connecting to discord server
 * Click "OAuth2" in the left sidebar
 * In the "scopes" section, check `bot`
-* In the "bot permissions" section, check `Administrator`
+* In the "bot permissions" section, check the following boxes [![perms](https://i.postimg.cc/NFkdvDCY/perms.png)](https://postimg.cc/xNqvKvSF)
 * Copy the link from the "scopes" section and open in a new tab/window
 * Select the test server to add the bot to
 * Confirm you want to give the bot Administrator permissions
