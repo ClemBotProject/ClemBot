@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 import aiosqlite
 
@@ -15,7 +16,7 @@ class Database:
         if not os.path.exists('database'):
             log.info('Database Folder not found: Creating one')
             os.makedirs('database')
-        async with aiosqlite.connect(f'database/{self.database_name}') as db:
+        async with aiosqlite.connect(Path(f'database/{self.database_name}')) as db:
             #db.row_factory = aiosqlite.Row
             with open('bot/data/CreateTables.sql') as f:
                 await db.executescript(f.read())
