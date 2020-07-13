@@ -1,0 +1,12 @@
+{
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.pythonPath": "venv/bin/python",
+    "python.linting.banditEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": false,
+    "python.linting.flake8Args": [
+        "--max-line-length=130",
+        "--ignore=E402,F841,F401,E302,E251,E305,W291,W292,W293,W391,E265,E128",
+    ],
+}
