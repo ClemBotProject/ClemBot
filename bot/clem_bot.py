@@ -184,9 +184,9 @@ class ClemBot(commands.Bot):
         def on_error(name: str) -> t.NoReturn:
             raise ImportError(name=name)
 
-        for module in pkgutil.walk_packages(pkg.__path__, f'{module}.', onerror=on_error):
-            if not module.ispkg:
-                yield importlib.import_module(f'bot.{module.name}')
+        for _, name, ispkg in pkgutil.walk_packages(path=pkg.__path__, prefix=pkg.__name__ + '.', onerror= on_error):
+            if not ispkg:
+                yield importlib.import_module(name)
 
     @staticmethod
     def walk_types(module: ModuleType, base: any) -> t.Iterator[commands.Cog]:
