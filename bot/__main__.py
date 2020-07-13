@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 from bot.bot_secrets import BotSecrets
 from bot.clem_bot import ClemBot as ClemBot
@@ -22,7 +23,7 @@ def main():
     #sets up the logging for discord.py
     disc_log = logging.getLogger('discord')
     disc_log.setLevel(logging.DEBUG)
-    disc_log_name = f'Logs/{datetime.now().strftime("%Y-%m-%d-%H:%M:%S")}_discord.log'
+    disc_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H:%M:%S")}_discord.log')
     handler = logging.FileHandler(filename= disc_log_name, encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     disc_log.addHandler(handler)
@@ -30,7 +31,7 @@ def main():
     #creates the logger for the Bot Itself
     setup_logger()
     bot_log = logging.getLogger('bot')
-    bot_log_name = f'Logs/{datetime.now().strftime("%Y-%m-%d-%H:%M:%S")}_bot.log'
+    bot_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H:%M:%S")}_bot.log')
     bot_file_handle = logging.FileHandler(filename= bot_log_name, encoding='utf-8', mode='w')
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
