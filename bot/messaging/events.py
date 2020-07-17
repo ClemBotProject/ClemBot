@@ -17,6 +17,18 @@ class Events:
         """
         return self._on_message_recieved
 
+    _on_raw_message_edit = 'on_raw_message_edit'
+    @property
+    def on_raw_message_edit(self):
+        """
+        Published when a Message receives an update event and is not in the cache
+
+        Args:
+
+            payload (Edit Object) – The edit payload with the id of the edited message
+        """
+        return self._on_raw_message_edit
+
     _on_message_edit = 'on_message_edit'
     @property
     def on_message_edit(self):
@@ -31,7 +43,19 @@ class Events:
         """
         return self._on_message_edit
 
+    _on_raw_message_delete = 'on_raw_message_edit'
+    @property
+    def on_raw_message_delete(self):
+        """
+        Published when a Message receives an update event and is not in the cache
+
+        Args:
+
+            payload (Edit Object) – The delete payload with the id of the edited message
+        """
+        return self._on_raw_message_delete
     _on_message_delete = 'on_message_delete'
+
     @property
     def on_message_delete(self):
         """

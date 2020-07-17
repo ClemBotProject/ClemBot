@@ -2,6 +2,7 @@ import datetime
 import importlib
 import logging
 import pkgutil
+from sqlite3.dbapi2 import paramstyle
 import traceback
 import typing as t
 from types import ModuleType
@@ -87,11 +88,20 @@ class ClemBot(commands.Bot):
     async def on_message_edit(self, before, after):
         if before.author.id != self.user.id and len(before.embeds) == 0:
             await self.publish_with_error(Events.on_message_edit, before, after)
+
+    async def on_raw_message_edit(self, payload):
+        #if before.author.id != self.user.id and len(before.embeds) == 0:
+        if payload.cached_message is None:
+            await self.publish_with_error(Events.on_raw_message_edit, payload)
     
     async def on_message_delete(self, message):
         if message.author.id != self.user.id:
             await self.publish_with_error(Events.on_message_delete, message)
-        
+
+    async def on_raw_message_delete(self, payload):
+        if payload.cached_message is None:
+            await self.publish_with_error(Events.on_raw_message_delete, payload) 
+
     async def publish_with_error(self, *args, **kwargs):
         try:
             await messenger.publish(*args, **kwargs)
