@@ -58,7 +58,7 @@ class MessageHandlingService(BaseService):
 
             await message_repo.edit_message_content(message['id'], payload.data['content'])
 
-            embed = discord.Embed(title= f':repeat: **Non Cached message edited in #{channel.name}**',
+            embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
                 color= Colors.ClemsonOrange)
 
             embed.add_field(name= 'Before', value= f'```{message["content"]}```', inline= False)
@@ -70,7 +70,7 @@ class MessageHandlingService(BaseService):
             log.info(f'Uncached message edited in #{channel.name} By: \
                 {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
 
-            embed = discord.Embed(title= f':repeat: **Non Cached message edited in #{channel.name}**',
+            embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
                 color= Colors.ClemsonOrange)
 
             embed.add_field(name= 'Before', value= 'Unknown, message not stored in the database', inline= False)
