@@ -79,9 +79,9 @@ class AssignableRolesCog(commands.Cog):
 
         await ctx.send(embed= embed)
 
-    @roles.command(pass_context= True)
+    @roles.command(pass_context= True, aliases= ['create'])
     @commands.has_role('Admin')
-    async def add(self, ctx, role: discord.Role = None, aliases= ['create']) -> None:
+    async def add(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
 
         await role_repo.set_role_assignable(role.id, True)
@@ -91,9 +91,9 @@ class AssignableRolesCog(commands.Cog):
 
         await ctx.send(embed= embed)
 
-    @roles.command(pass_context= True)
+    @roles.command(pass_context= True, aliases= ['delete'])
     @commands.has_role('Admin')
-    async def remove(self, ctx, role: discord.Role = None, aliases= ['delete']) -> None:
+    async def remove(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
 
         await role_repo.set_role_assignable(role.id, False)
