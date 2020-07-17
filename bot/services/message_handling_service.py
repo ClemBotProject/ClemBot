@@ -68,7 +68,7 @@ class MessageHandlingService(BaseService):
             await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
         else:
             log.info(f'Uncached message edited in #{channel.name} By: \
-                {message["fk_authorId"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
+                {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
 
             embed = discord.Embed(title= f':repeat: **Non Cached message edited in #{channel.name}**',
                 color= Colors.ClemsonOrange)
