@@ -35,7 +35,7 @@ ping @Jayy#6249 for permissions to add bots
 ## Prepare the Repo
 * Fork this repo
 * `git clone` your fork to wherever you want to work on this bot
-* Rename `BotSecrets.json.template` to `BotSecrets.json`
+* Copy `BotSecrets.json.template` and rename that copy to `BotSecrets.json`
 * Copy/paste the token from the Discord page into the `BotToken` empty string
 * Create a database name (Whatever you want it doesnt matter)
 
