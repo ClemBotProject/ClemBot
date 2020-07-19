@@ -29,8 +29,6 @@ ping @Jayy#6249 for permissions to add bots
 * In the "bot permissions" section, check the following boxes [![perms](https://i.postimg.cc/NFkdvDCY/perms.png)](https://postimg.cc/xNqvKvSF)
 * Copy the link from the "scopes" section and open in a new tab/window
 * Select the test server to add the bot to
-* Confirm you want to give the bot Administrator permissions
-
 
 ## Prepare the Repo
 * Fork this repo
