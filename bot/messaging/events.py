@@ -69,7 +69,7 @@ class Events:
     _on_reaction_add = 'on_reaction_add'
     @property
     def on_reaction_add(self):
-        """"
+        """
         Published whenever a reaction is sent in a server, and that message is stored
         in d.pys internal cache
 
@@ -93,7 +93,7 @@ class Events:
     _on_reaction_remove = 'on_reaction_remove'
     @property
     def on_reaction_remove(self):
-        """"
+        """
         Published whenever a reaction is removed in a server, and that message is stored
         in d.pys internal cache
 
@@ -117,7 +117,7 @@ class Events:
     _on_guild_joined = 'on_guild_joined'
     @property
     def on_guild_joined(self):
-        """"
+        """
         Published whenever the bot joins new guild
 
         Args:
@@ -128,7 +128,7 @@ class Events:
     _on_guild_role_create = 'on_guild_role_create'
     @property
     def on_guild_role_create(self):
-        """"
+        """
         published whenever a guild role is created in a guild
         
         Args:
@@ -139,7 +139,7 @@ class Events:
     _on_guild_role_update = 'on_guild_role_update'
     @property
     def on_guild_role_update(self):
-        """"
+        """
         published whenever a guild role is updated in a guild
         
         Args:
@@ -151,7 +151,7 @@ class Events:
     _on_guild_role_delete = 'on_guild_role_delete'
     @property
     def on_guild_role_delete(self):
-        """"
+        """
         published whenever a guild role is deleted in a guild
         
         Args:
@@ -162,7 +162,7 @@ class Events:
     _on_user_joined = 'on_user_joined'
     @property
     def on_user_joined(self):
-        """"
+        """
         Published whenever a new user joins a guild
         
         Args:
@@ -173,7 +173,7 @@ class Events:
     _on_user_left = 'on_user_left'
     @property
     def on_user_left(self):
-        """"
+        """
         Published whenever a user leaves a guild
         
         Args:
@@ -184,7 +184,7 @@ class Events:
     _on_user_update = 'on_user_update'
     @property
     def on_user_update(self):
-        """"
+        """
         Published whenever a user updates themselves
         
         Args:
