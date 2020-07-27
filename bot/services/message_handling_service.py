@@ -43,7 +43,10 @@ class MessageHandlingService(BaseService):
         embed.add_field(name= 'After', value= f'```{after.content}```', inline= False)
         embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url= before.author.avatar_url)
 
-        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
+        await messenger.publish(Events.on_send_in_designated_channel,
+                DesignatedChannels.message_log, 
+                after.guild.id, 
+                embed)
     
     @BaseService.Listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
@@ -77,7 +80,10 @@ class MessageHandlingService(BaseService):
             embed.add_field(name= 'After', value= f'```{payload.data["content"]}```', inline= False)
             embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
 
-            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
+            await messenger.publish(Events.on_send_in_designated_channel,
+                    DesignatedChannels.message_log, 
+                    payload.guild.id,
+                    embed)
 
     @BaseService.Listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):
@@ -91,7 +97,10 @@ class MessageHandlingService(BaseService):
         embed.add_field(name= 'Message', value= f'```{message.content}```', inline= False)
         embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url= message.author.avatar_url)
 
-        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
+        await messenger.publish(Events.on_send_in_designated_channel,
+                DesignatedChannels.message_log,
+                message.guild.id,
+                embed)
 
     @BaseService.Listener(Events.on_raw_message_delete)
     async def on_raw_message_delete(self, payload):
@@ -113,7 +122,10 @@ class MessageHandlingService(BaseService):
                 color= Colors.ClemsonOrange)
             embed.add_field(name= 'Message', value= 'Unknown, message not in the database', inline= False)
 
-        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
+        await messenger.publish(Events.on_send_in_designated_channel, 
+                DesignatedChannels.message_log, 
+                payload.guild.id,
+                embed)
     
     async def handle_message_links(self, message: discord.Message) -> None:
         """

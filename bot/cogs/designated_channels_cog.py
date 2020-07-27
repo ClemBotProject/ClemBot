@@ -29,7 +29,7 @@ class DesignatedChannelsCog(commands.Cog):
 
         for designated_id, name in channels:
             assigned_channels = []
-            for channel_id in await channel_repo.get_all_assigned_channels(name):
+            for channel_id in await channel_repo.get_guild_designated_channels(name, ctx.guild.id):
                 assigned_channels.append(ctx.bot.get_channel(channel_id))
 
             if len(assigned_channels) != 0:
@@ -61,7 +61,7 @@ class DesignatedChannelsCog(commands.Cog):
             await ctx.send(f'The requested designated channel `{channel_type}` does not exist')
             return
 
-        if channel.id in await channel_repo.get_all_assigned_channels(channel_type):
+        if channel.id in await channel_repo.get_guild_designated_channels(channel_type, ctx.guild.id):
             await ctx.send(f'{channel.mention} already registered to `{channel_type}`')
             return
         
@@ -92,7 +92,7 @@ class DesignatedChannelsCog(commands.Cog):
             await ctx.send(f'The requested designated channel `{channel_type}` does not exist')
             return
 
-        if channel.id not in await channel_repo.get_all_assigned_channels(channel_type):
+        if channel.id not in await channel_repo.get_guild_designated_channels(channel_type, ctx.guild.id):
             await ctx.send(f'{channel.mention} is not registered to `{channel_type}`')
             return
 
