@@ -9,6 +9,8 @@ class GuildRepository(BaseRepository):
 
     async def add_guild(self, guild) -> None:
         if await self.check_guild(guild.id): 
+            for c in guild.channels:
+                await self.add_channel(c, guild.id)
             return 
 
         async with aiosqlite.connect(self.resolved_db_path) as db:
