@@ -2,21 +2,65 @@ import logging
 
 import aiosqlite
 
-from bot.data.base_repository import BaseRepository
+import discord
 
+from bot.data.base_repository import BaseRepository
 log = logging.getLogger(__name__)
+
+
 class UserRepository(BaseRepository):
 
-    async def add_user(self, user: str, guild_id: int) -> None:
-        if await self.check_user(user.id):
+    async def add_user(self, user: discord.Member, guild_id: int) -> None:
+        """
+        Adds a User to the global users table and/or to the guild specific user tables
+
+        Args:
+            user (discord.Member)
+            guild_id (int)
+        """
+
+        if await self.check_user_guild(guild_id, user.id):
             return
 
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            await db.execute('INSERT INTO Users (id, fk_guildId, name) VALUES (?, ?, ?)', (user.id, guild_id, user.name))
+
+            if not await self.check_global_user(user.id):
+                await db.execute('INSERT INTO Users (id, name) VALUES (?, ?)', (user.id, user.name))
+
             await db.execute('INSERT INTO Users_Guilds VALUES (?, ?)', (guild_id, user.id))
             await db.commit()
 
-    async def check_user(self, user_id: int) -> bool:
+    async def check_global_user(self, user_id: int) -> bool:
+        """
+        Checks if the user is in the global users table
+
+        Args:
+            user_id (int)
+
+        Returns:
+            bool
+        """
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Users WHERE id = ?', (user_id,)) as c:
                 return await c.fetchone() is not None
+
+    async def check_user_guild(self, guild_id: int, user_id: int) -> bool:
+        """
+        Checks if a specific user is a logged member of a certain guild
+
+        Args:
+            guild_id (int)
+            user_id (int)
+
+        Returns:
+            bool
+        """
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(
+                    """
+                    SELECT * FROM Users_Guilds 
+                    WHERE fk_guildId = ? and fk_userId = ?
+                    """, (guild_id, user_id)) as c:
+                return await c.fetchone() is not None
+
+
