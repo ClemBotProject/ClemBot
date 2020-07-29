@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import List, Iterable
 
 import discord
 
@@ -39,8 +40,16 @@ class MessageHandlingService(BaseService):
 
         embed = discord.Embed(title= f':repeat: **Message Edited in #{before.channel.name}**', color= Colors.ClemsonOrange)
         embed.add_field(name= f'Message Link', value= f'[Click Here]({after.jump_url})')
-        embed.add_field(name= 'Before', value= f'```{before.content}```', inline= False)
-        embed.add_field(name= 'After', value= f'```{after.content}```', inline= False)
+
+        before_chunk = self.split_string_chunks(before.content, 900)
+        after_chunk = self.split_string_chunks(after.content, 900)
+
+        for i, val in enumerate(before_chunk): 
+            embed.add_field(name= '**Before**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
+        for i, val in enumerate(after_chunk): 
+            embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
         embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url= before.author.avatar_url)
 
         await messenger.publish(Events.on_send_in_designated_channel,
@@ -64,11 +73,21 @@ class MessageHandlingService(BaseService):
             embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
                 color= Colors.ClemsonOrange)
 
-            embed.add_field(name= 'Before', value= f'```{message["content"]}```', inline= False)
-            embed.add_field(name= 'After', value= f'```{payload.data["content"]}```', inline= False)
+            before_chunk = self.split_string_chunks(message['content'], 900)
+            after_chunk = self.split_string_chunks(payload.data['content'], 900)
+
+            for i, val in enumerate(before_chunk): 
+                embed.add_field(name= '**Before**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
+            for i, val in enumerate(after_chunk): 
+                embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
             embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
 
-            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.message_log, embed)
+            await messenger.publish(Events.on_send_in_designated_channel,
+                DesignatedChannels.message_log, 
+                int(payload.data['guild_id']), 
+                embed)
         else:
             log.info(f'Uncached message edited in #{channel.name} By: \
                 {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
@@ -77,13 +96,17 @@ class MessageHandlingService(BaseService):
                 color= Colors.ClemsonOrange)
 
             embed.add_field(name= 'Before', value= 'Unknown, message not stored in the database', inline= False)
-            embed.add_field(name= 'After', value= f'```{payload.data["content"]}```', inline= False)
+
+            after_chunk = self.split_string_chunks(payload.data['content'], 900)
+            for i, val in enumerate(after_chunk): 
+                embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
             embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
 
             await messenger.publish(Events.on_send_in_designated_channel,
-                    DesignatedChannels.message_log, 
-                    payload.guild.id,
-                    embed)
+                DesignatedChannels.message_log, 
+                int(payload.data['guild_id']), 
+                embed)
 
     @BaseService.Listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):
@@ -94,7 +117,11 @@ class MessageHandlingService(BaseService):
 
         embed = discord.Embed(title= f':wastebasket: **Message Deleted in #{message.channel.name}**',
             color= Colors.ClemsonOrange)
-        embed.add_field(name= 'Message', value= f'```{message.content}```', inline= False)
+
+        message_chunk = self.split_string_chunks(message.content, 900)
+        for i, val in enumerate(message_chunk): 
+            embed.add_field(name= '**Message**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
         embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url= message.author.avatar_url)
 
         await messenger.publish(Events.on_send_in_designated_channel,
@@ -116,16 +143,18 @@ class MessageHandlingService(BaseService):
         if message is not None:
             embed = discord.Embed(title= f':wastebasket: **Uncached message deleted in #{channel.name}**',
                 color= Colors.ClemsonOrange)
-            embed.add_field(name= 'Message', value= f'```{message["content"]}```', inline= False)
+            message_chunk = self.split_string_chunks(message['content'], 900)
+            for i, val in enumerate(message_chunk): 
+                embed.add_field(name= '**Message**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
         else:
             embed = discord.Embed(title= f':wastebasket: **Uncached message deleted in #{channel.name}**',
                 color= Colors.ClemsonOrange)
             embed.add_field(name= 'Message', value= 'Unknown, message not in the database', inline= False)
 
         await messenger.publish(Events.on_send_in_designated_channel, 
-                DesignatedChannels.message_log, 
-                payload.guild.id,
-                embed)
+            DesignatedChannels.message_log, 
+            int(payload.guild_id), 
+            embed)
     
     async def handle_message_links(self, message: discord.Message) -> None:
         """
@@ -159,5 +188,8 @@ class MessageHandlingService(BaseService):
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
     
+    def split_string_chunks(self, string: str, n: int) -> Iterable[str]:
+        return (string[i: i + n] for i in range(0, len(string), n))
+
     async def load_service(self):
         pass
