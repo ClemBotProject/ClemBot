@@ -36,6 +36,7 @@ ping @Jayy#6249 for permissions to add bots
 * Copy `BotSecrets.json.template` and rename that copy to `BotSecrets.json`
 * Copy/paste the token from the Discord page into the `BotToken` empty string
 * Create a database name (Whatever you want it doesnt matter)
+* Set a custom bot prefix that will invoke your commands 
 
 
 ## Setting up the build environment
