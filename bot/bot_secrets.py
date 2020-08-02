@@ -109,6 +109,8 @@ class BotSecrets:
         if self._botPrefix:
             raise ConfigAccessError(f'bot_prefix has already been initialized')
         self._botPrefix = value
+    
+    @property
     def gif_me(self) -> str:
         if not self._gifMe:
             raise ConfigAccessError(f'gif_me has not been intialized')
