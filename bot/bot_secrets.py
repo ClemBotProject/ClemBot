@@ -27,6 +27,7 @@ class BotSecrets:
         self._botToken = None
         self._databaseName = None
         self._botPrefix = None
+        self._gifMe = None
 
     @property
     def client_token(self) -> str:
@@ -108,6 +109,16 @@ class BotSecrets:
         if self._botPrefix:
             raise ConfigAccessError(f'bot_prefix has already been initialized')
         self._botPrefix = value
+    def gif_me(self) -> str:
+        if not self._gifMe:
+            raise ConfigAccessError(f'gif_me has not been intialized')
+        return self._gifMe
+
+    @gif_me.setter
+    def gif_me(self, value: str) -> None:
+        if self._gifMe:
+            raise ConfigAccessError(f'gif_me has already been initialized')
+        self._gifMe = value
 
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
@@ -118,3 +129,4 @@ class BotSecrets:
         self.bot_token = secrets['BotToken']
         self.database_name = secrets['DatabaseName'] or 'ClemBot'
         self.bot_prefix = secrets['BotPrefix'] or '!'
+        self.gif_me = secrets["GifMe"]
