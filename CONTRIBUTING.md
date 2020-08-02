@@ -19,7 +19,7 @@ Make sure you can run these commands and install them if not present.
 
 
 ## Join the test server
-[Click here to join the server](https://discord.gg/4xwKBs)
+[Click here to join the server](https://discord.gg/FACu8k4)
 ping @Jayy#6249 for permissions to add bots
 
 
