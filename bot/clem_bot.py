@@ -22,7 +22,9 @@ log = logging.getLogger(__name__)
 
 class ClemBot(commands.Bot):
     """
-    This is the base level bot class for ClemBot. this handles the sending of all api events
+    This is the base level bot class for ClemBot. 
+
+    This handles the sending of all api events
     as well as the dynamic loading of services and cogs
     """
 
@@ -72,7 +74,6 @@ class ClemBot(commands.Bot):
         Args:
             message ([type]): The d.py message object
         """
-
         if message.author.id != self.user.id:
             await self.publish_with_error(Events.on_message_recieved, message)
 

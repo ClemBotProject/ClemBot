@@ -1,9 +1,7 @@
 import logging
 
 import discord
-from discord.colour import Color
 import discord.ext.commands as commands
-from discord.ext.commands.converter import RoleConverter
 from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
