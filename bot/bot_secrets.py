@@ -26,6 +26,7 @@ class BotSecrets:
         self._clientSecret = None
         self._botToken = None
         self._databaseName = None
+        self._botPrefix = None
 
     @property
     def client_token(self) -> str:
@@ -96,6 +97,18 @@ class BotSecrets:
             raise ConfigAccessError(f'database_name has already been initialized')
         self._databaseName = f'{value}.sqlite'
 
+    @property
+    def bot_prefix(self) -> str:
+        if not self._botPrefix:
+            raise ConfigAccessError(f'bot_prefix has not been intialized')
+        return self._botPrefix
+
+    @bot_prefix.setter
+    def bot_prefix(self, value: str) -> None:
+        if self._botPrefix:
+            raise ConfigAccessError(f'bot_prefix has already been initialized')
+        self._botPrefix = value
+
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
@@ -103,4 +116,5 @@ class BotSecrets:
         self.client_token = secrets['ClientToken']
         self.client_secret = secrets['ClientSecret']
         self.bot_token = secrets['BotToken']
-        self.database_name = secrets['DatabaseName'] if secrets['DatabaseName'] is None else 'ClemBot'
+        self.database_name = secrets['DatabaseName'] or 'ClemBot'
+        self.bot_prefix = secrets['BotPrefix'] or '!'

@@ -11,10 +11,8 @@ class DesignatedChannelRepository(BaseRepository):
     async def get_all_assigned_channels(self, designated_name) -> List[int]:
         """
         Gets all the channels assigned to a specifc designation
-
         Args:
             designated_name ([type]): the string name of the designated channel
-
         Returns:
             List[int]: A list of ids of all registered channels
         """
@@ -27,6 +25,27 @@ class DesignatedChannelRepository(BaseRepository):
                     """, (designated_id,)) as c:
                 result = await c.fetchall()
                 return [v for _, v in result]
+
+    async def get_guild_designated_channels(self, designated_name: str, guild_id: int) -> List[int]:
+        """
+        Gets all the channels assigned to a specifc designation in a certain guild
+
+        Args:
+            designated_name ([type]): the string name of the designated channel
+
+        Returns:
+            List[int]: A list of ids of all registered channels
+        """
+        designated_id = await self.get_designated_id(designated_name)
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(
+                    """
+                    SELECT * FROM DesignatedChannels_Channels AS dc
+                    JOIN Channels AS c ON dc.fk_channelsId = c.id
+                    WHERE dc.fk_designatedChannelsId = ? AND c.fk_guildId = ?
+                    """, (designated_id, guild_id)) as c:
+                result = await self.fetcthall_as_dict(c)
+                return [r['fk_channelsId'] for r in result]
 
     async def get_all_designated_channels(self):
         """

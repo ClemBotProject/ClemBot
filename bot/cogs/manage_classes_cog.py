@@ -1,11 +1,8 @@
 import logging
-import asyncio
-import datetime
 
 import discord
 import discord.ext.commands as commands
 
-from bot.utils.scheduler import Scheduler
 log = logging.getLogger(__name__)
 
 
@@ -14,7 +11,6 @@ class ManageClassesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
-        self.scheduler = Scheduler()
 
     @commands.command()
     async def hello(self, ctx, *, member: discord.Member = None):

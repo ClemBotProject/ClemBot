@@ -38,7 +38,6 @@ class Events:
         Args:
 
             before (Message) – The previous version of the message.
-
             after (Message) – The current version of the message.
         """
         return self._on_message_edit
@@ -62,6 +61,7 @@ class Events:
         Published whenever a message is deleted while it exists in the cache
 
         Args:
+
             message (Message) – The message that was deleted
         """
         return self._on_message_delete
@@ -74,6 +74,7 @@ class Events:
         in d.pys internal cache
 
         Args:
+            
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who added the reaction.
         """
@@ -86,6 +87,7 @@ class Events:
         Called when a message has a reaction added. regardless of cache state
 
         Args:
+
             payload (RawReactionActionEvent) – The raw event payload data.
         """
         return self._on_raw_reaction_add
@@ -98,8 +100,9 @@ class Events:
         in d.pys internal cache
 
         Args:
+
             reaction (Reaction) – The current state of the reaction.
-            user (Union[Member, User]) – The user who removeed the reaction.
+            user (Union[Member, User]) – The user who removed the reaction.
         """
         return self._on_reaction_remove
 
@@ -110,6 +113,7 @@ class Events:
         Called when a message has a reaction removeed. regardless of cache state
 
         Args:
+
             payload (RawReactionActionEvent) – The raw event payload data.
         """
         return self._on_raw_reaction_remove
@@ -121,9 +125,24 @@ class Events:
         Published whenever the bot joins new guild
 
         Args:
+
             guild (Guild) – The guild that was joined.    
         """
         return self._on_guild_joined
+
+    _on_new_guild_initialized = '_on_new_guild_initialized'
+    @property
+    def on_new_guild_initialized(self):
+        """
+        Published whenever the bot joins a new guild and that guild has been created
+        in the bots database. This is the event that should be used for all new guild
+        related services
+
+        Args:
+
+            guild (Guild) – The guild that was joined.    
+        """
+        return self._on_new_guild_initialized
 
     _on_guild_role_create = 'on_guild_role_create'
     @property
@@ -132,6 +151,7 @@ class Events:
         published whenever a guild role is created in a guild
         
         Args:
+
             role (Role) – The role that was created or deleted.
         """
         return self._on_guild_role_create
@@ -143,6 +163,7 @@ class Events:
         published whenever a guild role is updated in a guild
         
         Args:
+
             before (Role) – The updated role’s old info.
             after (Role) – The updated role’s updated info.
         """
@@ -155,6 +176,7 @@ class Events:
         published whenever a guild role is deleted in a guild
         
         Args:
+
             role (Role) – The role that was created or deleted.
         """
         return self._on_guild_role_delete
@@ -166,6 +188,7 @@ class Events:
         Published whenever a new user joins a guild
         
         Args:
+
             user (User) – The user who joined or left.
         """
         return self._on_user_joined
@@ -177,6 +200,7 @@ class Events:
         Published whenever a user leaves a guild
         
         Args:
+
             user (User) – The user who joined or left.
         """
         return self._on_user_left
@@ -188,6 +212,7 @@ class Events:
         Published whenever a user updates themselves
         
         Args:
+
             before (User) – The updated user’s old info. 
             after (User) – The updated user’s updated info.
         """
@@ -200,18 +225,36 @@ class Events:
         Published whenever a designated channel id is added to a designated channel slot
 
         Args:
+
             channel (Channel) the channel object that was added
         """
         return self._on_add_designated_channel
 
     _on_send_in_designated_channel = 'on_send_in_designated_channel'
+
     @property
     def on_send_in_designated_channel(self):
         """
         Published when a reqeust to send a message in a designated channel is sent
 
         Args:
+
             channel_type (str) The designated channel to send the message in
+            guild_id (int) The id of the guild to attempt to send a message in
             message (union[embed, str]) the message to be sent to the channel
         """
         return self._on_send_in_designated_channel
+
+    _on_broadcast_designated_channel = '_on_broadcast_designated_channel'
+    @property
+    def on_broadcast_designated_channel(self):
+        """
+        Published when a reqeust to broadcast a message to all registered channels
+        in all servers is sent
+
+        Args:
+
+            channel_type (str) The designated channel to broadcast the message to
+            message (union[embed, str]) the message to be sent to the channels
+        """
+        return self._on_broadcast_designated_channel

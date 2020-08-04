@@ -48,7 +48,7 @@ class ClemBot(commands.Bot):
         embed = discord.Embed(title='Bot Ready', color= Colors.ClemsonOrange)
         embed.add_field(name= 'Startup Time', value= datetime.datetime.utcnow())
         embed.set_thumbnail(url= self.user.avatar_url)
-        await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.startup_log, embed)
+        await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
 
         log.info(f'Logged on as {self.user}')
 
@@ -58,13 +58,13 @@ class ClemBot(commands.Bot):
             embed = discord.Embed(title='Bot Shutting down', color= Colors.ClemsonOrange)
             embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
             embed.set_thumbnail(url= self.user.avatar_url)
-            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.startup_log, embed)
+            await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
+            await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
 
         log.info('Shutdown started: logging close time')
         await super().close()
-        await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
 
     async def on_message(self, message) -> None:
         """
@@ -157,7 +157,7 @@ class ClemBot(commands.Bot):
                 field_name = 'Traceback' if i == 0 else 'Continued'
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
-            await messenger.publish(Events.on_send_in_designated_channel, DesignatedChannels.error_log, embed)
+            await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.
