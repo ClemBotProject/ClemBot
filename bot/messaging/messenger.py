@@ -1,38 +1,61 @@
+import typing as t
 import weakref as wr
-from inspect import ismethod
-from typing import Callable, Union
+import inspect
+import logging
+import asyncio
 
-"""This is the global message bus that handles all application level events"""
+log = logging.getLogger(__name__)
 
-events = {}
+class Messenger:
+    """This is the global message bus that handles all application level events"""
 
-WeakObjOrMethod = Union[wr.WeakMethod, wr.ref]
+    def __init__(self, name = None) -> None:
+        log.info(f'New messenger created with name: {name}')
+        self.name = name
+        self._events: t.Dict[str, t.Awaitable] = {}
 
-DeadRefObserver = Callable[[WeakObjOrMethod], None]
+    async def publish(self, event: str, *args, **kwargs) -> None:
+        """
+        Publishes an event with given args onto the global message bus
 
-async def publish(event: str, *args, **kwargs) -> None:
-    """publishes an event onto the global message queue with accompanying arguements"""
-    if event in events.keys():
-        for sub in events[event]:
-            await sub()(*args, **kwargs)
+        Args:
+            event (str): The event invoke the listeners on
+        """
+        log.info(f'Recieved published event: {event}')
+        event = event
+        print(event)
+        if event in self._events.keys():
+            listeners = self._events[event]
+            for i, sub in enumerate(listeners):
+                if sub._alive:
+                    log.info(f'Invoking listener: {sub} on event {event} in Messenger: {self.name}')
+                    await sub()(*args, **kwargs)
+                else:
+                    log.info(f'Deleting dead reference in Event: {event} function: {sub}')
+                    del listeners[i]
 
-def subscribe(event: str, callback: callable) -> None:
-    """Subscribes a method as a callback listener to a given event """
-    weak_ref = getWeakRef(callback)
-    if event in events.keys():
-        events[event].append(weak_ref)
-    else:
-        events[event] = [weak_ref]
+    def subscribe(self, event: str, callback: t.Awaitable) -> None:
+        """Subscribes a method as a callback listener to a given event """
+        if not asyncio.iscoroutinefunction(callback):
+            raise TypeError('A given messenger callback must be awaitable')
 
+        weak_ref = self._getWeakRef(callback)
+        if event in self._events.keys():
+            self._events[event].append(weak_ref)
+        else:
+            log.info(f'Registering new event: {event} to Messenger: {self.name}')
+            self._events[event] = [weak_ref]
 
-def getWeakRef(obj, notifyDead: DeadRefObserver = None):
-    """
-    Get a weak reference to obj. If obj is a bound method, a WeakMethod
-    object, that behaves like a WeakRef, is returned; if it is
-    anything else a WeakRef is returned.
-    """
-    if ismethod(obj):
-        createRef = wr.WeakMethod
-    else:
-        createRef = wr.ref
-    return createRef(obj)
+        log.info(f'Registering listener {callback} to event: {event} in Messenger: {self.name}')
+
+    def _getWeakRef(self, obj):
+        """
+        Get a weak reference to obj. If obj is a bound method, a WeakMethod
+        object, that behaves like a WeakRef, is returned; if it is
+        anything else a WeakRef is returned.
+        """
+        if inspect.ismethod(obj):
+            createRef = wr.WeakMethod
+        else:
+            createRef = wr.ref
+        return createRef(obj)

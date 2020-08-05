@@ -1,6 +1,5 @@
 import logging
 
-import bot.messaging.messenger as messenger
 from bot.data.guild_repository import GuildRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -20,7 +19,7 @@ class GuildHandlingService(BaseService):
 
         #The guild has been initialized, broadcast this to the rest
         #of the services
-        await messenger.publish(Events.on_new_guild_initialized, guild)
+        await self.bot.messenger.publish(Events.on_new_guild_initialized, guild)
         log.info(f'Guild {guild.name}: {guild.id} loaded')
 
     async def add_guild(self, guild) -> None:
