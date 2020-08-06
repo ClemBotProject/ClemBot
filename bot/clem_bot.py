@@ -10,7 +10,6 @@ import discord
 from discord.ext import commands
 
 import bot.cogs as cogs
-import bot.messaging.messenger as messenger
 import bot.services as services
 from bot.bot_secrets import BotSecrets
 from bot.consts import Colors, DesignatedChannels
@@ -28,9 +27,11 @@ class ClemBot(commands.Bot):
     as well as the dynamic loading of services and cogs
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, command_prefix: str, messenger, max_messages: int):
         #this super call is to pass the prefix up to the super class
-        super().__init__(*args, **kwargs)
+        super().__init__(command_prefix= command_prefix, max_messages= max_messages)
+
+        self.messenger = messenger
 
         self.load_cogs()
         self.active_services = {}
@@ -48,7 +49,7 @@ class ClemBot(commands.Bot):
         embed = discord.Embed(title='Bot Ready', color= Colors.ClemsonOrange)
         embed.add_field(name= 'Startup Time', value= datetime.datetime.utcnow())
         embed.set_thumbnail(url= self.user.avatar_url)
-        await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
+        await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
 
         log.info(f'Logged on as {self.user}')
 
@@ -58,7 +59,7 @@ class ClemBot(commands.Bot):
             embed = discord.Embed(title='Bot Shutting down', color= Colors.ClemsonOrange)
             embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
             embed.set_thumbnail(url= self.user.avatar_url)
-            await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
+            await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
             await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
@@ -108,7 +109,7 @@ class ClemBot(commands.Bot):
 
     async def publish_with_error(self, *args, **kwargs):
         try:
-            await messenger.publish(*args, **kwargs)
+            await self.messenger.publish(*args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback= tb)
@@ -157,7 +158,7 @@ class ClemBot(commands.Bot):
                 field_name = 'Traceback' if i == 0 else 'Continued'
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
-            await messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
+            await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.

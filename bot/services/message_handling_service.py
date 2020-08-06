@@ -4,7 +4,6 @@ from typing import List, Iterable
 
 import discord
 
-import bot.messaging.messenger as messenger
 from bot.consts import Colors, DesignatedChannels
 from bot.data.message_repository import MessageRepository
 from bot.messaging.events import Events
@@ -52,7 +51,7 @@ class MessageHandlingService(BaseService):
 
         embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url= before.author.avatar_url)
 
-        await messenger.publish(Events.on_send_in_designated_channel,
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                 DesignatedChannels.message_log, 
                 after.guild.id, 
                 embed)
@@ -84,7 +83,7 @@ class MessageHandlingService(BaseService):
 
             embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
 
-            await messenger.publish(Events.on_send_in_designated_channel,
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                 DesignatedChannels.message_log, 
                 int(payload.data['guild_id']), 
                 embed)
@@ -103,7 +102,7 @@ class MessageHandlingService(BaseService):
 
             embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
 
-            await messenger.publish(Events.on_send_in_designated_channel,
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                 DesignatedChannels.message_log, 
                 int(payload.data['guild_id']), 
                 embed)
@@ -124,7 +123,7 @@ class MessageHandlingService(BaseService):
 
         embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url= message.author.avatar_url)
 
-        await messenger.publish(Events.on_send_in_designated_channel,
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                 DesignatedChannels.message_log,
                 message.guild.id,
                 embed)
@@ -151,7 +150,7 @@ class MessageHandlingService(BaseService):
                 color= Colors.ClemsonOrange)
             embed.add_field(name= 'Message', value= 'Unknown, message not in the database', inline= False)
 
-        await messenger.publish(Events.on_send_in_designated_channel, 
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel, 
             DesignatedChannels.message_log, 
             int(payload.guild_id), 
             embed)

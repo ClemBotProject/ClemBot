@@ -3,10 +3,12 @@ This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 
-class Events:
+from typing import Type
+
+
+class EventsMeta(Type):
     """Class that defines what events are exposed at the bot level"""
 
-    _on_message_recieved = 'on_message_recieved'
     @property
     def on_message_recieved(self):
         """
@@ -15,9 +17,8 @@ class Events:
         Args:
             message (Message) – The deleted message.
         """
-        return self._on_message_recieved
+        return '_on_message_recieved'
 
-    _on_raw_message_edit = 'on_raw_message_edit'
     @property
     def on_raw_message_edit(self):
         """
@@ -27,9 +28,8 @@ class Events:
 
             payload (Edit Object) – The edit payload with the id of the edited message
         """
-        return self._on_raw_message_edit
+        return '_on_raw_message_edit'
 
-    _on_message_edit = 'on_message_edit'
     @property
     def on_message_edit(self):
         """
@@ -40,9 +40,8 @@ class Events:
             before (Message) – The previous version of the message.
             after (Message) – The current version of the message.
         """
-        return self._on_message_edit
+        return '_on_message_edit'
 
-    _on_raw_message_delete = 'on_raw_message_edit'
     @property
     def on_raw_message_delete(self):
         """
@@ -52,8 +51,7 @@ class Events:
 
             payload (Edit Object) – The delete payload with the id of the edited message
         """
-        return self._on_raw_message_delete
-    _on_message_delete = 'on_message_delete'
+        return '_on_raw_message_delete'
 
     @property
     def on_message_delete(self):
@@ -64,10 +62,8 @@ class Events:
 
             message (Message) – The message that was deleted
         """
-        return self._on_message_delete
+        return '_on_message_delete'
 
-    _on_reaction_add = 'on_reaction_add'
-    @property
     def on_reaction_add(self):
         """
         Published whenever a reaction is sent in a server, and that message is stored
@@ -78,7 +74,7 @@ class Events:
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who added the reaction.
         """
-        return self._on_reaction_add
+        return '_on_reaction_add'
 
     _on_raw_reaction_add = 'on_raw_reaction_add'
     @property
@@ -90,9 +86,8 @@ class Events:
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return self._on_raw_reaction_add
+        return '_on_raw_reaction_add'
 
-    _on_reaction_remove = 'on_reaction_remove'
     @property
     def on_reaction_remove(self):
         """
@@ -104,9 +99,8 @@ class Events:
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who removed the reaction.
         """
-        return self._on_reaction_remove
+        return '_on_reaction_remove'
 
-    _on_raw_reaction_remove = 'on_raw_reaction_remove'
     @property
     def on_raw_reaction_remove(self):
         """
@@ -116,9 +110,8 @@ class Events:
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return self._on_raw_reaction_remove
+        return '_on_raw_reaction_remove'
 
-    _on_guild_joined = 'on_guild_joined'
     @property
     def on_guild_joined(self):
         """
@@ -128,9 +121,8 @@ class Events:
 
             guild (Guild) – The guild that was joined.    
         """
-        return self._on_guild_joined
+        return '_on_guild_joined'
 
-    _on_new_guild_initialized = '_on_new_guild_initialized'
     @property
     def on_new_guild_initialized(self):
         """
@@ -142,9 +134,8 @@ class Events:
 
             guild (Guild) – The guild that was joined.    
         """
-        return self._on_new_guild_initialized
+        return '_on_new_guild_initialized'
 
-    _on_guild_role_create = 'on_guild_role_create'
     @property
     def on_guild_role_create(self):
         """
@@ -154,9 +145,8 @@ class Events:
 
             role (Role) – The role that was created or deleted.
         """
-        return self._on_guild_role_create
+        return '_on_guild_role_create'
 
-    _on_guild_role_update = 'on_guild_role_update'
     @property
     def on_guild_role_update(self):
         """
@@ -167,9 +157,8 @@ class Events:
             before (Role) – The updated role’s old info.
             after (Role) – The updated role’s updated info.
         """
-        return self._on_guild_role_update
+        return '_on_guild_role_update'
 
-    _on_guild_role_delete = 'on_guild_role_delete'
     @property
     def on_guild_role_delete(self):
         """
@@ -179,9 +168,8 @@ class Events:
 
             role (Role) – The role that was created or deleted.
         """
-        return self._on_guild_role_delete
+        return '_on_guild_role_delete'
 
-    _on_user_joined = 'on_user_joined'
     @property
     def on_user_joined(self):
         """
@@ -191,9 +179,8 @@ class Events:
 
             user (User) – The user who joined or left.
         """
-        return self._on_user_joined
+        return '_on_user_joined'
 
-    _on_user_left = 'on_user_left'
     @property
     def on_user_left(self):
         """
@@ -203,9 +190,8 @@ class Events:
 
             user (User) – The user who joined or left.
         """
-        return self._on_user_left
+        return '_on_user_left'
 
-    _on_user_update = 'on_user_update'
     @property
     def on_user_update(self):
         """
@@ -216,9 +202,8 @@ class Events:
             before (User) – The updated user’s old info. 
             after (User) – The updated user’s updated info.
         """
-        return self._on_user_update
+        return '_on_user_update'
 
-    _on_add_designated_channel = 'on_add_designated_channel'
     @property
     def on_add_designated_channel(self):
         """
@@ -228,9 +213,7 @@ class Events:
 
             channel (Channel) the channel object that was added
         """
-        return self._on_add_designated_channel
-
-    _on_send_in_designated_channel = 'on_send_in_designated_channel'
+        return '_on_add_designated_channel'
 
     @property
     def on_send_in_designated_channel(self):
@@ -243,9 +226,8 @@ class Events:
             guild_id (int) The id of the guild to attempt to send a message in
             message (union[embed, str]) the message to be sent to the channel
         """
-        return self._on_send_in_designated_channel
+        return 'on_send_in_designated_channel'
 
-    _on_broadcast_designated_channel = '_on_broadcast_designated_channel'
     @property
     def on_broadcast_designated_channel(self):
         """
@@ -257,4 +239,7 @@ class Events:
             channel_type (str) The designated channel to broadcast the message to
             message (union[embed, str]) the message to be sent to the channels
         """
-        return self._on_broadcast_designated_channel
+        return '_on_broadcast_designated_channel'
+
+class Events(metaclass= EventsMeta):
+    pass

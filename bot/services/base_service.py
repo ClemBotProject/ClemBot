@@ -1,8 +1,6 @@
 import abc
 import inspect
 
-import bot.messaging.messenger as messenger
-
 
 class BaseService(abc.ABC):
     """
@@ -12,13 +10,14 @@ class BaseService(abc.ABC):
     """
 
     def __init__(self, bot):
+        self.bot = bot
+
         for elem, value in inspect.getmembers(self):
             event = None
             if hasattr(value, '__event_listener__'):
                 event = getattr(value, '__event_listener__')
             if event:
-                messenger.subscribe(event, value)
-        self.bot = bot
+                self.bot.messenger.subscribe(event, value)
 
     @abc.abstractmethod
     async def load_service(self):

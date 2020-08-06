@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from bot.bot_secrets import BotSecrets
+from bot.messaging.messenger import Messenger
 from bot.clem_bot import ClemBot as ClemBot
 
 
@@ -54,9 +55,20 @@ def main():
     if token is not None:
         BotSecrets.get_instance().bot_token = token
     
-    bot_log.info('Bot Starting Up')
     prefix = BotSecrets.get_instance().bot_prefix
-    ClemBot(command_prefix = prefix, max_messages= 5000).run(BotSecrets.get_instance().bot_token)
+
+    #Initialize the messenger here and inject it into the base bot class,
+    #this is so it can be reused later on
+    #if we decide to add something not related to the bot 
+    # E.G a website frontend
+    messenger = Messenger(name= 'primary_bot_messenger')
+
+    bot_log.info('Bot Starting Up')
+    ClemBot(
+            command_prefix = prefix,  # noqa: E126
+            messenger= messenger, 
+            max_messages= 5000
+        ).run(BotSecrets.get_instance().bot_token)
 
 
 if __name__ == "__main__":
