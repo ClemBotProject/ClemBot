@@ -18,7 +18,7 @@ class MessageHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_message_recieved)
     async def on_message_recieved(self, message: discord.Message) -> None:
-        log.info(f'Message from {message.author}: {message.content} in guild {message.guild.id}')
+        log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
 
         if self.bot.user.mentioned_in(message) and message.mention_everyone is False:
             await message.channel.send('Hello there everyone!!')
