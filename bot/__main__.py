@@ -1,12 +1,17 @@
 import logging
 import os
 import sys
+import typing as t
 from datetime import datetime
 from pathlib import Path
 
+import discord
+
 from bot.bot_secrets import BotSecrets
-from bot.messaging.messenger import Messenger
 from bot.clem_bot import ClemBot as ClemBot
+from bot.custom_prefix import CustomPrefix
+from bot.messaging.events import Events
+from bot.messaging.messenger import Messenger
 
 
 def setup_logger() -> None:
@@ -63,9 +68,14 @@ def main():
     # E.G a website frontend
     messenger = Messenger(name= 'primary_bot_messenger')
 
+    #create the custom prefix handler class, and register its methods
+    #as event callbacks
+    custom_prefix = CustomPrefix(default= prefix)
+    messenger.subscribe(Events.on_set_custom_prefix, custom_prefix.set_prefix)
+
     bot_log.info('Bot Starting Up')
     ClemBot(
-            command_prefix = prefix,  # noqa: E126
+            command_prefix = custom_prefix.get_prefix,  # noqa: E126
             messenger= messenger, 
             max_messages= 5000
         ).run(BotSecrets.get_instance().bot_token)
