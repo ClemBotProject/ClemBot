@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS Guilds (
 );
 
 CREATE TABLE IF NOT EXISTS CustomPrefixes (
+    fk_guildId  INTEGER     PRIMARY KEY,
     prefix      TEXT        NOT NULL, 
-    fk_guildId  INTEGER     UNIQUE NOT NULL,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id)
 );

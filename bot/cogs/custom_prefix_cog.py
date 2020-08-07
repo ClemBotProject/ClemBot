@@ -11,7 +11,7 @@ from bot.consts import Colors
 log = logging.getLogger(__name__)
 
 
-class CustomePrefixCog(commands.Cog):
+class CustomPrefixCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -68,4 +68,4 @@ class CustomePrefixCog(commands.Cog):
 
         await ctx.send(embed= embed)
 def setup(bot): 
-    bot.add_cog(CustomePrefixCog(bot))
+    bot.add_cog(CustomPrefixCog(bot))
