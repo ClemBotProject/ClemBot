@@ -3,6 +3,13 @@ CREATE TABLE IF NOT EXISTS Guilds (
     name    TEXT        NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS CustomPrefixes (
+    prefix      TEXT        NOT NULL, 
+    fk_guildId  INTEGER     UNIQUE NOT NULL,
+    FOREIGN KEY(fk_guildId)
+        REFERENCES Guilds (id)
+);
+
 CREATE TABLE IF NOT EXISTS Users (
     id          INTEGER     PRIMARY KEY,
     name        TEXT        NOT NULL,

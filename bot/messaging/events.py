@@ -240,6 +240,18 @@ class EventsMeta(Type):
             message (union[embed, str]) the message to be sent to the channels
         """
         return '_on_broadcast_designated_channel'
+    
+    @property
+    def on_set_custom_prefix(self):
+        """
+        Published when a new custom prefix is added in a guild
+
+        Args:
+
+            guild (discord.Guild): The guild object of the added prefix
+            prefix (str): The prefix to be added
+        """
+        return 'on_set_custom_prefix'
 
 class Events(metaclass= EventsMeta):
     pass
