@@ -45,7 +45,7 @@ class DesignatedChannelsCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @channel.command(pass_context= True, aliases= ['register'])
-    @commands.has_role('Admin')
+    @commands.has_guild_permissions(administrator= True)
     async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
         Command to add a registered TextChannel too a designated channel 
@@ -77,7 +77,7 @@ class DesignatedChannelsCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @channel.command(pass_context= True, aliases= ['unregister'])
-    @commands.has_role('Admin')
+    @commands.has_guild_permissions(administrator= True)
     async def delete(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
         Command to delete a registered TextChannel from a designated channel 

@@ -78,7 +78,7 @@ class AssignableRolesCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @roles.command(pass_context= True, aliases= ['create'])
-    @commands.has_role('Admin')
+    @commands.has_guild_permissions(administrator= True)
     async def add(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
 
@@ -90,7 +90,7 @@ class AssignableRolesCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @roles.command(pass_context= True, aliases= ['delete'])
-    @commands.has_role('Admin')
+    @commands.has_guild_permissions(administrator= True)
     async def remove(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
 
