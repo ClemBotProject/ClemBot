@@ -51,11 +51,6 @@ class RoleRepository(BaseRepository):
                     (guild_id,)) as c:
                 return await self.fetcthall_as_dict(c)
 
-    async def drop_roles_table(self):
-        async with aiosqlite.connect(self.resolved_db_path) as db:
-            await db.execute("""DROP TABLE IF EXISTS Roles""")
-            await db.commit()
-
     async def check_is_role_assignable(self, role_id: int) -> bool:
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Roles WHERE id = ? and isRoleAssignable = true', (role_id,)) as c:
