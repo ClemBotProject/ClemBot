@@ -25,9 +25,18 @@ class AssignableRolesCog(commands.Cog):
         try:
             role = await commands.RoleConverter().convert(ctx, input_role)
         except BadArgument:
+            str_input_role = str(input_role).casefold()
+            role_list = ctx.guild.roles # Return list of roles
+            str_role_list = [str(i).casefold() for i in role_list] # Case-fold to do case insensitive matching
+            
+            for j in range(len(str_role_list)):
+                if str_input_role == str_role_list[j]:
+                    await self.set_role(ctx, role_list[j])
+                    return
+            
             await self.send_role_list(ctx, f'@{input_role} not found')
             return
-        
+
         await self.set_role(ctx, role)
 
     async def send_role_list(self, ctx, title: str):
