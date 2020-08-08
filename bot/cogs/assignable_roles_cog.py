@@ -84,7 +84,7 @@ class AssignableRolesCog(commands.Cog):
 
         await role_repo.set_role_assignable(role.id, True)
 
-        title = f'Role #{role.name} Added as assignable :white_check_mark:'
+        title = f'Role @{role.name} Added as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
 
         await ctx.send(embed= embed)
@@ -96,7 +96,7 @@ class AssignableRolesCog(commands.Cog):
 
         await role_repo.set_role_assignable(role.id, False)
 
-        title = f'Role #{role.name} Removed as assignable :white_check_mark:'
+        title = f'Role @{role.name} Removed as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
 
         await ctx.send(embed= embed)
