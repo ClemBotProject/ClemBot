@@ -37,7 +37,7 @@ class AssignableRolesCog(commands.Cog):
         if results:
             names = '\n'.join([role['name'] for role in results])
         else:
-            names = 'No currently assignable channels'
+            names = 'No currently assignable roles'
 
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
         embed.add_field(name= 'Available:', value= names)
