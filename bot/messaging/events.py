@@ -10,6 +10,18 @@ class EventsMeta(Type):
     """Class that defines what events are exposed at the bot level"""
 
     @property
+    def on_example(self):
+        """
+        This is an example event for the Example Service, this should not be
+        used under any circumstances
+
+        Args:
+
+            None
+        """
+        return 'on_example'
+
+    @property
     def on_message_recieved(self):
         """
         Published whenever a message is sent in a server
