@@ -19,18 +19,18 @@ class AssignableRolesCog(commands.Cog):
     async def roles(self, ctx, *, input_role: str = None) -> None:
 
         if input_role is None:
-            await self.send_channel_list(ctx, 'Assignable Roles')
+            await self.send_role_list(ctx, 'Assignable Roles')
             return
         
         try:
             role = await commands.RoleConverter().convert(ctx, input_role)
         except BadArgument:
-            await self.send_channel_list(ctx, f'@{input_role} not found')
+            await self.send_role_list(ctx, f'@{input_role} not found')
             return
         
         await self.set_role(ctx, role)
 
-    async def send_channel_list(self, ctx, title: str):
+    async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
         results = await role_repo.get_assignable_roles(ctx.guild.id)
 
