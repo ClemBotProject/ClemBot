@@ -122,7 +122,7 @@ class AssignableRolesCog(commands.Cog):
             )
 
         try:
-            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
+            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=90.0, check=predicate)
         except asyncio.TimeoutError: # was asyncio.
             await ctx.send(f'You took too long.')
             await mes.clear_reactions()
