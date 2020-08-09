@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 #We create a class with the postfix of "Cog" 
 #and make sure it inherits from Commands.cog
-class ExampleCog(commands.Cog()):
+class ExampleCog(commands.Cog):
     """
     This is an example cog to demonstrate the expected layout of a cog with commands
     A cog is a grouping of bot commands that serve similar functions 
@@ -25,6 +25,7 @@ class ExampleCog(commands.Cog()):
     #its with this that we can access all parts of the discord api
     def __init__(self, bot):
         self.bot = bot
+        self._last_member = None
 
     #To createa a command you decorate an async method with commands.command
     #the command name in discord will be the name of the function that you have decorated
