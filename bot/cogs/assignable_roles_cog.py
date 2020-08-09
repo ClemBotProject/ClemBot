@@ -3,7 +3,6 @@ import asyncio
 
 import discord
 import discord.ext.commands as commands
-from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
@@ -26,65 +25,75 @@ class AssignableRolesCog(commands.Cog):
         
         try:
             role = await commands.RoleConverter().convert(ctx, input_role)
+
+            if not await self.check_role_assignable(ctx, input_role):
+                raise BadArgument
+
             await self.set_role(ctx, role)
+        
+        except BadArgument: # If RoleConverter failed
+            await self.find_possible_roles(ctx, input_role)
 
-        # If RoleConverter failed
-        except BadArgument:
-            # Casefold the roles
-            str_input_role = str(input_role).casefold()
-            role_list = ctx.guild.roles # Return list of roles
-            str_role_list = [str(i).casefold() for i in role_list] # Case-fold to do case insensitive matching
+    async def check_role_assignable(self, ctx, input_role: str) -> bool:
+        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
+        return input_role in [ctx.guild.get_role(i['id']) for i in assignable_roles]
 
-            # Compare input_role to role_list entries for matches
-            role_count, matching_roles = 0, []
 
-            for j in range(len(str_role_list)):
-                if str_input_role == str_role_list[j]:
-                    #await self.set_role(ctx, role_list[j])
-                    matching_roles.append(role_list[j]) # matching_roles.append(j)
-                    role_count = role_count + 1
-            
-            if role_count == 0: # If no matches found, report findings
-                await self.send_role_list(ctx, f'@{input_role} not found')
-            elif role_count == 1: # If only one match was found, assign the role
-                await self.set_role(ctx, matching_roles[0]) # role_list[k[0]])
-            else: # If multiple matches found, query user via emojis to select correct role
-                await self.send_matching_roles_list(ctx, f'Multiple roles found for @{input_role}', \
-                    matching_roles, role_count)
+    async def find_possible_roles(self, ctx, input_role: str):
+        # Casefold the roles
+        str_input_role = str(input_role).casefold()
 
-                #for m in range(len(k)):
-                #    await self.set_role(ctx, role_list[k[m]])
+        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
+        role_list = [ctx.guild.get_role(i['id']) for i in assignable_roles]
+
+        str_role_list = [str(i).casefold() for i in role_list] # Case-fold to do case insensitive matching
+
+        # Compare input_role to role_list entries for matches
+        matching_roles = []
+
+        for j, val_j in enumerate(str_role_list):
+            if str_input_role == val_j:
+                matching_roles.append(role_list[j]) # matching_roles.append(j)
+        
+        role_count = len(matching_roles)
+
+        if role_count == 0: # If no matches found, report findings
+            await self.send_role_list(ctx, f'@{input_role} not found')
+        elif role_count == 1: # If only one match was found, assign the role
+            await self.set_role(ctx, matching_roles[0])
+        else: # If multiple matches found, query user via emojis to select correct role
+            await self.send_matching_roles_list(ctx, f'Multiple roles found for @{input_role}',
+                matching_roles, role_count)
 
     async def send_matching_roles_list(self, ctx, title: str, matching_roles, role_count):
-        #role_repo = RoleRepository()
-        #results = await role_repo.get_assignable_roles(ctx.guild.id)
         names = ''
-        reactions = ['\u0031\ufe0f\u20e3','\u0032\ufe0f\u20e3','\u0033\ufe0f\u20e3','\u0034\ufe0f\u20e3', \
-                        '\u0035\ufe0f\u20e3','\u0036\ufe0f\u20e3','\u0037\ufe0f\u20e3','\u0038\ufe0f\u20e3', \
+        reactions = ['\u0031\ufe0f\u20e3','\u0032\ufe0f\u20e3','\u0033\ufe0f\u20e3','\u0034\ufe0f\u20e3',
+                        '\u0035\ufe0f\u20e3','\u0036\ufe0f\u20e3','\u0037\ufe0f\u20e3','\u0038\ufe0f\u20e3',
                         '\u0039\ufe0f\u20e3','\U0001F51F']
         """
             USING EMOJIS WITH EMBEDDED TEXT
                 What I know works:
                     1. Discord emoji name (e.g. ':pensive:')
                     2. Unicode emoji name (e.g. '\u0031\ufe0f\u20e3' or '\U0001F3D3')
+
+                More info on using unicode emojis is provided below.
         """
         choose = '\n\n Please choose from one of the roles above.'
 
-        for k in range(len(matching_roles)):
+        for k, val_k in enumerate(matching_roles):
             if k < len(reactions):
                 emojis = reactions[k] + ' '
             else:
                 emojis = ''
-            names = names + '\n' + emojis + str(matching_roles[k])
+            names = f'{names}\n{emojis}{val_k}'
         
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
         embed.add_field(name= 'Matching Roles:', value= names + choose)
 
-        mes: Message = await ctx.send(embed= embed)
+        mes = await ctx.send(embed= embed)
         
-        # Remove unnecessary emojis
+        # Remove unnecessary extra emojis from reactions list
         if role_count < len(reactions):
-            #print('\n' + str(len(reactions)) + '\n')
             del reactions[role_count:len(reactions)]
 
         """
@@ -97,14 +106,14 @@ class AssignableRolesCog(commands.Cog):
                 Additional info: https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
 
                 Method 1:
-                say you wants :ping_pong:, you would use the unicode charcter U+1F3D3 and change it to U0001F3D3.
+                say you want :ping_pong:, you would use the unicode charcter U+1F3D3 and change it to U0001F3D3.
                     thus, '\U0001F3D3' would be your string for ping pong
                 as another example, if you wanted to use :skull_crossbones:, you would use unicode character U+2620 and change it to U00002620
                     thus, '\U00002620' would be your string for skull and crossbones
 
                 Method 2:
                 Use the CDLR short names.
-                Not recommended. Only worked if name contains ONLY letters and spaces.
+                Not recommended. Only works if name contains ONLY letters and spaces.
         """
                 #e.g. '\N{pensive face}' is fine but '\N{keycap: 1} would NOT work'
 
@@ -113,38 +122,25 @@ class AssignableRolesCog(commands.Cog):
             await mes.add_reaction(str_emoji)
 
         # Validate the answer using a reaction event loop.
-        def predicate(reaction: Reaction, user: Member) -> bool:
+        def predicate(reaction: discord.Reaction, user: discord.Member) -> bool:
             # Test if the the answer is valid and can be evaluated.
             return (
                 reaction.message.id == mes.id         # The reaction is attached to the question we asked.
-                and user == ctx.author                # It's the user who triggered the quiz.
+                and user == ctx.author                # It's the user who triggered the initial role request.
                 and str(reaction.emoji) in reactions  # The reaction is one of the options.
             )
 
         try:
-            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=90.0, check=predicate)
-        except asyncio.TimeoutError: # was asyncio.
-            await ctx.send(f'You took too long.')
-            await mes.clear_reactions()
+            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
+        except asyncio.TimeoutError:
+            embed.add_field(name= 'Request Timeout:', value= 'User failed to respond in the alloted time', inline= 'false')
+            await mes.edit(embed= embed)
+            await mes.clear_reactions() # Remove reactions so use doesn't try to respond after timeout.
             return
         
-        answer = -1
-        
-        for m in range(len(reactions)):
-            if str(reaction.emoji) == reactions[m]:
-                answer = m
-        
-        if answer > -1:
-            await ctx.send(f'User reaction was associated with role **{reactions[answer]}**.')
-            await self.set_role(ctx, matching_roles[answer])
-        else:
-            await ctx.send(
-                f'User reaction was not associated with a role.'
-            )
-
-        await mes.clear_reactions()
-
-        return
+        answer = reactions.index(reaction.emoji) # Get user reaction
+        await self.set_role(ctx, matching_roles[answer]) # Attempt to assign user the requested role
+        await mes.delete() # Delete message now that user has made a successful choice
 
     async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
@@ -153,7 +149,7 @@ class AssignableRolesCog(commands.Cog):
         if results:
             names = '\n'.join([role['name'] for role in results])
         else:
-            names = 'No currently assignable roles'
+            names = 'No currently assignable roles.'
 
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
         embed.add_field(name= 'Available:', value= names)
@@ -164,8 +160,7 @@ class AssignableRolesCog(commands.Cog):
         role_repo = RoleRepository()
 
         if not await role_repo.check_is_role_assignable(role.id):
-            embed = discord.Embed(title= f'@{role.name} is not assignable', color= Colors.Error)
-            await ctx.send(embed= embed)
+            await self.send_role_list(ctx, f'@{str(role)} is not an assignable role')
             return
 
         if role.id in [role.id for role in ctx.author.roles]:
