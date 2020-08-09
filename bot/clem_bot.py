@@ -42,6 +42,9 @@ class ClemBot(commands.Bot):
         This is where services are loaded and the startup procedures for each service is run
         """
 
+        await self.change_presence(activity=discord.Game(
+            name='Contributors Welcome:\nhttps://github.com/ClemsonCPSC-Discord/ClemBot'))
+
         await Database(BotSecrets.get_instance().database_name).create_database()
         await self.load_services()
 
