@@ -97,7 +97,7 @@ class gradesCog(commands.Cog):
         AvgF = sum(F)//len(F)
         AvgWithdraw = sum(W)//len(W)
 
-        courseString = "Average; A: " + str(AvgA) + "%\nB: " + str(AvgB) + "%\nC: " + str(AvgC) + "%\nD: " + str(AvgD) + "% F: " + str(AvgF) + "%\nW: " + str(AvgWithdraw) + "%\nfrom " + str(len(data_list)) + " class(es) for " + orig_query + ": " + name
+        courseString = "Average; A: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}".format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
         
 
         bestProfName = "" #Professor name to go in professor string
@@ -127,7 +127,7 @@ class gradesCog(commands.Cog):
                 worstProfFW = data[1]
                 worstProfLenCount = data[-1]
         
-        profString = "The statistically best professor is " + bestProfName + " with an A+B Avg of " + str(bestProfAB) + "% in " + str(bestProfLenCount) + " classes\n\nThe statistically worst professor is " + worstProfName + " with an F+W Avg of " + str(worstProfFW) + "% out of " + str(worstProfLenCount) + " class(es)" #Final professor string
+        profString = "The statistically best professor is {} with an A+B Avg of {}% in %s classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)".format(bestProfName, bestProfAB, bestProfLenCount, worstProfName, worstProfFW, worstProfLenCount) #Final professor string
 
         return courseString + "\n\n" + profString + "\n\n"
 
@@ -244,14 +244,15 @@ class gradesCog(commands.Cog):
 
     @commands.command()
     async def grades(self, ctx, course):
-        print(course)
-        embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
-
-        result = self.go(course)
-        print(result)
-        # result = 'this is a testttt'
-
-        embed.add_field(name="Result", value=result, inline=False)
+        
+        try:
+            embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
+            result = self.go(course)
+            embed.add_field(name="Result", value=result, inline=False)
+        except NotADirectoryError as e:
+            embed = discord.Embed(title="Grades", color=Colors.Error)
+            result = "That's not a course\n Are you sure you used the proper notation (ex: cpsc-2120)"
+            embed.add_field(name="ERROR", value=result, inline=False)
 
         await ctx.send(embed=embed)
 
