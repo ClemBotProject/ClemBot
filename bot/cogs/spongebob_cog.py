@@ -27,11 +27,8 @@ class spongebobCog(commands.Cog):
         Spongebob Text
         '''
         random.seed(time.time())
-
-    
         args = args.replace('"', "'")
-        
-
+    
         result = ''
         for i in args:
             helper = random.randint(self.lowerThreshold,self.upperThreshold)

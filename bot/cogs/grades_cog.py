@@ -30,37 +30,18 @@ class gradesCog(commands.Cog):
 
     def process_Search(self, orig_query: str) -> str: #Primary search function and processing for a query. A query is generally defined by 
                                     #"Course-Number" of which it pulls the data from the DB.
-        print("PROCESSING")
+        
         query = orig_query.upper()
         
-        items = query.split("-")
+        items = query.split('-')
         master_String = ''
 
-        # if("ALL" in items):
-        #     print("ALL IN QUERY")
-        #     print("HERE COMES THE SUN")
-        #     if items[0] == "ALL" and items[1] == "ALL":
-        #         print("ALLALL")
-        #         for i in master_list:
-        #             master_String += process_Search(i)
-        #     elif items[0] == "ALL":
-        #         for i in master_list:
-        #             if items[1] in i:
-        #                 master_String += process_Search(i)
-        #     elif items[1] == "ALL":
-        #         for i in master_list:
-        #             if items[0] in i:
-        #                 master_String += process_Search(i)
-        #     else:
-        #         print("Misunderstood")
-        #         return "HELP"
-        #     return master_String
-
-        # else:
+       
         if query in self.master_list:
             data_list = self.master_list[query]
         else:
             raise NotADirectoryError
+
         name = data_list[-1]['name'] # Get the most recent course name on file. If we did the beginning, it'd throw the incorrect name because Clemson is big dumb.
         # print(data_list)
         A = []
@@ -97,14 +78,14 @@ class gradesCog(commands.Cog):
         AvgF = sum(F)//len(F)
         AvgWithdraw = sum(W)//len(W)
 
-        courseString = "Average; \nA: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}".format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
+        courseString = 'Average; \nA: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}'.format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
         
 
-        bestProfName = "" #Professor name to go in professor string
+        bestProfName = '' #Professor name to go in professor string
         bestProfAB = 0
         bestProfLenCount = 0
 
-        worstProfName = ""
+        worstProfName = ''
         worstProfFW = 0
         worstProfLenCount = 0
 
@@ -127,12 +108,12 @@ class gradesCog(commands.Cog):
                 worstProfFW = data[1]
                 worstProfLenCount = data[-1]
         
-        profString = "The statistically best professor is {} with an A+B Avg of {}% in {} classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)".format(bestProfName.replace('"', ''), bestProfAB, bestProfLenCount, worstProfName.replace('"', ''), worstProfFW, worstProfLenCount) #Final professor string
+        profString = 'The statistically best professor is {} with an A+B Avg of {}% in {} classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)'.format(bestProfName.replace('"', ''), bestProfAB, bestProfLenCount, worstProfName.replace('"', ''), worstProfFW, worstProfLenCount) #Final professor string
 
-        return courseString + "\n\n" + profString + "\n\n"
+        return courseString + '\n\n' + profString + '\n\n'
 
     def getInitials(self, Name):
-        initials = ""
+        initials = ''
         Name = Name.split()
         Name = Name[1:] + [Name[0]] #Rotates it
         for i in Name:
@@ -142,18 +123,15 @@ class gradesCog(commands.Cog):
     def initialize(self):
 
         if os.path.isfile('bot/cogs/Student-Teacher/assets/master.json'): #SKIP PARSE DATA WHEN NOT NECESSARY
-            print("FOUND COURSE FILE")
             with open('bot/cogs/Student-Teacher/assets/master.json', 'r') as f:
                 self.master_list = json.load(f)
-            # print(master_list)
+        
             if os.path.isfile('bot/cogs/Student-Teacher/assets/master_prof.json'):
-                print("FOUND PROF FILE")
                 with open('bot/cogs/Student-Teacher/assets/master_prof.json', 'r') as f:
                     self.master_prof_list = json.load(f)
-            else:
-                print("PROF FILE NOT FOUND")
+            
         else:
-            print("FILE NOT FOUND PLEASE SEND HELP")
+            log.info('FILES NOT FOUND')
             
             
 
@@ -161,7 +139,7 @@ class gradesCog(commands.Cog):
         FML = Name.split()
         First = FML[1]
         Last = FML[0]
-        return First + " " + Last
+        return First + ' ' + Last
 
     def process_profQuery(self, Name):
         
@@ -202,44 +180,23 @@ class gradesCog(commands.Cog):
         items = Name.split()
         for i in range(len(items)):
             items[i] = items[i][0].upper() + items[i][1:].lower()
-        return " ".join(items)
-
-    def getAllCourses(self):
-        temp = []
-        for i in self.master_list:
-            if i[:-5] not in temp:
-                temp.append(i[:-5])
-            else:
-                pass
-        with open("bot/cogs/Student-Teacher/assets/CourseList.txt", "w") as f:
-            for i in range(len(temp)):
-                f.write(temp[i]+"\n")
+        return ' '.join(items)
 
     def searchCourse(self, query):
-        # query = input("What course do you want to search? (Format: <Course>-<number> ie CPSC-3720)\n")
-        string = ""
-        # try:
-            
-        # string += "\n--------------------------------------------------------\n"
-        string += "Since Spring 2014, there was an average of " + self.process_Search(query)
-        string += "DISCLAIMER:\n"
-        string += "Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n"
-        # string += "Take it at your own discression\n"
-        # string += "\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n"
-        # string += "As a result, the limitations according to the GDR are as follows:\n"
-        string += '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*'
-        # string += '\n----------------------------------------------------------------------------'
-        return string
-        # except NotADirectoryError as e:
-        #     print("Class not found, are you sure you used the correct format? (Ex: cpsc-2120)")
+        string = ''
+
+        string += 'Since Spring 2014, there was an average of ' + self.process_Search(query)
+        string += 'DISCLAIMER:\n'
+        string += 'Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n'
         
-        # except Exception as e:
-        #     print("Something went wrong somewhere, idk bout that")
-        #     print(e)
+        string += '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*'
+        
+        return string
+        
 
     def go(self, course):
         self.initialize()
-        self.getAllCourses()
+        
         return self.searchCourse(course)
 
     @commands.command()
@@ -257,9 +214,10 @@ class gradesCog(commands.Cog):
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
             result = self.go(course)
             embed.add_field(name="Result", value=result, inline=False)
-        except NotADirectoryError as e:
+
+        except NotADirectoryError as e: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = "That's not a course\n Are you sure you used the proper notation (ex: cpsc-2120)"
+            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
             embed.add_field(name="ERROR", value=result, inline=False)
 
         await ctx.send(embed=embed)
