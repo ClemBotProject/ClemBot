@@ -97,7 +97,7 @@ class gradesCog(commands.Cog):
         AvgF = sum(F)//len(F)
         AvgWithdraw = sum(W)//len(W)
 
-        courseString = "Average; A: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}".format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
+        courseString = "Average; \nA: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}".format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
         
 
         bestProfName = "" #Professor name to go in professor string
@@ -127,7 +127,7 @@ class gradesCog(commands.Cog):
                 worstProfFW = data[1]
                 worstProfLenCount = data[-1]
         
-        profString = "The statistically best professor is {} with an A+B Avg of {}% in %s classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)".format(bestProfName, bestProfAB, bestProfLenCount, worstProfName, worstProfFW, worstProfLenCount) #Final professor string
+        profString = "The statistically best professor is {} with an A+B Avg of {}% in {} classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)".format(bestProfName.replace('"', ''), bestProfAB, bestProfLenCount, worstProfName.replace('"', ''), worstProfFW, worstProfLenCount) #Final professor string
 
         return courseString + "\n\n" + profString + "\n\n"
 
