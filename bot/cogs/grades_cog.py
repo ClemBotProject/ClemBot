@@ -244,6 +244,14 @@ class gradesCog(commands.Cog):
 
     @commands.command()
     async def grades(self, ctx, course):
+        '''
+        Attempts to give more information about courses @ Clemson.
+
+        USE:
+
+        grades <course title>-<course number>
+        EX: !grades cpsc-1010
+        '''
         
         try:
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
