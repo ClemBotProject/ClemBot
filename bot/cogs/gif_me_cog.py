@@ -14,7 +14,7 @@ class GifMeCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases= ['gif'])
     async def gifme(self, ctx, *args):
         
         response = requests.get(
