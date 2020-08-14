@@ -20,7 +20,7 @@ class GifMeCog(commands.Cog):
         response = requests.get(
             url="https://api.giphy.com/v1/gifs/random",
             params={
-                "api_key": BotSecrets.get_instance().gif_me,
+                "api_key": BotSecrets.get_instance().gif_me_token,
                 "rating": "PG-13",
             }
         )
