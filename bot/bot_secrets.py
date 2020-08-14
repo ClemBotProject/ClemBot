@@ -131,4 +131,4 @@ class BotSecrets:
         self.bot_token = secrets['BotToken']
         self.database_name = secrets['DatabaseName'] or 'ClemBot'
         self.bot_prefix = secrets['BotPrefix'] or '!'
-        self.gif_me_token = secrets["GifMe"]
+        self.gif_me_token = secrets["gifMeToken"]
