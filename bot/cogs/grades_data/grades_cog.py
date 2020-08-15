@@ -184,6 +184,7 @@ class gradesCog(commands.Cog):
         string += 'Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n'
         string += '\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n'
         string += 'Limitations GDR are as follows:\n'
+
         string += '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*'
         return string
         
@@ -207,7 +208,6 @@ class gradesCog(commands.Cog):
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
             result = self.go(course)
             result = result[:1024]
-            embed.add_field(name="Result", value=result, inline=False)
 
         except NotADirectoryError as e: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
