@@ -209,6 +209,9 @@ class gradesCog(commands.Cog):
             result = result[:1024]
             embed.add_field(name="Result", value=result, inline=False)
 
+            exp = '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*' # NOQA
+235:        embed.add_field(name='Explanation', value=exp)
+
         except NotADirectoryError as e: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
