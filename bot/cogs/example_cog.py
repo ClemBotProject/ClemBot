@@ -25,7 +25,6 @@ class ExampleCog(commands.Cog):
     #its with this that we can access all parts of the discord api
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
 
     #To createa a command you decorate an async method with commands.command
     #the command name in discord will be the name of the function that you have decorated
