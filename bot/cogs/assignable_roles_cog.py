@@ -38,7 +38,6 @@ class AssignableRolesCog(commands.Cog):
         assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
         return input_role in [ctx.guild.get_role(i['id']) for i in assignable_roles]
 
-
     async def find_possible_roles(self, ctx, input_role: str):
         # Casefold the roles
         str_input_role = str(input_role).casefold()
@@ -67,9 +66,9 @@ class AssignableRolesCog(commands.Cog):
 
     async def send_matching_roles_list(self, ctx, title: str, matching_roles, role_count):
         names = ''
-        reactions = ['\u0031\ufe0f\u20e3','\u0032\ufe0f\u20e3','\u0033\ufe0f\u20e3','\u0034\ufe0f\u20e3',
-                        '\u0035\ufe0f\u20e3','\u0036\ufe0f\u20e3','\u0037\ufe0f\u20e3','\u0038\ufe0f\u20e3',
-                        '\u0039\ufe0f\u20e3','\U0001F51F']
+        reactions = ['\u0031\ufe0f\u20e3', '\u0032\ufe0f\u20e3', '\u0033\ufe0f\u20e3', '\u0034\ufe0f\u20e3',
+                    '\u0035\ufe0f\u20e3', '\u0036\ufe0f\u20e3', '\u0037\ufe0f\u20e3', '\u0038\ufe0f\u20e3',
+                    '\u0039\ufe0f\u20e3', '\U0001F51F']
         """
             USING EMOJIS WITH EMBEDDED TEXT
                 What I know works:
@@ -108,14 +107,15 @@ class AssignableRolesCog(commands.Cog):
                 Method 1:
                 say you want :ping_pong:, you would use the unicode charcter U+1F3D3 and change it to U0001F3D3.
                     thus, '\U0001F3D3' would be your string for ping pong
-                as another example, if you wanted to use :skull_crossbones:, you would use unicode character U+2620 and change it to U00002620
+                as another example, if you wanted to use :skull_crossbones:, 
+                you would use unicode character U+2620 and change it to U00002620
                     thus, '\U00002620' would be your string for skull and crossbones
 
                 Method 2:
                 Use the CDLR short names.
                 Not recommended. Only works if name contains ONLY letters and spaces.
+                #e.g. '{pensive face}' is fine but '{keycap: 1} would NOT work'
         """
-                #e.g. '\N{pensive face}' is fine but '\N{keycap: 1} would NOT work'
 
         # Add reactions for user to choose from
         for str_emoji in reactions:
