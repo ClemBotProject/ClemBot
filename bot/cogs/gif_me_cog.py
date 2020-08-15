@@ -24,14 +24,15 @@ class GifMeCog(commands.Cog):
                 "rating": "PG-13",
             }
         )
-        if(response.status_code == 429):
+        response_info = response.json()["meta"]
+        if(response_info["status"] != 200):
             embed = discord.Embed(title ="GifMe", color = Colors.Error)
-            embed.add_field(name="Too Many Requests", value="The request limit has been reached for the hour.")
+            embed.add_field(name="Error", value=f"{response_info['status']}: {response_info['msg']}")
         else:
             embed = discord.Embed(title ="GifMe", color = Colors.ClemsonOrange)
             embed.set_image(url=response.json()["data"]["images"]["original"]["url"])
+            embed.set_footer(text = "Powered by GIPHY")
         await ctx.send(embed=embed)    
-        await ctx.send("Powered by GIPHY")
 
 
 def setup(bot):
