@@ -206,7 +206,7 @@ class gradesCog(commands.Cog):
         string += f'Since Spring 2014, there was an average of {self.process_Search(query)}'
         string += 'DISCLAIMER:\n'
         string += 'Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n' # NOQA
-        string += 'Take it at your own discression\n'
+        string += 'Take it at your own discretion\n'
         string += '\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n' # NOQA
         string += 'As a result, the limitations according to the GDR are as follows:\n'
         return string
