@@ -72,8 +72,7 @@ class gradesCog(commands.Cog):
         AvgF = sum(F)//len(F)
         AvgWithdraw = sum(W)//len(W)
 
-        courseString = 'Average; \nA: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}'.format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
-        
+        courseString = f'Average; \nA: {AvgA}%\nB: {AvgB}%\nC: {AvgC}%\nD: {AvgD}%\nF: {AvgF}%\nW: {AvgWithdraw}%\nfrom {len(data_list)} class(es) for {orig_query}: {name}'
 
         bestProfName = '' #Professor name to go in professor string
         bestProfAB = 0
@@ -101,8 +100,10 @@ class gradesCog(commands.Cog):
                 worstProfName = i
                 worstProfFW = data[1]
                 worstProfLenCount = data[-1]
-        
-        profString = 'The statistically best professor is {} with an A+B Avg of {}% in {} classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)'.format(bestProfName.replace('"', ''), bestProfAB, bestProfLenCount, worstProfName.replace('"', ''), worstProfFW, worstProfLenCount) #Final professor string
+        bestProfName = bestProfName.replace('"','')
+        worstProfName = worstProfName.replace('"', '')
+
+        profString = f'The statistically best professor is {bestProfName} with an A+B Avg of {bestProfAB}% in {bestProfLenCount} classes\n\nThe statistically worst professor is {worstProfName} with an F+W Avg of {worstProfFW}% out of {worstProfLenCount} class(es)'
 
         return courseString + '\n\n' + profString + '\n\n'
 
@@ -116,12 +117,12 @@ class gradesCog(commands.Cog):
 
     def initialize(self):
 
-        if os.path.isfile('bot/cogs/Student-Teacher/assets/master.json'): #SKIP PARSE DATA WHEN NOT NECESSARY
-            with open('bot/cogs/Student-Teacher/assets/master.json', 'r') as f:
+        if os.path.isfile('bot/cogs/grades_data/assets/master.json'): #SKIP PARSE DATA WHEN NOT NECESSARY
+            with open('bot/cogs/grades_data/assets/master.json', 'r') as f:
                 self.master_list = json.load(f)
         
-            if os.path.isfile('bot/cogs/Student-Teacher/assets/master_prof.json'):
-                with open('bot/cogs/Student-Teacher/assets/master_prof.json', 'r') as f:
+            if os.path.isfile('bot/cogs/grades_data/assets/master_prof.json'):
+                with open('bot/cogs/grades_data/assets/master_prof.json', 'r') as f:
                     self.master_prof_list = json.load(f)
             
         else:
@@ -181,9 +182,9 @@ class gradesCog(commands.Cog):
         string += 'Since Spring 2014, there was an average of ' + self.process_Search(query)
         string += 'DISCLAIMER:\n'
         string += 'Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n'
-        string += "Take it at your own discression\n"
-        string += "\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n"
-        string += "As a result, the limitations according to the GDR are as follows:\n"
+        string += 'Take it at your own discression\n'
+        string += '\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n'
+        string += 'As a result, the limitations according to the GDR are as follows:\n'
         string += '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*'
         return string
         
