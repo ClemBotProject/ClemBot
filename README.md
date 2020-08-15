@@ -32,4 +32,6 @@ The bot is set up in a simple way. There are 3 layers, the Cog layer, the Servic
 2. Service layer - This is where all things that are bot related but not controlled through front end commands live. Things like user tracking, event handling etc all go in here.
 3. Data layer - This is the abstraction on stop of the sqlite database. This layer is a collection of repositories which contain the code to query and insert from the DB
 
-The bot loads Cogs and Services dynamically. To create a new command simply create a class that inherits from Command.Cog and defines a setup function in module scope at the bottom. See manage_classes.py for an example.
+The bot loads Cogs and Services dynamically. To create a new command simply create a class that inherits from Command.Cog and defines a setup function in module scope at the bottom. See [example_cog.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/cogs/example_cog.py) for an example. 
+
+The bot does the same thing for services, to see how to define a service, see [example_service.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/services/example_service.py)
