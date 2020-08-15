@@ -25,16 +25,17 @@ class gradesCog(commands.Cog):
 
     def process_Search(self, orig_query: str) -> str: #Primary search function and processing for a query. A query is generally defined by 
                                     #"Course-Number" of which it pulls the data from the DB.
-        print("PROCESSING")
+        
         query = orig_query.upper()
         
-        items = query.split("-")
+        items = query.split('-')
         master_String = ''
 
         if query in self.master_list:
             data_list = self.master_list[query]
         else:
             raise NotADirectoryError
+
         name = data_list[-1]['name'] # Get the most recent course name on file. If we did the beginning, it'd throw the incorrect name because Clemson is big dumb.
         # print(data_list)
         A = []
@@ -71,13 +72,14 @@ class gradesCog(commands.Cog):
         AvgF = sum(F)//len(F)
         AvgWithdraw = sum(W)//len(W)
 
-        courseString = "Average; A: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}".format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
+        courseString = 'Average; \nA: {}%\nB: {}%\nC: {}%\nD: {}%\nF: {}%\nW: {}%\nfrom {} class(es) for {}: {}'.format(AvgA, AvgB, AvgC, AvgD, AvgF, AvgWithdraw, len(data_list), orig_query, name)
         
-        bestProfName = "" #Professor name to go in professor string
+
+        bestProfName = '' #Professor name to go in professor string
         bestProfAB = 0
         bestProfLenCount = 0
 
-        worstProfName = ""
+        worstProfName = ''
         worstProfFW = 0
         worstProfLenCount = 0
 
@@ -100,12 +102,12 @@ class gradesCog(commands.Cog):
                 worstProfFW = data[1]
                 worstProfLenCount = data[-1]
         
-        profString = "The statistically best professor is {} with an A+B Avg of {}% in %s classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)".format(bestProfName, bestProfAB, bestProfLenCount, worstProfName, worstProfFW, worstProfLenCount) #Final professor string
+        profString = 'The statistically best professor is {} with an A+B Avg of {}% in {} classes\n\nThe statistically worst professor is {} with an F+W Avg of {}% out of {} class(es)'.format(bestProfName.replace('"', ''), bestProfAB, bestProfLenCount, worstProfName.replace('"', ''), worstProfFW, worstProfLenCount) #Final professor string
 
-        return courseString + "\n\n" + profString + "\n\n"
+        return courseString + '\n\n' + profString + '\n\n'
 
     def getInitials(self, Name):
-        initials = ""
+        initials = ''
         Name = Name.split()
         Name = Name[1:] + [Name[0]] #Rotates it
         for i in Name:
@@ -115,18 +117,15 @@ class gradesCog(commands.Cog):
     def initialize(self):
 
         if os.path.isfile('bot/cogs/Student-Teacher/assets/master.json'): #SKIP PARSE DATA WHEN NOT NECESSARY
-            print("FOUND COURSE FILE")
             with open('bot/cogs/Student-Teacher/assets/master.json', 'r') as f:
                 self.master_list = json.load(f)
-            # print(master_list)
+        
             if os.path.isfile('bot/cogs/Student-Teacher/assets/master_prof.json'):
-                print("FOUND PROF FILE")
                 with open('bot/cogs/Student-Teacher/assets/master_prof.json', 'r') as f:
                     self.master_prof_list = json.load(f)
-            else:
-                print("PROF FILE NOT FOUND")
+            
         else:
-            print("FILE NOT FOUND PLEASE SEND HELP")
+            log.info('FILES NOT FOUND')
             
             
 
@@ -134,7 +133,7 @@ class gradesCog(commands.Cog):
         FML = Name.split()
         First = FML[1]
         Last = FML[0]
-        return First + " " + Last
+        return First + ' ' + Last
 
     def process_profQuery(self, Name):
         
@@ -190,19 +189,28 @@ class gradesCog(commands.Cog):
         
     def go(self, course):
         self.initialize()
-        self.getAllCourses()
+        
         return self.searchCourse(course)
 
     @commands.command()
     async def grades(self, ctx, course):
+        '''
+        Attempts to give more information about courses @ Clemson.
+
+        USE:
+
+        grades <course title>-<course number>
+        EX: !grades cpsc-1010
+        '''
         
         try:
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
             result = self.go(course)
             embed.add_field(name="Result", value=result, inline=False)
-        except NotADirectoryError as e:
+
+        except NotADirectoryError as e: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = "That's not a course\n Are you sure you used the proper notation (ex: cpsc-2120)"
+            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
             embed.add_field(name="ERROR", value=result, inline=False)
 
         await ctx.send(embed=embed)
