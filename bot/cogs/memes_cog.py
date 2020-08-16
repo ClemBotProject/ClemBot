@@ -5,7 +5,7 @@ import discord.ext.commands as commands
 
 log = logging.getLogger(__name__)
 
-class RandomStuffCog(commands.Cog):
+class MemesCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -22,4 +22,4 @@ class RandomStuffCog(commands.Cog):
         await ctx.send(msg)
 
 def setup(bot):
-    bot.add_cog(RandomStuffCog(bot))
+    bot.add_cog(MemesCog(bot))
