@@ -1,4 +1,3 @@
-from bot.messaging.events import Events
 import logging
 import asyncio
 
@@ -7,6 +6,7 @@ import discord.ext.commands as commands
 from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
+from bot.messaging.events import Events
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
