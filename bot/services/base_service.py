@@ -12,7 +12,7 @@ class BaseService(abc.ABC):
     def __init__(self, bot):
         self.bot = bot
 
-        for elem, value in inspect.getmembers(self):
+        for _, value in inspect.getmembers(self):
             event = None
             if hasattr(value, '__event_listener__'):
                 event = getattr(value, '__event_listener__')
