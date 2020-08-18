@@ -17,7 +17,7 @@ class CustomPrefixCog(commands.Cog):
         self.bot = bot
     
     @commands.group(pass_context= True, aliases= ['prefixs'])
-    async def prefix(sef, ctx):
+    async def prefix(self, ctx):
         pass
     
     @prefix.command(pass_context= True, aliases= ['add'])

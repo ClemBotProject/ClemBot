@@ -245,7 +245,11 @@ class ManageClassesCog(commands.Cog):
 
     async def create_role(self, ctx, class_repr):
         log.info(f'Creating new class role "{class_repr.role}""')
-        role = await ctx.guild.create_role(name=class_repr.role, mentionable=True)
+        #Attempt to convert the role, if we cant then we create a new one
+        try:
+            role = await commands.converter.RoleConverter().convert(ctx, class_repr.role)
+        except:
+            role = await ctx.guild.create_role(name=class_repr.role, mentionable=True)
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
     @classes.command(pass_context= True, aliases= ['delete'])
