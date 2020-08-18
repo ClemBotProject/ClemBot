@@ -230,11 +230,12 @@ class ManageClassesCog(commands.Cog):
         return await ctx.guild.create_category(class_repr.category)
 
     async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType):
-        log.info(f'Creating new Class channel "{class_repr.name}')
+        log.info(f'Creating new Class channel "{class_repr.name}""')
         await category.create_text_channel(class_repr.channel, 
             topic= f'{class_repr.name} - {class_repr.description}')
 
     async def create_role(self, ctx, class_repr):
+        log.info(f'Creating new class role "{class_repr.role}""')
         role = await ctx.guild.create_role(name=class_repr.role, mentionable=True)
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
