@@ -117,7 +117,8 @@ class ManageClassesCog(commands.Cog):
         
 
         #Create the class channel in the given category
-        await self.create_channel(category, class_repr)
+        channel = await self.create_channel(category, class_repr)
+        await channel.send(f'Here is your generated class channel {ctx.author.mention}, Good luck!')
 
         #create a class role and mark it as assignable
         await self.create_role(ctx, class_repr)
@@ -239,7 +240,7 @@ class ManageClassesCog(commands.Cog):
 
     async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType):
         log.info(f'Creating new Class channel "{class_repr.name}""')
-        await category.create_text_channel(class_repr.channel, 
+        return await category.create_text_channel(class_repr.channel, 
             topic= f'{class_repr.name} - {class_repr.description}')
 
     async def create_role(self, ctx, class_repr):
