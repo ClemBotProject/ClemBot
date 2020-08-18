@@ -1,3 +1,4 @@
+from bot.messaging.events import Events
 import logging
 import asyncio
 
@@ -131,7 +132,7 @@ class AssignableRolesCog(commands.Cog):
             )
 
         try:
-            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
+            reaction, _ = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
         except asyncio.TimeoutError:
             embed.add_field(name= 'Request Timeout:', value= 'User failed to respond in the alloted time', inline= 'false')
             await mes.edit(embed= embed)
@@ -191,9 +192,7 @@ class AssignableRolesCog(commands.Cog):
     @roles.command(pass_context= True, aliases= ['create'])
     @commands.has_guild_permissions(administrator = True)
     async def add(self, ctx, role: discord.Role = None) -> None:
-        role_repo = RoleRepository()
-
-        await role_repo.set_role_assignable(role.id, True)
+        await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
         title = f'Role @{role.name} Added as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
@@ -203,9 +202,8 @@ class AssignableRolesCog(commands.Cog):
     @roles.command(pass_context= True, aliases= ['delete'])
     @commands.has_guild_permissions(administrator = True)
     async def remove(self, ctx, role: discord.Role = None) -> None:
-        role_repo = RoleRepository()
 
-        await role_repo.set_role_assignable(role.id, False)
+        await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
         title = f'Role @{role.name} Removed as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
