@@ -80,8 +80,8 @@ class ManageClassesCog(commands.Cog):
         class name as a parameter E.G "cpsc-1010"
 
         Args:
-            ctx ([type]): [description]
-            class_name (str, optional): [description]. Defaults to None.
+            class_name (str, optional): Formatted class abbreviation and number
+            E.G "cpsc-1010" Defaults to None.
         """
 
         class_repr = ClassType()
@@ -125,7 +125,7 @@ class ManageClassesCog(commands.Cog):
     async def input_class(self, ctx, class_repr: ClassType) -> ClassType:
 
         def input_check(msg: discord.Message) -> bool:
-            return msg.author == ctx.author
+            return msg.author == ctx.author and ctx.channel == msg.channel
 
         #check if the initial command contained a class abbv and number
         if not class_repr.abbv:
