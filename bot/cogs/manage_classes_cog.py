@@ -73,7 +73,7 @@ class ManageClassesCog(commands.Cog):
         pass
 
     @classes.command(pass_context= True, aliases=['create'])
-    @commands.has_guild_permissions(administrator= True)
+    #@commands.has_guild_permissions(administrator= True)
     async def add(self, ctx, class_name: str = None):
         """
         Command to initiate the new class creation wizard, optionally takes a 
@@ -130,6 +130,8 @@ class ManageClassesCog(commands.Cog):
         #check if the initial command contained a class abbv and number
         if not class_repr.abbv:
             embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color= Colors.ClemsonOrange)
+            avi = ctx.author.avatar_url_as(static_format= 'png')
+            embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
             embed.add_field(name= '**Current values**', value=class_repr)
             embed.add_field(
                 name= 'Please enter the class abbreviation and name E.G.',
@@ -154,6 +156,8 @@ class ManageClassesCog(commands.Cog):
         embed = discord.Embed(
             title=f'Class "{class_repr.abbv}-{class_repr.number}" set',
             color= Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format= 'png')
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
             name= 'Please enter the class name or "None" to skip this step E.G.',
@@ -171,6 +175,8 @@ class ManageClassesCog(commands.Cog):
             return 
 
         embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color= Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format= 'png')
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
             name= 'Please enter the class description or "None" to skip this step E.G.',
@@ -190,6 +196,8 @@ class ManageClassesCog(commands.Cog):
         embed = discord.Embed(
             title=f'Class description: "{class_repr.description}" set',
             color= Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format= 'png')
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
             name= 'Please enter the class professor or "None" to skip this step E.G.',
@@ -207,7 +215,7 @@ class ManageClassesCog(commands.Cog):
             return 
 
         embed = discord.Embed(
-            title=f'Class professor: "{class_repr.teacher}" set',
+            title=f'Class and role "{class_repr.role}" created in category "{class_repr.category}" ',
             color= Colors.ClemsonOrange)
         embed.add_field(name= '**Current values**', value=class_repr)
         await ctx.send(embed= embed)
@@ -246,6 +254,9 @@ class ManageClassesCog(commands.Cog):
 
     async def input_timeout(self, ctx):
         await ctx.send('Response timed out please redo the class wizard')
+    
+    def get_full_name(self, author) -> str: 
+        return f'{author.name}#{author.discriminator}' 
 
 
 def round_down(num, divisor):
