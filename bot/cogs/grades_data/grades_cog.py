@@ -36,14 +36,14 @@ class gradesCog(commands.Cog):
         self.master_list = {}
         self.master_prof_list = {}
 
-    def process_Search(self, orig_query: str) -> str:
-        """
-        Primary search function and processing for a query. A query is generally defined by 
-        "Course-Number" of which it pulls the data from the DB.
-        """
+    def process_Search(self, orig_query: str) -> str: #Primary search function and processing for a query. A query is generally defined by 
+                                    #"Course-Number" of which it pulls the data from the DB.
         
         query = orig_query.upper()
         
+        items = query.split('-')
+        master_String = ''
+
         if query in self.master_list:
             data_list = self.master_list[query]
         else:
@@ -75,7 +75,7 @@ class gradesCog(commands.Cog):
             searchableName = self.getFirstLast(i['Professor'])
             professorGrades[searchableName] = []
 
-        gradesList = (a, b, c, d, f, w, p, np)
+        gradesList = (a,b,c,d,f,w,p,np)
         
         for letterGrade in gradesList:
             for i in range(len(letterGrade)):
@@ -103,7 +103,7 @@ class gradesCog(commands.Cog):
         bestProfLenCount = 0
 
         worstProfName = ''
-        worstProfFW = 0
+        worstProfDFW = 0
         worstProfLenCount = 0
 
         data = []
@@ -120,16 +120,14 @@ class gradesCog(commands.Cog):
                 bestProfName = i
                 bestProfAB = data[0]
                 bestProfLenCount = data[-1]
-            if data[1] > worstProfFW:
+            if data[1] > worstProfDFW:
                 worstProfName = i
-                worstProfFW = data[1]
+                worstProfDFW = data[1]
                 worstProfLenCount = data[-1]
-        bestProfName = bestProfName.replace('"', '')
+        bestProfName = bestProfName.replace('"','')
         worstProfName = worstProfName.replace('"', '')
 
-        profString = f"""The statistically best professor is {bestProfName} with an A+B Avg of {bestProfAB}% in {bestProfLenCount} classes
-        
-        The statistically worst professor is {worstProfName} with an F+W Avg of {worstProfFW}% out of {worstProfLenCount} class(es)""" # NOQA 
+        profString = f'The statistically best professor is {bestProfName} with an A+B Avg of {bestProfAB}% in {bestProfLenCount} classes\n\nThe statistically worst professor is {worstProfName} with an D+F+W Avg of {worstProfDFW}% out of {worstProfLenCount} class(es)'
 
         return courseString + '\n\n' + profString + '\n\n'
 
@@ -203,12 +201,8 @@ class gradesCog(commands.Cog):
 
     def searchCourse(self, query):
         string = ''
-        string += f'Since Spring 2014, there was an average of {self.process_Search(query)}'
-        string += 'DISCLAIMER:\n'
-        string += 'Not every professor listed will be at Clemson, this is a tool built for better information but not complete information\n' # NOQA
-        string += 'Take it at your own discretion\n'
-        string += '\nIn addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/\n' # NOQA
-        string += 'As a result, the limitations according to the GDR are as follows:\n'
+        string += 'Since Spring 2014, there is an ' + self.process_Search(query)
+        
         return string
         
     def go(self, course):
@@ -218,27 +212,33 @@ class gradesCog(commands.Cog):
 
     @commands.command()
     async def grades(self, ctx, course):
-        """
+
+        '''
         Attempts to give more information about courses @ Clemson.
 
         USE:
 
         grades <course title>-<course number>
         EX: !grades cpsc-1010
-        """
+
+        DISCLAIMER:
+        Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
+        In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
+        *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
+        '''
         
         try:
-            embed = discord.Embed(title='Grades', color=Colors.ClemsonOrange)
+            embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
             result = self.go(course)
-            embed.add_field(name='Result', value=result, inline=False)
-
-            exp = '*Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*' # NOQA
+            embed.add_field(name="Result", value=result, inline=False)
+            prefix = await self.bot.get_prefix(ctx)
+            exp = f'Type `{prefix}help grades` for more information' # NOQA
             embed.add_field(name='Explanation', value=exp)
 
-        except NotADirectoryError: 
+        except NotADirectoryError as e: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
-            embed.add_field(name='ERROR', value=result, inline=False)
+            embed.add_field(name="ERROR", value=result, inline=False)
 
         await ctx.send(embed=embed)
 
