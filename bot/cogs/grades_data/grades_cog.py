@@ -231,8 +231,8 @@ class gradesCog(commands.Cog):
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
             result = self.go(course)
             embed.add_field(name="Result", value=result, inline=False)
-
-            exp = 'Type `!help grades` for more information' # NOQA
+            prefix = await self.bot.get_prefix(ctx)
+            exp = f'Type `{prefix}help grades` for more information' # NOQA
             embed.add_field(name='Explanation', value=exp)
 
         except NotADirectoryError as e: # output if course doesn't exist
