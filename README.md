@@ -12,7 +12,7 @@ A Discord bot for server management with a focus on school related commands. We 
   </a>
   
   <a href="https://www.python.org/downloads/">
-    <img src="https://img.shields.io/badge/Made%20With-Python%203.7-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.7">
+    <img src="https://img.shields.io/badge/Made%20With-Python%203.8-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.7">
   </a>
   
   <a href="https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/LICENSE">
