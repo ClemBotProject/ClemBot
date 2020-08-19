@@ -3,10 +3,9 @@ This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 
-from typing import Type
 
 
-class EventsMeta(Type):
+class EventsMeta(type):
     """Class that defines what events are exposed at the bot level"""
 
     @property
@@ -264,6 +263,26 @@ class EventsMeta(Type):
             prefix (str): The prefix to be added
         """
         return 'on_set_custom_prefix'
+    
+    @property
+    def on_assignable_role_add(self):
+        """
+        Pulbished when a new role is marked as set to be marked as assignable
+
+        Args:
+            role (discord.Role) The role to mark as assignable
+        """
+        return 'on_assignable_role_add'
+
+    @property
+    def on_assignable_role_remove(self):
+        """
+        Pulbished when a role is marked as set to be removed as assignable
+
+        Args:
+            role (discord.Role) The role to remove as assignable
+        """
+        return 'on_assignable_role_remove'
 
 class Events(metaclass= EventsMeta):
     pass

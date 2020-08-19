@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
+from bot.messaging.events import Events
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ class AssignableRolesCog(commands.Cog):
 
             await self.set_role(ctx, role)
         
-        except BadArgument: # If RoleConverter failed
+        except BadArgument:  # If RoleConverter failed
             await self.find_possible_roles(ctx, input_role)
 
     async def check_role_assignable(self, ctx, input_role: str) -> bool:
@@ -45,22 +46,22 @@ class AssignableRolesCog(commands.Cog):
         assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
         role_list = [ctx.guild.get_role(i['id']) for i in assignable_roles]
 
-        str_role_list = [str(i).casefold() for i in role_list] # Case-fold to do case insensitive matching
+        str_role_list = [str(i).casefold() for i in role_list]  # Case-fold to do case insensitive matching
 
         # Compare input_role to role_list entries for matches
         matching_roles = []
 
         for j, val_j in enumerate(str_role_list):
             if str_input_role == val_j:
-                matching_roles.append(role_list[j]) # matching_roles.append(j)
+                matching_roles.append(role_list[j])  # matching_roles.append(j)
         
         role_count = len(matching_roles)
 
-        if role_count == 0: # If no matches found, report findings
+        if role_count == 0:  # If no matches found, report findings
             await self.send_role_list(ctx, f'@{input_role} not found')
-        elif role_count == 1: # If only one match was found, assign the role
+        elif role_count == 1:  # If only one match was found, assign the role
             await self.set_role(ctx, matching_roles[0])
-        else: # If multiple matches found, query user via emojis to select correct role
+        else:  # If multiple matches found, query user via emojis to select correct role
             await self.send_matching_roles_list(ctx, f'Multiple roles found for @{input_role}',
                 matching_roles, role_count)
 
@@ -131,16 +132,16 @@ class AssignableRolesCog(commands.Cog):
             )
 
         try:
-            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
+            reaction, _ = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
         except asyncio.TimeoutError:
             embed.add_field(name= 'Request Timeout:', value= 'User failed to respond in the alloted time', inline= 'false')
             await mes.edit(embed= embed)
-            await mes.clear_reactions() # Remove reactions so use doesn't try to respond after timeout.
+            await mes.clear_reactions()  # Remove reactions so use doesn't try to respond after timeout.
             return
         
-        answer = reactions.index(reaction.emoji) # Get user reaction
-        await self.set_role(ctx, matching_roles[answer]) # Attempt to assign user the requested role
-        await mes.delete() # Delete message now that user has made a successful choice
+        answer = reactions.index(reaction.emoji)  # Get user reaction
+        await self.set_role(ctx, matching_roles[answer])  # Attempt to assign user the requested role
+        await mes.delete()  # Delete message now that user has made a successful choice
 
     async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
@@ -191,9 +192,7 @@ class AssignableRolesCog(commands.Cog):
     @roles.command(pass_context= True, aliases= ['create'])
     @commands.has_guild_permissions(administrator = True)
     async def add(self, ctx, role: discord.Role = None) -> None:
-        role_repo = RoleRepository()
-
-        await role_repo.set_role_assignable(role.id, True)
+        await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
         title = f'Role @{role.name} Added as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
@@ -203,9 +202,7 @@ class AssignableRolesCog(commands.Cog):
     @roles.command(pass_context= True, aliases= ['delete'])
     @commands.has_guild_permissions(administrator = True)
     async def remove(self, ctx, role: discord.Role = None) -> None:
-        role_repo = RoleRepository()
-
-        await role_repo.set_role_assignable(role.id, False)
+        await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
         title = f'Role @{role.name} Removed as assignable :white_check_mark:'
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
