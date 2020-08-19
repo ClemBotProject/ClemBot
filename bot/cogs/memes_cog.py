@@ -3,9 +3,8 @@ import logging
 import discord
 import discord.ext.commands as commands
 
-from random import randint
-from random import seed
-from time import time
+import random
+import time
 
 from bot.consts import Colors
 
@@ -33,12 +32,12 @@ class MemesCog(commands.Cog):
         '''
         Spongebob Text
         '''
-        seed(time())
+        random.seed(time.time())
         args = args.replace('"', "'")
     
         result = ''
         for i in args:
-            helper = randint(0, 100)
+            helper = random.randint(0, 100)
             
             if helper > 60:
                 result += str(i).upper()
@@ -47,7 +46,7 @@ class MemesCog(commands.Cog):
 
         embed = discord.Embed(title="SpOnGeBoB", color=Colors.ClemsonOrange)
         result2 = ''
-        
+
         # Discord messages can only be 2k characters long, this block accounts for that
         if len(result) >= 1024:
             result2 = result[1024:len(result)]
