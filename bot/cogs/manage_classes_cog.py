@@ -207,7 +207,7 @@ class ManageClassesCog(commands.Cog):
             icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
-            name= 'Please enter the class professor or "None" to skip this step E.G.',
+            name= 'Please enter the class professors last name or "None" to skip this step E.G.',
             value='Plis',
             inline= False)
 
