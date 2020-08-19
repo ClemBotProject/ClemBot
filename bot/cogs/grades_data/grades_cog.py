@@ -238,12 +238,12 @@ class gradesCog(commands.Cog):
             exp = f'Type `{prefix}help grades` for more information' # NOQA
             embed.add_field(name='Explanation', value=exp)
 
-        except NotADirectoryError as e: # output if course doesn't exist
+        except NotADirectoryError: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
             embed.add_field(name="ERROR: Course doesn't exist", value=result, inline=False)
         
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = "Either master.json or master_prof.json are not found in the proper directory"
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
