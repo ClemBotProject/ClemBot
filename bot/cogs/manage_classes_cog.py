@@ -14,7 +14,7 @@ from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
 
-TIMEOUT = 30
+TIMEOUT = 60
 
 @dataclass
 class ClassType:
@@ -132,7 +132,8 @@ class ManageClassesCog(commands.Cog):
         if not class_repr.abbv:
             embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color= Colors.ClemsonOrange)
             avi = ctx.author.avatar_url_as(static_format= 'png')
-            embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
+            embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+                icon_url= avi)
             embed.add_field(name= '**Current values**', value=class_repr)
             embed.add_field(
                 name= 'Please enter the class abbreviation and name E.G.',
@@ -158,7 +159,8 @@ class ManageClassesCog(commands.Cog):
             title=f'Class "{class_repr.abbv}-{class_repr.number}" set',
             color= Colors.ClemsonOrange)
         avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+            icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
             name= 'Please enter the class name or "None" to skip this step E.G.',
@@ -177,17 +179,20 @@ class ManageClassesCog(commands.Cog):
 
         embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color= Colors.ClemsonOrange)
         avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+            icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
-            name= 'Please enter the class description or "None" to skip this step E.G.',
+            name= 'Please enter the class description (must be less than 256 characters) or "None" to skip this step E.G.',
             value='An overview of programming fundamentals using the C programming langauge',
             inline= False)
 
         await ctx.send(embed= embed)
 
         try:
-            val = (await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)).content
+            #Keep retrying to get the description until we get a less then 256 characters one or the wait times out
+            while(len(val := (await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)).content)) > 255:
+                await ctx.send('Error: Description needs to be less than 256 characters\nPlease try again')
             if val != 'None':
                 class_repr.description = val
         except asyncio.TimeoutError:
@@ -198,7 +203,8 @@ class ManageClassesCog(commands.Cog):
             title=f'Class description: "{class_repr.description}" set',
             color= Colors.ClemsonOrange)
         avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)}', icon_url= avi)
+        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+            icon_url= avi)
         embed.add_field(name= '**Current values**', value=class_repr)
         embed.add_field(
             name= 'Please enter the class professor or "None" to skip this step E.G.',
