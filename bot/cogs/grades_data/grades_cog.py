@@ -150,17 +150,17 @@ class gradesCog(commands.Cog):
                     self.master_prof_list = json.load(f)
             
         else:
-            notFound = ''
+            not_found = ''
             
             if not os.path.isfile('bot/cogs/grades_data/assets/master.json'): 
-                notFound += 'master.json '
+                not_found += 'master.json '
             
             if not os.path.isfile('bot/cogs/grades_data/assets/master_prof.json'):
-                notFound += 'master_prof.json'
+                not_found += 'master_prof.json'
 
-            log.error(f'{notfound} file not found, aborting grades command')
-
-            raise FileNotFoundError(notFound)
+            log.error(f'{not_found} file not found, aborting grades command')
+            
+            raise FileNotFoundError(not_found)
             
     def getFirstLast(self, Name):
         fml = Name.split()
