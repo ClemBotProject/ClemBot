@@ -158,7 +158,7 @@ class gradesCog(commands.Cog):
             if not os.path.isfile('bot/cogs/grades_data/assets/master_prof.json'):
                 notFound += 'master_prof.json'
 
-            log.error(f'{notfound} file not found, aborting grades command')
+            log.error(f'{notFound} file not found, aborting grades command')
 
             raise FileNotFoundError(notFound)
             
