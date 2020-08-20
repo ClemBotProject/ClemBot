@@ -146,7 +146,7 @@ class AssignableRolesCog(commands.Cog):
     async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
 
-        CHUNK_SIZE= 10
+        CHUNK_SIZE= 15
 
         results = await role_repo.get_assignable_roles(ctx.guild.id)
 
