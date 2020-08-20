@@ -15,7 +15,7 @@ class UserHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_user_joined)
     async def on_user_joined(self, user) -> None:
-        log.info(f'{user.name} has joined!')
+        log.info(f'"{user.name}:{user.id}" has joined guild "{user.guild.name}:{user.guild.id}"')
         await self.add_user(user, user.guild.id)
 
     @BaseService.Listener(Events.on_new_guild_initialized)
