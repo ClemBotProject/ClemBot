@@ -21,6 +21,9 @@ A Discord bot for server management with a focus on school related commands. We 
   </br>
 </div>
 
+# Bot Invite
+To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=2081291511&scope=bot)
+
 # Development
 To start developing and contributing to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
