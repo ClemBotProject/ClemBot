@@ -145,15 +145,18 @@ class AssignableRolesCog(commands.Cog):
 
     async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
+
+        CHUNK_SIZE= 10
+
         results = await role_repo.get_assignable_roles(ctx.guild.id)
 
-        if results:
-            names = '\n'.join([role['name'] for role in results])
-        else:
-            names = 'No currently assignable roles.'
-
         embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
-        embed.add_field(name= 'Available:', value= names)
+
+        if results:
+            for chunk in self.chunk_list([role['name'] for role in results], CHUNK_SIZE):
+                embed.add_field(name= 'Available:', value= '\n'.join(chunk), inline= True)
+        else:
+            embed.add_field(name= 'Available:', value= 'No currently assignable roles.')
 
         await ctx.send(embed= embed)
 
@@ -211,6 +214,11 @@ class AssignableRolesCog(commands.Cog):
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
+    
+    def chunk_list(self, lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
 
 def setup(bot): 
     bot.add_cog(AssignableRolesCog(bot))
