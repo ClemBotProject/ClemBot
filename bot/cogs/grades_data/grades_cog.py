@@ -139,24 +139,24 @@ class gradesCog(commands.Cog):
             initials += i[0]
         return initials
 
-    def initialize(self):
+    def initialize(self, year):
         #SKIP PARSE DATA WHEN NOT NECESSARY
-        if os.path.isfile('bot/cogs/grades_data/assets/master.json'): 
-            with open('bot/cogs/grades_data/assets/master.json', 'r') as f:
+        if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
+            with open(f'bot/cogs/grades_data/assets/master-{year}.json', 'r') as f:
                 self.master_list = json.load(f)
         
-            if os.path.isfile('bot/cogs/grades_data/assets/master_prof.json'):
-                with open('bot/cogs/grades_data/assets/master_prof.json', 'r') as f:
+            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
+                with open(f'bot/cogs/grades_data/assets/master_prof-{year}.json', 'r') as f:
                     self.master_prof_list = json.load(f)
             
         else:
             not_found = ''
             
-            if not os.path.isfile('bot/cogs/grades_data/assets/master.json'): 
-                not_found += 'master.json '
+            if not os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
+                not_found += f'master-{year}.json '
             
-            if not os.path.isfile('bot/cogs/grades_data/assets/master_prof.json'):
-                not_found += 'master_prof.json'
+            if not os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
+                not_found += f'master_prof-{year}.json'
 
             log.error(f'{not_found} file not found, aborting grades command')
             
@@ -209,26 +209,26 @@ class gradesCog(commands.Cog):
             items[i] = items[i][0].upper() + items[i][1:].lower()
         return ' '.join(items)
 
-    def searchCourse(self, query):
+    def searchCourse(self, query, year):
         string = ''
-        string += 'Since Spring 2014, there is an ' + self.process_Search(query)
+        string += f'Since Spring {year-1}, there is an ' + self.process_Search(query)
         
         return string
         
-    def go(self, course):
-        self.initialize()
+    def go(self, course, year):
+        self.initialize(year)
         
-        return self.searchCourse(course)
+        return self.searchCourse(course, year)
 
     @commands.command()
-    async def grades(self, ctx, course):
+    async def grades(self, ctx, course, year=2014):
 
         '''
         Attempts to give more information about courses @ Clemson.
 
         USE:
 
-        grades <course title>-<course number>
+        grades <course title>-<course number> <year (optional)>
         EX: !grades cpsc-1010
 
         DISCLAIMER:
@@ -239,7 +239,7 @@ class gradesCog(commands.Cog):
         
         try:
             embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
-            result = self.go(course)
+            result = self.go(course, year)
             embed.add_field(name="Result", value=result, inline=False)
             prefix = await self.bot.get_prefix(ctx)
             if isinstance(prefix, list):
@@ -256,8 +256,6 @@ class gradesCog(commands.Cog):
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = "Either master.json or master_prof.json are not found in the proper directory"
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
-
-
 
         await ctx.send(embed=embed)
 
