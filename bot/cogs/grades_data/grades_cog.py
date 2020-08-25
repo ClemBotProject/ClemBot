@@ -33,10 +33,39 @@ class gradesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.fileLines = []
+
         self.master_list = {}
         self.master_prof_list = {}
 
-    def process_Search(self, orig_query: str) -> str: #Primary search function and processing for a query. A query is generally defined by 
+        self.load_files()
+
+    def load_files(self):
+        temp = self.initialize('2014') # Store 2014
+        self.master_list['2014'] = temp[0]
+        self.master_prof_list['2014'] = temp[1]
+
+        temp = self.initialize('2015') # Store 2015
+        self.master_list['2015'] = temp[0]
+        self.master_prof_list['2015'] = temp[1]
+
+        temp = self.initialize('2016') # Store 2016
+        self.master_list['2016'] = temp[0]
+        self.master_prof_list['2016'] = temp[1]
+
+        temp = self.initialize('2017') # Store 2017
+        self.master_list['2017'] = temp[0]
+        self.master_prof_list['2017'] = temp[1]
+
+        temp = self.initialize('2018') # Store 2018
+        self.master_list['2018'] = temp[0]
+        self.master_prof_list['2018'] = temp[1]
+
+        temp = self.initialize('2019') # Store 2019
+        self.master_list['2019'] = temp[0]
+        self.master_prof_list['2019'] = temp[1]
+
+
+    def process_Search(self, orig_query: str, year = 2014) -> str: #Primary search function and processing for a query. A query is generally defined by 
                                     #"Course-Number" of which it pulls the data from the DB.
         
         query = orig_query.upper()
@@ -44,8 +73,8 @@ class gradesCog(commands.Cog):
         items = query.split('-')
         master_String = ''
 
-        if query in self.master_list:
-            data_list = self.master_list[query]
+        if query in self.master_list[str(year)]:
+            data_list = self.master_list[str(year)][query]
         else:
             raise NotADirectoryError
 
@@ -111,7 +140,7 @@ class gradesCog(commands.Cog):
         for i in professorGrades:
             
             try:
-                professorGrades[i].extend(self.process_profQuery(i))
+                professorGrades[i].extend(self.process_profQuery(i,year))
                 data = professorGrades[i]
             except Exception as e:
                 print(e)
@@ -124,6 +153,7 @@ class gradesCog(commands.Cog):
                 worstProfName = i
                 worstProfDFW = data[1]
                 worstProfLenCount = data[-1]
+
         bestProfName = bestProfName.replace('"','')
         worstProfName = worstProfName.replace('"', '')
 
@@ -143,12 +173,12 @@ class gradesCog(commands.Cog):
         #SKIP PARSE DATA WHEN NOT NECESSARY
         if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
             with open(f'bot/cogs/grades_data/assets/master-{year}.json', 'r') as f:
-                self.master_list = json.load(f)
+                normal = json.load(f)
         
             if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
                 with open(f'bot/cogs/grades_data/assets/master_prof-{year}.json', 'r') as f:
-                    self.master_prof_list = json.load(f)
-            
+                    prof = json.load(f)
+            return [normal, prof]
         else:
             not_found = ''
             
@@ -168,9 +198,9 @@ class gradesCog(commands.Cog):
         Last = fml[0]
         return First + ' ' + Last
 
-    def process_profQuery(self, Name):
+    def process_profQuery(self, Name, year=2014):
         
-        data_list = self.master_prof_list[Name]
+        data_list = self.master_prof_list[str(year)][Name]
         
         a = []
         b = []
@@ -211,13 +241,11 @@ class gradesCog(commands.Cog):
 
     def searchCourse(self, query, year):
         string = ''
-        string += f'Since Spring {year-1}, there is an ' + self.process_Search(query)
+        string += f'Since Fall {year}, there is an ' + self.process_Search(query, year)
         
         return string
         
     def go(self, course, year):
-        self.initialize(year)
-        
         return self.searchCourse(course, year)
 
     @commands.command()
@@ -228,7 +256,7 @@ class gradesCog(commands.Cog):
 
         USE:
 
-        grades <course title>-<course number> <year (optional)>
+        grades <course title>-<course number> <start year (optional)>
         EX: !grades cpsc-1010
 
         DISCLAIMER:
@@ -249,12 +277,12 @@ class gradesCog(commands.Cog):
 
         except NotADirectoryError: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
+            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)?'
             embed.add_field(name="ERROR: Course doesn't exist", value=result, inline=False)
         
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = "Either master.json or master_prof.json are not found in the proper directory"
+            result = f'Files `{e}` are not in directory. Reminder that the files go from 2014-2019!'
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
