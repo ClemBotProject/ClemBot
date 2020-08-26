@@ -38,7 +38,7 @@ class gradesCog(commands.Cog):
 
         self.master_list = {}
         self.master_prof_list = {}
-        self.MIN_YEAR = 2014
+        
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
 
@@ -261,7 +261,7 @@ class gradesCog(commands.Cog):
                 embed.add_field(name='Explanation', value=exp)
             else:
                 embed = discord.Embed(title="Grades", color=Colors.Error)
-                result = f'Year not available. Reminder that years go from {self.year_list[0]}-{self.year_list[len(self.year_list)-1]}'
+                result = f'Year not available. Reminder that years go from {self.year_list[0]}-{self.year_list[-1]}'
                 embed.add_field(name="ERROR: Year not available", value=result, inline=False)
 
         except NotADirectoryError: # output if course doesn't exist
@@ -271,7 +271,7 @@ class gradesCog(commands.Cog):
         
         except FileNotFoundError as e: #SHOULD NEVER THROW
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = f'Files `{e}` are not in directory. Reminder that the files go from {self.year_list[0]}-{self.year_list[len(self.year_list)-1]}!'
+            result = f'Files `{e}` are not in directory. Reminder that the files go from {self.year_list[0]}-{self.year_list[-1]}!'
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
