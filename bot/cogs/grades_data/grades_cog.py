@@ -30,13 +30,26 @@ class gradesCog(commands.Cog):
                     '2019Fall.csv', 
                     '2020Spring.csv']
 
+    MIN_YEAR = 2014
+
     def __init__(self, bot):
         self.bot = bot
         self.fileLines = []
+
         self.master_list = {}
         self.master_prof_list = {}
+        
+        self.year_list = ['2014','2015','2016','2017','2018','2019']
+        self.load_files(self.year_list)
 
-    def process_Search(self, orig_query: str) -> str: #Primary search function and processing for a query. A query is generally defined by 
+    def load_files(self,yearList):
+        for i in yearList:
+            temp = self.initialize(i) # Store 2014
+            self.master_list[i] = temp[0]
+            self.master_prof_list[i] = temp[1]
+
+
+    def process_Search(self, orig_query: str, year = 2014) -> str: #Primary search function and processing for a query. A query is generally defined by 
                                     #"Course-Number" of which it pulls the data from the DB.
         
         query = orig_query.upper()
@@ -44,8 +57,8 @@ class gradesCog(commands.Cog):
         items = query.split('-')
         master_String = ''
 
-        if query in self.master_list:
-            data_list = self.master_list[query]
+        if query in self.master_list[str(year)]:
+            data_list = self.master_list[str(year)][query]
         else:
             raise NotADirectoryError
 
@@ -111,7 +124,7 @@ class gradesCog(commands.Cog):
         for i in professorGrades:
             
             try:
-                professorGrades[i].extend(self.process_profQuery(i))
+                professorGrades[i].extend(self.process_profQuery(i,year))
                 data = professorGrades[i]
             except Exception as e:
                 print(e)
@@ -124,6 +137,7 @@ class gradesCog(commands.Cog):
                 worstProfName = i
                 worstProfDFW = data[1]
                 worstProfLenCount = data[-1]
+
         bestProfName = bestProfName.replace('"','')
         worstProfName = worstProfName.replace('"', '')
 
@@ -143,12 +157,12 @@ class gradesCog(commands.Cog):
         #SKIP PARSE DATA WHEN NOT NECESSARY
         if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
             with open(f'bot/cogs/grades_data/assets/master-{year}.json', 'r') as f:
-                self.master_list = json.load(f)
+                normal = json.load(f)
         
             if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
                 with open(f'bot/cogs/grades_data/assets/master_prof-{year}.json', 'r') as f:
-                    self.master_prof_list = json.load(f)
-            
+                    prof = json.load(f)
+            return [normal, prof]
         else:
             not_found = ''
             
@@ -168,9 +182,9 @@ class gradesCog(commands.Cog):
         Last = fml[0]
         return First + ' ' + Last
 
-    def process_profQuery(self, Name):
+    def process_profQuery(self, Name, year=2014):
         
-        data_list = self.master_prof_list[Name]
+        data_list = self.master_prof_list[str(year)][Name]
         
         a = []
         b = []
@@ -211,24 +225,22 @@ class gradesCog(commands.Cog):
 
     def searchCourse(self, query, year):
         string = ''
-        string += f'Since Spring {year-1}, there is an ' + self.process_Search(query)
+        string += f'Since Fall {year}, there is an ' + self.process_Search(query, year)
         
         return string
         
     def go(self, course, year):
-        self.initialize(year)
-        
         return self.searchCourse(course, year)
 
     @commands.command()
-    async def grades(self, ctx, course, year=2014):
+    async def grades(self, ctx, course, year=MIN_YEAR):
 
         '''
         Attempts to give more information about courses @ Clemson.
 
         USE:
 
-        grades <course title>-<course number> <year (optional)>
+        grades <course title>-<course number> <start year (optional)>
         EX: !grades cpsc-1010
 
         DISCLAIMER:
@@ -238,23 +250,28 @@ class gradesCog(commands.Cog):
         '''
         
         try:
-            embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
-            result = self.go(course, year)
-            embed.add_field(name="Result", value=result, inline=False)
-            prefix = await self.bot.get_prefix(ctx)
-            if isinstance(prefix, list):
-                prefix = prefix[0]
-            exp = f'Type `{prefix}help grades` for more information' # NOQA
-            embed.add_field(name='Explanation', value=exp)
+            if str(year) in self.year_list:
+                embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
+                result = self.go(course, year)
+                embed.add_field(name="Result", value=result, inline=False)
+                prefix = await self.bot.get_prefix(ctx)
+                if isinstance(prefix, list):
+                    prefix = prefix[0]
+                exp = f'Type `{prefix}help grades` for more information' # NOQA
+                embed.add_field(name='Explanation', value=exp)
+            else:
+                embed = discord.Embed(title="Grades", color=Colors.Error)
+                result = f'Year not available. Reminder that years go from {self.year_list[0]}-{self.year_list[-1]}'
+                embed.add_field(name="ERROR: Year not available", value=result, inline=False)
 
         except NotADirectoryError: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)'
+            result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)?'
             embed.add_field(name="ERROR: Course doesn't exist", value=result, inline=False)
         
-        except FileNotFoundError:
+        except FileNotFoundError as e: #SHOULD NEVER THROW
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = "Either master.json or master_prof.json are not found in the proper directory"
+            result = f'Files `{e}` are not in directory. Reminder that the files go from {self.year_list[0]}-{self.year_list[-1]}!'
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
