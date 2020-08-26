@@ -12,6 +12,8 @@ from bot.consts import Colors
 
 log = logging.getLogger(__name__)
 
+MIN_YEAR = 2014
+
 class gradesCog(commands.Cog):
     special_converted_files = ['2018Fall.csv', '2018Spring.csv'] 
     #these files have special formatting for names 
@@ -30,7 +32,6 @@ class gradesCog(commands.Cog):
                     '2019Fall.csv', 
                     '2020Spring.csv']
 
-    MIN_YEAR = 2014
 
     def __init__(self, bot):
         self.bot = bot
@@ -49,14 +50,14 @@ class gradesCog(commands.Cog):
             self.master_prof_list[i] = temp[1]
 
 
-    def process_Search(self, orig_query: str, year = 2014) -> str: #Primary search function and processing for a query. A query is generally defined by 
-                                    #"Course-Number" of which it pulls the data from the DB.
-        
+    def process_Search(self, orig_query: str, year = 2014) -> str: 
+        """
+        Primary search function and processing for a query. A query is generally defined by 
+        "Course-Number" of which it pulls the data from the DB.
+        """
+
         query = orig_query.upper()
         
-        items = query.split('-')
-        master_String = ''
-
         if query in self.master_list[str(year)]:
             data_list = self.master_list[str(year)][query]
         else:
@@ -234,8 +235,7 @@ class gradesCog(commands.Cog):
 
     @commands.command()
     async def grades(self, ctx, course, year=MIN_YEAR):
-
-        '''
+        """
         Attempts to give more information about courses @ Clemson.
 
         USE:
@@ -247,7 +247,7 @@ class gradesCog(commands.Cog):
         Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
         In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
         *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
-        '''
+        """
         
         try:
             if str(year) in self.year_list:
