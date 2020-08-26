@@ -30,39 +30,23 @@ class gradesCog(commands.Cog):
                     '2019Fall.csv', 
                     '2020Spring.csv']
 
+    MIN_YEAR = 2014
+
     def __init__(self, bot):
         self.bot = bot
         self.fileLines = []
 
         self.master_list = {}
         self.master_prof_list = {}
+        self.MIN_YEAR = 2014
+        self.year_list = ['2014','2015','2016','2017','2018','2019']
+        self.load_files(self.year_list)
 
-        self.load_files()
-
-    def load_files(self):
-        temp = self.initialize('2014') # Store 2014
-        self.master_list['2014'] = temp[0]
-        self.master_prof_list['2014'] = temp[1]
-
-        temp = self.initialize('2015') # Store 2015
-        self.master_list['2015'] = temp[0]
-        self.master_prof_list['2015'] = temp[1]
-
-        temp = self.initialize('2016') # Store 2016
-        self.master_list['2016'] = temp[0]
-        self.master_prof_list['2016'] = temp[1]
-
-        temp = self.initialize('2017') # Store 2017
-        self.master_list['2017'] = temp[0]
-        self.master_prof_list['2017'] = temp[1]
-
-        temp = self.initialize('2018') # Store 2018
-        self.master_list['2018'] = temp[0]
-        self.master_prof_list['2018'] = temp[1]
-
-        temp = self.initialize('2019') # Store 2019
-        self.master_list['2019'] = temp[0]
-        self.master_prof_list['2019'] = temp[1]
+    def load_files(self,yearList):
+        for i in yearList:
+            temp = self.initialize(i) # Store 2014
+            self.master_list[i] = temp[0]
+            self.master_prof_list[i] = temp[1]
 
 
     def process_Search(self, orig_query: str, year = 2014) -> str: #Primary search function and processing for a query. A query is generally defined by 
@@ -249,7 +233,7 @@ class gradesCog(commands.Cog):
         return self.searchCourse(course, year)
 
     @commands.command()
-    async def grades(self, ctx, course, year=2014):
+    async def grades(self, ctx, course, year=MIN_YEAR):
 
         '''
         Attempts to give more information about courses @ Clemson.
@@ -266,23 +250,28 @@ class gradesCog(commands.Cog):
         '''
         
         try:
-            embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
-            result = self.go(course, year)
-            embed.add_field(name="Result", value=result, inline=False)
-            prefix = await self.bot.get_prefix(ctx)
-            if isinstance(prefix, list):
-                prefix = prefix[0]
-            exp = f'Type `{prefix}help grades` for more information' # NOQA
-            embed.add_field(name='Explanation', value=exp)
+            if str(year) in self.year_list:
+                embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
+                result = self.go(course, year)
+                embed.add_field(name="Result", value=result, inline=False)
+                prefix = await self.bot.get_prefix(ctx)
+                if isinstance(prefix, list):
+                    prefix = prefix[0]
+                exp = f'Type `{prefix}help grades` for more information' # NOQA
+                embed.add_field(name='Explanation', value=exp)
+            else:
+                embed = discord.Embed(title="Grades", color=Colors.Error)
+                result = f'Year not available. Reminder that years go from {self.year_list[0]}-{self.year_list[len(self.year_list)-1]}'
+                embed.add_field(name="ERROR: Year not available", value=result, inline=False)
 
         except NotADirectoryError: # output if course doesn't exist
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a course\n Are you sure you used the proper notation (ex: cpsc-2120)?'
             embed.add_field(name="ERROR: Course doesn't exist", value=result, inline=False)
         
-        except FileNotFoundError as e:
+        except FileNotFoundError as e: #SHOULD NEVER THROW
             embed = discord.Embed(title="Grades", color=Colors.Error)
-            result = f'Files `{e}` are not in directory. Reminder that the files go from 2014-2019!'
+            result = f'Files `{e}` are not in directory. Reminder that the files go from {self.year_list[0]}-{self.year_list[len(self.year_list)-1]}!'
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
