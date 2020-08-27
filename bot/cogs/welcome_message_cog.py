@@ -18,8 +18,14 @@ class WelcomeMessageCog(commands.Cog):
     @commands.has_guild_permissions(administrator= True)
     async def welcome(self, ctx):
         repo = WelcomeMessageRepository()
-        content = await repo.get_welcome_message(ctx.guild.id)
-        await ctx.send(content)
+        message = await repo.get_welcome_message(ctx.guild.id)
+
+        if not message:
+            embed = discord.Embed(title= 'Error: This server has no welcome message', color= Colors.Error) 
+            await ctx.send(embed= embed)
+            return
+
+        await ctx.send(message)
 
     @welcome.command()
     @commands.has_guild_permissions(administrator= True)
