@@ -29,7 +29,7 @@ class MemesCog(commands.Cog):
         await ctx.send(msg)
 
     @commands.command()
-    async def Waldo(self, ctx, size=max_waldo_grid_size):
+    async def waldo(self, ctx, size=max_waldo_grid_size):
 
         max_waldo_line_size = 6
         new_line_waldo_chance = 10
