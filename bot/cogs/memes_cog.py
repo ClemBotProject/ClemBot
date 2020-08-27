@@ -12,6 +12,9 @@ log = logging.getLogger(__name__)
 
 class MemesCog(commands.Cog):
 
+    
+    max_waldo_grid_size = 100
+
     def __init__(self, bot):
         self.bot = bot
     
@@ -23,6 +26,29 @@ class MemesCog(commands.Cog):
             for j in range(0, 10):
                 msg += '||pop!|| '
             msg += '\n'
+
+        await ctx.send(msg)
+
+    @commands.command()
+    async def Waldo(self, ctx, size=max_waldo_grid_size):
+
+        max_waldo_line_size = 6
+        new_line_waldo_chance = 10
+        msg = ''
+        count = 0
+        place = random.randint(0,size)
+
+        for i in range(size+1):
+            if i == place:
+                msg += '||WALDO|| '
+                count += 1
+            else:
+                msg += '||MALDO|| '
+                count += 1
+            new_line = random.randint(0,100)
+            if new_line < new_line_waldo_chance or count > max_waldo_line_size:
+                msg += '\n'
+                count = 0
 
         await ctx.send(msg)
 
