@@ -81,3 +81,10 @@ CREATE TABLE IF NOT EXISTS DesignatedChannels_Channels (
         REFERENCES DesignatedChannels (id)
 );
 
+CREATE TABLE IF NOT EXISTS WelcomeMessages (
+    id                      INTEGER     PRIMARY KEY,
+    fk_guildId              INTEGER     UNIQUE NOT NULL,
+    content                 TEXT        NOT NULL,
+    FOREIGN KEY(fk_guildId)
+        REFERENCES Guilds (id)
+);
