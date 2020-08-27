@@ -1,4 +1,7 @@
-<img src="ClemBot.png" width="300" height= "300">
+<p align="center">
+  <img src="ClemBot.png" width="275" height= "275">
+</p>
+
 
 # ClemBot - A Discord Bot for the Clemson CPSC Discord Server
 A Discord bot for server management with a focus on school related commands. We are a community focused on learning and acceptance and anyone is welcome. If you have an idea or a feature you would like to contribute feel free to open an issue and we as a community can begin discussion. 
