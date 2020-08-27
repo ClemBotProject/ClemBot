@@ -10,9 +10,10 @@ from bot.consts import Colors
 
 log = logging.getLogger(__name__)
 
+max_waldo_grid_size = 100
+
 class MemesCog(commands.Cog):
 
-    max_waldo_grid_size = 100
     def __init__(self, bot):
         self.bot = bot
     
