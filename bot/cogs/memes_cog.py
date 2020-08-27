@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 
 class MemesCog(commands.Cog):
 
+    max_waldo_grid_size = 100
     def __init__(self, bot):
         self.bot = bot
     
@@ -25,7 +26,7 @@ class MemesCog(commands.Cog):
             msg += '\n'
 
         await ctx.send(msg)
-        
+
     @commands.command()
     async def Waldo(self, ctx, size=max_waldo_grid_size):
 
