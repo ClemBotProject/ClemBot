@@ -1,4 +1,7 @@
-![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
+<p align="center">
+  <img src="ClemBot.png" width="275" height= "275">
+</p>
+
 
 # ClemBot - A Discord Bot for the Clemson CPSC Discord Server
 A Discord bot for server management with a focus on school related commands. We are a community focused on learning and acceptance and anyone is welcome. If you have an idea or a feature you would like to contribute feel free to open an issue and we as a community can begin discussion. 
@@ -38,3 +41,6 @@ The bot is set up in a simple way. There are 3 layers, the Cog layer, the Servic
 The bot loads Cogs and Services dynamically. To create a new command simply create a class that inherits from Command.Cog and defines a setup function in module scope at the bottom. See [example_cog.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/cogs/example_cog.py) for an example. 
 
 The bot does the same thing for services, to see how to define a service, see [example_service.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/services/example_service.py)
+
+![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
+
