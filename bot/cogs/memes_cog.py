@@ -31,6 +31,13 @@ class MemesCog(commands.Cog):
     @commands.command()
     async def waldo(self, ctx, size=max_waldo_grid_size):
 
+        '''
+        Play Where's Waldo!
+
+        Usage: <prefix>waldo [size = 100]
+        '''
+        random_start_letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z']
+
         max_waldo_line_size = 6
         new_line_waldo_chance = 10
         msg = ''
@@ -39,12 +46,16 @@ class MemesCog(commands.Cog):
 
         for i in range(size+1):
             if i == place:
-                msg += '||WALDO|| '
+                msg += '||`WALDO`|| '
                 count += 1
             else:
-                msg += '||MALDO|| '
+                helper = random.randint(0,len(random_start_letters)-1)
+                letter = random_start_letters[helper]
+                msg += f'||`{letter}ALDO`|| '
                 count += 1
+            
             new_line = random.randint(0,100)
+
             if new_line < new_line_waldo_chance or count > max_waldo_line_size:
                 msg += '\n'
                 count = 0
