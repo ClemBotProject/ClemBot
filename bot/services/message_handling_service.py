@@ -1,6 +1,7 @@
 import logging
 import re
 from typing import List, Iterable
+import datetime
 
 import discord
 
@@ -28,7 +29,7 @@ class MessageHandlingService(BaseService):
         #Primary entry point for handling commands
         await self.bot.process_commands(message)
 
-        await MessageRepository().add_message(message)
+        await MessageRepository().add_message(message, datetime.datetime.utcnow())
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
