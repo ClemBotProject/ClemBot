@@ -24,7 +24,7 @@ class EvalCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Command
+    @commands.command(aliases=['e']) 
     async def eval(self, ctx, *, code= None) -> None:
         code = code.strip('`')
         code = utils.escape_mentions(code)
