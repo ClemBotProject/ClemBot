@@ -22,12 +22,13 @@ class BotSecrets:
             raise Exception("BotSecrets is in singleton scope")
         else:
             BotSecrets.__instance = self
-        self._clientToken = None
-        self._clientSecret = None
-        self._botToken = None
-        self._databaseName = None
-        self._botPrefix = None
+        self._client_token = None
+        self._client_secret = None
+        self._bot_token = None
+        self._database_name = None
+        self._bot_prefix = None
         self._gifMe_token = None
+        self._repl_url = None
 
     @property
     def client_token(self) -> str:
@@ -41,29 +42,29 @@ class BotSecrets:
             str: The API Token
         """
 
-        if not self._clientToken:
+        if not self._client_token:
             raise ConfigAccessError(f'client_token has not been initialized')
         else:
-            return self._clientToken
+            return self._client_token
 
     @client_token.setter
     def client_token(self, value: str) -> None:
-        if self._clientToken:
+        if self._client_token:
             raise ConfigAccessError(f'client_token has already been initialized')
         else:
-            self._clientToken = value
+            self._client_token = value
 
     @property
     def client_secret(self) -> str:
-        if not self._clientSecret:
+        if not self._client_secret:
             raise ConfigAccessError(f'client_secret has not been intialized')
-        return self._clientToken
+        return self._client_token
 
     @client_secret.setter
     def client_secret(self, value: str) -> None:
-        if self._clientSecret:
+        if self._client_secret:
             raise ConfigAccessError(f'client_secret has already been initialized')
-        self._clientSecret = value
+        self._client_secret = value
 
     @property
     def bot_token(self) -> str:
@@ -76,39 +77,39 @@ class BotSecrets:
         Returns:
             str: The api Token
         """
-        if not self._botToken:
+        if not self._bot_token:
             raise ConfigAccessError(f'bot_token has not been intialized')
-        return self._botToken
+        return self._bot_token
 
     @bot_token.setter
     def bot_token(self, value: str) -> None:
-        if self._botToken:
+        if self._bot_token:
             raise ConfigAccessError(f'bot_token has already been initialized')
-        self._botToken = value
+        self._bot_token = value
 
     @property
     def database_name(self) -> str:
-        if not self._databaseName:
+        if not self._database_name:
             raise ConfigAccessError(f'database_name has not been intialized')
-        return self._databaseName
+        return self._database_name
 
     @database_name.setter
     def database_name(self, value: str) -> None:
-        if self._databaseName:
+        if self._database_name:
             raise ConfigAccessError(f'database_name has already been initialized')
-        self._databaseName = f'{value}.sqlite'
+        self._database_name = f'{value}.sqlite'
 
     @property
     def bot_prefix(self) -> str:
-        if not self._botPrefix:
+        if not self._bot_prefix:
             raise ConfigAccessError(f'bot_prefix has not been intialized')
-        return self._botPrefix
+        return self._bot_prefix
 
     @bot_prefix.setter
     def bot_prefix(self, value: str) -> None:
-        if self._botPrefix:
+        if self._bot_prefix:
             raise ConfigAccessError(f'bot_prefix has already been initialized')
-        self._botPrefix = value
+        self._bot_prefix = value
     
     @property
     def gif_me_token(self) -> str:
@@ -122,6 +123,19 @@ class BotSecrets:
             raise ConfigAccessError(f'gif_me_token has already been initialized')
         self._gifMe_token = value
 
+    @property
+    def repl_url(self) -> str:
+        if not self._repl_url:
+            raise ConfigAccessError(f'repl_url has not been intialized')
+        return self._repl_url
+        
+
+    @repl_url.setter
+    def repl_url(self, value: str) -> None:
+        if self._repl_url:
+            raise ConfigAccessError(f'repl_url has already been initialized')
+        self._repl_url = value
+
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
@@ -131,4 +145,5 @@ class BotSecrets:
         self.bot_token = secrets['BotToken']
         self.database_name = secrets['DatabaseName'] or 'ClemBot'
         self.bot_prefix = secrets['BotPrefix'] or '!'
-        self.gif_me_token = secrets["GifMeToken"]
+        self.gif_me_token = secrets['GifMeToken']
+        self.repl_url = secrets['ReplUrl']
