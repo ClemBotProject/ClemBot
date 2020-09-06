@@ -25,6 +25,7 @@ class EvalCog(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['e']) 
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     async def eval(self, ctx, *, code= None) -> None:
         code = code.strip('`')
         code = utils.escape_mentions(code)
