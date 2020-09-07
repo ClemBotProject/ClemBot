@@ -211,7 +211,7 @@ import io
 
 import os
 import datetime
-import PIL as pil
+from PIL import Image, ImageDraw, ImageSequence, ImageFont
 
 from bot.consts import Colors
 
@@ -317,9 +317,9 @@ class MemesCog(commands.Cog):
         timestamp = datetime.datetime.utcnow()
         msg = await ctx.send('Generating your gif')
         # Open crab.gif and add our font
-        im = pil.Image.open('bot/cogs/memes_cog/assets/crab.gif')
+        im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
         fnt_path = 'bot/cogs/memes_cog/assets/LemonMilk.otf'
-        fnt = pil.ImageFont.truetype(fnt_path, 11)
+        fnt = ImageFont.truetype(fnt_path, 11)
 
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
@@ -337,8 +337,8 @@ class MemesCog(commands.Cog):
         # Draw the text on to each frame of the gif
         # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
         frames = []
-        for frame in pil.ImageSequence.Iterator(im):
-            d = pil.ImageDraw.Draw(frame)
+        for frame in ImageSequence.Iterator(im):
+            d = ImageDraw.Draw(frame)
             w, h = d.textsize(args, fnt)
             # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
             d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
@@ -347,7 +347,7 @@ class MemesCog(commands.Cog):
 
             b = io.BytesIO()
             frame.save(b, format='GIF')
-            frame = pil.Image.open(b)
+            frame = Image.open(b)
             frames.append(frame)
 
         # Save, send, and delete created gif
