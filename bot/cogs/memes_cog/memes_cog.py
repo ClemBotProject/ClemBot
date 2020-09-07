@@ -211,6 +211,9 @@ import io
 
 import os
 import datetime
+import asyncio
+import concurrent.futures
+import typing as t
 from PIL import Image, ImageDraw, ImageSequence, ImageFont
 
 from bot.consts import Colors
@@ -220,6 +223,28 @@ log = logging.getLogger(__name__)
 max_waldo_grid_size = 100
 
 CRAB_LINE_LENGTH = 58
+
+def pillow_process(args, rave, lines_in_text, timestamp):
+    # Open crab.gif and add our font
+    im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
+    fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
+    
+    # Draw text on each frame of the gif
+    # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
+    frames = []
+    for frame in ImageSequence.Iterator(im):
+        d = ImageDraw.Draw(frame)
+        w, h = d.textsize(args, fnt)
+        # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
+        d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
+            stroke_width=rave, stroke_fill=Colors.ClemsonOrange, spacing=6)
+        del d
+
+        b = io.BytesIO()
+        frame.save(b, format='GIF')
+        frame = Image.open(b)
+        frames.append(frame)
+    frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
 
 class MemesCog(commands.Cog):
 
@@ -305,29 +330,23 @@ class MemesCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['rave', '🦀'])
-    async def crab(self, ctx, *, args='Bottom text\n is dead'):
+    async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
         '''
         Create your own crab rave.
-
-        Usage: <prefix>crab [text=Bottom text\n is dead]
+        Usage: <prefix>crab [is_rave=True] [text=Bottom text\\n is dead]
         Aliases: rave, 🦀
         '''
         # crab.gif dimensions - 352 by 200
         # Immediately grab the timestamp incase of multiple calls in a row
         timestamp = datetime.datetime.utcnow()
         msg = await ctx.send('Generating your gif')
-        # Open crab.gif and add our font
-        im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
-        fnt_path = 'bot/cogs/memes_cog/assets/LemonMilk.otf'
-        fnt = ImageFont.truetype(fnt_path, 11)
 
         # Determine if there is a full rave or not
-        if str.isnumeric(args[0]):
-            rave = int(args[0])
-            args = args[1:] or 'Bottom text\n is dead'
-        else:
+        if is_rave:
             rave = 1
-
+        else:
+            rave = 0
+        
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
         while len(args) > (CRAB_LINE_LENGTH * lines_in_text):
@@ -341,32 +360,17 @@ class MemesCog(commands.Cog):
             args = f'{args[:newline_loc]} \n{args[newline_loc:]}'
             lines_in_text += 1
         
-        # Draw the text on to each frame of the gif
-        # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
-        frames = []
-        for frame in ImageSequence.Iterator(im):
-            d = ImageDraw.Draw(frame)
-            w, h = d.textsize(args, fnt)
-            # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
-            d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
-                stroke_width=rave, stroke_fill=Colors.ClemsonOrange, spacing=6)
-            del d
+        
+        loop = self.bot.loop
+        with concurrent.futures.ProcessPoolExecutor() as pool:
+            pil_args = (args, rave, lines_in_text, timestamp)
+            await loop.run_in_executor(pool, pillow_process, *pil_args)
 
-            b = io.BytesIO()
-            frame.save(b, format='GIF')
-            frame = Image.open(b)
-            frames.append(frame)
-
-        # Save, send, and delete created gif
-        frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
+        # Attach, send, and delete created gif
         attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
-         
         await ctx.send(file=attachment)
         await msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
-
-
 def setup(bot):
-    bot.add_cog(MemesCog(bot))
->>>>>>> Changed strings to follow convention
+    bot.add_cog(MemesCog(bot))>>>>>>> Changed strings to follow convention
