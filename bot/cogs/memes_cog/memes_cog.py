@@ -120,6 +120,13 @@ class MemesCog(commands.Cog):
         fnt_path = 'bot/cogs/memes_cog/assets/LemonMilk.otf'
         fnt = ImageFont.truetype(fnt_path, 11)
 
+        # Determine if there is a full rave or not
+        if str.isnumeric(args[0]):
+            rave = int(args[0])
+            args = args[1:] or 'Bottom text\n is dead'
+        else:
+            rave = 1
+
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
         while len(args) > (CRAB_LINE_LENGTH * lines_in_text):
@@ -141,7 +148,7 @@ class MemesCog(commands.Cog):
             w, h = d.textsize(args, fnt)
             # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
             d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
-                stroke_width=1, stroke_fill=Colors.ClemsonOrange, spacing=6)
+                stroke_width=rave, stroke_fill=Colors.ClemsonOrange, spacing=6)
             del d
 
             b = io.BytesIO()
