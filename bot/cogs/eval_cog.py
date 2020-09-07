@@ -11,12 +11,13 @@ from bot.bot_secrets import BotSecrets
 log = logging.getLogger(__name__)
 
 HEADERS = {
-            'Content-type':'application/json', 
-            'Accept':'application/json'
-          }
+    'Content-type':'application/json', 
+    'Accept':'application/json'
+}
 
 MAX_CONTENT_LENGTH = 1900
 MAX_LINE_LENGTH = 15
+EVAL_COMMAND_COOLDOWN = 2
 
 
 class EvalCog(commands.Cog):
@@ -25,7 +26,7 @@ class EvalCog(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['e']) 
-    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.cooldown(1, EVAL_COMMAND_COOLDOWN, commands.BucketType.guild)
     async def eval(self, ctx, *, code= None) -> None:
         code = code.strip('`')
         code = utils.escape_mentions(code)
