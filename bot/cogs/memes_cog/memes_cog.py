@@ -224,7 +224,7 @@ max_waldo_grid_size = 100
 
 CRAB_LINE_LENGTH = 58
 
-def pillow_process(args, rave, lines_in_text, timestamp):
+def pillow_process(args, is_rave, lines_in_text, timestamp):
     # Open crab.gif and add our font
     im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
     fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
@@ -237,7 +237,7 @@ def pillow_process(args, rave, lines_in_text, timestamp):
         w, h = d.textsize(args, fnt)
         # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
         d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
-            stroke_width=rave, stroke_fill=Colors.ClemsonOrange, spacing=6)
+            stroke_width=bool(is_rave), stroke_fill=Colors.ClemsonOrange, spacing=6)
         del d
 
         b = io.BytesIO()
@@ -342,10 +342,6 @@ class MemesCog(commands.Cog):
         msg = await ctx.send('Generating your gif')
 
         # Determine if there is a full rave or not
-        if is_rave:
-            rave = 1
-        else:
-            rave = 0
         
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
@@ -363,7 +359,7 @@ class MemesCog(commands.Cog):
         
         loop = self.bot.loop
         with concurrent.futures.ProcessPoolExecutor() as pool:
-            pil_args = (args, rave, lines_in_text, timestamp)
+            pil_args = (args, is_rave, lines_in_text, timestamp)
             await loop.run_in_executor(pool, pillow_process, *pil_args)
 
         # Attach, send, and delete created gif
