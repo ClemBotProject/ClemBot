@@ -127,9 +127,6 @@ class MemesCog(commands.Cog):
             # I didn't want to add a newline in the middle of a word
             while not args[newline_loc].isspace():
                 newline_loc -= 1
-                if newline_loc == 0:
-                    newline_loc = CRAB_LINE_LENGTH * lines_in_text
-                    break
             args = f'{args[:newline_loc]} \n{args[newline_loc:]}'
             lines_in_text += 1
         
