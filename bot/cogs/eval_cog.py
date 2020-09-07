@@ -42,8 +42,9 @@ class EvalCog(commands.Cog):
         if len(stdout) > MAX_CONTENT_LENGTH:
             await ctx.send(f'{ctx.author.mention} Attempted output length exceeds 2000 characters, Please try again')
             return
-
-        out = f'{ctx.author.mention} :white_check_mark:  Eval Completed with response code: {output["returncode"]}'
+        
+        result_emoji = ':white_check_mark:' if output['returncode'] == 0 else ':warning:'
+        out = f'{ctx.author.mention}  {result_emoji} Eval Completed with response code: {output["returncode"]}'
         if stdout:
             await ctx.send(f'{out}\n\n```{self._format(stdout)}```')
         else:
