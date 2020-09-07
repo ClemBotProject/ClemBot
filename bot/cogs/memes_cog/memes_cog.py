@@ -110,8 +110,8 @@ class MemesCog(commands.Cog):
         timestamp = datetime.datetime.utcnow()
 
         # Open crab.gif and add our font
-        im = Image.open('bot/cogs/MemesData/CrabData/crab.gif')
-        fnt_path = 'bot/cogs/MemesData/CrabData/LemonMilk.otf'
+        im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
+        fnt_path = 'bot/cogs/memes_cog/assets/LemonMilk.otf'
         fnt = ImageFont.truetype(fnt_path, 11)
 
         # Add new lines for when the text would go out of bounds
@@ -140,10 +140,12 @@ class MemesCog(commands.Cog):
             frames.append(frame)
 
         # Save, send, and delete created gif
-        frames[0].save(f'bot/cogs/MemesData/CrabData/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
-        attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/MemesData/CrabData/out_{timestamp}.gif') 
+        frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
+        attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
+        msg = await ctx.send('Generating your gif') 
         await ctx.send(file=attachment)
-        os.remove(f'bot/cogs/MemesData/CrabData/out_{timestamp}.gif')
+        await msg.delete()
+        os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
 
 
