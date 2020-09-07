@@ -31,6 +31,7 @@ class EvalCog(commands.Cog):
         code = utils.escape_mentions(code)
 
         feedback_mes = await ctx.send('Code execution started')
+        log.info(f'Code: {code} sent for evaluation by author: {ctx.author.id} in guild: {ctx.guild.id}')
 
         output = await self._post_eval(code)
         stdout = output['stdout']
