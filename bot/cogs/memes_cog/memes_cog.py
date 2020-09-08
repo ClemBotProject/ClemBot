@@ -91,6 +91,7 @@ class MemesCog(commands.Cog):
 
     @commands.command()
     async def spongebob(self, ctx, *, args):
+
         """
         Spongebob Text
         """
@@ -132,8 +133,6 @@ class MemesCog(commands.Cog):
         # Immediately grab the timestamp incase of multiple calls in a row
         timestamp = datetime.datetime.utcnow()
         msg = await ctx.send('Generating your gif')
-
-        # Determine if there is a full rave or not
         
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
@@ -142,12 +141,12 @@ class MemesCog(commands.Cog):
             # I didn't want to add a newline in the middle of a word
             while not args[newline_loc].isspace():
                 newline_loc -= 1
-                if newline_loc == 0:
+                if newline_loc == CRAB_LINE_LENGTH * (lines_in_text - 1):
                     newline_loc = CRAB_LINE_LENGTH * lines_in_text
                     break
+
             args = f'{args[:newline_loc]} \n{args[newline_loc:]}'
             lines_in_text += 1
-        
         
         loop = self.bot.loop
         with concurrent.futures.ProcessPoolExecutor() as pool:
@@ -159,6 +158,7 @@ class MemesCog(commands.Cog):
         await ctx.send(file=attachment)
         await msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
+
 
 def setup(bot):
     bot.add_cog(MemesCog(bot))
