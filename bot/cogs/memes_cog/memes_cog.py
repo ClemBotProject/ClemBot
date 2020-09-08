@@ -1,26 +1,20 @@
 import logging
+import random
+import time
+import io
+import os
+import datetime
+import concurrent.futures
+import typing as t
 
 import discord
 import discord.ext.commands as commands
-
-import random
-import time
-
-import io
-
-import os
-import datetime
-import asyncio
-import concurrent.futures
-import typing as t
 from PIL import Image, ImageDraw, ImageSequence, ImageFont
 
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
-
-max_waldo_grid_size = 100
-
+MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
 
 def pillow_process(args, is_rave, lines_in_text, timestamp):
@@ -54,21 +48,21 @@ class MemesCog(commands.Cog):
     async def bubblewrap(self, ctx):
 
         msg = ''
-        for i in range(0, 5):
-            for j in range(0, 10):
+        for _ in range(0, 5):
+            for _ in range(0, 10):
                 msg += '||pop!|| '
             msg += '\n'
 
         await ctx.send(msg)
 
     @commands.command()
-    async def waldo(self, ctx, size=max_waldo_grid_size):
+    async def waldo(self, ctx, size=MAX_WALDO_GRID_SIZE):
 
-        '''
+        """
         Play Where's Waldo!
 
         Usage: <prefix>waldo [size = 100]
-        '''
+        """
         random_start_letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z']
 
         max_waldo_line_size = 6
@@ -97,10 +91,9 @@ class MemesCog(commands.Cog):
 
     @commands.command()
     async def spongebob(self, ctx, *, args):
-
-        '''
+        """
         Spongebob Text
-        '''
+        """
         random.seed(time.time())
         args = args.replace('"', "'")
     
@@ -130,11 +123,11 @@ class MemesCog(commands.Cog):
 
     @commands.command(aliases=['rave', '🦀'])
     async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
-        '''
+        """
         Create your own crab rave.
         Usage: <prefix>crab [is_rave=True] [text=Bottom text\\n is dead]
         Aliases: rave, 🦀
-        '''
+        """
         # crab.gif dimensions - 352 by 200
         # Immediately grab the timestamp incase of multiple calls in a row
         timestamp = datetime.datetime.utcnow()
