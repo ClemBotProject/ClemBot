@@ -16,6 +16,7 @@ from bot.consts import Colors
 log = logging.getLogger(__name__)
 MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
+CRAB_COMMAND_COOLDOWN = 3
 
 def pillow_process(args, is_rave, lines_in_text, timestamp):
     # Open crab.gif and add our font
@@ -123,6 +124,7 @@ class MemesCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['rave', '🦀'])
+    @commands.cooldown(1, CRAB_COMMAND_COOLDOWN, commands.BucketType.guild)
     async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
         """
         Create your own crab rave.
