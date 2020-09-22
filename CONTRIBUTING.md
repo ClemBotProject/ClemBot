@@ -43,7 +43,7 @@ ping @Jayy#6249 for permissions to add bots
 Setup a virtual environment:  
 `pip3 install virtualenv` windows: `py -m pip install --user virtualenv`
 
-`virtualenv venv`  windows: `py -m venv env`
+`virtualenv venv`  windows: `py -m venv venv`
 
 Enter the virtualenv with:  
 `source venv/bin/activate` windows: `source .\env\Scripts\activate`

@@ -5,18 +5,18 @@ from bot.data.base_repository import BaseRepository
 
 class MessageRepository(BaseRepository):
 
-    async def add_message(self, message):
+    async def add_message(self, message, time):
         if await self.check_message(message.id):
             return
-
+        
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
                 INSERT INTO Messages
-                (id, fk_guildId, fk_channelId, fk_authorId, content)
+                (id, fk_guildId, fk_channelId, fk_authorId, content, time)
                 VALUES
-                (?, ?, ?, ?, ?)
-                """, (message.id, message.guild.id, message.channel.id, message.author.id, message.content))
+                (?, ?, ?, ?, ?, ?)
+                """, (message.id, message.guild.id, message.channel.id, message.author.id, message.content, time))
             await db.commit()
 
     async def edit_message_content(self, message_id, content):

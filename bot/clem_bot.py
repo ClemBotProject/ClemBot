@@ -1,3 +1,4 @@
+from asyncio.locks import Event
 import datetime
 import importlib
 import logging
@@ -126,6 +127,7 @@ class ClemBot(commands.Bot):
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback= tb)
+        
 
     async def on_command_error(self, ctx, e):
         """

@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Messages (
     fk_authorId     INTEGER     NOT NULL,
     content         TEXT        NOT NULL,
     isDeleted       BOOLEAN     NOT NULL DEFAULT False,
-    misc            TEXT,       
+    time            TEXT,       
     FOREIGN KEY(fk_authorId)
         REFERENCES Users (id),
     FOREIGN KEY(fk_guildId)

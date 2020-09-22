@@ -1,6 +1,8 @@
 import logging
 import re
 from typing import List, Iterable
+import datetime
+import json
 
 import discord
 
@@ -28,7 +30,7 @@ class MessageHandlingService(BaseService):
         #Primary entry point for handling commands
         await self.bot.process_commands(message)
 
-        await MessageRepository().add_message(message)
+        await MessageRepository().add_message(message, datetime.datetime.utcnow())
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
@@ -59,6 +61,7 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
 
+                
         message_repo = MessageRepository()
         message = await message_repo.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
@@ -88,8 +91,11 @@ class MessageHandlingService(BaseService):
                 int(payload.data['guild_id']), 
                 embed)
         else:
-            log.info(f'Uncached message edited in #{channel.name} By: \
-                {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
+            try:
+                log.info(f'Uncached message edited in #{channel.name} By: \
+                    {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
+            except KeyError:
+                log.error(json.dumps(payload.data))
 
             embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
                 color= Colors.ClemsonOrange)

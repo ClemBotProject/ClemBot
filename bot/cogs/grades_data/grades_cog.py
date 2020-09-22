@@ -156,6 +156,7 @@ class gradesCog(commands.Cog):
 
     def initialize(self, year):
         #SKIP PARSE DATA WHEN NOT NECESSARY
+        prof = None
         if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
             with open(f'bot/cogs/grades_data/assets/master-{year}.json', 'r') as f:
                 normal = json.load(f)

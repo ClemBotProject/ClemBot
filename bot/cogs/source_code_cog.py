@@ -17,7 +17,7 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs/', 'venv/', '__pycache__/', 'BotSecrets.json']
+        self.ignored = ['Logs/', 'venv/', '__pycache__/']
 
         for root, dirs, files in os.walk(os.getcwd(), topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -107,7 +107,6 @@ class SourceCodeCog(commands.Cog):
             #loop over the chunks and send them one by one with correct python formatting
             for chunk in chunks_to_send:
                 backslash = '\\'
-                foo = len(chunk)
                 await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
 
     def chunk_iterable(self, iterable, chunk_size):
@@ -115,7 +114,7 @@ class SourceCodeCog(commands.Cog):
             yield iterable[i:i + chunk_size]
     
     def process_source(self, source: str, line_start: int = None, line_stop: int = None):
-        split_source = [f'{i}:    {value}' for i, value in enumerate(source.splitlines())]
+        split_source = [f'{i:03d} |  {value}' for i, value in enumerate(source.splitlines())]
         filtered_source = split_source[line_start or 0: line_stop or len(source)]
 
         return filtered_source
