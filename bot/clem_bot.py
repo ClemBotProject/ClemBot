@@ -114,8 +114,9 @@ class ClemBot(commands.Bot):
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_delete, payload) 
 
-    async def on_reaction_add(self, reaction, user):
-        await self.publish_with_error(Events.on_reaction_add, reaction, user)
+    async def on_reaction_add(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
+        if user.id != self.user.id:
+            await self.publish_with_error(Events.on_reaction_add, reaction, user)
 
     async def on_raw_reaction_add(self, reaction) -> None:
         log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
@@ -142,7 +143,6 @@ class ClemBot(commands.Bot):
         embed.add_field(name=ctx.author, value= e)
         await ctx.channel.send(embed= embed)
         await self.global_error_handler(e)
-
 
     async def global_error_handler(self, e, *, traceback: str = None):
         """

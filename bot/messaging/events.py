@@ -284,5 +284,17 @@ class EventsMeta(type):
         """
         return 'on_assignable_role_remove'
 
+    @property
+    def on_set_deletable(self):
+        """
+        Published when a bot message is needed to be able to be deleted
+        
+        Args:
+            messagesToDelete (List[discord.Message]) Messages to be deleted
+            author (discord.Member) member who called the bot 
+            roles (str) Stores the roles needed to delete the message
+        """
+        return '_on_set_deletable'
+
 class Events(metaclass= EventsMeta):
     pass
