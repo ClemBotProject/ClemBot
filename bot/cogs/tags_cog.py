@@ -13,6 +13,7 @@ MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 50
 TAG_COMMAND_COOLDOWN = 30
 TAG_CHUNK_SIZE = 25
+MAX_NON_ADMIN_LINE_LENGTH = 10
 
 @dataclass
 class Tag:
@@ -48,6 +49,12 @@ class TagCog(commands.Cog):
     async def add(self, ctx, name: str, *, content: str):
 
         name = name.lower()
+
+        is_admin = ctx.author.guild_permissions.administrator
+        if len(content.split('\n')) > MAX_NON_ADMIN_LINE_LENGTH and not is_admin:
+            embed = discord.Embed(title= f'Error: Tag line number exceeds  {MAX_NON_ADMIN_LINE_LENGTH} lines', color=Colors.Error)
+            await ctx.send(embed=embed)
+            return
 
         if len(content) > MAX_TAG_CONTENT_SIZE:
             embed = discord.Embed(title= f'Error: Tag content exceeds  {MAX_TAG_CONTENT_SIZE} characters', color=Colors.Error)
