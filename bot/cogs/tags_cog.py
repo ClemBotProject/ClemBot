@@ -44,7 +44,7 @@ class TagCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @tag.command(aliases=['create', 'make'])
-    @commands.cooldown(1, TAG_COMMAND_COOLDOWN, commands.BucketType.guild)
+    @commands.cooldown(1, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
     async def add(self, ctx, name: str, *, content: str):
 
         if len(content) > MAX_TAG_CONTENT_SIZE:
