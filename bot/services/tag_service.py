@@ -26,12 +26,13 @@ class TagService(BaseService):
         if not found_name:
             return
 
-        name = found_name.groupdict()['name']
+        name = found_name.groupdict()['name'].lower()
         
         if not await repo.check_tag_exists(name, message.guild.id):
             return
 
         content = await repo.get_tag_content(name, message.guild.id)
+        log.info(f'Tag "{found_name}" invoked in guild: {message.guild.id} by: {message.author.id}')
         await message.channel.send(content)
 
     async def load_service(self):
