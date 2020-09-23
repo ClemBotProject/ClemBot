@@ -46,4 +46,3 @@ class TagRepository(BaseRepository):
             async with db.execute('SELECT * FROM Tags WHERE fk_guildId = ?',
                     (guild_id,)) as c:
                 return await self.fetcthall_as_dict(c)
-

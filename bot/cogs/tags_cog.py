@@ -107,6 +107,29 @@ class TagCog(commands.Cog):
         
         await self._delete_tag(name, ctx)
 
+    @tag.command(aliases=['info'])
+    async def about(self, ctx, name):
+
+        repo = TagRepository()
+
+        if not await repo.check_tag_exists(name, ctx.guild.id):
+            embed = discord.Embed(title= f'Error: Tag {name} does not exist', color=Colors.Error)
+            await ctx.send(embed=embed)
+            return
+
+        tag = await repo.get_tag(name, ctx.guild.id)
+
+        author = self.bot.get_user(tag['fk_UserId'])
+
+        embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
+        embed.add_field(name='Name ', value=tag['name'])
+        embed.add_field(name='Content ', value=tag['content'])
+        fullNameGet = self.get_full_name(author)
+        embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
+        embed.add_field(name='Creation Date: ', value=tag['CreationDate'], inline=False)
+
+        await ctx.send(embed=embed)
+
     async def _delete_tag(self, name, ctx):
         await TagRepository().delete_tag(name, ctx.guild.id)
         embed=discord.Embed(title=':white_check_mark: Tag successfully deleted', color=Colors.ClemsonOrange)
