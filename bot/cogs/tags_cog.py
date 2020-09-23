@@ -47,6 +47,8 @@ class TagCog(commands.Cog):
     @commands.cooldown(1, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
     async def add(self, ctx, name: str, *, content: str):
 
+        name = name.lower()
+
         if len(content) > MAX_TAG_CONTENT_SIZE:
             embed = discord.Embed(title= f'Error: Tag content exceeds  {MAX_TAG_CONTENT_SIZE} characters', color=Colors.Error)
             await ctx.send(embed=embed)
@@ -93,7 +95,10 @@ class TagCog(commands.Cog):
         if tag['fk_UserId'] != ctx.author.id:
             embed = discord.Embed(title= f'Error: Tag {name} is not owned by {self.get_full_name(ctx.author)}',
                 color=Colors.Error)
+            return
         
+        self._delete_tag(name, ctx)
+
     async def _delete_tag(self, name, ctx):
         await TagRepository().delete_tag(name, ctx.guild.id)
         embed=discord.Embed(title=':white_check_mark: Tag successfully deleted', color=Colors.ClemsonOrange)
