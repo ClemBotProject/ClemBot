@@ -54,6 +54,8 @@ class TagCog(commands.Cog):
             embed = discord.Embed(title= f'Error: Tag name exceeds {MAX_TAG_NAME_SIZE} characters', color=Colors.Error)
             await ctx.send(embed=embed)
             return 
+        
+        content = discord.utils.escape_mentions(content)
 
         repo = TagRepository()
         if await repo.check_tag_exists(name, ctx.guild.id):
