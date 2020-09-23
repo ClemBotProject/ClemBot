@@ -97,7 +97,7 @@ class TagCog(commands.Cog):
                 color=Colors.Error)
             return
         
-        self._delete_tag(name, ctx)
+        await self._delete_tag(name, ctx)
 
     async def _delete_tag(self, name, ctx):
         await TagRepository().delete_tag(name, ctx.guild.id)
