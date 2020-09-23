@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 50
+TAG_COMMAND_COOLDOWN = 30
 TAG_CHUNK_SIZE = 25
 
 @dataclass
@@ -43,6 +44,7 @@ class TagCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @tag.command(aliases=['create', 'make'])
+    @commands.cooldown(1, TAG_COMMAND_COOLDOWN, commands.BucketType.guild)
     async def add(self, ctx, name: str, *, content: str):
 
         if len(content) > MAX_TAG_CONTENT_SIZE:
