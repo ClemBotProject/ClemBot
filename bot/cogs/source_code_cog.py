@@ -1,10 +1,13 @@
 import logging
 import os
+from threading import Event
 from typing import List
 
 import discord
 import discord.ext.commands as commands
+
 from bot.consts import Colors
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
@@ -105,9 +108,13 @@ class SourceCodeCog(commands.Cog):
             chunks_to_send.append('\n'.join(temp_list))
 
             #loop over the chunks and send them one by one with correct python formatting
+            sent_messages = []
             for chunk in chunks_to_send:
                 backslash = '\\'
-                await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
+                msg = await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
+                sent_messages.append(msg)
+            
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=sent_messages, author=ctx.author)
 
     def chunk_iterable(self, iterable, chunk_size):
         for i in range(0, len(iterable), chunk_size):

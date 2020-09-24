@@ -7,9 +7,11 @@ from enum import Enum
 
 import discord
 import discord.ext.commands as commands
+
 from bot.consts import Colors
 from bot.data.tag_repository import TagRepository
 from discord.ext.commands.errors import CheckFailure
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
@@ -161,7 +163,8 @@ class TagCog(commands.Cog):
             embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
             embed.add_field(name='Exception:', value= e)
             embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-            await ctx.channel.send(embed= embed)
+            msg = await ctx.channel.send(embed= embed)
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
             await self.bot.global_error_handler(e)
 
 

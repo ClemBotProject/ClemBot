@@ -144,7 +144,8 @@ class ClemBot(commands.Bot):
         embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
         embed.add_field(name='Exception:', value= e)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-        await ctx.channel.send(embed= embed)
+        msg = await ctx.channel.send(embed= embed)
+        await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         await self.global_error_handler(e)
 
     async def global_error_handler(self, e, *, traceback: str = None):
