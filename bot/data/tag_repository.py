@@ -47,7 +47,7 @@ class TagRepository(BaseRepository):
                         """
                         SELECT * FROM Tags 
                         WHERE fk_guildId = ? 
-                        ORDER BY name ASC
+                        ORDER BY name
                         """,
                     (guild_id,)) as c:
                 return await self.fetcthall_as_dict(c)
