@@ -38,7 +38,10 @@ class GifMeCog(commands.Cog):
             embed.set_image(url=response["data"]["images"]["original"]["url"])
             embed.set_footer(text="Powered by GIPHY")
         msg = await ctx.send(embed=embed)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, timeout=60)
+        await self.bot.messenger.publish(Events.on_set_deletable, 
+                msg=msg, 
+                author=ctx.author, 
+                timeout=60)
 
 
 def setup(bot):
