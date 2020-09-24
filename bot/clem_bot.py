@@ -1,4 +1,3 @@
-from asyncio.locks import Event
 import datetime
 import importlib
 import logging
@@ -138,9 +137,13 @@ class ClemBot(commands.Bot):
             ctx ([type]): The context that the command that errored was sent from
             e ([type]): The unhandled exception
         """
+        if ctx.cog:
+            if commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
+                return
 
         embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
-        embed.add_field(name=ctx.author, value= e)
+        embed.add_field(name='Exception:', value= e)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         await ctx.channel.send(embed= embed)
         await self.global_error_handler(e)
 
@@ -171,6 +174,8 @@ class ClemBot(commands.Bot):
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
+    def get_full_name(self, author) -> str: 
+        return f'{author.name}#{author.discriminator}' 
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.
