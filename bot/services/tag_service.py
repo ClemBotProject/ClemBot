@@ -34,7 +34,7 @@ class TagService(BaseService):
         content = await repo.get_tag_content(name, message.guild.id)
         log.info(f'Tag "{found_name}" invoked in guild: {message.guild.id} by: {message.author.id}')
         msg = await message.channel.send(content)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, timeout=60)
 
     async def load_service(self):
         pass

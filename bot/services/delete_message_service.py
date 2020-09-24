@@ -1,5 +1,6 @@
 import logging
 import typing as t
+import asyncio
 
 import discord
 
@@ -26,7 +27,8 @@ class DeleteMessageService(BaseService):
     async def set_message_deletable(self, *,
                                     msg: t.List[discord.Message],
                                     roles: t.List[discord.Role] = [],
-                                    author: discord.Member = None):
+                                    author: discord.Member = None,
+                                    timeout: int = None):
 
         if not isinstance(msg , t.List):
             msg = [msg]
@@ -42,6 +44,15 @@ class DeleteMessageService(BaseService):
 
         # the emoji is placed on the last message in the list
         await msg[-1].add_reaction("🗑️")
+        if timeout:
+            await asyncio.sleep(timeout) 
+            try:
+                await msg[-1].clear_reactions()
+                del self.messages[msg[-1].id]
+            except:
+                pass
+            finally:
+                log.info(f'Message: {msg[-1].id} timed out as deletable')
 
     @BaseService.Listener(Events.on_reaction_add)
     async def delete_message(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
