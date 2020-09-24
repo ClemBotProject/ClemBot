@@ -36,7 +36,7 @@ class TagService(BaseService):
         msg = await message.channel.send(content)
         await self.bot.messenger.publish(Events.on_set_deletable, 
                 msg=msg, 
-                author= msg.author, 
+                author= message.author, 
                 timeout=60)
 
     async def load_service(self):
