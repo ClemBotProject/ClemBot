@@ -43,6 +43,11 @@ class TagRepository(BaseRepository):
 
     async def get_all_server_tags(self, guild_id: int) -> str:
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute('SELECT * FROM Tags WHERE fk_guildId = ?',
+            async with db.execute(
+                        """
+                        SELECT * FROM Tags 
+                        WHERE fk_guildId = ? 
+                        ORDER BY name ASC
+                        """,
                     (guild_id,)) as c:
                 return await self.fetcthall_as_dict(c)
