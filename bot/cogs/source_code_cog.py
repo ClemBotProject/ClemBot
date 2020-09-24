@@ -38,8 +38,15 @@ class SourceCodeCog(commands.Cog):
 
         if file is None:
             file_tree = self.list_files(os.getcwd(), self.ignored)
+
+            sent_messages = []
             for chunk in self.chunk_iterable(file_tree, 1980):
-                await ctx.send(f'```yaml\n{chunk}```')
+                sent_messages.append(await ctx.send(f'```yaml\n{chunk}```'))
+
+            await self.bot.messenger.publish(Events.on_set_deletable,
+                    msg=sent_messages,
+                    author=ctx.author)
+
             return
         elif file == 'BotSecrets.json':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)
