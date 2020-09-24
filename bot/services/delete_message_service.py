@@ -23,33 +23,38 @@ class DeleteMessageService(BaseService):
 
     # Called When a cog would like to be able to delete a message or messages
     @BaseService.Listener(Events.on_set_deletable)
-    async def set_message_deletable(self, messagesToDelete: t.List[discord.Message],
-                                    roles: t.List[str] = [],
+    async def set_message_deletable(self, *,
+                                    msg: t.List[discord.Message],
+                                    roles: t.List[discord.Role] = [],
                                     author: discord.Member = None):
+
+        if not isinstance(msg , t.List):
+            msg = [msg]
+        if not isinstance(roles , t.List):
+            roles = [roles]
+
         # stores the message info
-        self.messages[messagesToDelete[-1].id] = {
-            "MessagesToDelete": messagesToDelete,
+        self.messages[msg[-1].id] = {
+            "MessagesToDelete": msg,
             "Roles": roles,
-            "Author": author.id
+            "Author": author.id if author else None
         }
 
         # the emoji is placed on the last message in the list
-        await messagesToDelete[-1].add_reaction("🗑️")
+        await msg[-1].add_reaction("🗑️")
 
     @BaseService.Listener(Events.on_reaction_add)
     async def delete_message(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
-        names = [role.name for role in user.roles]
+        role_ids = [role.id for role in user.roles]
         delete = False
+
         if reaction.emoji != "🗑️" and reaction.message.id not in self.messages:
             return
-
         elif user.guild_permissions.administrator:
             delete = True
-
         elif user.id == self.messages[reaction.message.id]["Author"]:
             delete = True
-
-        elif any(True for role in self.messages[reaction.message.id]["Roles"] if role in names):
+        elif any(True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids):
             delete = True
 
         if delete:
