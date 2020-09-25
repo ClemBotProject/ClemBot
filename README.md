@@ -2,12 +2,9 @@
   <img src="ClemBot.png" width="275" height= "275">
 </p>
 
+# ClemBot 
 
-# ClemBot - A Discord Bot for the Clemson CPSC Discord Server
-A Discord bot for server management with a focus on school related commands. We are a community focused on learning and acceptance; anyone is welcome. If you have an idea or a feature you would like to contribute, feel free to open an issue and we as a community can begin discussion. 
-## Server Invite:  
-
-<div align="center">
+<p align="center">
   <br>
 
   <a href="https://discord.gg/QNRbC6k">
@@ -22,10 +19,28 @@ A Discord bot for server management with a focus on school related commands. We 
     <img src="https://img.shields.io/badge/license-mit-e74c3c.svg?style=for-the-badge&logo=appveyor" alt="MIT License">
   </a>
   </br>
-</div>
+</p>
+
+A Discord bot for server and community management with a focus on school/fun related commands. 
+   - Role Management
+   - Customizable Prefix
+   - Python Repl
+   - Message Logging
+   - Moderation
+   - Tags
+   - Channel Generation
+   - Welcome Messages
+   - Expression Evaluator
+   - Meme Generator
+   and so much more
+   
+   Clembot is in current active development so check back often to see whats new!!
 
 # Bot Invite
 To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=2081291511&scope=bot)
+
+## Community
+We are a community focused on learning and acceptance; anyone is welcome. If you have an idea or a feature you would like to contribute, feel free to open an issue and we as a community can begin discussion. 
 
 # Development
 To start developing and contributing to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md)
