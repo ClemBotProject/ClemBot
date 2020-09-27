@@ -1,10 +1,13 @@
+from datetime import datetime
 import logging
+import datetime as datetime
 
 import discord
 
 from bot.data.user_repository import UserRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.consts import Colors, DesignatedChannels
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +20,7 @@ class UserHandlingService(BaseService):
     async def on_user_joined(self, user) -> None:
         log.info(f'"{user.name}:{user.id}" has joined guild "{user.guild.name}:{user.guild.id}"')
         await self.add_user(user, user.guild.id)
+        await self.notify_user_join(user)
 
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild):
@@ -24,6 +28,18 @@ class UserHandlingService(BaseService):
 
     async def add_user(self, user, guild_id: int) -> None:
         await UserRepository().add_user(user, guild_id)
+    
+    async def notify_user_join(self, user: discord.Member):
+        embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
+        embed.add_field(name='Username', value=self.get_full_name(user))
+        embed.add_field(name='Account Creation date', value=user.created_at.date())
+        embed.set_thumbnail(url= user.avatar_url_as(static_format= 'png'))
+        embed.set_footer(text=datetime.datetime.now().date())
+
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                DesignatedChannels.user_join_log, 
+                user.guild.id, 
+                embed)
 
     async def load_users(self, guild: discord.Guild):
         for user in guild.members:
