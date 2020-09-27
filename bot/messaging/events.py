@@ -295,6 +295,38 @@ class EventsMeta(type):
             roles (str) Stores the roles needed to delete the message
         """
         return '_on_set_deletable'
+    
+    @property
+    def on_guild_channel_create(self):
+        """
+        Published when a new text channel is created in a guild
+
+        Args:
+            channel (discord.TextChannel): The new channel
+        """
+        return 'on_guild_channel_create'
+
+    @property
+    def on_guild_channel_delete(self):
+        """
+        Published when a new text channel is deleted in a guild
+
+        Args:
+            channel (discord.TextChannel): The deleted channel
+        """
+        return 'on_guild_channel_delete'
+
+    @property
+    def on_guild_channel_update(self):
+        """
+        Published when a text channel is edited
+
+        Args:
+            before (discord.TextChannel): The before of the channel
+            after (discord.TextChannel): The after of the channel
+        """
+        return 'on_guild_channel_update'
+
 
 class Events(metaclass= EventsMeta):
     pass
