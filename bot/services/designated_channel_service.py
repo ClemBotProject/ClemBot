@@ -55,6 +55,12 @@ class DesignatedChannelService(BaseService):
             return
         
         await self._send_dc_messages(assigned_channel_ids, content)
+    
+    @BaseService.Listener(Events.on_guild_channel_delete)
+    async def designated_channel_removed(self, channel):
+        repo = DesignatedChannelRepository()
+        if await repo.check_channel(channel):
+            await repo.remove_from_all_designated_channels(channel)
         
     async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed]):
         if len(assigned_channel_ids) > 0:

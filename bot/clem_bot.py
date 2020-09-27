@@ -92,6 +92,15 @@ class ClemBot(commands.Bot):
 
     async def on_guild_role_delete(self, role):
         await self.publish_with_error(Events.on_guild_role_delete, role)
+    
+    async def on_guild_channel_create(self, channel):
+        await self.publish_with_error(Events.on_guild_channel_create, channel)
+
+    async def on_guild_channel_delete(self, channel):
+        await self.publish_with_error(Events.on_guild_channel_delete, channel)
+    
+    async def on_guild_channel_update(self, before, after):
+        await self.publish_with_error(Events.on_guild_channel_update, before, after)
 
     async def on_member_join(self, user):
         await self.publish_with_error(Events.on_user_joined, user)
