@@ -44,7 +44,7 @@ class DesignatedChannelsCog(commands.Cog):
         
         await ctx.send(embed= embed)
 
-    @channel.command(pass_context= True, aliases= ['register'])
+    @channel.command(pass_context= True, aliases= ['register','set'])
     @commands.has_guild_permissions(administrator= True)
     async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
