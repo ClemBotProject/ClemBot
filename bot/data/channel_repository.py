@@ -30,7 +30,7 @@ class ChannelRepository(BaseRepository):
                 """
                 INSERT INTO Channels (id, name) VALUES (?, ?)
                 ON CONFLICT(id) DO UPDATE SET
-                    id = excluded.id
+                    id = excluded.id,
                     name = excluded.name
                 """, (after.id, after.name))
             await db.commit()
