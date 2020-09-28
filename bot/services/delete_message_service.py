@@ -59,7 +59,7 @@ class DeleteMessageService(BaseService):
         role_ids = [role.id for role in user.roles]
         delete = False
 
-        if reaction.emoji != "🗑️" and reaction.message.id not in self.messages:
+        if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
             return
         elif user.guild_permissions.administrator:
             delete = True
