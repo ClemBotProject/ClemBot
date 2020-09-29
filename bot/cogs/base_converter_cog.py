@@ -8,6 +8,8 @@ class BaseConverterCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #if number less than <
+
     @commands.group()
     async def baseconvert(self, ctx):
         """
@@ -32,7 +34,7 @@ class BaseConverterCog(commands.Cog):
         else:
             a = 'Unicode representation not found.'
 
-        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {str(number)}', color = Colors.ClemsonOrange)
+        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
         embed.add_field(name='Decimal', value=d, inline=False)
         embed.add_field(name='Hexadecimal', value=h, inline=False)
         embed.add_field(name='Octal', value=o, inline=False)
@@ -57,7 +59,7 @@ class BaseConverterCog(commands.Cog):
         else:
             a = 'Unicode representation not found.'
 
-        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {str(number)}', color = Colors.ClemsonOrange)
+        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
         embed.add_field(name='Binary', value=b, inline=False)
         embed.add_field(name='Hexadecimal', value=h, inline=False)
         embed.add_field(name='Octal', value=o, inline=False)
@@ -84,7 +86,7 @@ class BaseConverterCog(commands.Cog):
         else:
             a = 'Unicode representation not found.'
 
-        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {str(number)}', color = Colors.ClemsonOrange)
+        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
         embed.add_field(name='Binary', value=b, inline=False)
         embed.add_field(name='Decimal', value=d, inline=False)
         embed.add_field(name='Octal', value=o, inline=False)
@@ -110,7 +112,7 @@ class BaseConverterCog(commands.Cog):
         else:
             a = 'Unicode representation not found.'
 
-        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {str(number)}', color = Colors.ClemsonOrange)
+        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
         embed.add_field(name='Binary', value=b, inline=False)
         embed.add_field(name='Decimal', value=d, inline=False)
         embed.add_field(name='Hexadecimal', value=h, inline=False)
