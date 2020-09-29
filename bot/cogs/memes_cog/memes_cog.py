@@ -161,7 +161,7 @@ class MemesCog(commands.Cog):
         await msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
-    @commands.command(aliases=['8ball',"🎱"])
+    @commands.command(aliases=['8ball','🎱'])
     async def ball(self, ctx, *, question):
         """
         A simple magic 8 ball than can be used with 'ball' or '8ball'
@@ -191,7 +191,7 @@ class MemesCog(commands.Cog):
             'Outlook not so good.',
             'Very doubtful.'
             ]
-        embed = discord.Embed(title="🎱", description= f"{random.choice(responses)}",color = Colors.ClemsonOrange)
+        embed = discord.Embed(title='🎱', description= f'{random.choice(responses)}',color = Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
 def setup(bot):
