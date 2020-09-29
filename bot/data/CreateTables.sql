@@ -101,3 +101,12 @@ CREATE TABLE IF NOT EXISTS Tags (
     FOREIGN KEY(fk_UserId)
         REFERENCES Users (id)
 );
+
+CREATE TABLE IF NOT EXISTS Starboard (
+    id                      INTEGER     PRIMARY KEY,
+    timestamp               TEXT        NOT NULL,
+    stars                   INTEGER     NOT NULL,
+    fk_messageId            INTEGER     NOT NULL,
+    FOREIGN KEY(fk_messageId)
+        REFERENCES Messages (id)
+);
