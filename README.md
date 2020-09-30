@@ -59,3 +59,4 @@ The bot does the same thing for services, to see how to define a service, see [e
 
 ![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
 
+Wyatt Dorris
