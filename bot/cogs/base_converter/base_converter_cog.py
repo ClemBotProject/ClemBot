@@ -21,30 +21,23 @@ class BaseConverterCog(commands.Cog):
                 number examples: [11, 99, ff, 77 ]
                 number with base prefix examples: [0b11, 99, 0xff, 0o77]
         """
-        if ctx.invoked_command is None:
-            await ctx.send('Invalid entry! Use the help command for examples!')
-        return
-    
     async def result(self, ctx, number) -> None:
         b = bin(number)
         d = int(number)
         h = hex(number)
-        o = oct(number)	
+        o = oct(number)
 
-        if number < 1114112: 
-            a = chr(number)
-        else:
-            a = 'Unicode representation not found.'
+        attachment = discord.File(filename="Code.gif",
+                             fp="bot/cogs/base_converter/assets/Code.gif")
 
         embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
-        embed.set_thumbnail(url = 'https://i.gifer.com/8oXf.gif')
+        embed.set_thumbnail(url = 'attachment://Code.gif')
         embed.add_field(name='Binary', value=b, inline=False)
         embed.add_field(name='Decimal', value=d, inline=False)
         embed.add_field(name='Hexadecimal', value=h, inline=False)
         embed.add_field(name='Octal', value=o, inline=False)
-        embed.add_field(name="UTF-8", value=a, inline=False)
         
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, file=attachment)
 
     @bconvert.command(pass_context= True, aliases= ['binary'])
     async def bin(self, ctx, *, number) -> None:
