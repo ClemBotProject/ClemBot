@@ -13,10 +13,10 @@ class DiceRollCog(commands.Cog):
         """
         Rolls dice in a XdY format where X is the number of dice and Y is the number of sides on the dice.
             Example:
-            1d6     -   Rolling 1 die with 6 sides
-            2d8     -   Rolling 2 die with 8 sides
-            3d10    -   Rolling 3 die with 10 sides
-            4d20    -   Rolling 4 die with 20 sides
+            1d6     -   Rolls 1 die with 6 sides
+            2d8     -   Rolls 2 die with 8 sides
+            3d10    -   Rolls 3 die with 10 sides
+            4d20    -   Rolls 4 die with 20 sides
         """
         try:
             rolls, limit = map(int, dice.split('d'))
