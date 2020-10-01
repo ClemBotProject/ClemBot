@@ -28,11 +28,10 @@ class ChannelRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
-                INSERT INTO Channels (id, name) VALUES (?, ?)
+                INSERT INTO Channels (id, fk_guildId, name) VALUES (?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
-                    id = excluded.id,
                     name = excluded.name
-                """, (after.id, after.name))
+                """, (after.id, after.guild.id, after.name))
             await db.commit()
 
     async def check_channel(self, channel_id: int) -> bool:
