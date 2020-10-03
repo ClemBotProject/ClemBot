@@ -26,7 +26,7 @@ class DiceRollCog(commands.Cog):
 
         result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
 
-        embed = discord.Embed(title ='Dice Roller', description = f'{ctx.message.author.mention} rolled {dice}', color = Colors.ClemsonOrange)
+        embed = discord.Embed(title ='Dice Roller', description = f'{ctx.message.author.mention} rolled **{dice}**', color = Colors.ClemsonOrange)
         embed.add_field(name ='Here are the results of their rolls: ', value = result, inline = False)
         await ctx.send(embed = embed)
 
