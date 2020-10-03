@@ -21,6 +21,9 @@ class BaseConverterCog(commands.Cog):
                 number examples: [11, 99, ff, 77 ]
                 number with base prefix examples: [0b11, 99, 0xff, 0o77]
         """
+
+        embed = discord.Embed(title='Available Bases', description ='Available Bases Include: binary (bin), decimal(dec), hexadecimal(hex), octal(oct)',color= Colors.ClemsonOrange)
+        await ctx.send(embed=embed)
     async def result(self, ctx, number) -> None:
         b = bin(number)
         d = int(number)
