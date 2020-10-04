@@ -9,7 +9,7 @@ class BaseConverterCog(commands.Cog):
         self.bot = bot
 
     @commands.group(pass_context= True, invoke_without_command= True, aliases= ['convert','baseconvert'])
-    async def bconvert(self, ctx, *, number) -> None:
+    async def bconvert(self, ctx) -> None:
         """
         A simple base converter that takes in a base number an a value, then displays the value in binary, octal, decimal, and hexadecimal
 
@@ -21,9 +21,10 @@ class BaseConverterCog(commands.Cog):
                 number examples: [11, 99, ff, 77 ]
                 number with base prefix examples: [0b11, 99, 0xff, 0o77]
         """
-
-        embed = discord.Embed(title='Available Bases', description ='Available Bases Include: binary (bin), decimal(dec), hexadecimal(hex), octal(oct)',color= Colors.ClemsonOrange)
+        desc = 'Available Bases Include:\n binary (bin),\n decimal(dec),\n hexadecimal(hex),\n octal(oct)'
+        embed = discord.Embed(title='Available Bases', description=desc, color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
+        
     async def result(self, ctx, number) -> None:
         b = bin(number)
         d = int(number)
