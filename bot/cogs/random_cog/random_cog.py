@@ -20,20 +20,20 @@ class RandomCog(commands.Cog):
 
         random.seed(time.time())
 
-        embed = discord.Embed(title="Coin Flip", color=Colors.ClemsonOrange)
+        embed = discord.Embed(title='Coin Flip', color=Colors.ClemsonOrange)
 
-        heads = discord.File(filename="Heads.jpg",
-                             fp="bot/cogs/random_cog/assets/Heads.jpg")
+        heads = discord.File(filename='Heads.jpg',
+                             fp='bot/cogs/random_cog/assets/Heads.jpg')
 
-        tails = discord.File(filename="Tails.jpg",
-                             fp="bot/cogs/random_cog/assets/Tails.jpg")
+        tails = discord.File(filename='Tails.jpg',
+                             fp='bot/cogs/random_cog/assets/Tails.jpg')
 
         if random.randint(0, 1) == 1:
             attachment = heads
-            embed.set_thumbnail(url="attachment://Heads.jpg")
+            embed.set_thumbnail(url='attachment://Heads.jpg')
         else:
             attachment = tails
-            embed.set_thumbnail(url="attachment://Tails.jpg")
+            embed.set_thumbnail(url='attachment://Tails.jpg')
 
         await ctx.send(embed=embed, file=attachment)
 
