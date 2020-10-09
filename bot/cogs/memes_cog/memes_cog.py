@@ -176,7 +176,12 @@ class MemesCog(commands.Cog):
                 3.14
 
             To have it converted into cookout trays
-            Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
+                Examples:
+                    cookouttray 20
+                    ctray 100
+                    trayforjay 3.14
+        
+        Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
         """
         money = round(float(input),2)
         output = money/5
