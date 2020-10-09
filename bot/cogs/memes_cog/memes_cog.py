@@ -161,5 +161,28 @@ class MemesCog(commands.Cog):
         await msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
+    @commands.command(aliases = ['ctray','trayforjay'])
+    async def cookouttray(self, ctx, input):
+        """
+        For those who do finances with cookout trays, we proudly present the command for you
+            Simply type one of the following:
+                cookouttray
+                ctray
+                trayforjay
+
+            Followed by a monetary value such as (leave off the dollar sign):
+                20
+                100
+                3.14
+
+            To have it converted into cookout trays
+            Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
+        """
+        money = round(float(input),2)
+        output = money/5
+
+        embed = discord.Embed(title ='Cash to Cookout Tray Converter', description = f'{ctx.message.author.mention} ${money} is approximately {output} cookout trays', url=f"https://www.fastfoodmenuprices.com/cookout-prices/", color = Colors.ClemsonOrange)
+        await ctx.send(embed = embed) 
+
 def setup(bot):
     bot.add_cog(MemesCog(bot))
