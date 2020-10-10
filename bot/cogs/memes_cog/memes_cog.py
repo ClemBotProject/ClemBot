@@ -186,7 +186,11 @@ class MemesCog(commands.Cog):
         money = round(float(input),2)
         output = money/5
 
-        embed = discord.Embed(title ='Cash to Cookout Tray Converter', description = f'{ctx.message.author.mention} ${money} is approximately {output} cookout trays', url=f"https://www.fastfoodmenuprices.com/cookout-prices/", color = Colors.ClemsonOrange)
+        embed = discord.Embed(
+            title ='Cash to Cookout Tray Converter', 
+            description = f'{ctx.message.author.mention} ${money} is approximately {output} cookout trays', 
+            url=f"https://www.fastfoodmenuprices.com/cookout-prices/", 
+            color = Colors.ClemsonOrange)
         await ctx.send(embed = embed) 
 
 def setup(bot):
