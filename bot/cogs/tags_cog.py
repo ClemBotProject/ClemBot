@@ -116,7 +116,9 @@ class TagCog(commands.Cog):
 
     @tag.command(aliases=['info'])
     async def about(self, ctx, name):
-
+        
+        name = name.lower()
+        
         repo = TagRepository()
 
         if not await repo.check_tag_exists(name, ctx.guild.id):
