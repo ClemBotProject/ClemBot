@@ -1,6 +1,7 @@
 import logging
 import random
 import time
+import asyncio
 
 import discord
 import discord.ext.commands as commands
@@ -8,7 +9,7 @@ import discord.ext.commands as commands
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
-
+SLOTS_COMMAND_COOLDOWN = 6
 
 class RandomCog(commands.Cog):
 
@@ -91,6 +92,45 @@ class RandomCog(commands.Cog):
             ]
         embed = discord.Embed(title='🎱', description= f'{random.choice(responses)}',color = Colors.ClemsonOrange)
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=['slotmachine','🎰'])
+    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.guild)
+    async def slots(self, ctx):
+        """
+        A simple slot machine.
+            """
+        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        a = random.choice(emojis)
+        b = random.choice(emojis)
+        c = random.choice(emojis)
+
+        blank = '⬜'
+
+        if (a == b ==c):
+            message = f'{ctx.message.author.mention} won!'
+        elif (a == b) or (a == c) or (b == c):
+            message = f'{ctx.message.author.mention} almost won, 2/3!'
+        else:
+            message = f'{ctx.message.author.mention} lost, no matches.'
+
+        embed = discord.Embed(title = '💎 Slot Machine 💎', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} is rolling the slots**')
+        embed.add_field(name = f'{blank} | {blank} | {blank}', value = 'Spinning...', inline = False)
+        await ctx.send(embed = embed, delete_after = 1.75)
+        await asyncio.sleep(1.75)
+
+        embed = discord.Embed(title = '💎 Slot Machine 💎', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} is rolling the slots**')
+        embed.add_field(name = f'{a} | {blank} | {blank}', value = 'Spinning...', inline = False)
+        await ctx.send(embed = embed, delete_after = 1.75)
+        await asyncio.sleep(1.75)
+
+        embed = discord.Embed(title = '💎 Slot Machine 💎', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} is rolling the slots**')
+        embed.add_field(name = f'{a} | {b} | {blank}', value = 'Spinning...', inline = False)
+        await ctx.send(embed = embed, delete_after = 1.75)
+        await asyncio.sleep(1.75)
+
+        embed = discord.Embed(title = '💎 Slot Machine 💎', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} rolled the slots**')
+        embed.add_field(name = f'{a} | {b} | {c}', value = f'**{message}**', inline = False)
+        await ctx.send(embed = embed)
 
 def setup(bot):
     bot.add_cog(RandomCog(bot))
