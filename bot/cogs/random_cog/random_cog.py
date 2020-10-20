@@ -101,12 +101,13 @@ class RandomCog(commands.Cog):
         a = random.choice(emojis)
         b = random.choice(emojis)
         c = random.choice(emojis)
-
         blank = '⬜'
 
-        if (a == b ==c):
+        slotset = {a, b, c}
+
+        if (len(slotset) == 1):
             message = f'{ctx.message.author.mention} won!'
-        elif (a == b) or (a == c) or (b == c):
+        elif (len(slotset) == 2):
             message = f'{ctx.message.author.mention} almost won, 2/3!'
         else:
             message = f'{ctx.message.author.mention} lost, no matches.'
