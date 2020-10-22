@@ -1,6 +1,7 @@
 import logging
 import random
 import time
+import asyncio
 
 import discord
 import discord.ext.commands as commands
@@ -8,7 +9,6 @@ import discord.ext.commands as commands
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
-
 
 class RandomCog(commands.Cog):
 
@@ -91,6 +91,46 @@ class RandomCog(commands.Cog):
             ]
         embed = discord.Embed(title='🎱', description= f'{random.choice(responses)}',color = Colors.ClemsonOrange)
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=['slotmachine','🎰'])
+    async def slots(self, ctx):
+        """
+        A simple slot machine.
+            """
+        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        a = random.choice(emojis)
+        b = random.choice(emojis)
+        c = random.choice(emojis)
+        blank = '⬜'
+
+        slotset = {a, b, c}
+
+        if (len(slotset) == 1):
+            message = f'{ctx.message.author.mention} won!'
+        elif (len(slotset) == 2):
+            message = f'{ctx.message.author.mention} almost won, 2/3!'
+        else:
+            message = f'{ctx.message.author.mention} lost, no matches.'
+
+        slotstitle = '💎 Slot Machine 💎'
+
+        def slotsrolling(input, spinstatus,waittime):
+            slotembed = discord.Embed(title = f'{slotstitle}', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} has rolled the slots**')
+            slotembed.add_field(name = input, value = spinstatus, inline = False)
+            time.sleep(waittime)
+            return slotembed
+
+        embed = slotsrolling(f'{blank} | {blank} | {blank}','Spinning',0)
+        msg = await ctx.send(embed = embed)
+
+        embed = slotsrolling(f'{a} | {blank} | {blank}','Spinning',1.75)
+        await msg.edit(embed = embed)
+
+        embed = slotsrolling(f'{a} | {b} | {blank}','Spinning',1.75)
+        await msg.edit(embed = embed)
+
+        embed = slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1.75)
+        await msg.edit(embed = embed)
 
 def setup(bot):
     bot.add_cog(RandomCog(bot))
