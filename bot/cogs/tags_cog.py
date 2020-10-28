@@ -50,7 +50,8 @@ class TagCog(commands.Cog):
         else:
             embed.add_field(name= 'Available:', value= 'No currently available tags')
 
-        await ctx.send(embed= embed)
+        msg = await ctx.send(embed= embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
     @tag.command(aliases=['create', 'make'])
     async def add(self, ctx, name: str, *, content: str):
