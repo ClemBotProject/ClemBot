@@ -4,23 +4,29 @@
 
 # ClemBot 
 
+
+
 <p align="center">
   <br>
-
   <a href="https://discord.gg/QNRbC6k">
     <img src="https://img.shields.io/discord/515071617815019520.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge" alt="Support">
   </a>
-  
-  <a href="https://www.python.org/downloads/">
-    <img src="https://img.shields.io/badge/Made%20With-Python%203.8-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.7">
+    <a href="https://top.gg/bot/710672266245177365">
+    <img src="https://top.gg/api/widget/710672266245177365.svg" alt="ClemBot" />
   </a>
-  
-  <a href="https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/license-mit-e74c3c.svg?style=for-the-badge&logo=appveyor" alt="MIT License">
+  <a href="https://www.python.org/downloads/">
+    <img src="https://img.shields.io/badge/Made%20With-Python%203.8-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.8">
   </a>
   </br>
 </p>
 
+<p align="center">
+  <a href="https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-mit-e74c3c.svg?style=for-the-badge&logo=appveyor" alt="MIT License">
+  </a>
+</p>
+ 
+ 
 A Discord bot for server and community management with a focus on school/fun related commands. 
    - Role Management
    - Customizable Prefix
