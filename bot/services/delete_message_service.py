@@ -47,7 +47,7 @@ class DeleteMessageService(BaseService):
         if timeout:
             await asyncio.sleep(timeout) 
             try:
-                await msg[-1].clear_reactions()
+                await msg[-1].clear_reaction("🗑️")
                 del self.messages[msg[-1].id]
             except:
                 pass
