@@ -5,7 +5,6 @@ from typing import List
 
 import discord
 import discord.ext.commands as commands
-
 from bot.consts import Colors
 from bot.messaging.events import Events
 

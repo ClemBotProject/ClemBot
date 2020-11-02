@@ -1,15 +1,13 @@
 import asyncio
-
-from bot.messaging.events import Events
 import logging
-from dataclasses import dataclass
 import typing as t
-
+from dataclasses import dataclass
 
 import discord
 import discord.ext.commands as commands
 
 from bot.consts import Colors
+from bot.messaging.events import Events
 from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
