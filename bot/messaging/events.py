@@ -236,8 +236,22 @@ class EventsMeta(type):
             channel_type (str) The designated channel to send the message in
             guild_id (int) The id of the guild to attempt to send a message in
             message (union[embed, str]) the message to be sent to the channel
+            id [Optional] (int) Id to associate a sent dc message with sent message ids at the publish site
         """
         return 'on_send_in_designated_channel'
+
+    @property
+    def on_designated_message_sent(self):
+        """
+        Published when an on_send_in_designate_channel event is published with an optional id parameter, 
+        this serves as a callback for that event to maintain seperation of concerns
+
+        Args:
+
+            dc_id (int) The id of the dc send event that was given to the dc service
+            message_id (Union[int, list[int]]) the id or the list of The ids of the sent messages in dc channels
+        """
+        return 'on_designated_message_sent'
 
     @property
     def on_broadcast_designated_channel(self):

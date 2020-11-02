@@ -11,6 +11,7 @@ class BaseService(abc.ABC):
 
     def __init__(self, bot):
         self.bot = bot
+        self.messenger = bot.messenger
 
         for _, value in inspect.getmembers(self):
             event = None
