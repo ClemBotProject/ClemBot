@@ -60,8 +60,7 @@ class OwnerCog(commands.Cog):
         db_path = f'database/{database_name}'
         connect_mode = 'ro'
         json_params = {
-                'sort_keys': True,
-                'indent': 4, 
+                'indent': 2, 
                 'separators': (',', ': ')
             }
 
