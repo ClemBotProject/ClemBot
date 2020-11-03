@@ -20,3 +20,8 @@ class GuildRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Guilds WHERE id = ?', (guild_id,)) as c:
                 return await c.fetchone() is not None
+            
+    async def get_guild_count(self) -> int:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute('SELECT count(*) FROM Guilds') as c:
+                return (await c.fetchone())[0]
