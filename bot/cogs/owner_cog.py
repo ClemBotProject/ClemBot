@@ -53,7 +53,7 @@ class OwnerCog(commands.Cog):
 
     @database.command()
     @commands.is_owner()
-    async def eval(self, ctx, query):
+    async def eval(self, ctx, *, query):
         """Runs arbitrary sql queries on the db in readonly mode and returns the results"""
 
         database_name = BotSecrets.get_instance().database_name
