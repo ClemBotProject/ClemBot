@@ -45,6 +45,17 @@ class MessageRepository(BaseRepository):
                 """, (message_id,))
             await db.commit()
 
+    async def get_message_count(self, guild_id: int=None) -> int:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            try:
+                if guild_id:
+                    c = await db.execute('SELECT count(*) FROM Messages WHERE fk_guildId = ?', (guild_id,))
+                else:
+                    c = await db.execute('SELECT count(*) FROM Messages')
+                return (await c.fetchone())[0]
+            finally:
+                c.close()
+
     async def get_message(self, message_id):
         if not await self.check_message(message_id):
             return None
