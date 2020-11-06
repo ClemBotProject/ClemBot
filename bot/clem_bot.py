@@ -27,9 +27,9 @@ class ClemBot(commands.Bot):
     as well as the dynamic loading of services and cogs
     """
 
-    def __init__(self, command_prefix: str, messenger, max_messages: int):
+    def __init__(self, messenger, **kwargs):
         #this super call is to pass the prefix up to the super class
-        super().__init__(command_prefix= command_prefix, max_messages= max_messages)
+        super().__init__(**kwargs)
 
         self.messenger = messenger
 
