@@ -8,7 +8,7 @@ Make sure you can run these commands and install them if not present.
 * pip3 (packaged as python3-pip)
 
 
-## Get a Discord bot token
+## Get a Discord bot token and enable intents
 * Go to https://discordapp.com/developers/applications (log in if needed)
 * Create an application (name doesn't matter)
 * Click "Bot" it the left sidebar
@@ -16,6 +16,7 @@ Make sure you can run these commands and install them if not present.
   * The bot's name will be what users see in servers
   * Changing the bot's name changes the BotToken
 * Make note of the token on this page (later refered to as BotToken)
+* Enable Discord member intents [![Intents](https://i.postimg.cc/hhWy9N7W/Screen-Shot-2020-11-06-at-10-30-25-AM.png)]
 
 
 ## Join the test server
