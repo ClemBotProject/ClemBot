@@ -73,11 +73,16 @@ def main():
     custom_prefix = CustomPrefix(default= prefix)
     messenger.subscribe(Events.on_set_custom_prefix, custom_prefix.set_prefix)
 
+    #enable privileged member gateway intents
+    intents = discord.Intents.default()
+    intents.members = True
+
     bot_log.info('Bot Starting Up')
     ClemBot(
-            command_prefix = custom_prefix.get_prefix,  # noqa: E126
-            messenger= messenger, 
-            max_messages= 5000
+            messenger=messenger, 
+            command_prefix=custom_prefix.get_prefix,  # noqa: E126
+            max_messages=5000,
+            intents=intents
         ).run(BotSecrets.get_instance().bot_token)
 
 
