@@ -16,7 +16,7 @@ Make sure you can run these commands and install them if not present.
   * The bot's name will be what users see in servers
   * Changing the bot's name changes the BotToken
 * Make note of the token on this page (later refered to as BotToken)
-* Enable Discord member intents [![Intents](https://i.postimg.cc/hhWy9N7W/Screen-Shot-2020-11-06-at-10-30-25-AM.png)]
+* Enable Discord member intents ![Intents](https://i.postimg.cc/hhWy9N7W/Screen-Shot-2020-11-06-at-10-30-25-AM.png)
 
 
 ## Join the test server
