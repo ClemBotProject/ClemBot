@@ -5,6 +5,7 @@ class Colors:
 
     Error = 0xE20000
     ClemsonOrange = 0xF56600
+    Starboard = 0xFFD700
 
 class DesignatedChannels(Enum):
     """Enum that defines possible designated channels for the bot to use"""

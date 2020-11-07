@@ -3,8 +3,6 @@ This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 
-
-
 class EventsMeta(type):
     """Class that defines what events are exposed at the bot level"""
 
