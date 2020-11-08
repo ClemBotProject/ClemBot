@@ -28,17 +28,27 @@
 </p>
  
  
-A Discord bot for server and community management with a focus on school/fun related commands. 
-   - Role Management
-   - Customizable Prefix
-   - Python Repl
-   - Message Logging
-   - Moderation
-   - Tags
-   - Channel Generation
-   - Welcome Messages
-   - Expression Evaluator
-   - Meme Generator
+A Discord bot for server and community management with a focus on school/programming/fun related commands. 
+   - <b>Role Management:</b> Easily manage you and your users roles with designated assignable roles
+   
+   - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix with  `!prefix set <prefix>`
+    
+   - <b>Python Repl:</b> Coding is fun, Discord is fun. Put them together and collaborative learning is easy with a built in python interpreter. Just type your python code into discord and run it with `!eval` and watch the bot evaluate your code.
+    
+   - <b>Message Logging:</b> Clembot offers the abillity to log message edits and deletions, just run `!channels add message_log #mychannel` to designate a channel as a log message
+   
+   - <b>Tags:</b> Tags allow you to create message snippets that can be invoked right in discord with a simple inline command. Just run `!tag add  <MyTagName> <MyTagsBody>` and invoke it with `$MyTagName`
+   
+   - <b>Channel Generation:</b>  If you are a school related server clembot offers an easy way to generate class channels and roles. Just run `!class add` and follow the onscreen prompts
+   
+   - <b>Welcome Messages:</b>  You can optionally set a message to be sent to new members of your server. Making it easy to make sure people understand rules and procedures.
+   
+   - <b>Expression Evaluator:</b>  Clembot implements the shunting yard algorithim to allow for rapid mathematical expression evaluation right in discord. just run `!calc 1+1` to get your result
+   
+   - <b>Meme Generator:</b>  SpongeBob text, Crab raves, wheres waldo and more. only one way to find all of them!!
+   
+   - <b>Moderation:</b>  Coming soon!!!
+   
    and so much more
    
    Clembot is in current active development so check back often to see whats new!!
