@@ -1,6 +1,5 @@
 import logging
 import random
-import time
 import asyncio
 
 import discord
@@ -96,7 +95,8 @@ class RandomCog(commands.Cog):
     async def slots(self, ctx):
         """
         A simple slot machine.
-            """
+        """
+
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
         a = random.choice(emojis)
         b = random.choice(emojis)
@@ -114,22 +114,22 @@ class RandomCog(commands.Cog):
 
         slotstitle = '💎 Slot Machine 💎'
 
-        def slotsrolling(input, spinstatus,waittime):
+        async def slotsrolling(input, spinstatus,waittime):
             slotembed = discord.Embed(title = f'{slotstitle}', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} has rolled the slots**')
             slotembed.add_field(name = input, value = spinstatus, inline = False)
-            time.sleep(waittime)
+            await asyncio.sleep(waittime)
             return slotembed
 
-        embed = slotsrolling(f'{blank} | {blank} | {blank}','Spinning',0)
+        embed = await slotsrolling(f'{blank} | {blank} | {blank}','Spinning',0)
         msg = await ctx.send(embed = embed)
 
-        embed = slotsrolling(f'{a} | {blank} | {blank}','Spinning',1.75)
+        embed = await slotsrolling(f'{a} | {blank} | {blank}','Spinning',1.75)
         await msg.edit(embed = embed)
 
-        embed = slotsrolling(f'{a} | {b} | {blank}','Spinning',1.75)
+        embed = await slotsrolling(f'{a} | {b} | {blank}','Spinning',1.75)
         await msg.edit(embed = embed)
 
-        embed = slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1.75)
+        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1.75)
         await msg.edit(embed = embed)
 
 def setup(bot):
