@@ -158,7 +158,9 @@ class RandomCog(commands.Cog):
         for reaction in cache_msg.reactions:
             if reaction.emoji == '🎟️':
                 if reaction.count == 1:
-                    await ctx.send('No one entered the raffle :(')
+                    description += '\n\nNo one entered the raffle :('
+                    embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
+                    await msg.edit(embed = embed)
                 else:
                     reactors = await reaction.users().flatten()
                     # remove first user b/c first user is always bot
