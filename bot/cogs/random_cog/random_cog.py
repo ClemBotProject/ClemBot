@@ -2,6 +2,7 @@ import logging
 import random
 import asyncio
 import time
+import typing
 
 import discord
 import discord.ext.commands as commands
@@ -132,6 +133,33 @@ class RandomCog(commands.Cog):
 
         embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1.75)
         await msg.edit(embed = embed)
+
+    @commands.command()
+    async def raffle(self, ctx, time: typing.Optional[int] = 5, *, reason):
+        """
+        Raffle command, picks a random winner from users who reacted with :tickets:
+        :param time: optional, timer for the raffle
+        :param reason: required, reason/purpose for the raffle
+        """
+        description = f'Raffle for {reason}\nReact with :tickets: to enter the raffle'
+        embed = discord.Embed(title = 'RAFFLE', color=15158332, description = description)
+        msg = await ctx.send(embed = embed)
+        await msg.add_reaction('🎟️')
+        await asyncio.sleep(time)
+
+        cache_msg = discord.utils.get(self.bot.cached_messages, id=msg.id)
+        for reaction in cache_msg.reactions:
+            if reaction.emoji == '🎟️':
+                if reaction.count == 1:
+                    await ctx.send('No one entered the raffle :(')
+                else:
+                    reactors = await reaction.users().flatten()
+                    # remove first user b/c first user is always bot
+                    reactors.pop(0)
+                    winner = random.choice(reactors).name
+                    description += f'\n\n🎉 Winner is {winner} 🎉'
+                    embed = discord.Embed(title = 'RAFFLE', color=15158332, description = description)
+                    await msg.edit(embed = embed)
 
 def setup(bot):
     bot.add_cog(RandomCog(bot))
