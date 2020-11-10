@@ -8,6 +8,8 @@ import discord
 import discord.ext.commands as commands
 
 from bot.consts import Colors
+from bot.utils.converters import Duration
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -135,19 +137,24 @@ class RandomCog(commands.Cog):
         await msg.edit(embed = embed)
 
     @commands.command()
-    async def raffle(self, ctx, time: typing.Optional[int] = 5, *, reason):
+    async def raffle(self, ctx, time: typing.Optional[Duration] = 5, *, reason):
         """
         Raffle command, picks a random winner from users who reacted with :tickets:
-        :param time: optional, timer for the raffle
+        :param time: optional, timer for the raffle, default is 5 seconds
         :param reason: required, reason/purpose for the raffle
         """
+        if isinstance(time, datetime):
+            delay_time = (time - datetime.utcnow()).total_seconds()
+        else:
+            delay_time = time
+
         description = f'Raffle for {reason}\nReact with :tickets: to enter the raffle'
-        embed = discord.Embed(title = 'RAFFLE', color=15158332, description = description)
+        embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
         msg = await ctx.send(embed = embed)
         await msg.add_reaction('🎟️')
-        await asyncio.sleep(time)
+        await asyncio.sleep(delay_time)
 
-        cache_msg = discord.utils.get(self.bot.cached_messages, id=msg.id)
+        cache_msg = await ctx.fetch_message(msg.id)
         for reaction in cache_msg.reactions:
             if reaction.emoji == '🎟️':
                 if reaction.count == 1:
@@ -158,7 +165,7 @@ class RandomCog(commands.Cog):
                     reactors.pop(0)
                     winner = random.choice(reactors).name
                     description += f'\n\n🎉 Winner is {winner} 🎉'
-                    embed = discord.Embed(title = 'RAFFLE', color=15158332, description = description)
+                    embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
                     await msg.edit(embed = embed)
 
 def setup(bot):
