@@ -87,10 +87,9 @@ class PaginateService(BaseService):
         msg = self.messages[reaction.message.id]
 
         # check if emoji matches and user has perm to change page
-        if (reaction.emoji not in self.reactions 
-             or reaction.message.id not in self.messages 
-             or not user.guild_permissions.administrator 
-             or not user.id == msg.author):
+        if reaction.emoji not in self.reactions or reaction.message.id not in self.messages:
+            return
+        if not user.guild_permissions.administrator and not user.id == msg.author:
             return
 
         embed = discord.Embed(title =  msg.embed_name, color=Colors.ClemsonOrange)
