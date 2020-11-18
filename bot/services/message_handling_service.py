@@ -61,57 +61,60 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
 
-                
         message_repo = MessageRepository()
         message = await message_repo.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
         
-        if message is not None:
-            log.info(f'Uncached message edited in #{channel.name} By: \
-                {message["fk_authorId"]} \nBefore: {message["content"]} \nAfter: {payload.data["content"]}')
-
-            await message_repo.edit_message_content(message['id'], payload.data['content'])
-
-            embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
-                color= Colors.ClemsonOrange)
-
-            before_chunk = self.split_string_chunks(message['content'], 900)
-            after_chunk = self.split_string_chunks(payload.data['content'], 900)
-
-            for i, val in enumerate(before_chunk): 
-                embed.add_field(name= '**Before**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
-
-            for i, val in enumerate(after_chunk): 
-                embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
-
-            embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
-
-            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
-                DesignatedChannels.message_log, 
-                int(payload.data['guild_id']), 
-                embed)
-        else:
-            try:
+        try:
+            if message is not None:
                 log.info(f'Uncached message edited in #{channel.name} By: \
-                    {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
-            except KeyError:
-                log.error(json.dumps(payload.data))
+                    {message["fk_authorId"]} \nBefore: {message["content"]} \nAfter: {payload.data["content"]}')
 
-            embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
-                color= Colors.ClemsonOrange)
+                await message_repo.edit_message_content(message['id'], payload.data['content'])
 
-            embed.add_field(name= 'Before', value= 'Unknown, message not stored in the database', inline= False)
+                embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
+                    color= Colors.ClemsonOrange)
 
-            after_chunk = self.split_string_chunks(payload.data['content'], 900)
-            for i, val in enumerate(after_chunk): 
-                embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+                before_chunk = self.split_string_chunks(message['content'], 900)
+                after_chunk = self.split_string_chunks(payload.data['content'], 900)
 
-            embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
+                for i, val in enumerate(before_chunk): 
+                    embed.add_field(name= '**Before**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
 
-            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
-                DesignatedChannels.message_log, 
-                int(payload.data['guild_id']), 
-                embed)
+                for i, val in enumerate(after_chunk): 
+                    embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
+                embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
+
+                await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                    DesignatedChannels.message_log, 
+                    int(payload.data['guild_id']), 
+                    embed)
+            else:
+                try:
+                    log.info(f'Uncached message edited in #{channel.name} By: \
+                        {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}')
+                except KeyError:
+                    log.error(json.dumps(payload.data))
+
+                embed = discord.Embed(title= f':repeat: **Uncached message edited in #{channel.name}**',
+                    color= Colors.ClemsonOrange)
+
+                embed.add_field(name= 'Before', value= 'Unknown, message not stored in the database', inline= False)
+
+                after_chunk = self.split_string_chunks(payload.data['content'], 900)
+                for i, val in enumerate(after_chunk): 
+                    embed.add_field(name= '**After**' if i == 0 else 'Cont...', value= f'```{val}```', inline= False)
+
+                embed.set_footer(text=f'Author id: {payload.data["author"]["id"]}')
+
+                await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                    DesignatedChannels.message_log, 
+                    int(payload.data['guild_id']), 
+                    embed)
+        except KeyError as e:
+            log.error(f'raw_message_edit Error: {e} \nContent: {json.dumps(payload)}')
+
 
     @BaseService.Listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):
