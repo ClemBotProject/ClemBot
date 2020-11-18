@@ -84,13 +84,14 @@ class PaginateService(BaseService):
 
     @BaseService.Listener(Events.on_reaction_add)
     async def change_page(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
-        msg = self.messages[reaction.message.id]
-
+        
         # check if emoji matches and user has perm to change page
         if reaction.emoji not in self.reactions or reaction.message.id not in self.messages.keys():
             return
         if not user.guild_permissions.administrator and not user.id == msg.author:
             return
+        
+        msg = self.messages[reaction.message.id]
 
         embed = discord.Embed(title =  msg.embed_name, color=Colors.ClemsonOrange)
 
