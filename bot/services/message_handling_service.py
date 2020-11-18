@@ -181,6 +181,14 @@ class MessageHandlingService(BaseService):
             link_channel = await self.bot.fetch_channel(matches['channel_id'])
             link_message = await link_channel.fetch_message(matches['message_id'])
 
+            if len(link_message.embeds) > 0:
+                embed = link_message.embeds[0]
+                full_name = f'{self.get_full_name(message.author)}'
+                embed.add_field(name= f'Quoted by:', value= f'{full_name} from [Click Me]({link_message.jump_url})')
+                await message.delete()
+                await source_channel.send(embed=embed)
+                return
+
             embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color= Colors.ClemsonOrange)
             embed.set_author(name= f'Quoted by: {self.get_full_name(message.author)}', icon_url= avi)
             embed.add_field(name= 'Content', value= f'`{link_message.content}`', inline= False)
