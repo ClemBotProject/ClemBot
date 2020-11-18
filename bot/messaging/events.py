@@ -352,6 +352,7 @@ class EventsMeta(type):
             pages (list[str]): a list of every page/field for the embed
             author (discord.Member): member who called the bot 
             channel (discord.TextChannel): the channel to send the embed
+            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
         """
         return 'on_set_pageable'
 

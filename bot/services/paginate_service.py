@@ -1,6 +1,7 @@
 import logging
 import typing as t
 import asyncio
+from dataclasses import dataclass
 
 import discord
 
@@ -12,6 +13,19 @@ from bot.messaging import messenger
 
 log = logging.getLogger(__name__)
 
+@dataclass
+class Message:
+    embed_name: str
+    field_title: str
+    pages: t.List[str]
+    curr_page: int
+    author: int
+
+    def set_page(self, page: int):
+        self.curr_page = page
+
+    def get_content(self):
+        return self.pages[self.curr_page]
 
 class PaginateService(BaseService):
     """
@@ -44,17 +58,13 @@ class PaginateService(BaseService):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
 
         # stores the message info
-        self.messages[msg.id] = {
-            "embed_name": embed_name,
-            "field_title": field_title,
-            "curr_page": 0,
-            "pages": pages,
-            "author": author.id if author else None
-        }
+        message = Message(embed_name, field_title, pages, 0, author.id if author else None)
+        self.messages[msg.id] = message
 
         # add every emoji from the reaction list
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
+
         if timeout:
             await asyncio.sleep(timeout) 
             try:
@@ -68,38 +78,36 @@ class PaginateService(BaseService):
 
     @BaseService.Listener(Events.on_reaction_add)
     async def change_page(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
-        perm = False
+        msg = self.messages[reaction.message.id]
 
-        if reaction.emoji not in self.reactions or reaction.message.id not in self.messages:
+        # check if emoji matches and user has perm to change page
+        if (reaction.emoji not in self.reactions 
+            or reaction.message.id not in self.messages 
+            or not user.guild_permissions.administrator 
+            or not user.id == msg.author):
             return
-        elif user.guild_permissions.administrator:
-            perm = True
-        elif user.id == self.messages[reaction.message.id]["author"]:
-            perm = True
 
-        # check if user has perm to change the page
-        if perm:
-            msg = self.messages[reaction.message.id]
-            embed = discord.Embed(title =  msg["embed_name"], color=Colors.ClemsonOrange)
-            # check what emoji user used
-            if reaction.emoji == "⏮️":
-                if msg["curr_page"] != 0:
-                    self.messages[reaction.message.id]["curr_page"] = 0
-            elif reaction.emoji == "⬅️":
-                if msg["curr_page"] != 0:
-                    self.messages[reaction.message.id]["curr_page"] -= 1
-            elif reaction.emoji == "➡️":
-                if msg["curr_page"] < len(msg["pages"])-1:
-                    self.messages[reaction.message.id]["curr_page"] += 1
-            elif reaction.emoji == "⏭️":
-                if msg["curr_page"] != len(msg["pages"])-1:
-                    self.messages[reaction.message.id]["curr_page"] = len(msg["pages"])-1
+        embed = discord.Embed(title =  msg.embed_name, color=Colors.ClemsonOrange)
 
-            # edits the message and reset emoji (only user that triggered the action)
-            embed.add_field(name= msg["field_title"], value=msg["pages"][msg["curr_page"]])
-            embed.set_footer(text=f'Page {msg["curr_page"]+1} of {len(msg["pages"])}')
-            await reaction.message.edit(embed = embed)
-            await reaction.message.remove_reaction(reaction.emoji, user)
+        # check what emoji the user used
+        if reaction.emoji == "⏮️":
+            if msg.curr_page != 0:
+                msg.set_page(0)
+        elif reaction.emoji == "⬅️":
+            if msg.curr_page != 0:
+                msg.set_page(msg.curr_page - 1)
+        elif reaction.emoji == "➡️":
+            if msg.curr_page < len(msg.pages)-1:
+                msg.set_page(msg.curr_page + 1)
+        elif reaction.emoji == "⏭️":
+            if msg.curr_page != len(msg.pages)-1:
+                msg.set_page(len(msg.pages) - 1)
+
+        # edits the message and reset emoji (only user that triggered the action)
+        embed.add_field(name= msg.field_title, value=msg.get_content())
+        embed.set_footer(text=f'Page {msg.curr_page+1} of {len(msg.pages)}')
+        await reaction.message.edit(embed = embed)
+        await reaction.message.remove_reaction(reaction.emoji, user)
 
     async def load_service(self):
         pass
