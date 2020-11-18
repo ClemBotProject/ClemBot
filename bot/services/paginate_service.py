@@ -87,7 +87,7 @@ class PaginateService(BaseService):
         msg = self.messages[reaction.message.id]
 
         # check if emoji matches and user has perm to change page
-        if reaction.emoji not in self.reactions or reaction.message.id not in self.messages:
+        if reaction.emoji not in self.reactions or reaction.message.id not in self.messages.keys():
             return
         if not user.guild_permissions.administrator and not user.id == msg.author:
             return
