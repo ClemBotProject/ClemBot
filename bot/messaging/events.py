@@ -341,6 +341,21 @@ class EventsMeta(type):
         """
         return 'on_guild_channel_update'
 
+    @property
+    def on_set_pageable(self):
+        """
+        Published when a bot message is needed to be able to be paginate
+        
+        Args:
+            embed_name (str): name of the embed
+            field_title (str): name for the field/page 
+            pages (list[str]): a list of every page/field for the embed
+            author (discord.Member): member who called the bot 
+            channel (discord.TextChannel): the channel to send the embed
+        """
+        return 'on_set_pageable'
+
+
 
 class Events(metaclass= EventsMeta):
     pass
