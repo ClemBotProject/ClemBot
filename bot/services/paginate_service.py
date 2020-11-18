@@ -18,14 +18,20 @@ class Message:
     embed_name: str
     field_title: str
     pages: t.List[str]
-    curr_page: int
+    _curr_page: int
     author: int
 
-    def set_page(self, page: int):
-        self.curr_page = page
+    @property
+    def curr_page(self):
+        return self._curr_page
 
-    def get_content(self):
-        return self.pages[self.curr_page]
+    @curr_page.setter
+    def curr_page(self, page: int):
+        self._curr_page = page
+
+    @property
+    def curr_content(self):
+        return self.pages[self._curr_page]
 
 class PaginateService(BaseService):
     """
@@ -82,9 +88,9 @@ class PaginateService(BaseService):
 
         # check if emoji matches and user has perm to change page
         if (reaction.emoji not in self.reactions 
-            or reaction.message.id not in self.messages 
-            or not user.guild_permissions.administrator 
-            or not user.id == msg.author):
+             or reaction.message.id not in self.messages 
+             or not user.guild_permissions.administrator 
+             or not user.id == msg.author):
             return
 
         embed = discord.Embed(title =  msg.embed_name, color=Colors.ClemsonOrange)
@@ -92,19 +98,19 @@ class PaginateService(BaseService):
         # check what emoji the user used
         if reaction.emoji == "⏮️":
             if msg.curr_page != 0:
-                msg.set_page(0)
+                msg.curr_page = 0
         elif reaction.emoji == "⬅️":
             if msg.curr_page != 0:
-                msg.set_page(msg.curr_page - 1)
+                msg.curr_page -= 1
         elif reaction.emoji == "➡️":
             if msg.curr_page < len(msg.pages)-1:
-                msg.set_page(msg.curr_page + 1)
+                msg.curr_page += 1
         elif reaction.emoji == "⏭️":
             if msg.curr_page != len(msg.pages)-1:
-                msg.set_page(len(msg.pages) - 1)
+                msg.curr_page = len(msg.pages) - 1
 
         # edits the message and reset emoji (only user that triggered the action)
-        embed.add_field(name= msg.field_title, value=msg.get_content())
+        embed.add_field(name= msg.field_title, value=msg.curr_content)
         embed.set_footer(text=f'Page {msg.curr_page+1} of {len(msg.pages)}')
         await reaction.message.edit(embed = embed)
         await reaction.message.remove_reaction(reaction.emoji, user)
