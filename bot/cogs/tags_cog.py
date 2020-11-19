@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 50
 TAG_COMMAND_COOLDOWN = 30
-TAG_CHUNK_SIZE = 25
+TAG_CHUNK_SIZE = 20*3
 MAX_NON_ADMIN_LINE_LENGTH = 10
 
 @dataclass
@@ -41,17 +41,42 @@ class TagCog(commands.Cog):
     async def tag(self, ctx):
         tags = await TagRepository().get_all_server_tags(ctx.guild.id)
 
-
-        embed = discord.Embed(title= f'Available Tags', color= Colors.ClemsonOrange)
-
-        if tags:
-            for chunk in self.chunk_list([role['name'] for role in tags], TAG_CHUNK_SIZE):
-                embed.add_field(name= 'Available:', value= '\n'.join(chunk), inline= True)
-        else:
+        pages = []
+        #check for if no tags exist in this server
+        if not tags:
+            embed = discord.Embed(title= f'Available Tags', color= Colors.ClemsonOrange)
             embed.add_field(name= 'Available:', value= 'No currently available tags')
+            msg = await ctx.send(embed= embed)
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+            return
 
-        msg = await ctx.send(embed= embed)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+        #begin generating paginated columns
+        #chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
+        for chunk in self.chunk_list([role['name'] for role in tags], TAG_CHUNK_SIZE):
+
+            #we need to create the columns on the page so chunk the list again
+            content = ''
+            for col in self.chunk_list(chunk, 3):
+                #the columns wont have the perfect number of elements every time, we need to append spaces if
+                #the list entries is less then the number of columns
+                while len(col) <3:
+                    col.append(' ')
+
+                #Cocatenate the formatted column string to the page content string
+                content += "{: <15} {: <15} {: <15}\n".format(*col)
+
+
+            #Apped the content string to the list of pages to send to the paginator
+            #Marked as a code block to ensure a monospaced font and even columns
+            pages.append(f'```{content}```')
+
+        #send the pages to the paginator service
+        await self.bot.messenger.publish(Events.on_set_pageable,
+                embed_name='Available Tags', 
+                field_title='Available:',
+                pages=pages, 
+                author=ctx.author, 
+                channel=ctx.channel)
 
     @tag.command(aliases=['create', 'make'])
     async def add(self, ctx, name: str, *, content: str):
