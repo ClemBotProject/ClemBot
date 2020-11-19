@@ -16,7 +16,7 @@ from bot.messaging.events import Events
 log = logging.getLogger(__name__)
 
 MAX_TAG_CONTENT_SIZE = 1000
-MAX_TAG_NAME_SIZE = 50
+MAX_TAG_NAME_SIZE = 20
 TAG_COMMAND_COOLDOWN = 30
 TAG_CHUNK_SIZE = 20*3
 MAX_NON_ADMIN_LINE_LENGTH = 10
@@ -63,7 +63,7 @@ class TagCog(commands.Cog):
                     col.append(' ')
 
                 #Cocatenate the formatted column string to the page content string
-                content += "{: <15} {: <15} {: <15}\n".format(*col)
+                content += "{: <20} {: <20} {: <20}\n".format(*col)
 
 
             #Apped the content string to the list of pages to send to the paginator
