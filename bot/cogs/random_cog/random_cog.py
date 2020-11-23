@@ -12,7 +12,7 @@ from bot.utils.converters import Duration
 from datetime import datetime
 
 log = logging.getLogger(__name__)
-
+SLOTS_COMMAND_COOLDOWN = 30
 class RandomCog(commands.Cog):
 
     def __init__(self, bot):
@@ -96,6 +96,7 @@ class RandomCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['slotmachine','🎰'])
+    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     async def slots(self, ctx):
         """
         A simple slot machine.
