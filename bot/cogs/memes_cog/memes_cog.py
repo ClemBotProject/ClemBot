@@ -131,6 +131,8 @@ class MemesCog(commands.Cog):
         Usage: <prefix>crab [is_rave=True] [text=Bottom text\\n is dead]
         Aliases: rave, 🦀
         """
+        await ctx.send('Due to a bug this command is currently unavilable, for further information plz see this issue https://github.com/ClemsonCPSC-Discord/ClemBot/issues/213')
+        return
         # crab.gif dimensions - 352 by 200
         # Immediately grab the timestamp incase of multiple calls in a row
         timestamp = datetime.datetime.utcnow()
