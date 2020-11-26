@@ -49,7 +49,6 @@ class gradesCog(commands.Cog):
             self.master_list[i] = temp[0]
             self.master_prof_list[i] = temp[1]
 
-
     def process_Search(self, orig_query: str, year = 2014) -> str: 
         """
         Primary search function and processing for a query. A query is generally defined by 
@@ -276,6 +275,11 @@ class gradesCog(commands.Cog):
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def prof(self, ctx, lastName):
+        # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
+        pass
 
 def setup(bot):
     bot.add_cog(gradesCog(bot))
