@@ -8,6 +8,7 @@ import discord.ext.commands as commands
 
 from bot.clem_bot import BotSecrets
 from bot.consts import Colors
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +37,11 @@ class GifMeCog(commands.Cog):
             embed = discord.Embed(title="GifMe", color=Colors.ClemsonOrange)
             embed.set_image(url=response["data"]["images"]["original"]["url"])
             embed.set_footer(text="Powered by GIPHY")
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, 
+                msg=msg, 
+                author=ctx.author, 
+                timeout=60)
 
 
 def setup(bot):

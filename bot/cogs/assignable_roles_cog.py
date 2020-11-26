@@ -194,7 +194,7 @@ class AssignableRolesCog(commands.Cog):
 
     @roles.command(pass_context= True, aliases= ['create'])
     @commands.has_guild_permissions(administrator = True)
-    async def add(self, ctx, role: discord.Role = None) -> None:
+    async def add(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
         title = f'Role @{role.name} Added as assignable :white_check_mark:'
@@ -204,7 +204,7 @@ class AssignableRolesCog(commands.Cog):
 
     @roles.command(pass_context= True, aliases= ['delete'])
     @commands.has_guild_permissions(administrator = True)
-    async def remove(self, ctx, role: discord.Role = None) -> None:
+    async def remove(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
         title = f'Role @{role.name} Removed as assignable :white_check_mark:'

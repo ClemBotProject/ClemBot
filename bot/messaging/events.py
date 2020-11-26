@@ -236,8 +236,22 @@ class EventsMeta(type):
             channel_type (str) The designated channel to send the message in
             guild_id (int) The id of the guild to attempt to send a message in
             message (union[embed, str]) the message to be sent to the channel
+            id [Optional] (int) Id to associate a sent dc message with sent message ids at the publish site
         """
         return 'on_send_in_designated_channel'
+
+    @property
+    def on_designated_message_sent(self):
+        """
+        Published when an on_send_in_designate_channel event is published with an optional id parameter, 
+        this serves as a callback for that event to maintain seperation of concerns
+
+        Args:
+
+            dc_id (int) The id of the dc send event that was given to the dc service
+            message_id (Union[int, list[int]]) the id or the list of The ids of the sent messages in dc channels
+        """
+        return 'on_designated_message_sent'
 
     @property
     def on_broadcast_designated_channel(self):
@@ -283,6 +297,66 @@ class EventsMeta(type):
             role (discord.Role) The role to remove as assignable
         """
         return 'on_assignable_role_remove'
+
+    @property
+    def on_set_deletable(self):
+        """
+        Published when a bot message is needed to be able to be deleted
+        
+        Args:
+            messagesToDelete (List[discord.Message]) Messages to be deleted
+            author (discord.Member) member who called the bot 
+            roles (str) Stores the roles needed to delete the message
+        """
+        return '_on_set_deletable'
+    
+    @property
+    def on_guild_channel_create(self):
+        """
+        Published when a new text channel is created in a guild
+
+        Args:
+            channel (discord.TextChannel): The new channel
+        """
+        return 'on_guild_channel_create'
+
+    @property
+    def on_guild_channel_delete(self):
+        """
+        Published when a new text channel is deleted in a guild
+
+        Args:
+            channel (discord.TextChannel): The deleted channel
+        """
+        return 'on_guild_channel_delete'
+
+    @property
+    def on_guild_channel_update(self):
+        """
+        Published when a text channel is edited
+
+        Args:
+            before (discord.TextChannel): The before of the channel
+            after (discord.TextChannel): The after of the channel
+        """
+        return 'on_guild_channel_update'
+
+    @property
+    def on_set_pageable(self):
+        """
+        Published when a bot message is needed to be able to be paginate
+        
+        Args:
+            embed_name (str): name of the embed
+            field_title (str): name for the field/page 
+            pages (list[str]): a list of every page/field for the embed
+            author (discord.Member): member who called the bot 
+            channel (discord.TextChannel): the channel to send the embed
+            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
+        """
+        return 'on_set_pageable'
+
+
 
 class Events(metaclass= EventsMeta):
     pass

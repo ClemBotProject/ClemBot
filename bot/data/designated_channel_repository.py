@@ -109,6 +109,16 @@ class DesignatedChannelRepository(BaseRepository):
                 VALUES (?)
                 """, (channel_type,))
             await db.commit()
+    
+    async def remove_from_all_designated_channels(self, channel):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            await db.execute(
+                """
+                DELETE FROM DesignatedChannels_Channels
+                WHERE fk_channelsId = ?
+                """, (channel.id,))
+            await db.commit()
+
 
     async def remove_from_designated_channel(self, channel_type: str, channel_id) -> None:
         """
@@ -171,6 +181,15 @@ class DesignatedChannelRepository(BaseRepository):
                     SELECT * FROM DesignatedChannels_Channels
                     WHERE fk_channelsId = ? and fk_designatedChannelsId = ?
                     """, (added_channel_id, designated_channel_id)) as c:
+                return await c.fetchone() is not None
+    
+    async def check_channel(self, channel) -> bool:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(
+                    """ 
+                    SELECT * FROM DesignatedChannels_Channels
+                    WHERE fk_channelsId = ?
+                    """, (channel.id,)) as c:
                 return await c.fetchone() is not None
 
     async def check_designated_channel(self, designated_name: int) -> bool:

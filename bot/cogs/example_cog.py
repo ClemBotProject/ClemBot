@@ -38,10 +38,18 @@ class ExampleCog(commands.Cog):
         #it provodes contextual metadata about how the command was invoked
         member = member or ctx.author
         if self._last_member is None or self._last_member.id != member.id:
-            await ctx.send(f'Hello {member.name}~')
+            msg = await ctx.send(f'Hello {member.name}~')
         else:
             await ctx.send(f'Hello {member.name}... This feels familiar.')
         self._last_member = member
+    
+    #temporary placement till i can do it better
+    @commands.command()
+    @commands.has_guild_permissions(administrator = True)
+    async def slowmode(self, ctx, value: int):
+        await ctx.channel.edit(slowmode_delay=value)
+        await ctx.send(f'Slowmode set to {value}')
+
 
 #This is the setup function at the module level, d.py expects this function to 
 #load cogs into the library internally

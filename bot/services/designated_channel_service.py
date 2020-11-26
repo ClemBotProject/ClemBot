@@ -19,14 +19,17 @@ class DesignatedChannelService(BaseService):
     async def send_designated_message(self, 
             designated_name: DesignatedChannels, 
             guild_id: int, 
-            content: Union[str, discord.Embed]):
+            content: Union[str, discord.Embed],
+            dc_id: int=None):
         """
         Event call back to sent a given string or embed message to all registered designated channels
         in a given guild
 
         Args:
             designated_name (DesignatedChannels): The enum name of the designated channel
+            guild_id (int): the guild to send the message in
             content (Union[str, discord.Embed]): The message to send
+            dc_id [optional] (int) an optional callback id to associate sent dc messages at the publish site
         """
         dc_repo = DesignatedChannelRepository()
         assigned_channel_ids = await dc_repo.get_guild_designated_channels(designated_name.name, guild_id)
@@ -34,7 +37,10 @@ class DesignatedChannelService(BaseService):
         if assigned_channel_ids is None:
             return
         
-        await self._send_dc_messages(assigned_channel_ids, content)
+        sent_ids = await self._send_dc_messages(assigned_channel_ids, content)
+
+        if dc_id:
+            await self.messenger.publish(Events.on_designated_message_sent, dc_id, sent_ids)
 
     @BaseService.Listener(Events.on_broadcast_designated_channel)
     async def broadcast_designated_message(self, 
@@ -55,14 +61,25 @@ class DesignatedChannelService(BaseService):
             return
         
         await self._send_dc_messages(assigned_channel_ids, content)
+    
+    @BaseService.Listener(Events.on_guild_channel_delete)
+    async def designated_channel_removed(self, channel):
+        repo = DesignatedChannelRepository()
+        if await repo.check_channel(channel):
+            await repo.remove_from_all_designated_channels(channel)
         
-    async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed]):
+    async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed]) -> List[int]:
+        sent_ids = []
+
         if len(assigned_channel_ids) > 0:
             for channel_id in assigned_channel_ids:
                 if isinstance(content, str):
-                    await self.bot.get_channel(channel_id).send(content)
+                    mes = await self.bot.get_channel(channel_id).send(content)
+                    sent_ids.append(mes.id)
                 elif isinstance(content, discord.Embed):
-                    await self.bot.get_channel(channel_id).send(embed= content)
+                    mes = await self.bot.get_channel(channel_id).send(embed= content)
+                    sent_ids.append(mes.id)
+        return sent_ids
 
     async def load_service(self):
         repo = DesignatedChannelRepository()

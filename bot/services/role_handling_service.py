@@ -19,7 +19,7 @@ class RoleHandlingService(BaseService):
     
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild: discord.Guild):
-        await self.insert_guild(guild)
+        await self.insert_roles(guild)
 
     @BaseService.Listener(Events.on_guild_role_delete)
     async def on_role_delete(self, role):
@@ -35,7 +35,7 @@ class RoleHandlingService(BaseService):
         for role in guild.roles:
             await RoleRepository().add_or_update_role(role, guild.id)
 
-    async def insert_guild(self, guild: discord.Guild):
+    async def insert_roles(self, guild: discord.Guild):
         log.info(f'Loading Roles from {guild.name}')
 
         role_repo = RoleRepository()
@@ -53,4 +53,4 @@ class RoleHandlingService(BaseService):
 
     async def load_service(self):
         for guild in self.bot.guilds:
-            await self.insert_guild(guild)
+            await self.insert_roles(guild)

@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Messages (
     fk_authorId     INTEGER     NOT NULL,
     content         TEXT        NOT NULL,
     isDeleted       BOOLEAN     NOT NULL DEFAULT False,
-    misc            TEXT,       
+    time            TEXT,       
     FOREIGN KEY(fk_authorId)
         REFERENCES Users (id),
     FOREIGN KEY(fk_guildId)
@@ -87,4 +87,17 @@ CREATE TABLE IF NOT EXISTS WelcomeMessages (
     content                 TEXT        NOT NULL,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id)
+);
+
+CREATE TABLE IF NOT EXISTS Tags (
+    id                      INTEGER     PRIMARY KEY,
+    name                    TEXT        NOT NULL,
+    content                 TEXT        NOT NULL,
+    CreationDate            TEXT        NOT NULL,
+    fk_GuildId              INTEGER     NOT NULL,
+    fk_UserId               INTEGER     NOT NULL,
+    FOREIGN KEY(fk_GuildId)
+        REFERENCES Guilds (id),
+    FOREIGN KEY(fk_UserId)
+        REFERENCES Users (id)
 );

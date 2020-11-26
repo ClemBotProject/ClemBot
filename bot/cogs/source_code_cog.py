@@ -1,10 +1,12 @@
 import logging
 import os
+from threading import Event
 from typing import List
 
 import discord
 import discord.ext.commands as commands
 from bot.consts import Colors
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +19,7 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs/', 'venv/', '__pycache__/', 'BotSecrets.json']
+        self.ignored = ['Logs/', 'venv/', '__pycache__/']
 
         for root, dirs, files in os.walk(os.getcwd(), topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -35,8 +37,15 @@ class SourceCodeCog(commands.Cog):
 
         if file is None:
             file_tree = self.list_files(os.getcwd(), self.ignored)
+
+            sent_messages = []
             for chunk in self.chunk_iterable(file_tree, 1980):
-                await ctx.send(f'```yaml\n{chunk}```')
+                sent_messages.append(await ctx.send(f'```yaml\n{chunk}```'))
+
+            await self.bot.messenger.publish(Events.on_set_deletable,
+                    msg=sent_messages,
+                    author=ctx.author)
+
             return
         elif file == 'BotSecrets.json':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)
@@ -105,17 +114,20 @@ class SourceCodeCog(commands.Cog):
             chunks_to_send.append('\n'.join(temp_list))
 
             #loop over the chunks and send them one by one with correct python formatting
+            sent_messages = []
             for chunk in chunks_to_send:
                 backslash = '\\'
-                foo = len(chunk)
-                await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
+                msg = await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
+                sent_messages.append(msg)
+            
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=sent_messages, author=ctx.author)
 
     def chunk_iterable(self, iterable, chunk_size):
         for i in range(0, len(iterable), chunk_size):
             yield iterable[i:i + chunk_size]
     
     def process_source(self, source: str, line_start: int = None, line_stop: int = None):
-        split_source = [f'{i}:    {value}' for i, value in enumerate(source.splitlines())]
+        split_source = [f'{i:03d} |  {value}' for i, value in enumerate(source.splitlines())]
         filtered_source = split_source[line_start or 0: line_stop or len(source)]
 
         return filtered_source

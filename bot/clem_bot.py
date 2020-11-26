@@ -27,9 +27,9 @@ class ClemBot(commands.Bot):
     as well as the dynamic loading of services and cogs
     """
 
-    def __init__(self, command_prefix: str, messenger, max_messages: int):
+    def __init__(self, messenger, **kwargs):
         #this super call is to pass the prefix up to the super class
-        super().__init__(command_prefix= command_prefix, max_messages= max_messages)
+        super().__init__(**kwargs)
 
         self.messenger = messenger
 
@@ -92,6 +92,15 @@ class ClemBot(commands.Bot):
 
     async def on_guild_role_delete(self, role):
         await self.publish_with_error(Events.on_guild_role_delete, role)
+    
+    async def on_guild_channel_create(self, channel):
+        await self.publish_with_error(Events.on_guild_channel_create, channel)
+
+    async def on_guild_channel_delete(self, channel):
+        await self.publish_with_error(Events.on_guild_channel_delete, channel)
+    
+    async def on_guild_channel_update(self, before, after):
+        await self.publish_with_error(Events.on_guild_channel_update, before, after)
 
     async def on_member_join(self, user):
         await self.publish_with_error(Events.on_user_joined, user)
@@ -113,12 +122,20 @@ class ClemBot(commands.Bot):
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_delete, payload) 
 
+    async def on_reaction_add(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
+        if user.id != self.user.id:
+            await self.publish_with_error(Events.on_reaction_add, reaction, user)
+
+    async def on_raw_reaction_add(self, reaction) -> None:
+        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+
     async def publish_with_error(self, *args, **kwargs):
         try:
             await self.messenger.publish(*args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback= tb)
+        
 
     async def on_command_error(self, ctx, e):
         """
@@ -129,14 +146,16 @@ class ClemBot(commands.Bot):
             ctx ([type]): The context that the command that errored was sent from
             e ([type]): The unhandled exception
         """
+        if ctx.cog:
+            if commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
+                return
 
         embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
-        embed.add_field(name=ctx.author, value= e)
-        await ctx.channel.send(embed= embed)
+        embed.add_field(name='Exception:', value= e)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        msg = await ctx.channel.send(embed= embed)
+        await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         await self.global_error_handler(e)
-
-    async def on_raw_reaction_add(self, reaction) -> None:
-        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
 
     async def global_error_handler(self, e, *, traceback: str = None):
         """
@@ -165,6 +184,8 @@ class ClemBot(commands.Bot):
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
+    def get_full_name(self, author) -> str: 
+        return f'{author.name}#{author.discriminator}' 
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.

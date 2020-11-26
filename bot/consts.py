@@ -13,3 +13,7 @@ class DesignatedChannels(Enum):
     moderation_log = auto()
     error_log = auto()
     startup_log = auto()
+    user_join_log = auto()
+
+class DiscordLimits:
+    MessageLength = 1900
