@@ -4,9 +4,12 @@ import os
 import logging
 import random
 import time
+import collections
 
 import discord
 import discord.ext.commands as commands
+from bot.messaging.events import Events
+import typing as t
 
 from bot.consts import Colors
 
@@ -39,16 +42,18 @@ class gradesCog(commands.Cog):
 
         self.master_list = {}
         self.master_prof_list = {}
+        self.global_master_prof_list = {}
         
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
+        
 
     def load_files(self,yearList):
         for i in yearList:
             temp = self.initialize(i) # Store 2014
             self.master_list[i] = temp[0]
             self.master_prof_list[i] = temp[1]
-
+            self.global_master_prof_list = temp[2]
 
     def process_Search(self, orig_query: str, year = 2014) -> str: 
         """
@@ -164,7 +169,12 @@ class gradesCog(commands.Cog):
             if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
                 with open(f'bot/cogs/grades_data/assets/master_prof-{year}.json', 'r') as f:
                     prof = json.load(f)
-            return [normal, prof]
+
+            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof.json'):
+                with open(f'bot/cogs/grades_data/assets/master_prof.json', 'r') as f:
+                    totalProf = json.load(f)
+                    
+            return (normal, prof, totalProf)
         else:
             not_found = ''
             
@@ -234,6 +244,59 @@ class gradesCog(commands.Cog):
     def go(self, course, year):
         return self.searchCourse(course, year)
 
+    def get_professor_query(self, prof_name, detailed):
+        # print("NAME: " + prof_name)
+        primary = self.global_master_prof_list[prof_name]
+        courses = {}
+        
+        for section in primary:
+            course = section['course'] + "-" + section['number']
+            if course not in courses:
+                courses[course] = {
+                    "A": [],
+                    "B": [],
+                    "C": [],
+                    "D": [],
+                    "F": [],
+                    "W": []
+                }
+            courses[course]['A'].append(int(section['A'][:-1]))
+            courses[course]['B'].append(int(section['B'][:-1]))
+            courses[course]['C'].append(int(section['C'][:-1]))
+            courses[course]['D'].append(int(section['D'][:-1]))
+            courses[course]['F'].append(int(section['F'][:-1]))
+            courses[course]['W'].append(int(section['W'][:-1]))
+        
+        for course in courses:
+            course = courses[course]
+            course['length'] = len(course['A'])
+            course['A'] = round(sum(course['A']) / len(course['A']), 0)
+            course['B'] = round(sum(course['B']) / len(course['B']), 0)
+            course['C'] = round(sum(course['C']) / len(course['C']), 0)
+            course['D'] = round(sum(course['D']) / len(course['D']), 0)
+            course['F'] = round(sum(course['F']) / len(course['F']), 0)
+            course['W'] = round(sum(course['W']) / len(course['W']), 0)
+
+        
+
+        courses = collections.OrderedDict(sorted(courses.items()))
+
+        build = []
+        #I loooooove string building https://www.youtube.com/watch?v=oQHvuoQSwas
+        build.append(f'Professor {prof_name} has a course average of:\n')
+        
+        if detailed:
+            for i in courses:
+                course = courses[i]
+                build.append(f"```{i};\nA: {course['A']}%\nB: {course['B']}%\nC: {course['C']}%\nD: {course['D']}%\nF: {course['F']}%\nW: {course['W']}%\nin {course['length']} classes\n```")
+        else:
+            for i in courses:
+                course = courses[i]
+                build.append(f"```{i};\nPass: {round((course['A'] + course['B'] + course['C'])/3, 0)}%\nFail: {round((course['D'] + course['F'])/2,0)}%\nW:{course['W']}%\nin {course['length']} classes\n```")
+        
+        return build
+        
+
     @commands.command()
     async def grades(self, ctx, course, year=MIN_YEAR):
         """
@@ -276,6 +339,44 @@ class gradesCog(commands.Cog):
             embed.add_field(name="ERROR: File not found", value=result, inline=False)
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def prof(self, ctx, firstName, lastName, detailed: t.Optional[bool] = True):
+        # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
+        """
+        Attempts to give more information about professor's grade distribution @ Clemson.
+
+        USE:
+
+        prof <first name> <last name> <detailed (Optional)>
+        EX: !prof Brian Dean                <-- will print all letter distributions
+        !prof Brian Dean blah blah blah     <-- will print only pass/fail/withdrawal
+
+        DISCLAIMER:
+        Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
+        In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
+        *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
+        """
+        #Handle casing
+        prof_name = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}' 
+        
+        if prof_name not in self.global_master_prof_list:
+            embed = discord.Embed(title="Grades", color=Colors.Error)
+            result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
+            embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
+            await ctx.send(embed=embed)
+            return
+        
+        hell = self.get_professor_query(prof_name, detailed)
+
+        await self.bot.messenger.publish(Events.on_set_pageable,
+                embed_name = "Professor Grades",
+                field_title = hell[0],
+                pages=hell[1:],
+                author=ctx.author,
+                channel=ctx.channel)
+        
+        
 
 def setup(bot):
     bot.add_cog(gradesCog(bot))
