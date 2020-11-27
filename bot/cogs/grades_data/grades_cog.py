@@ -318,7 +318,7 @@ class gradesCog(commands.Cog):
                 embed = discord.Embed(title="Grades", color=Colors.ClemsonOrange)
                 result = self.go(course, year)
                 embed.add_field(name="Result", value=result, inline=False)
-                prefix = await self.bot.get_prefix(ctx)
+                prefix = (await self.bot.get_prefix(ctx))[2]
                 if isinstance(prefix, list):
                     prefix = prefix[0]
                 exp = f'Type `{prefix}help grades` for more information' # NOQA
