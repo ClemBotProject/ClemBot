@@ -22,9 +22,6 @@ class MessageHandlingService(BaseService):
     async def on_message_recieved(self, message: discord.Message) -> None:
         log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
 
-        if self.bot.user.mentioned_in(message) and message.mention_everyone is False:
-            await message.channel.send('Hello there everyone!!')
-
         await self.handle_message_links(message)
 
         #Primary entry point for handling commands
