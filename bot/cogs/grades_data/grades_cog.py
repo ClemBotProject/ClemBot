@@ -45,6 +45,7 @@ class gradesCog(commands.Cog):
         
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
+        
 
     def load_files(self,yearList):
         for i in yearList:
@@ -172,7 +173,7 @@ class gradesCog(commands.Cog):
                 with open(f'bot/cogs/grades_data/assets/master_prof.json', 'r') as f:
                     totalProf = json.load(f)
                     
-            return [normal, prof, totalProf]
+            return (normal, prof, totalProf)
         else:
             not_found = ''
             
@@ -248,7 +249,7 @@ class gradesCog(commands.Cog):
         courses = {}
         
         for section in primary:
-            course = section['course'] + "-" + section['number']
+            course = f"{section['course']}-{section['number']}"
             courses[course] = {
                 "A": [],
                 "B": [],
@@ -257,6 +258,7 @@ class gradesCog(commands.Cog):
                 "F": [],
                 "W": []
             }
+
         for section in primary:
             course = section['course'] + "-" + section['number']
             courses[course]['A'].append(int(section['A'][:-1]))
@@ -283,14 +285,15 @@ class gradesCog(commands.Cog):
         build = []
         #I loooooove string building https://www.youtube.com/watch?v=oQHvuoQSwas
         build.append(f'Professor {prof_name} has a course average of:\n')
-        if detailed.lower() == 'yes':
+        
+        if detailed:
             for i in courses:
                 course = courses[i]
-                build.append(f'''{i};\nA: {course['A']}%\nB: {course['B']}%\nC: {course['C']}%\nD: {course['D']}%\nF: {course['F']}%\nW: {course['W']}%\nin {course['length']} classes\n''')
+                build.append(f"```{i};\nA: {course['A']}%\nB: {course['B']}%\nC: {course['C']}%\nD: {course['D']}%\nF: {course['F']}%\nW: {course['W']}%\nin {course['length']} classes\n```")
         else:
             for i in courses:
                 course = courses[i]
-                build.append(f'''{i};\nPass: {round((course['A'] + course['B'] + course['C'])/3, 0)}%\nFail: {round((course['D'] + course['F'])/2,0)}%\nW:{course['W']}%\nin {course['length']} classes\n''')
+                build.append(f"```{i};\nPass: {round((course['A'] + course['B'] + course['C'])/3, 0)}%\nFail: {round((course['D'] + course['F'])/2,0)}%\nW:{course['W']}%\nin {course['length']} classes\n```")
         
         return build
         
@@ -339,7 +342,7 @@ class gradesCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def prof(self, ctx, firstName, lastName, detailed = 'yes'):
+    async def prof(self, ctx, firstName, lastName, detailed = bool('yes')):
         # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
         """
         Attempts to give more information about professor's grade distribution @ Clemson.
@@ -358,19 +361,20 @@ class gradesCog(commands.Cog):
         #Handle casing
         prof_name = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}' 
         
+        if prof_name not in self.global_master_prof_list:
+            embed = discord.Embed(title="Grades", color=Colors.Error)
+            result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
+            embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
+            await ctx.send(embed=embed)
+        else:
+            hell = self.get_professor_query(prof_name, detailed)
 
-        hell = self.get_professor_query(prof_name, detailed)
-
-        prefix = await self.bot.get_prefix(ctx)
-        if isinstance(prefix, list):
-            prefix = prefix[0]
-        exp = f'Type `{prefix}help grades` for more information'
-        await self.bot.messenger.publish(Events.on_set_pageable,
-                embed_name = "Professor Grades",
-                field_title = hell[0],
-                pages=hell[1:]+exp,
-                author=ctx.author,
-                channel=ctx.channel)
+            await self.bot.messenger.publish(Events.on_set_pageable,
+                    embed_name = "Professor Grades",
+                    field_title = hell[0],
+                    pages=hell[1:],
+                    author=ctx.author,
+                    channel=ctx.channel)
         
         
 
