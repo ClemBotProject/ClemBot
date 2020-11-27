@@ -181,14 +181,14 @@ class RandomCog(commands.Cog):
         https://c.xkcd.com/random/comic/ is a random comic from the xkcd catalogue
         """
         async with aiohttp.ClientSession() as session:
-            async with await session.get(url="https://c.xkcd.com/random/comic/") as resp:
+            async with await session.get(url='https://c.xkcd.com/random/comic/') as resp:
                 if(resp.status == 200):
                     msg = await ctx.send(resp.url)
                     await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
                 else:
                     response_info = json.loads(await resp.text())['meta']
-                    embed = discord.Embed(title="xkcd", color=Colors.Error)
-                    embed.add_field(name="Error", value=f"{response_info['status']}: {response_info['msg']}")
+                    embed = discord.Embed(title='xkcd', color=Colors.Error)
+                    embed.add_field(name='Error', value=f"{response_info['status']}: {response_info['msg']}")
                     msg = await ctx.send(embed=embed)
                     await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
         

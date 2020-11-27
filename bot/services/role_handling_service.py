@@ -28,6 +28,7 @@ class RoleHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_role_update)
     async def on_role_update(self, before, after):
+        log.info(f'Role: {after.id} updated in guild: {after.guild.id}')
         await self.refresh_roles(after)
 
     async def refresh_roles(self, role):
