@@ -347,7 +347,8 @@ class gradesCog(commands.Cog):
         USE:
 
         prof <first name> <last name> <detailed (Optional)>
-        EX: !prof Brian Dean yes
+        EX: !prof Brian Dean                <-- will print all letter distributions
+        !prof Brian Dean blah blah blah     <-- will print only pass/fail/withdrawal
 
         DISCLAIMER:
         Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
@@ -360,11 +361,14 @@ class gradesCog(commands.Cog):
 
         hell = self.get_professor_query(prof_name, detailed)
 
-        
+        prefix = await self.bot.get_prefix(ctx)
+        if isinstance(prefix, list):
+            prefix = prefix[0]
+        exp = f'Type `{prefix}help grades` for more information'
         await self.bot.messenger.publish(Events.on_set_pageable,
                 embed_name = "Professor Grades",
                 field_title = hell[0],
-                pages=hell[1:],
+                pages=hell[1:]+exp,
                 author=ctx.author,
                 channel=ctx.channel)
         
