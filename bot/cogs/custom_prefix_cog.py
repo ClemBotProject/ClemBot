@@ -2,6 +2,7 @@ import logging
 
 import discord
 from discord import embeds
+from discord.colour import Color
 import discord.ext.commands as commands
 
 from bot.messaging.events import Events
@@ -16,15 +17,23 @@ class CustomPrefixCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.group(pass_context= True, aliases= ['prefixs'])
+    @commands.group(pass_context= True, invoke_without_command=True, aliases= ['prefixs'])
     async def prefix(self, ctx):
-        pass
+        #get_prefix returns two mentions as the first possible prefixes in the tuple,
+        #those are global so we dont care about them
+        prefixes = (await self.bot.get_prefix(ctx.message))[2:]
+
+        embed = discord.Embed(title='Current Active Prefixes',
+                description=f'```{", ".join(prefixes)}```', 
+                color=Colors.ClemsonOrange)
+
+        await ctx.send(embed=embed)
     
     @prefix.command(pass_context= True, aliases= ['add'])
     @commands.has_guild_permissions(administrator= True)
     async def set(self, ctx, prefix: str):
 
-        if await self.bot.get_prefix(ctx.message) == prefix:
+        if prefix in await self.bot.get_prefix(ctx.message):
             embed = discord.Embed(title= 'Error', color= Colors.Error)
             embed.add_field(name= 'Invalid prefix', value= f'"{prefix}" is already the prefix for this guild')
             await ctx.send(embed= embed)
@@ -50,7 +59,8 @@ class CustomPrefixCog(commands.Cog):
 
         default_prefix = BotSecrets.get_instance().bot_prefix
 
-        if await self.bot.get_prefix(ctx.message) == default_prefix:
+
+        if default_prefix in await self.bot.get_prefix(ctx.message):
             embed = discord.Embed(title= 'Error', color= Colors.Error)
             embed.add_field(name= 'Invalid prefix', value= f'"{default_prefix}" Prefix is already the default')
             await ctx.send(embed= embed)
