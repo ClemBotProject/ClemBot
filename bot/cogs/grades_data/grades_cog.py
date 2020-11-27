@@ -250,18 +250,16 @@ class gradesCog(commands.Cog):
         courses = {}
         
         for section in primary:
-            course = f"{section['course']}-{section['number']}"
-            courses[course] = {
-                "A": [],
-                "B": [],
-                "C": [],
-                "D": [],
-                "F": [],
-                "W": []
-            }
-
-        for section in primary:
             course = section['course'] + "-" + section['number']
+            if course not in courses:
+                courses[course] = {
+                    "A": [],
+                    "B": [],
+                    "C": [],
+                    "D": [],
+                    "F": [],
+                    "W": []
+                }
             courses[course]['A'].append(int(section['A'][:-1]))
             courses[course]['B'].append(int(section['B'][:-1]))
             courses[course]['C'].append(int(section['C'][:-1]))
