@@ -15,6 +15,7 @@ from bot.data.user_repository import UserRepository
 
 log = logging.getLogger(__name__)
 
+MAX_MESSAGE_SIZE = 1900
 
 
 class OwnerCog(commands.Cog):
@@ -48,8 +49,10 @@ class OwnerCog(commands.Cog):
     async def get(self, ctx, lines: int):
         log_name = log.parent.handlers[0].baseFilename
         with open(log_name, 'r') as f:
-            await ctx.send(f'```{"".join(deque(f, lines))}```')
-        
+            logs = "".join(deque(f, lines))
+            chunks = [logs[i:i+MAX_MESSAGE_SIZE] for i in range(0, len(logs), MAX_MESSAGE_SIZE)]
+            for c in chunks:
+                await ctx.send(f'```{c}```')
 
     @database.command()
     @commands.is_owner()
