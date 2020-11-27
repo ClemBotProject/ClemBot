@@ -174,8 +174,8 @@ class RandomCog(commands.Cog):
                     embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
                     await msg.edit(embed = embed)
 
-    @commands.command(aliases=['xkcd'])
-    async def relevant(self, ctx):
+    @commands.command(aliases=['relevant'])
+    async def xkcd(self, ctx):
         """
         Generates a possibly relevant xkcd.
         https://c.xkcd.com/random/comic/ is a random comic from the xkcd catalogue
