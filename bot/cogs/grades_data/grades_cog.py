@@ -361,6 +361,9 @@ class gradesCog(commands.Cog):
         prof_name = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}' 
         
         if prof_name not in self.global_master_prof_list:
+            print(prof_name)
+            for i in self.global_master_prof_list.keys():
+                print(i)
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
