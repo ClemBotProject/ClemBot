@@ -283,7 +283,7 @@ class gradesCog(commands.Cog):
 
         build = []
         #I loooooove string building https://www.youtube.com/watch?v=oQHvuoQSwas
-        build.append(f'Professor {prof_name} has a course average of:\n')
+        build.append(f'Professor {prof_name.capitalize()} has a course average of:\n')
         
         if detailed:
             for i in courses:
@@ -359,6 +359,8 @@ class gradesCog(commands.Cog):
         """
         #Handle casing
         prof_name = f'{firstName.lower()} {lastName.lower()}' 
+        #Display name
+        prof_name_caps = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}'
         
         if prof_name not in self.global_master_prof_list:
             embed = discord.Embed(title="Grades", color=Colors.Error)
@@ -371,7 +373,7 @@ class gradesCog(commands.Cog):
 
         await self.bot.messenger.publish(Events.on_set_pageable,
                 embed_name = "Professor Grades",
-                field_title = hell[0],
+                field_title = f'Professor {prof_name_caps} has a course average of:',
                 pages=hell[1:],
                 author=ctx.author,
                 channel=ctx.channel)
