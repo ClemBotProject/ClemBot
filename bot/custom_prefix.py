@@ -1,7 +1,10 @@
 import typing as t
 import logging
+from functools import reduce 
+import operator
 
 import discord
+from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
@@ -14,11 +17,13 @@ class CustomPrefix:
         self.default = default
     
     def get_prefix(self, bot, message):
-        if message.guild.id not in self.prefixes.keys():
-            return self.default
+        if message.guild.id not in self.prefixes:
+            prefixes = self.default
         else:
-            return self.prefixes[message.guild.id]
+            prefixes = self.prefixes[message.guild.id] 
 
-    async def set_prefix(self, guild: discord.Guild, prefix: str):
+        return commands.when_mentioned_or(*prefixes)(bot, message)
+        
+    async def set_prefix(self, guild: discord.Guild, prefix: t.Tuple[str]):
         log.info(f'Setting custom prefix in guild: {guild.name}({guild.id}) to "{prefix}""')
         self.prefixes[guild.id] = prefix
