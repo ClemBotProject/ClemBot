@@ -189,6 +189,7 @@ class gradesCog(commands.Cog):
             raise FileNotFoundError(not_found)
             
     def getFirstLast(self, Name):
+        # NEEDS IMPROVEMENTS (See 3x names (Yvon H Feaster) and/or 4x names (Rodger Larry Van Scoy))
         fml = Name.split()
         First = fml[1]
         Last = fml[0]
@@ -283,7 +284,7 @@ class gradesCog(commands.Cog):
 
         build = []
         #I loooooove string building https://www.youtube.com/watch?v=oQHvuoQSwas
-        build.append(f'Professor {prof_name} has a course average of:\n')
+        build.append(f'Professor {prof_name.capitalize()} has a course average of:\n')
         
         if detailed:
             for i in courses:
@@ -358,7 +359,9 @@ class gradesCog(commands.Cog):
         *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
         """
         #Handle casing
-        prof_name = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}' 
+        prof_name = f'{firstName.lower()} {lastName.lower()}' 
+        #Display name
+        prof_name_caps = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}'
         
         if prof_name not in self.global_master_prof_list:
             embed = discord.Embed(title="Grades", color=Colors.Error)
@@ -371,7 +374,7 @@ class gradesCog(commands.Cog):
 
         await self.bot.messenger.publish(Events.on_set_pageable,
                 embed_name = "Professor Grades",
-                field_title = hell[0],
+                field_title = f'Professor {prof_name_caps} has a course average of:',
                 pages=hell[1:],
                 author=ctx.author,
                 channel=ctx.channel)
