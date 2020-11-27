@@ -292,7 +292,7 @@ class gradesCog(commands.Cog):
         else:
             for i in courses:
                 course = courses[i]
-                build.append(f"```{i};\nPass: {round((course['A'] + course['B'] + course['C'])/3, 0)}%\nFail: {round((course['D'] + course['F'])/2,0)}%\nW:{course['W']}%\nin {course['length']} classes\n```")
+                build.append(f"```{i};\nPass: {round((course['A'] + course['B'] + course['C']), 0)}%\nFail: {round((course['D'] + course['F']),0)}%\nW:{course['W']}%\nin {course['length']} classes\n```")
         
         return build
         
