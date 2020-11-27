@@ -358,7 +358,7 @@ class gradesCog(commands.Cog):
         *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
         """
         #Handle casing
-        prof_name = f'{firstName.lower().capitalize()} {lastName.lower().capitalize()}' 
+        prof_name = f'{firstName.lower()} {lastName.lower()}' 
         
         if prof_name not in self.global_master_prof_list:
             embed = discord.Embed(title="Grades", color=Colors.Error)
