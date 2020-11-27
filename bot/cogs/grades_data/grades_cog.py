@@ -9,6 +9,7 @@ import collections
 import discord
 import discord.ext.commands as commands
 from bot.messaging.events import Events
+import typing as t
 
 from bot.consts import Colors
 
@@ -342,7 +343,7 @@ class gradesCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def prof(self, ctx, firstName, lastName, detailed = bool('yes')):
+    async def prof(self, ctx, firstName, lastName, detailed: t.Optional[bool] = True):
         # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
         """
         Attempts to give more information about professor's grade distribution @ Clemson.
@@ -366,15 +367,16 @@ class gradesCog(commands.Cog):
             result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
             await ctx.send(embed=embed)
-        else:
-            hell = self.get_professor_query(prof_name, detailed)
+            return
+        
+        hell = self.get_professor_query(prof_name, detailed)
 
-            await self.bot.messenger.publish(Events.on_set_pageable,
-                    embed_name = "Professor Grades",
-                    field_title = hell[0],
-                    pages=hell[1:],
-                    author=ctx.author,
-                    channel=ctx.channel)
+        await self.bot.messenger.publish(Events.on_set_pageable,
+                embed_name = "Professor Grades",
+                field_title = hell[0],
+                pages=hell[1:],
+                author=ctx.author,
+                channel=ctx.channel)
         
         
 
