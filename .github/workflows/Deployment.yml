@@ -15,6 +15,6 @@ jobs:
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
-              uses: Ilshidur/action-discord@master
+              uses: "Ilshidur/action-discord@0.3.0"
               with:
                 args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'

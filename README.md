@@ -75,4 +75,4 @@ The bot loads Cogs and Services dynamically. To create a new command simply crea
 The bot does the same thing for services, to see how to define a service, see [example_service.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/services/example_service.py)
 
 ![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
-
+![ClemBot Master Integration](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20integration/badge.svg?branch=master)

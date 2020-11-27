@@ -10,6 +10,7 @@ import typing as t
 import discord
 import discord.ext.commands as commands
 from PIL import Image, ImageDraw, ImageSequence, ImageFont
+from bot.messaging.events import Events
 
 from bot.consts import Colors
 
@@ -20,25 +21,26 @@ CRAB_COMMAND_COOLDOWN = 3
 
 def pillow_process(args, is_rave, lines_in_text, timestamp):
     # Open crab.gif and add our font
-    im = Image.open('bot/cogs/memes_cog/assets/crab.gif')
-    fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
-    
-    # Draw text on each frame of the gif
-    # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
-    frames = []
-    for frame in ImageSequence.Iterator(im):
-        d = ImageDraw.Draw(frame)
-        w, h = d.textsize(args, fnt)
-        # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
-        d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
-            stroke_width=bool(is_rave), stroke_fill=Colors.ClemsonOrange, spacing=6)
-        del d
+    with Image.open('bot/cogs/memes_cog/assets/crab.gif') as im:
 
-        b = io.BytesIO()
-        frame.save(b, format='GIF')
-        frame = Image.open(b)
-        frames.append(frame)
-    frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
+        fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
+    
+        # Draw text on each frame of the gif
+        # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
+        frames = []
+        for frame in ImageSequence.Iterator(im):
+            d = ImageDraw.Draw(frame)
+            w, h = d.textsize(args, fnt)
+            # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
+            d.text((im.size[0]/2 - w/2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
+                stroke_width=bool(is_rave), stroke_fill=Colors.ClemsonOrange, spacing=6)
+            del d
+
+            b = io.BytesIO()
+            frame.save(b, format='GIF')
+            frame = Image.open(b)
+            frames.append(frame)
+        frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
 
 class MemesCog(commands.Cog):
 
@@ -131,13 +133,12 @@ class MemesCog(commands.Cog):
         Usage: <prefix>crab [is_rave=True] [text=Bottom text\\n is dead]
         Aliases: rave, 🦀
         """
-        await ctx.send('Due to a bug this command is currently unavilable, for further information plz see this issue https://github.com/ClemsonCPSC-Discord/ClemBot/issues/213')
-        return
         # crab.gif dimensions - 352 by 200
         # Immediately grab the timestamp incase of multiple calls in a row
-        timestamp = datetime.datetime.utcnow()
-        msg = await ctx.send('Generating your gif')
-        
+        timestamp = datetime.datetime.utcnow().microsecond
+        wait_msg = await ctx.send('Generating your gif')
+        args = args.replace('\\','')
+
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
         while len(args) > (CRAB_LINE_LENGTH * lines_in_text):
@@ -159,8 +160,9 @@ class MemesCog(commands.Cog):
 
         # Attach, send, and delete created gif
         attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
-        await ctx.send(file=attachment)
-        await msg.delete()
+        msg = await ctx.send(file=attachment)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+        await wait_msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
     @commands.command(aliases = ['ctray','trayforjay'])
