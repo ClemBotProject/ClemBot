@@ -3,6 +3,8 @@ import random
 import asyncio
 import time
 import typing
+import aiohttp
+import  json
 
 import discord
 import discord.ext.commands as commands
@@ -10,6 +12,7 @@ import discord.ext.commands as commands
 from bot.consts import Colors
 from bot.utils.converters import Duration
 from datetime import datetime
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
@@ -171,5 +174,22 @@ class RandomCog(commands.Cog):
                     embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
                     await msg.edit(embed = embed)
 
+    @commands.command(aliases=['xkcd'])
+    async def relevant(self, ctx):
+        """
+        Generates a possibly relevant xkcd.
+        https://c.xkcd.com/random/comic/ is a random comic from the xkcd catalogue
+        """
+        async with aiohttp.ClientSession() as session:
+            async with await session.get(url="https://c.xkcd.com/random/comic/") as resp:
+                if(resp.status == 200):
+                    await ctx.send(resp.url)
+                else:
+                    response_info = json.loads(await resp.text())['meta']
+                    embed = discord.Embed(title="xkcd", color=Colors.Error)
+                    embed.add_field(name="Error", value=f"{response_info['status']}: {response_info['msg']}")
+                    msg = await ctx.send(embed=embed)
+                    await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
+        
 def setup(bot):
     bot.add_cog(RandomCog(bot))
