@@ -19,7 +19,7 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs/', 'venv/', '__pycache__/']
+        self.ignored = ['Logs/', 'venv/', '__pycache__/', 'database/']
 
         for root, dirs, files in os.walk(os.getcwd(), topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
