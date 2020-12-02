@@ -21,11 +21,21 @@ MAX_MESSAGE_SIZE = 1900
 class OwnerCog(commands.Cog):
     """ This is a cog for bot owner commands, things like log viewing and bot stats are shown here"""
 
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group(hidden=True, invoke_without_command=True, case_insensitive=True)
     @commands.is_owner()
     async def owner(self, ctx):
         """For User by the bots owner to get errors and metrics"""
         pass
+
+
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def leave(self, ctx, id: int):
+        server = self.bot.get_server(id)
+        await self.bot.leave_server(server)
 
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
