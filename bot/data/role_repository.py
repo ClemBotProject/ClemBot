@@ -13,11 +13,10 @@ class RoleRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
-                INSERT INTO Roles (id, fk_guildId, name, position) VALUES (?, ?, ?, ?)
+                INSERT INTO Roles (id, fk_guildId, name) VALUES (?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
-                    name = excluded.name,
-                    position = excluded.position
-                """, (role.id, guild_id, role.name, role.position))
+                    name = excluded.name
+                """, (role.id, guild_id, role.name))
             await db.commit()
 
     async def delete_role(self, role_id: int) -> None:
