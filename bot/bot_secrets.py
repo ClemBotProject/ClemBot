@@ -29,6 +29,7 @@ class BotSecrets:
         self._bot_prefix = None
         self._gifMe_token = None
         self._repl_url = None
+        self._github_url = None 
 
     @property
     def client_token(self) -> str:
@@ -124,6 +125,18 @@ class BotSecrets:
         self._gifMe_token = value
 
     @property
+    def github_url(self) -> str:
+        if not self._github_url:
+            raise ConfigAccessError(f'github_url has not been intialized')
+        return self._github_url
+
+    @github_url.setter
+    def github_url(self, value: str) -> None:
+        if self._github_url:
+            raise ConfigAccessError(f'github_url has already been initialized')
+        self._github_url = value
+
+    @property
     def repl_url(self) -> str:
         if not self._repl_url:
             raise ConfigAccessError(f'repl_url has not been intialized')
@@ -147,3 +160,4 @@ class BotSecrets:
         self.bot_prefix = secrets['BotPrefix'] or '!'
         self.gif_me_token = secrets['GifMeToken']
         self.repl_url = secrets['ReplUrl']
+        self.github_url = secrets['GithubSourceUrl'] or 'https://github.com/ClemsonCPSC-Discord/ClemBot'

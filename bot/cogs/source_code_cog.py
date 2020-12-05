@@ -1,15 +1,24 @@
 import logging
 import os
+from dataclasses import dataclass
 from threading import Event
 from typing import List
 
 import discord
 import discord.ext.commands as commands
+
+from bot.consts import Colors
+from bot.bot_secrets import BotSecrets
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.displayable_path import DisplayablePath
 
 log = logging.getLogger(__name__)
 
+@dataclass
+class FilePaths:
+    absolute: str
+    relative: str
 
 class SourceCodeCog(commands.Cog):
     """
@@ -19,35 +28,61 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs/', 'venv/', '__pycache__/', 'database/']
+        self.ignored = ['Logs', 'venv', '__pycache__', 'database', '.git', '.pytest_cache']
+        self.repo_url = BotSecrets.get_instance().github_url
 
-        for root, dirs, files in os.walk(os.getcwd(), topdown= True):
+        root = os.getcwd()
+        root_dir = root.split('/')[-1]
+        for root, dirs, files in os.walk(root, topdown= True):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             if not any(folder in f'{root}/' for folder in self.ignored):
                 for f in files:
-                    self.bot_files[f] = os.path.join(root, f)
+                    path = os.path.join(root, f)
+                    self.bot_files[f] = FilePaths(path, path.split(root_dir)[1])
 
-    @commands.command()
-    async def source(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
+    @commands.group(pass_context= True, invoke_without_command= True)
+    async def source(self, ctx, file: str=None):
+        if not file:
+            embed = discord.Embed(title='Heres my source repository', 
+                    color=Colors.ClemsonOrange,
+                    description=f'Feel free to contribute :grin:')
+            embed.add_field(name='Link', value=f'[Source]({self.repo_url})')
+            embed.set_thumbnail(url='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
+            await ctx.send(embed=embed)
+            return
+        
+        relative_url = self.bot_files[file].relative
+        gh_url = f'{self.repo_url}/tree/master{relative_url}'
+
+        embed = discord.Embed(title=f'Heres the source for {file}', 
+                color=Colors.ClemsonOrange,
+                description=f'Feel free to contribute :grin:')
+        embed.add_field(name='Link', value=f'[Source]({gh_url})')
+        embed.set_thumbnail(url='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
+        await ctx.send(embed=embed)
+
+    @source.command(aliases=['directory', 'tree'])
+    async def list(self, ctx):
+        file_tree = self.list_files(os.getcwd(), self.ignored)
+
+        sent_messages = []
+        for chunk in self.chunk_iterable(file_tree, 1980):
+            sent_messages.append(await ctx.send(f'```yaml\n{chunk}```'))
+
+        await self.bot.messenger.publish(Events.on_set_deletable,
+                msg=sent_messages,
+                author=ctx.author)
+
+
+    @source.command(aliases=['show'])
+    async def print(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
         """
         Either prints the bots file structure as a tree or, if given a file, 
         prints out the source code of that file. the beginning and ending line numbers to be 
         printed can also be specified
         """
 
-        if file is None:
-            file_tree = self.list_files(os.getcwd(), self.ignored)
-
-            sent_messages = []
-            for chunk in self.chunk_iterable(file_tree, 1980):
-                sent_messages.append(await ctx.send(f'```yaml\n{chunk}```'))
-
-            await self.bot.messenger.publish(Events.on_set_deletable,
-                    msg=sent_messages,
-                    author=ctx.author)
-
-            return
-        elif file == 'BotSecrets.json':
+        if file == 'BotSecrets.json':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)
             await ctx.send(embed= embed)
             return
@@ -62,13 +97,13 @@ class SourceCodeCog(commands.Cog):
                 return
 
         try:
-            open(self.bot_files[file])
+            open(self.bot_files[file].absolute)
         except (FileNotFoundError, KeyError):
             embed = discord.Embed(title= f'Error: File {file} not found', color= Colors.Error)
             await ctx.send(embed= embed)
             return
 
-        with open(self.bot_files[file]) as f:
+        with open(self.bot_files[file].absolute) as f:
             source = f.read()
 
             if not source:
@@ -133,18 +168,9 @@ class SourceCodeCog(commands.Cog):
         return filtered_source
     
     def list_files(self, startpath, to_ignore: List[str]) -> str:
-        tree = []
-        for root, dirs, files in os.walk(startpath, topdown= True):
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
-            if not any(folder in f'{root}/' for folder in to_ignore):
-                level = root.replace(startpath, '').count(os.sep)
-                indent = ' ' * 4 * (level)
-                tree.append(f'{indent}{os.path.basename(root)}/')
-                subindent = ' ' * 4 * (level + 1)
-                for f in files:
-                    tree.append(f'{subindent}{f}')
-        return '\n'.join(tree)
-
+        paths = DisplayablePath.get_tree(startpath, criteria=
+            lambda s: not any(i in s.parts for i in to_ignore))
+        return paths
 
 def setup(bot):
     bot.add_cog(SourceCodeCog(bot))
