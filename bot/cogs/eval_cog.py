@@ -28,7 +28,7 @@ class EvalCog(commands.Cog):
     @commands.command(aliases=['e']) 
     @commands.cooldown(1, EVAL_COMMAND_COOLDOWN, commands.BucketType.guild)
     async def eval(self, ctx, *, code= None) -> None:
-        code = code.strip('`')
+        code = code.replace('`', '')
         code = utils.escape_mentions(code)
 
         feedback_mes = await ctx.send('Code execution started')
@@ -36,7 +36,9 @@ class EvalCog(commands.Cog):
 
         output = await self._post_eval(code)
         stdout = output['stdout']
-
+        stdout = stdout.strip('`')
+        stdout = utils.escape_mentions(stdout)
+        
         await feedback_mes.delete()
 
         if len(stdout) > MAX_CONTENT_LENGTH:
