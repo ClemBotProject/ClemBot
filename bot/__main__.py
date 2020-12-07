@@ -76,12 +76,16 @@ def main():
     #enable privileged member gateway intents
     intents = discord.Intents.default()
     intents.members = True
+                        
+    #set allowed mentions
+    mentions = discord.AllowedMentions(everyone=False, roles=False)
 
     bot_log.info('Bot Starting Up')
     ClemBot(
             messenger=messenger, 
             command_prefix=custom_prefix.get_prefix,  # noqa: E126
             max_messages=5000,
+            allowed_mentions=mentions,
             intents=intents
         ).run(BotSecrets.get_instance().bot_token)
 
