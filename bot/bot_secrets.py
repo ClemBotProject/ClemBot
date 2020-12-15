@@ -29,7 +29,8 @@ class BotSecrets:
         self._bot_prefix = None
         self._gifMe_token = None
         self._repl_url = None
-        self._github_url = None 
+        self._github_url = None
+        self._merriam_key = None 
 
     @property
     def client_token(self) -> str:
@@ -148,6 +149,18 @@ class BotSecrets:
         if self._repl_url:
             raise ConfigAccessError(f'repl_url has already been initialized')
         self._repl_url = value
+    
+    @property
+    def merriam_key(self) -> str:
+        if not self._merriam_key:
+            raise ConfigAccessError(f'merriam_key has not been intialized')
+        return self._merriam_key
+
+    @merriam_key.setter
+    def merriam_key(self, value: str) -> None:
+        if self._merriam_key:
+            raise ConfigAccessError(f'merriam_key has already been initialized')
+        self._merriam_key = value
 
     def load_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
@@ -161,3 +174,4 @@ class BotSecrets:
         self.gif_me_token = secrets['GifMeToken']
         self.repl_url = secrets['ReplUrl']
         self.github_url = secrets['GithubSourceUrl'] or 'https://github.com/ClemsonCPSC-Discord/ClemBot'
+        self.merriam_key = secrets['MerriamKey']
