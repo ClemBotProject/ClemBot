@@ -41,57 +41,62 @@ class StarboardService(BaseService):
         reaction: discord.Reaction,
         user: discord.User
     ) -> bool:
+
         # emote verification - stars only
         if str(reaction) != "⭐":
-            return True
+            return False
 
         # orignal poster reactions don't count
         if reaction.message.author == user:
-            return True
+            return False
 
         # bot messages don't count
         if reaction.message.author == self.bot.user:
-            return True
+            return False
 
         # minimum reactions
         if reaction.count < MIN_REACTIONS:
-            return True
+            return False
 
         # everything passes
-        return False
+        return True
 
     # message formatting function
     def make_message(self, message: discord.Message, stars: int) -> discord.Embed:
+
         title = f'{RANKINGS[math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS)]} | {stars} Stars'
 
         embed = discord.Embed(
             title= title,
             color= Colors.Starboard,
-            description= f'_Posted in #{message.channel}_ by @{message.author.display_name}'
+            description= f'_Posted in #{message.channel}_ by {message.author.mention}'
         )
+
         embed.set_thumbnail(url= message.author.avatar_url_as(static_format='png'))
         embed.set_footer(text= f'Sent on {message.created_at.strftime("%m/%d/%Y")}')
 
         if len(message.content) > 0:
             embed.add_field(name= 'Message', value= message.content, inline= False)
-
+    
         if len(message.attachments) > 0:
             embed.set_image(url= message.attachments[0].url)
 
         return embed
 
     # function to add an entry from the starboard
-    async def add_to_starboard(self, message: discord.Message):
+    async def add_to_starboard(self, reaction: discord.Reaction):
 
         # create message to send in the starboards
-        starboard_message = await self.make_message(message, MIN_REACTIONS)
+        starboard_message = self.make_message(reaction.message, reaction.count)
 
         #TODO: Add database insertion here, id, timestamp, stars, message id
+        
 
+        # send the message to #starboard
         await self.bot.messenger.publish(
             Events.on_send_in_designated_channel,
             DesignatedChannels.starboard,
-            message.guild.id,
+            reaction.message.guild.id,
             starboard_message
         )
 
@@ -141,7 +146,7 @@ class StarboardService(BaseService):
 
         # check to see if the message is worthy
         if self.update_check(reaction, user):
-            await self.add_to_starboard(reaction.message)
+            await self.add_to_starboard(reaction)
             # await self.updateStarboardEntry(reaction, True)
 
         else:
