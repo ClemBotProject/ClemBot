@@ -3,8 +3,6 @@ This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 
-
-
 class EventsMeta(type):
     """Class that defines what events are exposed at the bot level"""
 
@@ -249,7 +247,7 @@ class EventsMeta(type):
         Args:
 
             dc_id (int) The id of the dc send event that was given to the dc service
-            message_id (Union[int, list[int]]) the id or the list of The ids of the sent messages in dc channels
+            message (Union[discord.Message, list[discord.Message]]) the message or the list of The messages sent in dc channels
         """
         return 'on_designated_message_sent'
 
