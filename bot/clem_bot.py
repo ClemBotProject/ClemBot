@@ -129,13 +129,19 @@ class ClemBot(commands.Bot):
     async def on_raw_reaction_add(self, reaction) -> None:
         log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
 
+    async def on_reaction_remove(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
+        if user.id != self.user.id:
+            await self.publish_with_error(Events.on_reaction_remove, reaction, user)
+
+    async def on_raw_reaction_remove(self, reaction) -> None:
+        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+
     async def publish_with_error(self, *args, **kwargs):
         try:
             await self.messenger.publish(*args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback= tb)
-        
 
     async def on_command_error(self, ctx, e):
         """
@@ -184,6 +190,7 @@ class ClemBot(commands.Bot):
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
+
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
 

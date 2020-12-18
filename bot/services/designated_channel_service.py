@@ -37,10 +37,10 @@ class DesignatedChannelService(BaseService):
         if assigned_channel_ids is None:
             return
         
-        sent_ids = await self._send_dc_messages(assigned_channel_ids, content)
+        sent_messages = await self._send_dc_messages(assigned_channel_ids, content)
 
         if dc_id:
-            await self.messenger.publish(Events.on_designated_message_sent, dc_id, sent_ids)
+            await self.messenger.publish(Events.on_designated_message_sent, dc_id, sent_messages)
 
     @BaseService.Listener(Events.on_broadcast_designated_channel)
     async def broadcast_designated_message(self, 
@@ -69,17 +69,17 @@ class DesignatedChannelService(BaseService):
             await repo.remove_from_all_designated_channels(channel)
         
     async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed]) -> List[int]:
-        sent_ids = []
+        sent_messages = []
 
         if len(assigned_channel_ids) > 0:
             for channel_id in assigned_channel_ids:
                 if isinstance(content, str):
                     mes = await self.bot.get_channel(channel_id).send(content)
-                    sent_ids.append(mes.id)
+                    sent_messages.append(mes)
                 elif isinstance(content, discord.Embed):
                     mes = await self.bot.get_channel(channel_id).send(embed= content)
-                    sent_ids.append(mes.id)
-        return sent_ids
+                    sent_messages.append(mes)
+        return sent_messages
 
     async def load_service(self):
         repo = DesignatedChannelRepository()

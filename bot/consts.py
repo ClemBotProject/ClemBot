@@ -14,6 +14,8 @@ class DesignatedChannels(Enum):
     error_log = auto()
     startup_log = auto()
     user_join_log = auto()
+    starboard = auto()
 
 class DiscordLimits:
     MessageLength = 1900
+    EmbedFieldLength = 900
