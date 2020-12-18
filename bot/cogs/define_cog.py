@@ -19,7 +19,6 @@ class defineCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.api_key = BotSecrets.get_instance().merriam_key
     
     def getPageData(self, jsonData, word):
         pages = []
@@ -100,6 +99,8 @@ class defineCog(commands.Cog):
         For phrases, use underscores
         EXAMPLE: define computer_science
         """
+
+        self.api_key = BotSecrets.get_instance().merriam_key
 
         actualWord = word.replace('_',' ')
         word = word.replace('_','%20').lower()
