@@ -61,7 +61,6 @@ class PaginateService(BaseService):
         embed.add_field(name= field_title, value= pages[0])
         embed.set_footer(text=f'Page 1 of {len(pages)}')
         msg = await channel.send(embed= embed)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
 
         # stores the message info
         message = Message(embed_name, field_title, pages, 0, author.id if author else None)
@@ -70,6 +69,8 @@ class PaginateService(BaseService):
         # add every emoji from the reaction list
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
+
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
 
         if timeout:
             await asyncio.sleep(timeout) 
