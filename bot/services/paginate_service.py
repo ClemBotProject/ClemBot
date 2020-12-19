@@ -61,7 +61,7 @@ class PaginateService(BaseService):
         embed.add_field(name= field_title, value= pages[0])
         embed.set_footer(text=f'Page 1 of {len(pages)}')
         msg = await channel.send(embed= embed)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
 
         # stores the message info
         message = Message(embed_name, field_title, pages, 0, author.id if author else None)
