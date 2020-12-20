@@ -27,7 +27,7 @@ RANKINGS = {
 
 @dataclasses.dataclass
 class StarboardPost:
-    star_post: t.List[discord.Message]
+    star_posts: t.List[discord.Message]
     star_num: int
     star_users: t.Set[int] = dataclasses.field(default_factory=set)
 
