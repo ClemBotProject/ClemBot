@@ -32,10 +32,9 @@ class TagService(BaseService):
 
         tagsContent = ''
         remainingMessage = message.content
+        
         while found_name:
             name = found_name.groupdict()['name'].lower()
-            
-            
             if not await repo.check_tag_exists(name, message.guild.id):
                 return
             tagsContent += await repo.get_tag_content(name, message.guild.id) + '\n'
@@ -48,6 +47,8 @@ class TagService(BaseService):
                 found_name = re.search(pattern, remainingMessage)
             except ValueError: 
                 found_name = False
+
+        #If length of all tags is greater than the threshold, sends it to the paginate, otherwise sends as a normal message
         if len(tagsContent) > TAG_PAGINATE_THRESHOLD:
             pages = []
             lowerBound = 0
