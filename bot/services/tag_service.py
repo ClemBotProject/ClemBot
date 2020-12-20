@@ -32,6 +32,7 @@ class TagService(BaseService):
             return
 
         content = await repo.get_tag_content(name, message.guild.id)
+        await repo.increment_tag_use_counter(name, message.guild.id)
         log.info(f'Tag "{found_name}" invoked in guild: {message.guild.id} by: {message.author.id}')
         msg = await message.channel.send(content)
         await self.bot.messenger.publish(Events.on_set_deletable, 

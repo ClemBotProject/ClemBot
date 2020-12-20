@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS Tags (
     id                      INTEGER     PRIMARY KEY,
     name                    TEXT        NOT NULL,
     content                 TEXT        NOT NULL,
+    useCount                INTEGER     DEFAULT 0,
     CreationDate            TEXT        NOT NULL,
     fk_GuildId              INTEGER     NOT NULL,
     fk_UserId               INTEGER     NOT NULL,
