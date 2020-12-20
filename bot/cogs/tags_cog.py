@@ -158,11 +158,11 @@ class TagCog(commands.Cog):
         
         embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
         embed.add_field(name='Name ', value=tag['name'])
-        embed.add_field(name='Uses ', value=tag['useCount'])
         embed.add_field(name='Content ', value=tag['content'])
+        embed.add_field(name='Uses ', value=tag['useCount'], inline=False)
         fullNameGet = self.get_full_name(author)
-        embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
         embed.add_field(name='Creation Date: ', value=tag['CreationDate'], inline=False)
+        embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
 
         await ctx.send(embed=embed)
 
