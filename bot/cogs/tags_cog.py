@@ -28,7 +28,6 @@ class Tag:
     creation_date: str
     guild_id: int
     user_id: int
-    #use_count: int
 
 
 class TagCog(commands.Cog):
@@ -157,7 +156,6 @@ class TagCog(commands.Cog):
 
         author = self.bot.get_user(tag['fk_UserId'])
         
-
         embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
         embed.add_field(name='Name ', value=tag['name'])
         embed.add_field(name='Uses ', value=tag['useCount'])
