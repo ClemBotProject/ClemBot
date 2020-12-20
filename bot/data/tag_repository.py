@@ -29,10 +29,13 @@ class TagRepository(BaseRepository):
                 (name, guild_id)) as c:
                 return await c.fetchone() is not None
 
-    async def get_tag_content(self, name: str, guild_id: int) -> str:
+    async def increment_tag_use_counter(self, name: str, guild_id: int) -> str:
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute('UPDATE Tags SET useCount = useCount + 1 WHERE name = ? AND fk_guildId = ?', (name, guild_id,))
             await db.commit()
+
+    async def get_tag_content(self, name: str, guild_id: int) -> str:
+        async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT Content FROM Tags WHERE name = ? AND fk_guildId = ?',
                     (name, guild_id,)) as c:
                 return (await self.fetcthone_as_dict(c))['content']
