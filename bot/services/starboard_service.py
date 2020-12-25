@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 # minimum reactions required to get on the starboard
 # TODO: implement to where user-editable
-MIN_REACTIONS = 3
+MIN_REACTIONS = 4
 
 # dictionary of rankings
 RANKINGS = {
