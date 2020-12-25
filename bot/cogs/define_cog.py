@@ -11,6 +11,7 @@ from bot.consts import Colors
 
 import json
 import aiohttp
+import re
 
 log = logging.getLogger(__name__)
 API_URL = 'https://www.dictionaryapi.com/api/v3/references/collegiate/json/'
@@ -98,33 +99,47 @@ class defineCog(commands.Cog):
 
         For phrases, use underscores
         EXAMPLE: define computer_science
+
+        Letters, numbers, and special characters (_, &, and -) are supported
         """
 
         self.api_key = BotSecrets.get_instance().merriam_key
 
+        # Remove any characters besides &, _, or - that are not in ranges a-z, A-Z, or 0-9
+        # per the ASCII Table https://www.asciitable.com
+        word = re.sub("[^a-zA-Z0-9 &_-]+", "", word)
+
         actualWord = word.replace('_',' ')
         word = word.replace('_','%20').lower()
+
         url = f'{API_URL}{word}?key={self.api_key}'
         wordPages = []
-        async with aiohttp.request('get', url) as response:
-            if response.status == 200:
-                jsonData = await response.json()
-                wordPages = self.getPageData(jsonData, word)
+        
+        # Try Except for catching errors that could give away the API key
+        try:
+            async with aiohttp.request('get', url) as response:
+                if response.status == 200:
+                    jsonData = await response.json()
+                    wordPages = self.getPageData(jsonData, word)
 
-            else:
-                embed = discord.Embed(title='Merriam_Webster Dictionary', color=Colors.Error)
-                ErrMsg = f'Oh No! There appears to be an issue! Yell at one of the developers with the following code.\nError Code: {response.status}'
-                embed.add_field(name='Error with API', value=ErrMsg, inline=False)
-                await ctx.send(embed=embed)
-                return
-                    
-            await self.bot.messenger.publish(Events.on_set_pageable,
-                embed_name = 'Merriam-Webster Dictionary',
-                field_title = f'Word: {actualWord}',
-                pages = wordPages,
-                author = ctx.author,
-                channel = ctx.channel)
-    
+                else:
+                    embed = discord.Embed(title='Merriam_Webster Dictionary', color=Colors.Error)
+                    ErrMsg = f'Oh No! There appears to be an issue! Yell at one of the developers with the following code.\nError Code: {response.status}'
+                    embed.add_field(name='Error with API', value=ErrMsg, inline=False)
+                    await ctx.send(embed=embed)
+                    return
+                        
+                await self.bot.messenger.publish(Events.on_set_pageable,
+                    embed_name = 'Merriam-Webster Dictionary',
+                    field_title = f'Word: {actualWord}',
+                    pages = wordPages,
+                    author = ctx.author,
+                    channel = ctx.channel)
+        except Exception as err:
+            err_str = str(err)
+            err_str = re.sub(self.api_key, "CLASSIFIED", err_str)
+            raise Exception(err_str).with_traceback(err.__traceback__)
+
 def setup(bot):
     bot.add_cog(defineCog(bot))
 
