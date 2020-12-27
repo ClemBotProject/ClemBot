@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS Guilds (
     id      INTEGER     PRIMARY KEY,
-    name    TEXT        NOT NULL
+    name    TEXT        NOT NULL,
+    active  BOOLEAN     DEFAULT true
 );
 
 CREATE TABLE IF NOT EXISTS CustomPrefixes (

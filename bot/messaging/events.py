@@ -133,6 +133,17 @@ class EventsMeta(type):
         return '_on_guild_joined'
 
     @property
+    def on_guild_leave(self):
+        """
+        Published whenever the bot leaves a guild
+
+        Args:
+
+            guild (Guild) – The guild that was left.    
+        """
+        return '_on_guild_leave'
+
+    @property
     def on_new_guild_initialized(self):
         """
         Published whenever the bot joins a new guild and that guild has been created
