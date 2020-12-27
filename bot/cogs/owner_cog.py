@@ -45,8 +45,7 @@ class OwnerCog(commands.Cog):
         embed = discord.Embed(title='Available metrics', color=Colors.ClemsonOrange)
         embed.add_field(name='Guilds', value=len(self.bot.guilds), inline=False)
 
-        users = await UserRepository().get_user_count()
-        embed.add_field(name='Users', value=users, inline=False)
+        embed.add_field(name='Users', value=sum(len(i.members) for i in self.bot.guilds), inline=False)
 
         messages = await MessageRepository().get_message_count()
         embed.add_field(name='Messages', value=messages, inline=False)
@@ -111,16 +110,20 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def guilds(self, ctx):
         count = len(self.bot.guilds)
+
         embed = discord.Embed(title='Current guild count', color=Colors.ClemsonOrange)
         embed.add_field(name='Global', value=count)
+
         await ctx.send(embed=embed)
 
     @count.command()
     @commands.is_owner()
     async def users(self, ctx, guild_id: int=None):
-        count = await UserRepository().get_user_count(guild_id)
+        count = sum(len(i.members) for i in self.bot.guilds)
+
         embed = discord.Embed(title='Current user count', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Guild: {guild_id}' if guild_id else 'Global', value=count)
+
         await ctx.send(embed=embed)
 
 
