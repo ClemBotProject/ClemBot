@@ -43,7 +43,7 @@ def main():
     bot_log.addHandler(bot_file_handle)
 
     #check if this is a prod or a dev instance
-    if os.environ.get('PROD') == 1:
+    if bool(os.environ.get('PROD')):
         bot_log.info('Production env var found, loading production enviroment')
         BotSecrets.get_instance().load_production_secrets()
     else:
