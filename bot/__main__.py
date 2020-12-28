@@ -42,24 +42,25 @@ def main():
     bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     bot_log.addHandler(bot_file_handle)
 
-    try:
-        bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
-        with open("BotSecrets.json") as f:
-            BotSecrets.get_instance().load_secrets(f.read())
-    except FileNotFoundError as e:
-        bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
-        sys.exit(0)
-    except KeyError as e:
-        bot_log.error(f'{e} is not a valid key in BotSecrets')
-        sys.exit(0)
-    except Exception as e:
-        bot_log.error(e)
-
-    token = os.environ.get('BotToken', None) 
-
-    if token is not None:
-        BotSecrets.get_instance().bot_token = token
+    #check if this is a prod or a dev instance
+    if os.environ.get('PROD') == 1:
+        bot_log.info('Production env var found, loading production enviroment')
+        BotSecrets.get_instance().load_production_secrets()
+    else:
+        try:
+            bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
+            with open("BotSecrets.json") as f:
+                BotSecrets.get_instance().load_development_secrets(f.read())
+        except FileNotFoundError as e:
+            bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
+            sys.exit(0)
+        except KeyError as e:
+            bot_log.error(f'{e} is not a valid key in BotSecrets')
+            sys.exit(0)
+        except Exception as e:
+            bot_log.error(e)
     
+    #get the default prefix for the bot instance
     prefix = BotSecrets.get_instance().bot_prefix
 
     #Initialize the messenger here and inject it into the base bot class,

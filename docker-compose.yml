@@ -17,6 +17,8 @@ services:
       - snekbox
     networks: 
       - ClemBotNet
+    env_file: 
+      - bot_env.env
     volumes:
       - ~/database:/ClemBot/database
       - ~/Logs:/ClemBot/Logs
