@@ -25,30 +25,32 @@ class TagService(BaseService):
         pattern = f'(^| )[{TAG_PREFIX}](?P<name>\\w+)($| )'
         found_name = re.search(pattern, message.content)
         
+        validTagFound = False
         if not found_name:
             return
-        
-        searchIndex = 0
 
         tagsContent = ''
-        remainingMessage = message.content
         
-        while found_name:
+        for match in re.finditer('(^| ?)[$](\w+)($| )', message.content, re.S):
+            end = match.end()
+            
             name = found_name.groupdict()['name'].lower()
             if not await repo.check_tag_exists(name, message.guild.id):
-                return
+                found_name = re.search(pattern, message.content[end: ])
+                continue
+            validTagFound = True
             tagsContent += await repo.get_tag_content(name, message.guild.id) + '\n'
             await repo.increment_tag_use_counter(name, message.guild.id)
             log.info(f'Tag "{found_name}" invoked in guild: {message.guild.id} by: {message.author.id}')
                     
-            try:
-                searchIndex = remainingMessage.index(TAG_PREFIX) + 1
-                remainingMessage = remainingMessage[searchIndex: ]
-                found_name = re.search(pattern, remainingMessage)
-            except ValueError: 
-                found_name = False
+            found_name = re.search(pattern, message.content[end: ])
+            if(found_name):
+                tagsContent += '-----\n'
 
-        #If length of all tags is greater than the threshold, sends it to the paginate, otherwise sends as a normal message
+        if not validTagFound:
+            return
+            
+        #If length of all tags is greater than the threshold, sends it to the paginate service, otherwise sends as a normal message
         if len(tagsContent) > TAG_PAGINATE_THRESHOLD:
             pages = []
             lowerBound = 0
