@@ -6,6 +6,7 @@ import discord
 from bot.services.base_service import BaseService
 from bot.messaging.events import Events
 from bot.data.tag_repository import TagRepository
+from bot.services.starboard_service import StarboardService
 
 log = logging.getLogger(__name__)
 
@@ -50,17 +51,13 @@ class TagService(BaseService):
         if not validTagFound:
             return
             
+        pages = []
+
         #If length of all tags is greater than the threshold, sends it to the paginate service, otherwise sends as a normal message
-        if len(tagsContent) > TAG_PAGINATE_THRESHOLD:
-            pages = []
-            lowerBound = 0
-            higherBound = TAG_PAGINATE_THRESHOLD
+        for i, chunk in enumerate(StarboardService.chunk_iterable(self, tagsContent, 500)):
+            pages.append(chunk)
 
-            while lowerBound < len(tagsContent):
-                pages.append(tagsContent[lowerBound:higherBound])
-                lowerBound = higherBound
-                higherBound += TAG_PAGINATE_THRESHOLD
-
+        if len(pages) > 1:
             await self.bot.messenger.publish(Events.on_set_pageable,
                     embed_name='Tags Contents',
                     field_title='Contents',
@@ -74,6 +71,5 @@ class TagService(BaseService):
                 author= message.author, 
                 timeout=60)
             
-
     async def load_service(self):
         pass
