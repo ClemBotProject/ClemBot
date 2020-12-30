@@ -3,7 +3,7 @@ from typing import Union, List
 
 import discord
 
-from bot.consts import DesignatedChannels
+from bot.consts import DesignatedChannels, OwnerDesignatedChannels, DesignatedChannelBase
 from bot.data.designated_channel_repository import DesignatedChannelRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -17,7 +17,7 @@ class DesignatedChannelService(BaseService):
 
     @BaseService.Listener(Events.on_send_in_designated_channel)
     async def send_designated_message(self, 
-            designated_name: DesignatedChannels, 
+            designated_name: DesignatedChannelBase, 
             guild_id: int, 
             content: Union[str, discord.Embed],
             dc_id: int=None):
@@ -83,6 +83,6 @@ class DesignatedChannelService(BaseService):
 
     async def load_service(self):
         repo = DesignatedChannelRepository()
-        for channel in DesignatedChannels:
+        for channel in list(DesignatedChannels) + list(OwnerDesignatedChannels):
             log.info(f'Loading designated channel: {channel.name}')
             await repo.add_designated_channel_type(channel.name)

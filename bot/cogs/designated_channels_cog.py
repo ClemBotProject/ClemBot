@@ -3,7 +3,7 @@ import logging
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
+from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.data.designated_channel_repository import DesignatedChannelRepository
 
 log = logging.getLogger(__name__)
@@ -18,18 +18,17 @@ class DesignatedChannelsCog(commands.Cog):
         """
 
         channel_repo = DesignatedChannelRepository()
-        channels = await channel_repo.get_all_designated_channels()
 
         embed = discord.Embed(title= f'Designated Channels', color= Colors.ClemsonOrange)
         
-        if channels is None:
+        if len(list(DesignatedChannels)) == 0:
             embed.add_field(name= 'No possible designated channels', value= '')
             await ctx.send(embed= embed)
             return
 
-        for designated_id, name in channels:
+        for i, channel in enumerate(DesignatedChannels):
             assigned_channels = []
-            for channel_id in await channel_repo.get_guild_designated_channels(name, ctx.guild.id):
+            for channel_id in await channel_repo.get_guild_designated_channels(channel.name, ctx.guild.id):
                 assigned_channels.append(ctx.bot.get_channel(channel_id))
 
             if len(assigned_channels) != 0:
@@ -38,10 +37,10 @@ class DesignatedChannelsCog(commands.Cog):
                 embed_value = 'No channel added'
 
             embed.add_field(
-                name= f'#{designated_id} {name}', 
+                name= f'#{i+1} {channel.name}', 
                 value= embed_value,
                 inline= False)
-        
+            
         await ctx.send(embed= embed)
 
     @channel.command(pass_context= True, aliases= ['register','set'])
@@ -57,7 +56,15 @@ class DesignatedChannelsCog(commands.Cog):
 
         channel_repo = DesignatedChannelRepository()
 
-        if not await channel_repo.check_designated_channel(channel_type):
+        if OwnerDesignatedChannels.has(channel_type):
+            await ctx.send(
+                    f"""
+                    The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
+                    If you are the owner of the instance please reference owner_cog.py for more information
+                    """)
+            return
+
+        if not DesignatedChannels.has(channel_type):
             await ctx.send(f'The requested designated channel `{channel_type}` does not exist')
             return
 
@@ -88,7 +95,15 @@ class DesignatedChannelsCog(commands.Cog):
         """
         channel_repo = DesignatedChannelRepository()
 
-        if not await channel_repo.check_designated_channel(channel_type):
+        if OwnerDesignatedChannels.has(channel_type):
+            await ctx.send(
+                    f"""
+                    The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
+                    If you are the owner of the instance please reference owner_cog.py for more information
+                    """)
+            return
+
+        if not DesignatedChannels.has(channel_type):
             await ctx.send(f'The requested designated channel `{channel_type}` does not exist')
             return
 
