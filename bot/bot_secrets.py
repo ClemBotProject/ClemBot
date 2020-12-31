@@ -31,7 +31,9 @@ class BotSecrets:
         self._gifMe_token = None
         self._repl_url = None
         self._github_url = None
-        self._merriam_key = None 
+        self._merriam_key = None
+        self._weather_key = None
+        self._geocode_key = None
 
     @property
     def client_token(self) -> str:
@@ -162,6 +164,30 @@ class BotSecrets:
         if self._merriam_key:
             raise ConfigAccessError(f'merriam_key has already been initialized')
         self._merriam_key = value
+    
+    @property
+    def weather_key(self) -> str:
+        if not self._weather_key:
+            raise ConfigAccessError(f'weather_key has not been intialized')
+        return self._weather_key
+
+    @weather_key.setter
+    def weather_key(self, value: str) -> None:
+        if self._weather_key:
+            raise ConfigAccessError(f'weather_key has already been initialized')
+        self._weather_key = value
+
+    @property
+    def geocode_key(self) -> str:
+        if not self._geocode_key:
+            raise ConfigAccessError(f'geocode_key has not been intialized')
+        return self._geocode_key
+
+    @geocode_key.setter
+    def geocode_key(self, value: str) -> None:
+        if self._geocode_key:
+            raise ConfigAccessError(f'geocode_key has already been initialized')
+        self._geocode_key = value
 
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
@@ -176,6 +202,8 @@ class BotSecrets:
         self.repl_url = secrets['ReplUrl']
         self.github_url = secrets['GithubSourceUrl'] 
         self.merriam_key = secrets['MerriamKey']
+        self.weather_key = secrets['WeatherKey']
+        self.geocode_key = secrets['GeocodeKey']
 
     def load_production_secrets(self) -> None:
 
@@ -188,5 +216,7 @@ class BotSecrets:
         self.repl_url = os.environ.get('REPL_URL')
         self.github_url = os.environ.get('GITHUB_URL') 
         self.merriam_key = os.environ.get('MERRIAM_KEY')
+        self.weather_key = os.environ.get('WEATHER_KEY')
+        self.geocode_key = os.environ.get('GEOCODE_KEY')
 
         log.info('Production keys loaded')
