@@ -66,7 +66,7 @@ class ManageClassesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context= True, aliases=['class'])
+    @commands.group(pass_context= True, aliases=['class'], case_insensitive=True)
     async def classes(self, ctx):
         pass
 
