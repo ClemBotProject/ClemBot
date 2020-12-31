@@ -14,7 +14,7 @@ class WelcomeMessageCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.group(pass_context= True, invoke_without_command= True)
+    @commands.group(pass_context= True, invoke_without_command= True, case_insensitive=True)
     @commands.has_guild_permissions(administrator= True)
     async def welcome(self, ctx):
         repo = WelcomeMessageRepository()

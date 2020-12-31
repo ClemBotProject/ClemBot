@@ -17,7 +17,10 @@ class AssignableRolesCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
     
-    @commands.group(pass_context= True, invoke_without_command= True, aliases= ['role'])
+    @commands.group(pass_context= True, 
+        invoke_without_command= True, 
+        aliases= ['role'], 
+        case_insensitive=True)
     async def roles(self, ctx, *, input_role: str = None) -> None:
 
         if input_role is None:

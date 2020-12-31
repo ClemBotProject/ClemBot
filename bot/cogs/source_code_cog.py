@@ -40,7 +40,7 @@ class SourceCodeCog(commands.Cog):
                     path = os.path.join(root, f)
                     self.bot_files[f] = FilePaths(path, path.split(root_dir)[1])
 
-    @commands.group(pass_context= True, invoke_without_command= True)
+    @commands.group(pass_context= True, invoke_without_command= True, case_insensitive=True)
     async def source(self, ctx, file: str=None):
         if not file:
             embed = discord.Embed(title='Heres my source repository', 

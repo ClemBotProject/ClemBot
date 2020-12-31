@@ -17,7 +17,10 @@ class CustomPrefixCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.group(pass_context= True, invoke_without_command=True, aliases= ['prefixs'])
+    @commands.group(pass_context= True,
+        invoke_without_command=True, 
+        aliases= ['prefixs'], 
+        case_insensitive=True)
     async def prefix(self, ctx):
         #get_prefix returns two mentions as the first possible prefixes in the tuple,
         #those are global so we dont care about them

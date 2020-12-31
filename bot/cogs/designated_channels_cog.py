@@ -10,7 +10,10 @@ log = logging.getLogger(__name__)
 
 class DesignatedChannelsCog(commands.Cog):
 
-    @commands.group(pass_context= True, invoke_without_command= True, aliases= ['channels'])
+    @commands.group(pass_context= True,
+        invoke_without_command= True, 
+        aliases= ['channels'], 
+        case_insensitive=True)
     async def channel(self, ctx):
         """
         Sends a formatted embed of the possible designated channels and their listeners to 

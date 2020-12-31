@@ -37,7 +37,7 @@ class TagCog(commands.Cog):
         self._cd = commands.CooldownMapping.from_cooldown(1.0, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
 
     
-    @commands.group(pass_context= True, invoke_without_command= True, aliases=['tags'])
+    @commands.group(pass_context= True, invoke_without_command= True, aliases=['tags'], case_insensitive=True)
     async def tag(self, ctx):
         tags = await TagRepository().get_all_server_tags(ctx.guild.id)
 

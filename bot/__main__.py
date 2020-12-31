@@ -85,6 +85,7 @@ def main():
     ClemBot(
             messenger=messenger, 
             command_prefix=custom_prefix.get_prefix,  # noqa: E126
+            case_insensitive=True,
             max_messages=50000,
             allowed_mentions=mentions,
             intents=intents
