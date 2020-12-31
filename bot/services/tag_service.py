@@ -31,8 +31,8 @@ class TagService(BaseService):
             return
 
         tagsContent = ''
-        
-        for match in re.finditer('(^| ?)[$](\w+)($| )', message.content, re.S):
+        pattern = re.compile('(^| ?)[$](\w+)($| )', re.MULTILINE)       
+        for match in pattern.finditer(message.content, re.S):
             end = match.end()
             
             name = found_name.groupdict()['name'].lower()
