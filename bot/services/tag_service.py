@@ -23,38 +23,28 @@ class TagService(BaseService):
     async def on_message_recieved(self, message: discord.Message) -> None:
         repo = TagRepository()
 
-        pattern = f'(^| )[{TAG_PREFIX}](?P<name>\\w+)($| )'
-        found_name = re.search(pattern, message.content)
-        
-        validTagFound = False
-        if not found_name:
-            return
+        tagsContent = []
+        tagFound = False
+        pattern = re.compile(f'(^|\\s)[{TAG_PREFIX}](\\w+)')       
+        for match in set(i[1] for i in pattern.findall(message.content)):
 
-        tagsContent = ''
-        pattern = re.compile('(^| ?)[$](\w+)($| )', re.MULTILINE)       
-        for match in pattern.finditer(message.content, re.S):
-            end = match.end()
-            
-            name = found_name.groupdict()['name'].lower()
-            if not await repo.check_tag_exists(name, message.guild.id):
-                found_name = re.search(pattern, message.content[end: ])
+            if not await repo.check_tag_exists(match, message.guild.id):
                 continue
-            validTagFound = True
-            tagsContent += await repo.get_tag_content(name, message.guild.id) + '\n'
-            await repo.increment_tag_use_counter(name, message.guild.id)
-            log.info(f'Tag "{found_name}" invoked in guild: {message.guild.id} by: {message.author.id}')
-                    
-            found_name = re.search(pattern, message.content[end: ])
-            if(found_name):
-                tagsContent += '-----\n'
 
-        if not validTagFound:
+            tagFound = True
+                
+            tagsContent.append(await repo.get_tag_content(match, message.guild.id))
+            await repo.increment_tag_use_counter(match ,message.guild.id)
+            log.info(f'Tag "{match}" invoked in guild: {message.guild.id} by: {message.author.id}')
+
+        if not tagFound:
             return
-            
+
+        tag_str = '\n-------\n'.join(tagsContent)
         pages = []
 
         #If length of all tags is greater than the threshold, sends it to the paginate service, otherwise sends as a normal message
-        for i, chunk in enumerate(StarboardService.chunk_iterable(self, tagsContent, 500)):
+        for chunk in self.chunk_iterable(tag_str, TAG_PAGINATE_THRESHOLD):
             pages.append(chunk)
 
         if len(pages) > 1:
@@ -65,11 +55,15 @@ class TagService(BaseService):
                     author=message.author,
                     channel=message.channel)
         else:
-            msg = await message.channel.send(tagsContent)
+            msg = await message.channel.send(tag_str)
             await self.bot.messenger.publish(Events.on_set_deletable, 
                 msg=msg, 
                 author= message.author, 
                 timeout=60)
+
+    def chunk_iterable(self, iterable, chunk_size):
+        for i in range(0, len(iterable), chunk_size):
+            yield iterable[i:i + chunk_size]
             
     async def load_service(self):
         pass
