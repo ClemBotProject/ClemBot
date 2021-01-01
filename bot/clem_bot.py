@@ -186,6 +186,10 @@ class ClemBot(commands.Bot):
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
+    
+    async def current_prefix(self, ctx):
+        prefixes = await self.get_prefix(ctx)
+        return prefixes[2]
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.

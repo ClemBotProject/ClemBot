@@ -342,7 +342,7 @@ class EventsMeta(type):
         return 'on_guild_channel_update'
 
     @property
-    def on_set_pageable(self):
+    def on_set_pageable_text(self):
         """
         Published when a bot message is needed to be able to be paginate
         
@@ -354,8 +354,21 @@ class EventsMeta(type):
             channel (discord.TextChannel): the channel to send the embed
             timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
         """
-        return 'on_set_pageable'
+        return 'on_set_pageable_text'
 
+
+    @property
+    def on_set_pageable_embed(self):
+        """
+        Published when a listof embeds is needed to be able to paginate
+        
+        Args:
+            pages (list[discord.Embed]): a list of embeds to scroll through
+            author (discord.Member): member who called the bot 
+            channel (discord.TextChannel): the channel to send the embed
+            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
+        """
+        return 'on_set_pageable_embed'
 
 
 class Events(metaclass= EventsMeta):

@@ -9,6 +9,7 @@ import discord.ext.commands as commands
 
 from bot.consts import Colors
 from bot.bot_secrets import BotSecrets
+import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.displayable_path import DisplayablePath
@@ -40,7 +41,14 @@ class SourceCodeCog(commands.Cog):
                     path = os.path.join(root, f)
                     self.bot_files[f] = FilePaths(path, path.split(root_dir)[1])
 
-    @commands.group(pass_context= True, invoke_without_command= True)
+    @ext.group(pass_context= True, invoke_without_command= True)
+    @ext.long_help(
+        """
+        Links the bots repository or optionally a specicifc file within the bots source tree
+        """
+    )
+    @ext.short_help('Links the bots source repo')
+    @ext.example(('source', 'source clem_bot.py'))
     async def source(self, ctx, file: str=None):
         if not file:
             embed = discord.Embed(title='Heres my source repository', 
@@ -62,6 +70,14 @@ class SourceCodeCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @source.command(aliases=['directory', 'tree'])
+    @ext.long_help(
+        """
+        Prints out the bots full source directory structure in discord, you may use this to know what
+        files the source command has access too
+        """
+    )
+    @ext.short_help('Prints the source directory')
+    @ext.example('source list')
     async def list(self, ctx):
         file_tree = self.list_files(os.getcwd(), self.ignored)
 
@@ -75,12 +91,14 @@ class SourceCodeCog(commands.Cog):
 
 
     @source.command(aliases=['show'])
+    @ext.long_help(
+        'Prints the contents of a specified source file directly into discord, optionally allows you to specify the start and' 
+        'ending line numbers to narrow down what you display, if you only provide one number the'
+        'command will print from that number to the end of the file'
+    )
+    @ext.short_help('Displays a source file directly in discord')
+    @ext.example(('source print __main__.py', 'source print __main__.py 10 20'))
     async def print(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
-        """
-        Either prints the bots file structure as a tree or, if given a file, 
-        prints out the source code of that file. the beginning and ending line numbers to be 
-        printed can also be specified
-        """
 
         if file == 'BotSecrets.json':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)

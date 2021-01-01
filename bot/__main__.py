@@ -44,7 +44,7 @@ def main():
 
     try:
         bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
-        with open("BotSecrets.json") as f:
+        with open('BotSecrets.json') as f:
             BotSecrets.get_instance().load_secrets(f.read())
     except FileNotFoundError as e:
         bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
@@ -84,11 +84,12 @@ def main():
     ClemBot(
             messenger=messenger, 
             command_prefix=custom_prefix.get_prefix,  # noqa: E126
+            help_command = None,
             max_messages=5000,
             allowed_mentions=mentions,
             intents=intents
         ).run(BotSecrets.get_instance().bot_token)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -7,19 +7,23 @@ from discord.ext.commands.errors import BadArgument
 
 from bot.data.role_repository import RoleRepository
 from bot.messaging.events import Events
+import bot.extensions as ext
 from bot.consts import Colors
 
 log = logging.getLogger(__name__)
 
 
 class AssignableRolesCog(commands.Cog):
+    """this is a test cog comment"""
 
     def __init__(self, bot) -> None:
         self.bot = bot
     
-    @commands.group(pass_context= True, invoke_without_command= True, aliases= ['role'])
+    @ext.group(invoke_without_command= True, aliases= ['role'])
+    @ext.long_help('Lists all roles that have been marked as assignable in this server')
+    @ext.short_help('Defines custom assignable roles')
+    @ext.example('roles')
     async def roles(self, ctx, *, input_role: str = None) -> None:
-
         if input_role is None:
             await self.send_role_list(ctx, 'Assignable Roles')
             return
@@ -194,6 +198,9 @@ class AssignableRolesCog(commands.Cog):
 
     @roles.command(pass_context= True, aliases= ['create'])
     @commands.has_guild_permissions(administrator = True)
+    @ext.long_help('Command to add a role as assignable in the current guild')
+    @ext.short_help('Marks a role as user assignable')
+    @ext.example('roles add #SomeExampleRole')
     async def add(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
@@ -204,6 +211,9 @@ class AssignableRolesCog(commands.Cog):
 
     @roles.command(pass_context= True, aliases= ['delete'])
     @commands.has_guild_permissions(administrator = True)
+    @ext.long_help('Command to remove a role as assignable in the current guild')
+    @ext.short_help('Removes a role as user assignable')
+    @ext.example('roles delete #SomeExampleRole')
     async def remove(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 

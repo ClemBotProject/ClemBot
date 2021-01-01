@@ -8,6 +8,7 @@ import discord.ext.commands as commands
 from bot.messaging.events import Events
 from bot.bot_secrets import BotSecrets
 from bot.data.custom_prefixes_repository import CustomPrefixesRepository
+import bot.extensions as ext
 from bot.consts import Colors
 log = logging.getLogger(__name__)
 
@@ -17,7 +18,12 @@ class CustomPrefixCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.group(pass_context= True, invoke_without_command=True, aliases= ['prefixs'])
+    @ext.group(pass_context= True, invoke_without_command=True, aliases= ['prefixs'])
+    @ext.long_help(
+        'Allows configuring the command prefix that the bot will respond too'
+    )
+    @ext.short_help('Configure a custom command prefix')
+    @ext.example('prefix')
     async def prefix(self, ctx):
         #get_prefix returns two mentions as the first possible prefixes in the tuple,
         #those are global so we dont care about them
@@ -31,6 +37,11 @@ class CustomPrefixCog(commands.Cog):
     
     @prefix.command(pass_context= True, aliases= ['add'])
     @commands.has_guild_permissions(administrator= True)
+    @ext.long_help(
+        'Sets the bot prefix to any given valid string'
+    )
+    @ext.short_help('set a custom prefix')
+    @ext.example('prefix set +')
     async def set(self, ctx, prefix: str):
 
         if prefix in await self.bot.get_prefix(ctx.message):
@@ -55,6 +66,11 @@ class CustomPrefixCog(commands.Cog):
         
     @prefix.command(pass_context= True, aliases= ['revert'])
     @commands.has_guild_permissions(administrator= True)
+    @ext.long_help(
+        'resets the bot prefix to the default'
+    )
+    @ext.short_help('resets a custom prefix')
+    @ext.example('prefix set')
     async def reset(self, ctx):
 
         default_prefix = BotSecrets.get_instance().bot_prefix

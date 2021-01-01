@@ -7,6 +7,7 @@ import discord.utils as utils
 import aiohttp
 
 from bot.bot_secrets import BotSecrets
+import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +26,14 @@ class EvalCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['e']) 
+    @ext.command(aliases=['e']) 
     @commands.cooldown(1, EVAL_COMMAND_COOLDOWN, commands.BucketType.guild)
+    @ext.long_help(
+        'Allows for the evaluations of arbitrary python code directly in discord'
+        'Supports all internal standard libraries like json or re'
+    )
+    @ext.short_help('Runs arbitrary python code in discord')
+    @ext.example('eval print("hello world")')
     async def eval(self, ctx, *, code= None) -> None:
         code = code.replace('`', '')
         code = utils.escape_mentions(code)
