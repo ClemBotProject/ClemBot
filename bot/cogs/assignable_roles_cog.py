@@ -200,7 +200,7 @@ class AssignableRolesCog(commands.Cog):
     @commands.has_guild_permissions(administrator = True)
     @ext.long_help('Command to add a role as assignable in the current guild')
     @ext.short_help('Marks a role as user assignable')
-    @ext.example('roles add #SomeExampleRole')
+    @ext.example('roles add @SomeExampleRole')
     async def add(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
@@ -213,7 +213,7 @@ class AssignableRolesCog(commands.Cog):
     @commands.has_guild_permissions(administrator = True)
     @ext.long_help('Command to remove a role as assignable in the current guild')
     @ext.short_help('Removes a role as user assignable')
-    @ext.example('roles delete #SomeExampleRole')
+    @ext.example('roles delete @SomeExampleRole')
     async def remove(self, ctx, *, role: discord.Role = None) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
