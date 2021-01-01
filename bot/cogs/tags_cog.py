@@ -10,6 +10,7 @@ import discord.ext.commands as commands
 
 from bot.consts import Colors
 from bot.data.tag_repository import TagRepository
+import bot.extensions as ext
 from discord.ext.commands.errors import CheckFailure
 from bot.messaging.events import Events
 
@@ -37,7 +38,13 @@ class TagCog(commands.Cog):
         self._cd = commands.CooldownMapping.from_cooldown(1.0, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
 
     
-    @commands.group(pass_context= True, invoke_without_command= True, aliases=['tags'], case_insensitive=True)
+    @ext.group(invoke_without_command= True, aliases=['tags'], case_insensitive=True)
+    @ext.long_help(
+        'Lists all the possible tags in the current server' 
+        'tags are invoked with the command notation $<tag_name> anywhere in a message'
+    )
+    @ext.short_help('Supports custom tag functionality')
+    @ext.example('tag')
     async def tag(self, ctx):
         tags = await TagRepository().get_all_server_tags(ctx.guild.id)
 
@@ -71,7 +78,7 @@ class TagCog(commands.Cog):
             pages.append(f'```{content}```')
 
         #send the pages to the paginator service
-        await self.bot.messenger.publish(Events.on_set_pageable,
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
                 embed_name='Available Tags', 
                 field_title='Available:',
                 pages=pages, 
@@ -79,6 +86,11 @@ class TagCog(commands.Cog):
                 channel=ctx.channel)
 
     @tag.command(aliases=['create', 'make'])
+    @ext.long_help(
+        'Creates a tag with a given name and value that can be invoked at any time in the future' 
+    )
+    @ext.short_help('Creates a tag')
+    @ext.example('tag add mytagname mytagcontnt')
     async def add(self, ctx, name: str, *, content: str):
 
         name = name.lower()
@@ -117,6 +129,12 @@ class TagCog(commands.Cog):
 
 
     @tag.command(aliases=['remove', 'destroy'])
+    @ext.long_help(
+        'Deletes a tag with a given name, this command can only be run by '
+        'server staff or the person who created the tag'
+    )
+    @ext.short_help('Deletes a tag')
+    @ext.example('tag delete mytagname mytagcontnt')
     async def delete(self, ctx, name):
 
         repo = TagRepository()
@@ -140,8 +158,13 @@ class TagCog(commands.Cog):
         
         await self._delete_tag(name, ctx)
 
-    @tag.command(aliases=['info'])
-    async def about(self, ctx, name):
+    @tag.command(aliases=['about'])
+    @ext.long_help(
+        'Provides info about a given tag including creation date, usage stats and tag owner'
+    )
+    @ext.short_help('Provides info about tag')
+    @ext.example('tag info mytagname')
+    async def info(self, ctx, name):
         
         name = name.lower()
         

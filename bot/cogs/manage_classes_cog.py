@@ -9,6 +9,7 @@ import discord.ext.commands as commands
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.user_choice import UserChoice
+import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 
@@ -66,12 +67,21 @@ class ManageClassesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context= True, aliases=['class'], case_insensitive=True)
+    @ext.group(pass_context= True, aliases=['class'], case_insensitive=True)
+    @ext.long_help(
+        'Command group for the manage classes functionality' 
+    )
+    @ext.short_help('Academic class creation functionality')
     async def classes(self, ctx):
         pass
 
     @classes.command(pass_context= True, aliases=['create'])
-    #@commands.has_guild_permissions(administrator= True)
+    @ext.long_help(
+        'Command to initiate the new class creation wizard, optionally takes a ' 
+        'class name as a parameter E.G "cpsc-1010"'
+    )
+    @ext.short_help('Starts the class creation wizard')
+    @ext.example(('class add', 'class add cpsc-1010'))
     async def add(self, ctx, class_name: str = None):
         """
         Command to initiate the new class creation wizard, optionally takes a 
