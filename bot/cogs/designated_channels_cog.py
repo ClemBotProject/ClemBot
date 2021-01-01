@@ -3,6 +3,7 @@ import logging
 import discord
 import discord.ext.commands as commands
 
+import bot.extensions as ext
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.data.designated_channel_repository import DesignatedChannelRepository
 
@@ -10,10 +11,13 @@ log = logging.getLogger(__name__)
 
 class DesignatedChannelsCog(commands.Cog):
 
-    @commands.group(pass_context= True,
-        invoke_without_command= True, 
-        aliases= ['channels'], 
-        case_insensitive=True)
+    @ext.group(case_insensitive=True, invoke_without_command= True, aliases= ['channels'])
+    @ext.long_help(
+        'Designated channels are channels that you can set to for the bot to send a variety of info to ' 
+        'You can register as many channels as youd like to any given category'
+    )
+    @ext.short_help('Designated channel configuration')
+    @ext.example('channel')
     async def channel(self, ctx):
         """
         Sends a formatted embed of the possible designated channels and their listeners to 
@@ -48,14 +52,13 @@ class DesignatedChannelsCog(commands.Cog):
 
     @channel.command(pass_context= True, aliases= ['register','set'])
     @commands.has_guild_permissions(administrator= True)
+    @ext.long_help(
+        'Adds a channel to a given designated channel listing, use the "channel" command to ' 
+        'see a listing of all current and available designated channels'
+    )
+    @ext.short_help('Set a Designated channel')
+    @ext.example('channel add user_join_log #some-channel')
     async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
-        """
-        Command to add a registered TextChannel too a designated channel 
-
-        Args:
-            channel_type (str): Designated channel to add the textchannel too
-            channel (discord.TextChannel): Channel to add
-        """
 
         channel_repo = DesignatedChannelRepository()
 
@@ -88,6 +91,12 @@ class DesignatedChannelsCog(commands.Cog):
 
     @channel.command(pass_context= True, aliases= ['unregister'])
     @commands.has_guild_permissions(administrator= True)
+    @ext.long_help(
+        'Removes a channel from a given designated channel listing, use the "channel" command to ' 
+        'see a listing of all current and available designated channels'
+    )
+    @ext.short_help('Removes a Designated channel listing')
+    @ext.example('channel delete user_join_log #some-channel')
     async def delete(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
         Command to delete a registered TextChannel from a designated channel 

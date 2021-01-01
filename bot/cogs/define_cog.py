@@ -129,7 +129,7 @@ class defineCog(commands.Cog):
                     await ctx.send(embed=embed)
                     return
                         
-                await self.bot.messenger.publish(Events.on_set_pageable,
+                await self.bot.messenger.publish(Events.on_set_pageable_text,
                     embed_name = 'Merriam-Webster Dictionary',
                     field_title = f'Word: {actualWord}',
                     pages = wordPages,

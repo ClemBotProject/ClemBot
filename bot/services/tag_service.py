@@ -50,7 +50,7 @@ class TagService(BaseService):
             pages.append(chunk)
 
         if len(pages) > 1:
-            await self.bot.messenger.publish(Events.on_set_pageable,
+            await self.bot.messenger.publish(Events.on_set_pageable_text,
                     embed_name='Tags Contents',
                     field_title='Contents',
                     pages = pages,
