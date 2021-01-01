@@ -22,7 +22,7 @@ class CustomPrefix:
         else:
             prefixes = self.prefixes[message.guild.id] 
 
-        return commands.when_mentioned_or(*prefixes)(bot, message)
+        return commands.when_mentioned(bot, message) + [prefixes]
         
     async def set_prefix(self, guild: discord.Guild, prefix: t.Tuple[str]):
         log.info(f'Setting custom prefix in guild: {guild.name}({guild.id}) to "{prefix}""')

@@ -18,7 +18,7 @@ class CustomPrefixCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @ext.group(pass_context= True, invoke_without_command=True, aliases= ['prefixs'])
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases= ['prefixs'])
     @ext.long_help(
         'Allows configuring the command prefix that the bot will respond too'
     )

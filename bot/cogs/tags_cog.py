@@ -38,7 +38,7 @@ class TagCog(commands.Cog):
         self._cd = commands.CooldownMapping.from_cooldown(1.0, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
 
     
-    @ext.group(invoke_without_command= True, aliases=['tags'])
+    @ext.group(invoke_without_command= True, aliases=['tags'], case_insensitive=True)
     @ext.long_help(
         'Lists all the possible tags in the current server' 
         'tags are invoked with the command notation $<tag_name> anywhere in a message'
@@ -118,7 +118,7 @@ class TagCog(commands.Cog):
             embed = discord.Embed(title= f'Error: Tag "{name}" already exists in this server', color=Colors.Error)
             await ctx.send(embed=embed)
             return
-            
+  
         tag = Tag(name, content, datetime.utcnow(), ctx.guild.id, ctx.author.id)
         await TagRepository().insert_tag(tag)
 
@@ -178,13 +178,14 @@ class TagCog(commands.Cog):
         tag = await repo.get_tag(name, ctx.guild.id)
 
         author = self.bot.get_user(tag['fk_UserId'])
-
+        
         embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
         embed.add_field(name='Name ', value=tag['name'])
         embed.add_field(name='Content ', value=tag['content'])
+        embed.add_field(name='Uses ', value=tag['useCount'], inline=False)
         fullNameGet = self.get_full_name(author)
-        embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
         embed.add_field(name='Creation Date: ', value=tag['CreationDate'], inline=False)
+        embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
 
         await ctx.send(embed=embed)
 

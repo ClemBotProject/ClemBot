@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 from bot.errors import ConfigAccessError
 
@@ -29,7 +30,8 @@ class BotSecrets:
         self._bot_prefix = None
         self._gifMe_token = None
         self._repl_url = None
-        self._github_url = None 
+        self._github_url = None
+        self._merriam_key = None 
 
     @property
     def client_token(self) -> str:
@@ -91,7 +93,7 @@ class BotSecrets:
     @property
     def database_name(self) -> str:
         if not self._database_name:
-            raise ConfigAccessError(f'database_name has not been intialized')
+            return 'ClemBot'
         return self._database_name
 
     @database_name.setter
@@ -103,7 +105,7 @@ class BotSecrets:
     @property
     def bot_prefix(self) -> str:
         if not self._bot_prefix:
-            raise ConfigAccessError(f'bot_prefix has not been intialized')
+            return '!'
         return self._bot_prefix
 
     @bot_prefix.setter
@@ -127,7 +129,7 @@ class BotSecrets:
     @property
     def github_url(self) -> str:
         if not self._github_url:
-            raise ConfigAccessError(f'github_url has not been intialized')
+            return 'https://github.com/ClemsonCPSC-Discord/ClemBot'
         return self._github_url
 
     @github_url.setter
@@ -148,16 +150,43 @@ class BotSecrets:
         if self._repl_url:
             raise ConfigAccessError(f'repl_url has already been initialized')
         self._repl_url = value
+    
+    @property
+    def merriam_key(self) -> str:
+        if not self._merriam_key:
+            raise ConfigAccessError(f'merriam_key has not been intialized')
+        return self._merriam_key
 
-    def load_secrets(self, lines: str) -> None:
+    @merriam_key.setter
+    def merriam_key(self, value: str) -> None:
+        if self._merriam_key:
+            raise ConfigAccessError(f'merriam_key has already been initialized')
+        self._merriam_key = value
+
+    def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
-        
+
         self.client_token = secrets['ClientToken']
         self.client_secret = secrets['ClientSecret']
         self.bot_token = secrets['BotToken']
-        self.database_name = secrets['DatabaseName'] or 'ClemBot'
-        self.bot_prefix = secrets['BotPrefix'] or '!'
+        self.database_name = secrets['DatabaseName']
+        self.bot_prefix = secrets['BotPrefix']
         self.gif_me_token = secrets['GifMeToken']
         self.repl_url = secrets['ReplUrl']
-        self.github_url = secrets['GithubSourceUrl'] or 'https://github.com/ClemsonCPSC-Discord/ClemBot'
+        self.github_url = secrets['GithubSourceUrl'] 
+        self.merriam_key = secrets['MerriamKey']
+
+    def load_production_secrets(self) -> None:
+
+        self.client_token = os.environ.get('CLIENT_TOKEN')
+        self.client_secret = os.environ.get('CLIENT_SECRET')
+        self.bot_token = os.environ.get('BOT_TOKEN')
+        self.database_name = os.environ.get('DATABASE_NAME') 
+        self.bot_prefix = os.environ.get('BOT_PREFIX')
+        self.gif_me_token = os.environ.get('GIF_ME_TOKEN') 
+        self.repl_url = os.environ.get('REPL_URL')
+        self.github_url = os.environ.get('GITHUB_URL') 
+        self.merriam_key = os.environ.get('MERRIAM_KEY')
+
+        log.info('Production keys loaded')

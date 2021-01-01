@@ -67,7 +67,7 @@ class ManageClassesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.group(pass_context= True, aliases=['class'])
+    @ext.group(pass_context= True, aliases=['class'], case_insensitive=True)
     @ext.long_help(
         'Command group for the manage classes functionality' 
     )
@@ -263,7 +263,7 @@ class ManageClassesCog(commands.Cog):
         try:
             role = await commands.converter.RoleConverter().convert(ctx, class_repr.role)
         except:
-            role = await ctx.guild.create_role(name=class_repr.role, mentionable=True)
+            role = await ctx.guild.create_role(name=class_repr.role, mentionable=False)
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
     @classes.command(pass_context= True, aliases= ['delete'])

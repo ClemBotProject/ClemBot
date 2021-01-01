@@ -6,7 +6,12 @@ class Colors:
     Error = 0xE20000
     ClemsonOrange = 0xF56600
 
-class DesignatedChannels(Enum):
+class DesignatedChannelBase(Enum):
+    @staticmethod
+    def has(member: str) -> bool:
+        return member in DesignatedChannels.__members__
+
+class DesignatedChannels(DesignatedChannelBase):
     """Enum that defines possible designated channels for the bot to use"""
 
     message_log = auto()
@@ -14,6 +19,15 @@ class DesignatedChannels(Enum):
     error_log = auto()
     startup_log = auto()
     user_join_log = auto()
+    starboard = auto()
+class OwnerDesignatedChannels(DesignatedChannelBase):
+
+    server_join_log = auto()
+
+    @staticmethod
+    def has(member: str) -> bool:
+        return member in DesignatedChannels.__members__
 
 class DiscordLimits:
     MessageLength = 1900
+    EmbedFieldLength = 900

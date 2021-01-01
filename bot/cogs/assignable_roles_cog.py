@@ -19,7 +19,7 @@ class AssignableRolesCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
     
-    @ext.group(invoke_without_command= True, aliases= ['role'])
+    @ext.group(invoke_without_command= True, aliases= ['role'], case_insensitive=True)
     @ext.long_help('Lists all roles that have been marked as assignable in this server')
     @ext.short_help('Defines custom assignable roles')
     @ext.example('roles')

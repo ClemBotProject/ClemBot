@@ -15,7 +15,7 @@ class WelcomeMessageCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @ext.group(pass_context= True, invoke_without_command= True)
+    @ext.group(case_insensitive=True, invoke_without_command= True)
     @commands.has_guild_permissions(administrator= True)
     @ext.long_help(
         'Allows for server admins to set a welcome message to be dmd to every new member'
