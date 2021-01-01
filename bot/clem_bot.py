@@ -42,8 +42,7 @@ class ClemBot(commands.Bot):
         This is where services are loaded and the startup procedures for each service is run
         """
 
-        await self.change_presence(activity=discord.Game(
-            name='Contributors Welcome:\nhttps://github.com/ClemsonCPSC-Discord/ClemBot'))
+        await self.change_presence(activity=discord.Game(name='Run !help'))
 
         await Database(BotSecrets.get_instance().database_name).create_database()
         await self.load_services()
@@ -196,6 +195,10 @@ class ClemBot(commands.Bot):
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
+    
+    async def current_prefix(self, ctx):
+        prefixes = await self.get_prefix(ctx)
+        return prefixes[2]
 
     """
     This is the code to dynamically load all cogs and services defined in the assembly.

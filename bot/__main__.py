@@ -85,11 +85,13 @@ def main():
     ClemBot(
             messenger=messenger, 
             command_prefix=custom_prefix.get_prefix,  # noqa: E126
+            help_command = None,
+            case_insensitive=True,
             max_messages=50000,
             allowed_mentions=mentions,
             intents=intents
         ).run(BotSecrets.get_instance().bot_token)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

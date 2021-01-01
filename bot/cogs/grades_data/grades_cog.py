@@ -2,8 +2,6 @@ import json
 import os
 
 import logging
-import random
-import time
 import collections
 
 import discord
@@ -12,12 +10,13 @@ from bot.messaging.events import Events
 import typing as t
 
 from bot.consts import Colors
+import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 
 MIN_YEAR = 2014
 
-class gradesCog(commands.Cog):
+class GradesCog(commands.Cog):
     special_converted_files = ['2018Fall.csv', '2018Spring.csv'] 
     #these files have special formatting for names 
     #(ie ' "Smith, John William" ' is normal and in these it's simply 'Smith John William' without commas or quotes )
@@ -298,21 +297,20 @@ class gradesCog(commands.Cog):
         return build
         
 
-    @commands.command()
-    async def grades(self, ctx, course, year=MIN_YEAR):
+    @ext.command()
+    @ext.long_help(
         """
         Attempts to give more information about courses @ Clemson.
-
-        USE:
-
-        grades <course title>-<course number> <start year (optional)>
-        EX: !grades cpsc-1010
 
         DISCLAIMER:
         Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
         In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
         *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
         """
+    )
+    @ext.short_help('Attempts to give more information about courses @ Clemson University')
+    @ext.example(('grades cpsc-1010', 'grades cpsc-1010 2017'))
+    async def grades(self, ctx, course, year=MIN_YEAR):
         
         try:
             if str(year) in self.year_list:
@@ -341,11 +339,22 @@ class gradesCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @ext.command()
+    @ext.long_help(
+        """
+        Attempts to give more information about professor's grade distribution @ Clemson.
+
+        DISCLAIMER:
+        Not every professor listed will be at Clemson, this is a tool built for better information but not complete information
+        In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
+        *Course Sections that meet the following conditions are not included: Undergraduate classes with less than 10 students or Graduate classes with less than 5 students. In addition, if a section has all but 1 student making a common grade (example: All but one student makes a "B" in a class), the section is excluded.*
+        """
+    )
+    @ext.short_help('Provides info about a given professor')
+    @ext.example(('grades brian dean', 'grades brian dean false'))
     async def prof(self, ctx, firstName, lastName, detailed: t.Optional[bool] = True):
         # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
         """
-        Attempts to give more information about professor's grade distribution @ Clemson.
 
         USE:
 
@@ -372,7 +381,7 @@ class gradesCog(commands.Cog):
         
         hell = self.get_professor_query(prof_name, detailed)
 
-        await self.bot.messenger.publish(Events.on_set_pageable,
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
                 embed_name = "Professor Grades",
                 field_title = f'Professor {prof_name_caps} has a course average of:',
                 pages=hell[1:],
@@ -382,4 +391,4 @@ class gradesCog(commands.Cog):
         
 
 def setup(bot):
-    bot.add_cog(gradesCog(bot))
+    bot.add_cog(GradesCog(bot))
