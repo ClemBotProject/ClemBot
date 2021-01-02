@@ -5,6 +5,8 @@ import logging
 
 import discord
 import discord.ext.commands as commands
+
+import bot.extensions as ext
 from bot.messaging.events import Events
 from bot.bot_secrets import BotSecrets
 from bot.consts import Colors
@@ -30,8 +32,6 @@ class WeatherCog(commands.Cog):
         # For Converting Wind Degrees to Direction
         # Per http://snowfence.umn.edu/Components/winddirectionanddegrees.htm
         dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
-
-        print(f'\nThis is fine 2\n')
 
         #########################################################
         # Normal Request with Current Conditions + Daily Forecast
@@ -204,7 +204,6 @@ class WeatherCog(commands.Cog):
                     async with aiohttp.request("GET", url, params=queryparams) as response:
                         if (response.status == 200):
                             res_json = await response.json()
-                            print(f'\nThis is fine 1\n')
                             weatherPages, num_hr, num_day = self.getPageData(lat, lon, res_json, city, \
                                 is_cond, is_hr, is_day)
                         
@@ -230,7 +229,7 @@ class WeatherCog(commands.Cog):
                             msg_title += f'{num_day}-Day Forecast'
 
                         await wait_msg.delete()
-                        await self.bot.messenger.publish(Events.on_set_pageable,
+                        await self.bot.messenger.publish(Events.on_set_pageable_text,
                             embed_name = 'OpenWeatherMap Weather',
                             field_title = msg_title,
                             pages = weatherPages,
@@ -245,7 +244,7 @@ class WeatherCog(commands.Cog):
                     return
                 """ 
                 # FOR DEBUGGING. Takes a minute or two for message to display when enabled
-                await self.bot.messenger.publish(Events.on_set_pageable,
+                await self.bot.messenger.publish(Events.on_set_pageable_text,
                     embed_name = 'Geocoding Results',
                     field_title = 'Location',
                     pages = [f'Query: {loc}\n\nLatitude: {lat}\nLongitude: {lon}'],
@@ -261,34 +260,94 @@ class WeatherCog(commands.Cog):
     ##########################
     # USER EXECUTABLE COMMANDS    
     # Current Conditions with Daily Forecast
-    @commands.group(pass_context=True, invoke_without_command=True, aliases=['forecast'])
-    async def weather(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 1, 0, 1)
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['forecast'])
+    @ext.long_help(
+        """
+        This command provides the current weather conditions and daily forecast for a user-specified location, in that order.
+
+        Examples of locations shown below.
+        
+        Note: The format `City, ST` (ST = State Abbreviation) is **not** currently supported.
+        """
+    )
+    @ext.short_help('Provides location-based weather info')
+    @ext.example(('weather <location>', 'weather Clemson', 'weather 29631', 'weather Clemson, South Carolina', \
+        'weather Clemson, SC, USA', 'weather 105 Sikes Hall, Clemson, SC 29634'))
+    async def weather(self, ctx, *, location): # the * is used to "greedily" catch all text after it in the variable "loc"
+        await self.weatherCode(ctx, location, 1, 0, 1)
+
 
     # Current Conditions
     @weather.command(aliases=['conditions', 'current conditions'])
-    async def current(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 1, 0, 0)
-    
+    @ext.long_help(
+        """
+        This sub-command provides the current weather conditions for a user-specified location.
+        
+        Additional examples of locations provided in the `weather` command help message.
+        """
+    )
+    @ext.short_help('Current weather conditions')
+    @ext.example('weather current Clemson')
+    async def current(self, ctx, *, location):
+        await self.weatherCode(ctx, location, 1, 0, 0)
+
+
     # Daily and Hourly Forecasts
-    @weather.command()
-    async def forecast(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 0, 1, 1)
+    @weather.command(aliases=['forecasts'])
+    @ext.long_help(
+        """
+        This sub-command provides the daily and hourly weather forecasts for a user-specified location, in that order.
+        
+        Additional examples of locations provided in the `weather` command help message.
+        """
+    )
+    @ext.short_help('Daily and hourly forecasts')
+    @ext.example('weather forecast Clemson')
+    async def forecast(self, ctx, *, location):
+        await self.weatherCode(ctx, location, 0, 1, 1)
+
 
     # Hourly Forecast
     @weather.command()
-    async def hourly(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 0, 1, 0)
+    @ext.long_help(
+        """
+        This sub-command provides the hourly weather forecast for a user-specified location.
+        
+        Additional examples of locations provided in the `weather` command help message.
+        """
+    )
+    @ext.short_help('Hourly forecast')
+    @ext.example('weather hourly Clemson')
+    async def hourly(self, ctx, *, location):
+        await self.weatherCode(ctx, location, 0, 1, 0)
 
     # Daily Forecast
     @weather.command()
-    async def daily(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 0, 0, 1)
+    @ext.long_help(
+        """
+        This sub-command provides the daily weather forecast for a user-specified location.
+        
+        Additional examples of locations provided in the `weather` command help message.
+        """
+    )
+    @ext.short_help('Daily forecast')
+    @ext.example('weather daily Clemson')
+    async def daily(self, ctx, *, location):
+        await self.weatherCode(ctx, location, 0, 0, 1)
 
     # Current Conditions with Daily and Hourly Forecasts
     @weather.command(aliases=['everything'])
-    async def all(self, ctx, loc):
-        await self.weatherCode(ctx, loc, 1, 1, 1)
+    @ext.long_help(
+        """
+        This sub-command provides the current weather conditions with daily and hourly forecasts for a user-specified location, in that order.
+        
+        Additional examples of locations provided in the `weather` command help message.
+        """
+    )
+    @ext.short_help('Current conditions w/hourly and daily forecast')
+    @ext.example(('weather all Clemson', 'weather everything Clemson'))
+    async def all(self, ctx, *, location):
+        await self.weatherCode(ctx, location, 1, 1, 1)
 
 def setup(bot):
     bot.add_cog(WeatherCog(bot))
