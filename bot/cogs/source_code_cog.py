@@ -29,7 +29,7 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs', 'venv', '__pycache__', 'database', '.git', '.pytest_cache']
+        self.ignored = ['Logs', 'venv', '__pycache__', 'database', '.git', '.pytest_cache', 'bot_env.env']
         self.repo_url = BotSecrets.get_instance().github_url
 
         root = os.getcwd()
@@ -100,7 +100,7 @@ class SourceCodeCog(commands.Cog):
     @ext.example(('source print __main__.py', 'source print __main__.py 10 20'))
     async def print(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
 
-        if file == 'BotSecrets.json':
+        if file == 'BotSecrets.json' or file == 'bot_env.env':
             embed = discord.Embed(title= f'Error: Restricted access', color= Colors.Error)
             await ctx.send(embed= embed)
             return
