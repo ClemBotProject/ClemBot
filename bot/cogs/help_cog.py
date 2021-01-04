@@ -53,7 +53,7 @@ class HelpCog(commands.Cog):
         if len(command.aliases)>0:
             embed.add_field(name='Aliases', value=', '.join(command.aliases))
         
-        com_repr = '\n'.join(self.get_commands_repr(command.commands, prefix))
+        com_repr = '\n'.join(self.get_commands_repr(command.commands, f'{prefix}{command.qualified_name} '))
         embed.add_field(name='Subcommands',value= com_repr or 'No example provided', inline=False)
 
         embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.avatar_url)
@@ -141,7 +141,7 @@ class HelpCog(commands.Cog):
         commands_repr.sort()
         return commands_repr
     
-    def get_example(self, ex, prefix):
+    def get_example(self, ex, prefix, qualified_name: str= None):
         if isinstance(ex, str):
             return f'`{prefix}{ex}`'
         elif isinstance(ex, Iterable):
