@@ -40,8 +40,6 @@ class TagService(BaseService):
         if not tagFound:
             return
             
-        pages = []
-
         tag_str = '\n-------\n'.join(tagsContent)
         pages = []
 
