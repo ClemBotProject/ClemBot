@@ -137,6 +137,9 @@ class ClemBot(commands.Bot):
 
     async def on_raw_reaction_remove(self, reaction) -> None:
         log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+    
+    async def on_member_update(self, before , after):
+        await self.publish_with_error(Events.on_member_update, before, after)
 
     async def publish_with_error(self, *args, **kwargs):
         try:
