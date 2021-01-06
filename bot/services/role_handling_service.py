@@ -17,6 +17,11 @@ class RoleHandlingService(BaseService):
     async def on_role_create(self, role):
         await RoleRepository().add_or_update_role(role, role.guild.id)
 
+    @BaseService.Listener(Events.on_member_update)
+    async def on_member_update(self, before, after: discord.Member):
+        if after.guild.id == 386585461285715968 and not after.pending and before.pending:
+            await after.add_roles(684546202141851708)
+            
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild: discord.Guild):
         await self.insert_roles(guild)
