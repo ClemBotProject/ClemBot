@@ -44,8 +44,9 @@ class TagService(BaseService):
         pages = []
 
         #If length of all tags is greater than the threshold, sends it to the paginate service, otherwise sends as a normal message
-        for chunk in self.chunk_iterable(tag_str, TAG_PAGINATE_THRESHOLD):
-            pages.append(chunk)
+        if len(tagsContent) > 1:
+            for chunk in self.chunk_iterable(tag_str, TAG_PAGINATE_THRESHOLD):
+                pages.append(chunk)
 
         if len(pages) > 1:
             await self.bot.messenger.publish(Events.on_set_pageable_text,
