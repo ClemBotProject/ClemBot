@@ -16,7 +16,7 @@ class RoleHandlingService(BaseService):
     @BaseService.Listener(Events.on_guild_role_create)
     async def on_role_create(self, role):
         await RoleRepository().add_or_update_role(role, role.guild.id)
-    
+
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild: discord.Guild):
         await self.insert_roles(guild)

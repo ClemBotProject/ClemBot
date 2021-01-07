@@ -378,6 +378,20 @@ class EventsMeta(type):
             timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
         """
         return 'on_set_pageable_embed'
+    
+    @property
+    def on_member_update(self, before, after):
+        """
+        This is called when one or more of the following things change:
+
+            status
+            activity
+            nickname
+            roles
+            pending
+        """
+        return 'on_member_update'
+
 
 
 class Events(metaclass= EventsMeta):
