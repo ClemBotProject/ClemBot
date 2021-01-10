@@ -73,7 +73,7 @@ chunk_size = 15
 language_short_code_to_name = {value : key for key, value in language_name_to_short_code.items()}
 
 headers = {
-    'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().translator_subscription_key,
+    'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
     'Ocp-Apim-Subscription-Region': 'global',
     'Content-type': 'application/json',
     'X-ClientTraceId': str(uuid.uuid4())

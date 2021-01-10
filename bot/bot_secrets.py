@@ -32,7 +32,7 @@ class BotSecrets:
         self._repl_url = None
         self._github_url = None
         self._merriam_key = None 
-        self._translator_subscription_key = None
+        self._azure_translate_key = None
 
     @property
     def client_token(self) -> str:
@@ -165,16 +165,16 @@ class BotSecrets:
         self._merriam_key = value
 
     @property
-    def translator_subscription_key(self) -> str:
-        if not self._translator_subscription_key:
-            raise ConfigAccessError(f'translator_subscription_key has not been initialized')
-        return self._translator_subscription_key
+    def azure_translate_key(self) -> str:
+        if not self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has not been initialized')
+        return self._azure_translate_key
     
-    @translator_subscription_key.setter
-    def translator_subscription_key(self, value: str) -> None:
-        if self._translator_subscription_key:
-            raise ConfigAccessError(f'translator_subscription_key has already been initialized')
-        self._translator_subscription_key = value
+    @azure_translate_key.setter
+    def azure_translate_key(self, value: str) -> None:
+        if self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has already been initialized')
+        self._azure_translate_key = value
 
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
@@ -189,7 +189,7 @@ class BotSecrets:
         self.repl_url = secrets['ReplUrl']
         self.github_url = secrets['GithubSourceUrl'] 
         self.merriam_key = secrets['MerriamKey']
-        self.translator_subscription_key = secrets['TranslatorSubscriptionKey']
+        self.azure_translate_key = secrets['AzureTranslateKey']
 
     def load_production_secrets(self) -> None:
 
@@ -202,6 +202,6 @@ class BotSecrets:
         self.repl_url = os.environ.get('REPL_URL')
         self.github_url = os.environ.get('GITHUB_URL') 
         self.merriam_key = os.environ.get('MERRIAM_KEY')
-        self.translator_subscription_key = os.environ.get('TRANSLATOR_SUBSCRIPTION_KEY')
+        self.azure_translate_key = os.environ.get('azure_translate_key')
 
         log.info('Production keys loaded')
