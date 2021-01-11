@@ -87,21 +87,11 @@ class TranslateCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.command()
-    @ext.long_help('Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages?\' to see available languages')
+    @ext.group(case_insensitive=True, invoke_without_command= True)
+    @ext.long_help('Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages\' to see available languages')
     @ext.short_help('Translates words or phrases between two languages')
-    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages?', 'translate Spanish German Como estas?'))
+    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish German Como estas?'))
     async def translate(self, ctx, *input: str):
-        if input[0] == 'languages?':
-            pages = get_language_list(self)
-            await self.bot.messenger.publish(Events.on_set_pageable_text,
-                embed_name='Languages',
-                field_title='Here are the available languages:',
-                pages = pages,
-                author=ctx.author,
-                channel=ctx.channel)
-            return
-
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
         
@@ -109,6 +99,19 @@ class TranslateCog(commands.Cog):
             await self.translate_given_lang(ctx, input)
         else:
             await self.translate_detect_lang(ctx, input)
+
+    @translate.command()
+    @ext.long_help('Shows all available languages to translate between')
+    @ext.short_help('Shows available languages')
+    @ext.example(('translate languages'))
+    async def languages(self, ctx):
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
+            embed_name='Languages',
+            field_title='Here are the available languages:',
+            pages = get_language_list(self),
+            author=ctx.author,
+            channel=ctx.channel)
+        return
     
     async def translate_given_lang(self, ctx, input):
         input_lang = await get_lang_code(self, ctx, input[0])
