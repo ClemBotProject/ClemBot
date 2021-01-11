@@ -63,7 +63,8 @@ class ClemBot(commands.Bot):
             embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
             embed.set_thumbnail(url= self.user.avatar_url)
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
-            await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
+            now = datetime.datetime.now()
+            await LogoutRepository().add_logout_date(now.strftime("%m/%d/%Y, %H:%M:%S"))
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
 
