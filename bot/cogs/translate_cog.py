@@ -88,12 +88,23 @@ class TranslateCog(commands.Cog):
         self.bot = bot
 
     @ext.command()
-    @ext.long_help('Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate')
+    @ext.long_help('Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages?\' to see available languages')
     @ext.short_help('Translates words or phrases between two languages')
-    @ext.example(('translate en spanish Hello', 'translate german Hello'))
+    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages?', 'translate Spanish German Como estas?'))
     async def translate(self, ctx, *input: str):
+        if input[0] == 'languages?':
+            pages = get_language_list(self)
+            await self.bot.messenger.publish(Events.on_set_pageable_text,
+                embed_name='Languages',
+                field_title='Here are the available languages:',
+                pages = pages,
+                author=ctx.author,
+                channel=ctx.channel)
+            return
+
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
+        
         if is_valid_lang_code(input[1]):
             await self.translate_given_lang(ctx, input)
         else:
@@ -106,9 +117,7 @@ class TranslateCog(commands.Cog):
         if input_lang == None or output_lang == None:
             return
 
-        text = ''.join(input[2:])
-
-        params = {}
+        text = ' '.join(input[2:])
 
         log.info(f'Input Lang Code: {input_lang}')
         log.info(f'Output Lang Code: {output_lang}')
@@ -124,7 +133,7 @@ class TranslateCog(commands.Cog):
 
         async with aiohttp.ClientSession() as session:
             async with await session.post(url = TRANSLATE_API_URL, params = params, headers = HEADERS, json = body) as resp: 
-                    response = json.loads(await resp.text())
+                response = json.loads(await resp.text())
 
         log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color = Colors.ClemsonOrange)
@@ -137,9 +146,8 @@ class TranslateCog(commands.Cog):
         if output_lang == None: 
             return
 
-        text = ''
-        for i in input[1:]:
-            text += f'{i} '
+        text = ' '.join(input[1:])
+
         output_lang = await get_lang_code(self, ctx, output_lang)
         log.info(f'Output Lang Code: {output_lang}')
         

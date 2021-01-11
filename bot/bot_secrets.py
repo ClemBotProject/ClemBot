@@ -202,6 +202,6 @@ class BotSecrets:
         self.repl_url = os.environ.get('REPL_URL')
         self.github_url = os.environ.get('GITHUB_URL') 
         self.merriam_key = os.environ.get('MERRIAM_KEY')
-        self.azure_translate_key = os.environ.get('azure_translate_key')
+        self.azure_translate_key = os.environ.get('AZURE_TRANSLATE_KEY')
 
         log.info('Production keys loaded')
