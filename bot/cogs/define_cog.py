@@ -8,6 +8,7 @@ import discord.ext.commands as commands
 from bot.messaging.events import Events
 from bot.bot_secrets import BotSecrets
 from bot.consts import Colors
+import bot.extensions as ext
 
 import json
 import aiohttp
@@ -89,7 +90,13 @@ class defineCog(commands.Cog):
 
         return pages
     
-    @commands.command()
+    @ext.command()
+    @ext.long_help(
+        'Gets the dictionary defintion of any given word'
+    )
+    @ext.short_help('Gets a words definition')
+    @ext.example('define hello')
+
     async def define(self, ctx, word):
         """
         Given a word, find its definition and any other relevant information
