@@ -27,11 +27,12 @@ class ClemBot(commands.Bot):
     as well as the dynamic loading of services and cogs
     """
 
-    def __init__(self, messenger, **kwargs):
+    def __init__(self, messenger, scheduler, **kwargs):
         #this super call is to pass the prefix up to the super class
         super().__init__(**kwargs)
 
         self.messenger = messenger
+        self.scheduler = scheduler
 
         self.load_cogs()
         self.active_services = {}
