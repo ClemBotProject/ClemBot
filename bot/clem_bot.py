@@ -50,7 +50,8 @@ class ClemBot(commands.Bot):
 
         #Send the ready event AFTER services have been loaded so that the designated channel service is there
         embed = discord.Embed(title='Bot Ready', color= Colors.ClemsonOrange)
-        embed.add_field(name= 'Startup Time', value= datetime.datetime.utcnow())
+        time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        embed.add_field(name= 'Startup Time', value=time)
         embed.set_thumbnail(url= self.user.avatar_url)
         await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
 
@@ -60,11 +61,11 @@ class ClemBot(commands.Bot):
         try:
             log.info('Sending shutdown embed')
             embed = discord.Embed(title='Bot Shutting down', color= Colors.ClemsonOrange)
-            embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
+            time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            embed.add_field(name= 'Shutdown Time', value=time)
             embed.set_thumbnail(url= self.user.avatar_url)
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
-            now = datetime.datetime.now()
-            await LogoutRepository().add_logout_date(now.strftime("%m/%d/%Y, %H:%M:%S"))
+            await LogoutRepository().add_logout_date(datetime.datetime.utcnow())
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
 
