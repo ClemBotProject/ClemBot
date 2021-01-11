@@ -12,7 +12,7 @@ from bot.consts import Colors
 
 log = logging.getLogger(__name__)
 
-language_name_to_short_code = {
+LANGUAGE_NAME_TO_SHORT_CODE = {
     "afrikaans": "af",
     "arabic": "ar",
     "bulgarian": "bg",
@@ -69,10 +69,10 @@ language_name_to_short_code = {
     "welsh": "cy",
     "yucatec maya": "yua"
 }
-chunk_size = 15
-language_short_code_to_name = {value : key for key, value in language_name_to_short_code.items()}
+CHUNK_SIZE = 15
+LANGUAGE_SHORT_CODE_TO_NAME = {value : key for key, value in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 
-headers = {
+HEADERS = {
     'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
     'Ocp-Apim-Subscription-Region': 'global',
     'Content-type': 'application/json',
@@ -123,12 +123,12 @@ class TranslateCog(commands.Cog):
         }]
 
         async with aiohttp.ClientSession() as session:
-            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = headers, json = body) as resp: 
+            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = HEADERS, json = body) as resp: 
                     response = json.loads(await resp.text())
 
         log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color = Colors.ClemsonOrange)
-        name = 'Translated to ' + language_short_code_to_name[response[0]['translations'][0]['to']]
+        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
         embed.add_field(name=name, value = response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
         
@@ -153,30 +153,30 @@ class TranslateCog(commands.Cog):
         }]
         
         async with aiohttp.ClientSession() as session:
-            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = headers, json = body) as resp: 
+            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = HEADERS, json = body) as resp: 
                 response = json.loads(await resp.text())
         
         log.info(response[0]['detectedLanguage'])
         log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color = Colors.ClemsonOrange)
-        name = 'Translated to ' + language_short_code_to_name[response[0]['translations'][0]['to']]
+        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
         embed.add_field(name=name, value = response[0]['translations'][0]['text'], inline=False)
         embed.add_field(name='Confidence Level:', value = response[0]['detectedLanguage']['score'], inline=True)
-        embed.add_field(name='Detected Language:', value = language_short_code_to_name[response[0]['detectedLanguage']['language']], inline=True)
+        embed.add_field(name='Detected Language:', value = LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']], inline=True)
         await ctx.send(embed=embed)
         return
 
 def is_valid_lang_code(input: str):
-    return input.lower() in language_short_code_to_name or input.lower() in language_name_to_short_code
+    return input.lower() in LANGUAGE_SHORT_CODE_TO_NAME or input.lower() in LANGUAGE_NAME_TO_SHORT_CODE
 
 async def get_lang_code(self, ctx, input: str):
-    if input.lower() in language_short_code_to_name:
+    if input.lower() in LANGUAGE_SHORT_CODE_TO_NAME:
         return input.lower()
     else: 
         try:
-            return language_name_to_short_code[input.lower()]
+            return LANGUAGE_NAME_TO_SHORT_CODE[input.lower()]
         except KeyError:
-            pages = get_language_list()
+            pages = get_language_list(self)
             await self.bot.messenger.publish(Events.on_set_pageable_text,
                 embed_name='Languages',
                 field_title='Given language \'' + input + '\' not valid. Here are the available languages:',
@@ -184,14 +184,13 @@ async def get_lang_code(self, ctx, input: str):
                 author=ctx.author,
                 channel=ctx.channel)
 
-def get_language_list():
-    languages_dict = []
-    for i in range(0, len(language_name_to_short_code)):
-        languages_dict.append(list(language_name_to_short_code)[i] + ' (' + language_name_to_short_code[list(language_name_to_short_code)[i]] + ')')
-    pages = []
-    for i in range(0, len(languages_dict), chunk_size):
-        pages.append('\n'.join(languages_dict[i:i+chunk_size]))
-    return pages
+def get_language_list(self):
+    langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
+    return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
+
+def chunk_list(self, lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
 
 def setup(bot): 
     bot.add_cog(TranslateCog(bot))
