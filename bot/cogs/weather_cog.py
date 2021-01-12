@@ -17,15 +17,15 @@ import re
 import datetime as dt
 
 log = logging.getLogger(__name__)
-url = "https://api.openweathermap.org/data/2.5/onecall"
-url_Geo = "https://geocode.xyz/"
+URL_WEATHER = "https://api.openweathermap.org/data/2.5/onecall"
+URL_GEO = "https://geocode.xyz/"
 
 class WeatherCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    def getPageData(self, Lat, Lon, res_json, city, is_cond, is_hr, is_day):
+    def getPageData(self, Lat, Lon, res_weather_json, city, is_cond, is_hr, is_day):
         pages = []
         page = ''
 
@@ -40,10 +40,10 @@ class WeatherCog(commands.Cog):
             # FIRST PAGE: Current Conditions
 
             # Current Conditions
-            cond = res_json.get('current',{})
+            cond = res_weather_json.get('current',{})
 
             # Location
-            #city = res_json.get('name',{})
+            #city = res_weather_json.get('name',{})
 
             # Current Temperature
             temp = cond.get('temp',{})
@@ -93,10 +93,10 @@ class WeatherCog(commands.Cog):
 
         for j, req_type in enumerate(req_types):
             if req_type == 'day':
-                forecast = res_json.get('daily',{})
+                forecast = res_weather_json.get('daily',{})
                 num_day = len(forecast)-1
             else:
-                forecast = res_json.get('hourly',{})
+                forecast = res_weather_json.get('hourly',{})
                 num_hr = len(forecast)
 
             for i, val in enumerate(forecast):
@@ -168,7 +168,7 @@ class WeatherCog(commands.Cog):
         loc = re.sub("[^a-zA-Z0-9 ,&_-]+", "", loc)
 
         # Geocoding URL
-        url_GeoAPI = f'{url_Geo}{loc}'
+        url_Geo_API = f'{URL_GEO}{loc}'
 
         self.geocode_api_key = BotSecrets.get_instance().geocode_key
         self.weather_api_key = BotSecrets.get_instance().weather_key
@@ -183,79 +183,91 @@ class WeatherCog(commands.Cog):
 
         # Try Except for catching errors that could give away either API key
         try:
-            async with aiohttp.request("GET", url_GeoAPI, params=geo_queryparams) as response:
-                if (response.status == 200):
-                    res_geo_json = await response.json()
-                    city = res_geo_json.get('standard',{}).get('city',{})
-                    lon = res_geo_json.get('longt',{})
-                    lat = res_geo_json.get('latt',{})
-
-                    queryparams = {
-                        'lat' : lat,
-                        'lon' : lon,
-                        'appid' : self.weather_api_key,
-                        'units' : 'imperial',
-                        'lang' : 'en'
-                        }
-
-                    weatherPages = []
-                    await wait_msg.edit(content='Checking the weather')
-                    
-                    async with aiohttp.request("GET", url, params=queryparams) as response:
-                        if (response.status == 200):
-                            res_json = await response.json()
-                            weatherPages, num_hr, num_day = self.getPageData(lat, lon, res_json, city, \
-                                is_cond, is_hr, is_day)
-                        
-                        else:
-                            embed = discord.Embed(title='OpenWeatherMap Weather', color=Colors.Error)
-                            ErrMsg = f'Error Code: {response.status}'
-                            embed.add_field(name='Error with weather API', value=ErrMsg, inline=False)
-                            await ctx.send(embed=embed)
-                            return
-
-                        # Construct Title Message
-                        msg_title = ''
-                        if is_cond:
-                            msg_title += f'Current Conditions'
-                        if is_cond and (is_hr or is_day):
-                            msg_title += ' with '
-                        
-                        if is_hr and is_day:
-                            msg_title += 'Forecast'
-                        elif is_hr:
-                            msg_title += f'{num_hr}-Hour Forecast'
-                        elif is_day:
-                            msg_title += f'{num_day}-Day Forecast'
-
-                        await wait_msg.delete()
-                        await self.bot.messenger.publish(Events.on_set_pageable_text,
-                            embed_name = 'OpenWeatherMap Weather',
-                            field_title = msg_title,
-                            pages = weatherPages,
-                            author = ctx.author,
-                            channel = ctx.channel)
-                
-                else:
+            async with aiohttp.request("GET", url_Geo_API, params=geo_queryparams) as response:
+                if (response.status != 200):
                     embed = discord.Embed(title='OpenWeatherMap Weather', color=Colors.Error)
                     ErrMsg = f'Error Code: {response.status}'
                     embed.add_field(name='Error with geocode API', value=ErrMsg, inline=False)
                     await ctx.send(embed=embed)
                     return
-                """ 
-                # FOR DEBUGGING. Takes a minute or two for message to display when enabled
-                await self.bot.messenger.publish(Events.on_set_pageable_text,
-                    embed_name = 'Geocoding Results',
-                    field_title = 'Location',
-                    pages = [f'Query: {loc}\n\nLatitude: {lat}\nLongitude: {lon}'],
-                    author = ctx.author,
-                    channel = ctx.channel)
-                """
+                res_geo_json = await response.json()
         except Exception as err:
             err_str = str(err)
             err_str = re.sub(self.geocode_api_key, "CLASSIFIED", err_str)
             err_str = re.sub(self.weather_api_key, "CLASSIFIED", err_str)
             raise Exception(err_str).with_traceback(err.__traceback__)
+        
+        city = res_geo_json.get('standard',{}).get('city',{})
+        lon = res_geo_json.get('longt',{})
+        lat = res_geo_json.get('latt',{})
+
+        queryparams = {
+            'lat' : lat,
+            'lon' : lon,
+            'appid' : self.weather_api_key,
+            'units' : 'imperial',
+            'lang' : 'en'
+            }
+
+        weatherPages = []
+        await wait_msg.edit(content='Checking the weather')
+        
+        try:
+            async with aiohttp.request("GET", URL_WEATHER, params=queryparams) as response:
+                if (response.status != 200):
+                    embed = discord.Embed(title='OpenWeatherMap Weather', color=Colors.Error)
+                    ErrMsg = f'Error Code: {response.status}'
+                    embed.add_field(name='Error with weather API', value=ErrMsg, inline=False)
+                    await ctx.send(embed=embed)
+                    return
+                res_weather_json = await response.json()
+        except Exception as err:
+            err_str = str(err)
+            err_str = re.sub(self.geocode_api_key, "CLASSIFIED", err_str)
+            err_str = re.sub(self.weather_api_key, "CLASSIFIED", err_str)
+            raise Exception(err_str).with_traceback(err.__traceback__)
+
+        weatherPages, num_hr, num_day = self.getPageData(
+            lat,
+            lon,
+            res_weather_json,
+            city,
+            is_cond,
+            is_hr,
+            is_day)
+        
+        # Construct Title Message
+        msg_title = ''
+        if is_cond:
+            msg_title += f'Current Conditions'
+        if is_cond and (is_hr or is_day):
+            msg_title += ' with '
+        
+        if is_hr and is_day:
+            msg_title += 'Forecast'
+        elif is_hr:
+            msg_title += f'{num_hr}-Hour Forecast'
+        elif is_day:
+            msg_title += f'{num_day}-Day Forecast'
+
+        await wait_msg.delete()
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
+            embed_name = 'OpenWeatherMap Weather',
+            field_title = msg_title,
+            pages = weatherPages,
+            author = ctx.author,
+            channel = ctx.channel)
+
+        """ 
+        # FOR DEBUGGING. Takes a minute or two for message to display when enabled
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
+            embed_name = 'Geocoding Results',
+            field_title = 'Location',
+            pages = [f'Query: {loc}\n\nLatitude: {lat}\nLongitude: {lon}'],
+            author = ctx.author,
+            channel = ctx.channel)
+        """
+    
 
     ##########################
     # USER EXECUTABLE COMMANDS    
