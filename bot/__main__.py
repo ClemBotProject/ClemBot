@@ -10,6 +10,7 @@ import discord
 from bot.bot_secrets import BotSecrets
 from bot.clem_bot import ClemBot as ClemBot
 from bot.custom_prefix import CustomPrefix
+from bot.utils.scheduler import Scheduler
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
 
@@ -77,15 +78,19 @@ def main():
     #enable privileged member gateway intents
     intents = discord.Intents.default()
     intents.members = True
-                        
+
+    #Create the scheduler for injection into the bot instance
+    scheduler = Scheduler()
+
     #set allowed mentions
     mentions = discord.AllowedMentions(everyone=False, roles=False)
 
     bot_log.info('Bot Starting Up')
     ClemBot(
             messenger=messenger, 
+            scheduler=scheduler,
             command_prefix=custom_prefix.get_prefix,  # noqa: E126
-            help_command = None,
+            help_command=None,
             case_insensitive=True,
             max_messages=50000,
             allowed_mentions=mentions,

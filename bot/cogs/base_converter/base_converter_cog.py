@@ -2,13 +2,20 @@ import discord
 import discord.ext.commands as commands
 
 from bot.consts import Colors
+import bot.extensions as ext
 
 class BaseConverterCog(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot = bot
 
-    @commands.group(pass_context= True, invoke_without_command= True, aliases= ['convert','baseconvert'])
+    @ext.group(pass_context= True, invoke_without_command= True, aliases= ['convert','baseconvert'])
+    @ext.long_help(
+        'A simple base converter that takes in a base number an a value, ' 
+        'then displays the value in binary, octal, decimal, and hexadecimal'
+    )
+    @ext.short_help('Mathematic base converter')
+    @ext.example(('bconvert bin 11', 'bconvert hex 0xff'))
     async def bconvert(self, ctx) -> None:
         """
         A simple base converter that takes in a base number an a value, then displays the value in binary, octal, decimal, and hexadecimal

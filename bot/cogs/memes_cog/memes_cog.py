@@ -10,9 +10,10 @@ import typing as t
 import discord
 import discord.ext.commands as commands
 from PIL import Image, ImageDraw, ImageSequence, ImageFont
-from bot.messaging.events import Events
 
+from bot.messaging.events import Events
 from bot.consts import Colors
+import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 MAX_WALDO_GRID_SIZE = 100
@@ -47,7 +48,12 @@ class MemesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
+    @ext.command()
+    @ext.long_help(
+        'A fun command to generate a pseudo bubblewrap effect in discord' 
+    )
+    @ext.short_help('Creates bubblewrap!')
+    @ext.example('bubblewrap')
     async def bubblewrap(self, ctx):
 
         msg = ''
@@ -59,6 +65,12 @@ class MemesCog(commands.Cog):
         await ctx.send(msg)
 
     @commands.command()
+    @ext.long_help(
+        'A fun command to generate a wheres waldo effect in discord, see if you can find him first!' 
+        'Optionally takes a size parameter to make it easier or harder'
+    )
+    @ext.short_help('Can you find him?')
+    @ext.example(('waldo', 'waldo 10'))
     async def waldo(self, ctx, size=MAX_WALDO_GRID_SIZE):
 
         """
@@ -93,6 +105,11 @@ class MemesCog(commands.Cog):
         await ctx.send(msg)
 
     @commands.command()
+    @ext.long_help(
+        'A fun command to spongebob meme text in discord' 
+    )
+    @ext.short_help('sO yOu doNt KnOw wHat tHiS Is?')
+    @ext.example('spongebob hello world')
     async def spongebob(self, ctx, *, args):
 
         """
@@ -125,8 +142,13 @@ class MemesCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['rave', '🦀'])
+    @ext.command(aliases=['rave', '🦀'])
     @commands.cooldown(1, CRAB_COMMAND_COOLDOWN, commands.BucketType.guild)
+    @ext.long_help(
+        'A fun command to generate a crab rave gif with specified text overlay'
+    )
+    @ext.short_help('Generates a crab rave gif')
+    @ext.example('crab hello from crab world')
     async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
         """
         Create your own crab rave.
@@ -165,7 +187,7 @@ class MemesCog(commands.Cog):
         await wait_msg.delete()
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
-    @commands.command(aliases = ['ctray','trayforjay'])
+    @ext.command(hidden=True, aliases = ['ctray','trayforjay'])
     async def cookouttray(self, ctx, input):
         """
         For those who do finances with cookout trays, we proudly present the command for you

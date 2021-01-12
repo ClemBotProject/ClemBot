@@ -27,11 +27,12 @@ class ClemBot(commands.Bot):
     as well as the dynamic loading of services and cogs
     """
 
-    def __init__(self, messenger, **kwargs):
+    def __init__(self, messenger, scheduler, **kwargs):
         #this super call is to pass the prefix up to the super class
         super().__init__(**kwargs)
 
         self.messenger = messenger
+        self.scheduler = scheduler
 
         self.load_cogs()
         self.active_services = {}
@@ -49,7 +50,8 @@ class ClemBot(commands.Bot):
 
         #Send the ready event AFTER services have been loaded so that the designated channel service is there
         embed = discord.Embed(title='Bot Ready', color= Colors.ClemsonOrange)
-        embed.add_field(name= 'Startup Time', value= datetime.datetime.utcnow())
+        time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        embed.add_field(name= 'Startup Time', value=time)
         embed.set_thumbnail(url= self.user.avatar_url)
         await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
 
@@ -59,7 +61,8 @@ class ClemBot(commands.Bot):
         try:
             log.info('Sending shutdown embed')
             embed = discord.Embed(title='Bot Shutting down', color= Colors.ClemsonOrange)
-            embed.add_field(name= 'Shutdown Time', value= datetime.datetime.utcnow())
+            time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            embed.add_field(name= 'Shutdown Time', value=time)
             embed.set_thumbnail(url= self.user.avatar_url)
             await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
             await LogoutRepository().add_logout_date(datetime.datetime.utcnow())

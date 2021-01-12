@@ -8,6 +8,7 @@ import discord.ext.commands as commands
 
 from bot.clem_bot import BotSecrets
 from bot.consts import Colors
+import bot.extensions as ext
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
@@ -17,7 +18,12 @@ class GifMeCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['gif'])
+    @ext.command(aliases=['gif'])
+    @ext.long_help(
+        'Gets a random gif from giphy' 
+    )
+    @ext.short_help('shows a random gif')
+    @ext.example('gifme')
     async def gifme(self, ctx, *args):
 
         params = {

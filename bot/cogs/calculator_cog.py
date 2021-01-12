@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 
 from bot.errors import ParserError
 from bot.consts import Colors
+import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +22,12 @@ class CalculatorCog(commands.Cog):
             {'symbol': "^", 'precedence': 2, 'assoc': "R"},
         ]
 
-    @commands.command()
+    @ext.command()
+    @ext.long_help(
+        'Native calculator in discord to evaluate any arbitrary mathematical epxressions'
+    )
+    @ext.short_help('Does your math for you')
+    @ext.example(('calc 1+1', 'calc 10/20'))
     async def calc(self, ctx, *args):
         """
         A simple calculator that supports pemdas.

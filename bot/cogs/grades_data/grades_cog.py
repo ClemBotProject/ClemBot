@@ -351,7 +351,7 @@ class GradesCog(commands.Cog):
         """
     )
     @ext.short_help('Provides info about a given professor')
-    @ext.example(('grades brian dean', 'grades brian dean false'))
+    @ext.example(('prof brian dean', 'prof brian dean false'))
     async def prof(self, ctx, firstName, lastName, detailed: t.Optional[bool] = True):
         # Should not need a min year as professors hardly change a significant amount to be noteworthy (Exception: SP 2020 -- we ignore those dark times)
         """
