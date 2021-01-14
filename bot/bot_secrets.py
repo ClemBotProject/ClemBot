@@ -32,6 +32,7 @@ class BotSecrets:
         self._repl_url = None
         self._github_url = None
         self._merriam_key = None 
+        self._azure_translate_key = None
 
     @property
     def client_token(self) -> str:
@@ -163,6 +164,18 @@ class BotSecrets:
             raise ConfigAccessError(f'merriam_key has already been initialized')
         self._merriam_key = value
 
+    @property
+    def azure_translate_key(self) -> str:
+        if not self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has not been initialized')
+        return self._azure_translate_key
+    
+    @azure_translate_key.setter
+    def azure_translate_key(self, value: str) -> None:
+        if self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has already been initialized')
+        self._azure_translate_key = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
@@ -176,6 +189,7 @@ class BotSecrets:
         self.repl_url = secrets['ReplUrl']
         self.github_url = secrets['GithubSourceUrl'] 
         self.merriam_key = secrets['MerriamKey']
+        self.azure_translate_key = secrets['AzureTranslateKey']
 
     def load_production_secrets(self) -> None:
 
@@ -188,5 +202,6 @@ class BotSecrets:
         self.repl_url = os.environ.get('REPL_URL')
         self.github_url = os.environ.get('GITHUB_URL') 
         self.merriam_key = os.environ.get('MERRIAM_KEY')
+        self.azure_translate_key = os.environ.get('AZURE_TRANSLATE_KEY')
 
         log.info('Production keys loaded')
