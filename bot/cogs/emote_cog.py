@@ -1,7 +1,9 @@
 import logging
 
 import discord
+import aiohttp
 import discord.ext.commands as commands
+from discord.ext.commands.errors import BadArgument
 
 import bot.extensions as ext
 from bot.consts import Colors
@@ -19,8 +21,14 @@ class EmoteCog(commands.Cog):
 
     @emote.command()
     @commands.has_guild_permissions(manage_emojis=True)
-    async def add(self, ctx: commands.Context, emote: discord.Emoji, name: str):
-        emote = await ctx.guild.create_custom_emoji(name=name, image=await emote.url.read())
+    async def add(self, ctx: commands.Context, emote, name: str):
+
+        emote_id = emote.split(':')[2][:-1]
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp:
+                test = await resp.read()
+
+        emote = await ctx.guild.create_custom_emoji(name=name, image=test)
 
         log.info(f'Emote added in guild: {ctx.guild.id}, name: {emote.name}, by: {ctx.author.id}')
 
