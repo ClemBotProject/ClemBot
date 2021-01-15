@@ -141,9 +141,9 @@ class OwnerCog(commands.Cog):
         await msg.delete()
         await ctx.send(embed=embed)
 
-    @owner.group(invoke_without_command=True, aliases=['db'])
+    @owner.group(invoke_without_command=True, aliases=['eval'])
     @commands.is_owner()
-    async def database(self, ctx):
+    async def eval_bot(self, ctx):
         pass
 
     @owner.group(invoke_without_command=True)
@@ -161,9 +161,14 @@ class OwnerCog(commands.Cog):
             for c in chunks:
                 await ctx.send(f'```{c}```')
 
-    @database.command()
+    @eval_bot.command()
     @commands.is_owner()
-    async def eval(self, ctx, *, query):
+    async def bot(self, ctx, *, code):
+        await ctx.send(eval(code))
+
+    @eval_bot.command(aliases=['db'])
+    @commands.is_owner()
+    async def database(self, ctx, *, query):
         """Runs arbitrary sql queries on the db in readonly mode and returns the results"""
 
         database_name = BotSecrets.get_instance().database_name
