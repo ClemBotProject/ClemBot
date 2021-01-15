@@ -14,7 +14,6 @@ class DesignatedChannels(DesignatedChannelBase):
 
     message_log = auto()
     moderation_log = auto()
-    error_log = auto()
     startup_log = auto()
     user_join_log = auto()
     user_leave_log = auto()
@@ -26,6 +25,7 @@ class DesignatedChannels(DesignatedChannelBase):
 class OwnerDesignatedChannels(DesignatedChannelBase):
 
     server_join_log = auto()
+    error_log = auto()
 
     @staticmethod
     def has(member: str) -> bool:
