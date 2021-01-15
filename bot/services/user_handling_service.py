@@ -22,6 +22,11 @@ class UserHandlingService(BaseService):
         await self.add_user(user, user.guild.id)
         await self.notify_user_join(user)
 
+    @BaseService.Listener(Events.on_user_removed)
+    async def on_user_removed(self, user) -> None:
+        log.info(f'"{user.name}:{user.id}" has left guild "{user.guild.name}:{user.guild.id}"')
+        await self.notify_user_remove(user)
+
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild):
         await self.load_users(guild)
@@ -38,6 +43,18 @@ class UserHandlingService(BaseService):
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                 DesignatedChannels.user_join_log, 
+                user.guild.id, 
+                embed)
+
+    async def notify_user_remove(self, user: discord.Member):
+        embed = discord.Embed(title='Guild User Left', color=Colors.Error)
+        embed.add_field(name='Username', value=self.get_full_name(user))
+        embed.add_field(name='Account Creation date', value=user.created_at.date())
+        embed.set_thumbnail(url= user.avatar_url_as(static_format= 'png'))
+        embed.set_footer(text=datetime.datetime.now().date())
+
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                DesignatedChannels.user_leave_log, 
                 user.guild.id, 
                 embed)
 

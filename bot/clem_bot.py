@@ -110,6 +110,9 @@ class ClemBot(commands.Bot):
     async def on_member_join(self, user):
         await self.publish_with_error(Events.on_user_joined, user)
 
+    async def on_member_remove(self, user):
+        await self.publish_with_error(Events.on_user_removed, user)
+
     async def on_message_edit(self, before, after):
         if before.author.id != self.user.id and len(before.embeds) == 0:
             await self.publish_with_error(Events.on_message_edit, before, after)
