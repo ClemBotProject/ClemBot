@@ -72,14 +72,6 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
 CHUNK_SIZE = 15
 LANGUAGE_SHORT_CODE_TO_NAME = {value : key for key, value in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 
-HEADERS = {
-    'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
-    'Ocp-Apim-Subscription-Region': 'global',
-    'Content-type': 'application/json',
-    'X-ClientTraceId': str(uuid.uuid4())
-}
-
-
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
 class TranslateCog(commands.Cog):
@@ -134,8 +126,15 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
 
+        headers = {
+                        'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
+                        'Ocp-Apim-Subscription-Region': 'global',
+                        'Content-type': 'application/json',
+                        'X-ClientTraceId': str(uuid.uuid4())
+                    }
+
         async with aiohttp.ClientSession() as session:
-            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = HEADERS, json = body) as resp: 
+            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = headers, json = body) as resp: 
                 response = json.loads(await resp.text())
 
         log.info(response[0]['translations'])
@@ -163,8 +162,15 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
         
+        headers = {
+                        'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
+                        'Ocp-Apim-Subscription-Region': 'global',
+                        'Content-type': 'application/json',
+                        'X-ClientTraceId': str(uuid.uuid4())
+                    }
+
         async with aiohttp.ClientSession() as session:
-            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = HEADERS, json = body) as resp: 
+            async with await session.post(url = TRANSLATE_API_URL, params = params, headers = headers, json = body) as resp: 
                 response = json.loads(await resp.text())
         
         log.info(response[0]['detectedLanguage'])
