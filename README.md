@@ -49,6 +49,9 @@ A Discord bot for server and community management with a focus on school/program
    
    - <b>Meme Generator:</b>  SpongeBob text, Crab raves, wheres waldo and more. only one way to find all of them!!
    
+   - <b>Weather Forecasts:<b> Clembot supports weather forecasts from anywhere in the world, simply run `!weather <location>` to get a full 7 day forecast for your area
+  
+   - <b>Translation:<b> Leveraging Azure translation services Clembot supports over 50 langauges world wide for instant translation!
    - <b>Moderation:</b>  Coming soon!!!
    
    and so much more
