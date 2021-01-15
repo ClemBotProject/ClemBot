@@ -12,7 +12,7 @@ from discord.ext import commands
 import bot.cogs as cogs
 import bot.services as services
 from bot.bot_secrets import BotSecrets
-from bot.consts import Colors, DesignatedChannels
+from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels
 from bot.data.database import Database
 from bot.data.logout_repository import LogoutRepository
 from bot.messaging.events import Events
@@ -200,7 +200,7 @@ class ClemBot(commands.Bot):
                 field_name = 'Traceback' if i == 0 else 'Continued'
                 embed.add_field(name= field_name, value= f'```{field}```', inline= False)
 
-            await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.error_log, embed)
+            await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.error_log, embed)
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
