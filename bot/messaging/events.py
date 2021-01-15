@@ -202,15 +202,15 @@ class EventsMeta(type):
         return '_on_user_joined'
 
     @property
-    def on_user_left(self):
+    def on_user_removed(self):
         """
         Published whenever a user leaves a guild
         
         Args:
 
-            user (User) – The user who joined or left.
+            user (User) – The user who was removed or left.
         """
-        return '_on_user_left'
+        return '_on_user_removed'
 
     @property
     def on_user_update(self):

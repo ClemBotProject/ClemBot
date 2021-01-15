@@ -17,6 +17,7 @@ class DesignatedChannels(DesignatedChannelBase):
     error_log = auto()
     startup_log = auto()
     user_join_log = auto()
+    user_leave_log = auto()
     starboard = auto()
 
     @staticmethod

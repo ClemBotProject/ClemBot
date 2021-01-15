@@ -34,6 +34,8 @@ class BotSecrets:
         self._merriam_key = None
         self._weather_key = None
         self._geocode_key = None
+        self._merriam_key = None 
+        self._azure_translate_key = None
 
     @property
     def client_token(self) -> str:
@@ -189,6 +191,18 @@ class BotSecrets:
             raise ConfigAccessError(f'geocode_key has already been initialized')
         self._geocode_key = value
 
+    @property
+    def azure_translate_key(self) -> str:
+        if not self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has not been initialized')
+        return self._azure_translate_key
+    
+    @azure_translate_key.setter
+    def azure_translate_key(self, value: str) -> None:
+        if self._azure_translate_key:
+            raise ConfigAccessError(f'azure_translate_key has already been initialized')
+        self._azure_translate_key = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
@@ -204,6 +218,7 @@ class BotSecrets:
         self.merriam_key = secrets['MerriamKey']
         self.weather_key = secrets['WeatherKey']
         self.geocode_key = secrets['GeocodeKey']
+        self.azure_translate_key = secrets['AzureTranslateKey']
 
     def load_production_secrets(self) -> None:
 
@@ -218,5 +233,6 @@ class BotSecrets:
         self.merriam_key = os.environ.get('MERRIAM_KEY')
         self.weather_key = os.environ.get('WEATHER_KEY')
         self.geocode_key = os.environ.get('GEOCODE_KEY')
+        self.azure_translate_key = os.environ.get('AZURE_TRANSLATE_KEY')
 
         log.info('Production keys loaded')
