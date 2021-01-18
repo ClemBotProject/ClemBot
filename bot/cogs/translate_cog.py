@@ -74,6 +74,8 @@ LANGUAGE_SHORT_CODE_TO_NAME = {value : key for key, value in LANGUAGE_NAME_TO_SH
 
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
+TRACE_ID = str(uuid.uuid4())
+
 class TranslateCog(commands.Cog):
 
     def __init__(self, bot):
@@ -130,7 +132,7 @@ class TranslateCog(commands.Cog):
                         'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
                         'Ocp-Apim-Subscription-Region': 'global',
                         'Content-type': 'application/json',
-                        'X-ClientTraceId': str(uuid.uuid4())
+                        'X-ClientTraceId': TRACE_ID
                     }
 
         async with aiohttp.ClientSession() as session:
@@ -166,7 +168,7 @@ class TranslateCog(commands.Cog):
                         'Ocp-Apim-Subscription-Key': BotSecrets.get_instance().azure_translate_key,
                         'Ocp-Apim-Subscription-Region': 'global',
                         'Content-type': 'application/json',
-                        'X-ClientTraceId': str(uuid.uuid4())
+                        'X-ClientTraceId': TRACE_ID
                     }
 
         async with aiohttp.ClientSession() as session:
