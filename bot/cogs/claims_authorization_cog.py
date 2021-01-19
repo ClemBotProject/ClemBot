@@ -120,7 +120,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         claims.sort()
         claims_str = '\n'.join(claims) if claims else 'No available claims'
 
-        embed = discord.Embed(title='Available Claims', color=Colors.ClemsonOrange, description=f'```{claims_str}```')
+        embed = discord.Embed(title='Available Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
  
         await ctx.send(embed=embed)
