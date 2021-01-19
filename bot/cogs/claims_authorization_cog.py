@@ -52,9 +52,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     
     def _build_claims_embed(self, ctx, claims) -> discord.Embed:
 
-        claims = list(claims)
-        claims.sort()
-        claims_str = '\n'.join(claims) if claims else 'No current claims'
+        claims_str = '\n'.join(sorted(list(claims))) if claims else 'No current claims'
 
         embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
