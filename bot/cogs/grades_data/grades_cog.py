@@ -393,10 +393,9 @@ class GradesCog(commands.Cog):
                 # the error case is a return of the original name
                 if name != prof_name_caps:
                     temp_append_of_name += name + "\n"
-            if len(temp_append_of_name) > 0:
-                result += '\nDid you mean:\n'
-                result += temp_append_of_name
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
+            if len(temp_append_of_name) > 0:
+                embed.add_field(name="\nDid you mean:", value=temp_append_of_name, inline=False)
             await ctx.send(embed=embed)
             return
         
