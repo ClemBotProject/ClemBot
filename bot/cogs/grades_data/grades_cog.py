@@ -392,7 +392,7 @@ class GradesCog(commands.Cog):
             for name in self.spellChecker.candidates(prof_name_caps):
                 # the error case is a return of the original name
                 if name != prof_name_caps:
-                    temp_append_of_name += name
+                    temp_append_of_name += name + "\n"
             if len(temp_append_of_name) > 0:
                 result += '\nDid you mean:\n'
                 result += temp_append_of_name
