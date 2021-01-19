@@ -84,8 +84,8 @@ class ClemBot(commands.Bot):
             #Author has valid claims
             return
         
-        claims_str = '\n'.join(c.name for c in command.claims)
-        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```{claims_str}```')
+        claims_str = '\n'.join(command.claims)
+        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
 
 
     async def close(self) -> None:
