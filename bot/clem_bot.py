@@ -75,7 +75,7 @@ class ClemBot(commands.Bot):
 
         if author.guild_permissions.administrator:
             #Admins have full bot access no matter what
-            return
+            #return
             pass
 
         claims = await repo.fetch_all_claims_user(author)

@@ -69,7 +69,7 @@ def required_claims(*claims):
     def wrapper(func):
         if any(not isinstance(c, Claims) for c in claims):
             raise BadArgument('All required claims must be of type <Enum "Claim">')
-        set_claims = set(claims)
+        set_claims = set(c.name for c in claims)
         if isinstance(func, ExtBase):
             func.claims.update(set_claims)
         else:
@@ -103,6 +103,7 @@ class ExtBase:
 
         #check for intersection of two sets of claims, if there is one we have a valid user
         return len(set(claims).intersection(self.claims)) > 0
+
 
 class ClemBotCommand(discord.ext.commands.Command, ExtBase):
 
