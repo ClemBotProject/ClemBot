@@ -151,12 +151,6 @@ class TagCog(commands.Cog):
         if ctx.author.guild_permissions.administrator:
             await self._delete_tag(name, ctx)
             return
-
-        if tag['fk_UserId'] != ctx.author.id:
-            embed = discord.Embed(title= f'Error: Tag {name} is not owned by {self.get_full_name(ctx.author)}',
-                color=Colors.Error)
-            await ctx.send(embed=embed)
-            return
         
         await self._delete_tag(name, ctx)
 
