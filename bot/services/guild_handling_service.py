@@ -1,10 +1,9 @@
-from bot.consts import OwnerDesignatedChannels
 import logging
 
 import discord
 
+from bot.consts import Colors, OwnerDesignatedChannels
 from bot.data.guild_repository import GuildRepository
-from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
