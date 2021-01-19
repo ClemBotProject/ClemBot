@@ -5,7 +5,7 @@ from discord import colour
 import discord.ext.commands as commands
 
 from bot.data.welcome_message_repository import WelcomeMessageRepository
-from bot.consts import Colors
+from bot.consts import Colors, Claims
 import bot.extensions as ext
 
 log = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class WelcomeMessageCog(commands.Cog):
         self.bot = bot
     
     @ext.group(case_insensitive=True, invoke_without_command= True)
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.welcome_message_view)
     @ext.long_help(
         'Allows for server admins to set a welcome message to be dmd to every new member'
     )
@@ -34,7 +34,7 @@ class WelcomeMessageCog(commands.Cog):
         await ctx.send(message)
 
     @welcome.command()
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.welcome_message_modify)
     @ext.long_help(
         'Sets a welcome message to be dmd to every new member'
     )
@@ -48,7 +48,7 @@ class WelcomeMessageCog(commands.Cog):
 
 
     @welcome.command( aliases = ['remove'])
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.welcome_message_modify)
     @ext.long_help(
         'Allows for server admins to remove a welcome message from their server'
     )

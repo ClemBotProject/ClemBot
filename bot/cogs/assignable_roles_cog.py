@@ -8,7 +8,7 @@ from discord.ext.commands.errors import BadArgument
 from bot.data.role_repository import RoleRepository
 from bot.messaging.events import Events
 import bot.extensions as ext
-from bot.consts import Colors
+from bot.consts import Colors, Claims
 
 log = logging.getLogger(__name__)
 
@@ -197,7 +197,7 @@ class AssignableRolesCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @roles.command(pass_context= True, aliases= ['create'])
-    @commands.has_guild_permissions(administrator = True)
+    @ext.required_claims(Claims.assignable_roles_add)
     @ext.long_help('Command to add a role as assignable in the current guild')
     @ext.short_help('Marks a role as user assignable')
     @ext.example('roles add @SomeExampleRole')
@@ -210,7 +210,7 @@ class AssignableRolesCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @roles.command(pass_context= True, aliases= ['delete'])
-    @commands.has_guild_permissions(administrator = True)
+    @ext.required_claims(Claims.assignable_roles_delete)
     @ext.long_help('Command to remove a role as assignable in the current guild')
     @ext.short_help('Removes a role as user assignable')
     @ext.example('roles delete @SomeExampleRole')

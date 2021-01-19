@@ -3,6 +3,9 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import BadArgument, Context, Converter
+from discord.ext.commands.errors import ConversionError
+from bot.errors import ConversionError
+from bot.consts import Claims
 
 """
 This converter code was copied from the python discord bot
@@ -37,7 +40,7 @@ class DurationDelta(Converter):
         """
         match = self.duration_parser.fullmatch(duration)
         if not match:
-            raise BadArgument(f"`{duration}` is not a valid duration string.")
+            raise ConversionError(f"`{duration}` is not a valid duration string.")
 
         duration_dict = {unit: int(amount) for unit, amount in match.groupdict(default=0).items()}
         delta = relativedelta(**duration_dict)
@@ -58,4 +61,14 @@ class Duration(DurationDelta):
         try:
             return now + delta
         except ValueError:
-            raise BadArgument(f"`{duration}` results in a datetime outside the supported range.")
+            raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+
+class ClaimsConverter(Converter):
+    """Convert a given claim string into its enum representation"""
+
+    async def convert(self, ctx: Context, claim: str) -> Claims:
+        try:
+            return Claims.__members__[claim]
+        except KeyError:
+            raise ConversionError(f'`{claim}` is not a valid Claim')
+        

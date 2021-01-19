@@ -1,13 +1,7 @@
 # define Python user-defined exceptions
+from discord.ext.commands import CommandError
 
-
-class Error(Exception):
-    """Base class for other exceptions"""
-
-    pass
-
-
-class ConfigAccessError(Error):
+class ConfigAccessError(Exception):
     """
     Exception raised for errors in the input.
     """
@@ -16,7 +10,7 @@ class ConfigAccessError(Error):
         self.message = message
 
 
-class PrimaryKeyError(Error):
+class PrimaryKeyError(Exception):
     """
     Raised if the primary key fails on insert
     """
@@ -24,7 +18,7 @@ class PrimaryKeyError(Error):
     def __init__(self, message: str):
         self.message = message
 
-class DesignatedChannelError(Error):
+class DesignatedChannelError(Exception):
     """
     Raised if a channel is set to a designated channel type the doesnt exist
     """
@@ -32,9 +26,21 @@ class DesignatedChannelError(Error):
     def __init__(self, message: str):
         self.message = message
 
-class ParserError(Error):
+class ParserError(Exception):
     """
     Raised if user inputs bad data
     """
     def __init__(self, message: str):
+        self.message = message
+
+class ClaimsAccessError(CommandError):
+    """
+    Raised if a user attempts to use a command that they do not have claims for
+    """
+    def __init__(self, message: str):
+        self.message = message
+
+class ConversionError(CommandError):
+
+    def __init__(self, message):
         self.message = message
