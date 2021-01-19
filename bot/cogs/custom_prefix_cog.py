@@ -1,15 +1,14 @@
 import logging
 
+import bot.extensions as ext
 import discord
-from discord import embeds
-from discord.colour import Color
 import discord.ext.commands as commands
 
-from bot.messaging.events import Events
 from bot.bot_secrets import BotSecrets
+from bot.consts import Claims, Colors
 from bot.data.custom_prefixes_repository import CustomPrefixesRepository
-import bot.extensions as ext
-from bot.consts import Colors
+from bot.messaging.events import Events
+
 log = logging.getLogger(__name__)
 
 
@@ -36,7 +35,7 @@ class CustomPrefixCog(commands.Cog):
         await ctx.send(embed=embed)
     
     @prefix.command(pass_context= True, aliases= ['add'])
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.custom_prefix_set)
     @ext.long_help(
         'Sets the bot prefix to any given valid string'
     )
@@ -65,7 +64,7 @@ class CustomPrefixCog(commands.Cog):
         await ctx.send(embed= embed)
         
     @prefix.command(pass_context= True, aliases= ['revert'])
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.custom_prefix_set)
     @ext.long_help(
         'resets the bot prefix to the default'
     )
@@ -93,5 +92,6 @@ class CustomPrefixCog(commands.Cog):
             value= f'New Prefix: ```{default_prefix}```')
 
         await ctx.send(embed= embed)
+
 def setup(bot): 
     bot.add_cog(CustomPrefixCog(bot))

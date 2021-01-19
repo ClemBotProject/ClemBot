@@ -6,7 +6,7 @@ import discord.ext.commands as commands
 from discord.ext.commands.errors import BadArgument
 
 import bot.extensions as ext
-from bot.consts import Colors
+from bot.consts import Colors, Claims
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class EmoteCog(commands.Cog):
         pass
 
     @emote.command()
-    @commands.has_guild_permissions(manage_emojis=True)
+    @ext.required_claims(Claims.emote_add)
     async def add(self, ctx: commands.Context, emote, name: str):
 
         emote_id = emote.split(':')[2][:-1]

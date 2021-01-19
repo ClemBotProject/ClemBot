@@ -1,13 +1,13 @@
+import asyncio
 import logging
 import typing as t
-import asyncio
 
 import discord
 
-from bot.data.message_repository import MessageRepository
-from bot.services.base_service import BaseService
+from bot.consts import Claims
+from bot.data.claims_repository import ClaimsRepository
 from bot.messaging.events import Events
-from bot.messaging import messenger
+from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
@@ -59,18 +59,20 @@ class DeleteMessageService(BaseService):
         role_ids = [role.id for role in user.roles]
         delete = False
 
-        if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
+        if reaction.emoji != '🗑️' or reaction.message.id not in self.messages:
             return
+        elif await ClaimsRepository().check_claim_user(Claims.delete_message, user):
+            delete = True
         elif user.guild_permissions.administrator:
             delete = True
-        elif user.id == self.messages[reaction.message.id]["Author"]:
+        elif user.id == self.messages[reaction.message.id]['Author']:
             delete = True
-        elif any(True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids):
+        elif any(True for role in self.messages[reaction.message.id]['Roles'] if role.id in role_ids):
             delete = True
 
         if delete:
-            for msg in self.messages[reaction.message.id]["MessagesToDelete"]:
-                log.info(f"Mesaage {msg.id} deleted by delete message service")
+            for msg in self.messages[reaction.message.id]['MessagesToDelete']:
+                log.info(f'Mesaage {msg.id} deleted by delete message service')
                 await msg.delete()
             del self.messages[reaction.message.id]
 

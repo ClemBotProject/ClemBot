@@ -102,3 +102,16 @@ CREATE TABLE IF NOT EXISTS Tags (
     FOREIGN KEY(fk_UserId)
         REFERENCES Users (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS ClaimsMapping (
+    id                       INTEGER      PRIMARY KEY,
+    claimName                INTEGER      NOT NULL,
+    fk_roleId                INTEGER      NOT NULL,
+    fk_guildId               INTEGER      NOT NULL,
+    FOREIGN KEY(fk_roleId)
+        REFERENCES Roles (id),
+    FOREIGN KEY(fk_GuildId)
+        REFERENCES Guilds (id)
+);
+
