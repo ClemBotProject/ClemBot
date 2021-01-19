@@ -16,6 +16,7 @@ from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.data.claims_repository import ClaimsRepository
 from bot.data.database import Database
 from bot.data.logout_repository import LogoutRepository
+import bot.extensions as ext
 from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 
@@ -68,6 +69,10 @@ class ClemBot(commands.Bot):
         command = ctx.command
         author = ctx.author
         repo = ClaimsRepository()
+
+        if not isinstance(command, ext.ExtBase):
+            #If the command isnt an extension command let it through, we dont need to think about it
+            return
 
         if len(command.claims) == 0:
             #command requires no claims nothing else to do
