@@ -16,7 +16,6 @@ from spellchecker import SpellChecker # Here we will add a utility for correctin
 log = logging.getLogger(__name__)
 
 MIN_YEAR = 2014
-MAX_NUMBER_SUGGESTIONS = 3
 
 class GradesCog(commands.Cog):
     special_converted_files = ['2018Fall.csv', '2018Spring.csv'] 
