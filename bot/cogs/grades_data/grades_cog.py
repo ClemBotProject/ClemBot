@@ -388,11 +388,11 @@ class GradesCog(commands.Cog):
         if prof_name not in self.global_master_prof_list:
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
-            temp_append_of_name = ""
+            temp_append_of_name = ''
             for name in self.spellChecker.candidates(prof_name_caps):
                 # the error case is a return of the original name
                 if name != prof_name_caps:
-                    temp_append_of_name += name + "\n"
+                    temp_append_of_name += name + '\n'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
             if len(temp_append_of_name) > 0:
                 embed.add_field(name="\nDid you mean:", value=temp_append_of_name, inline=False)
