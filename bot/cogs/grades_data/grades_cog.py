@@ -11,6 +11,7 @@ import typing as t
 
 from bot.consts import Colors
 import bot.extensions as ext
+from spellchecker import SpellChecker # Here we will add a utility for correcting user input
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +46,18 @@ class GradesCog(commands.Cog):
         
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
+        self.spellChecker = SpellChecker()
+        # deliberately call this once.
+        self.initialize_professor_names(self.spellChecker)
+
+    def initialize_professor_names(self, spellCheckerToAdd):
+        # We need to parse the professor names from the main file
+        for year in self.year_list:
+            temp = self.initialize(year)
+            # temp[2] holds the professor name in a dictionary 
+            # i.e., yvon feaster: [{...}]
+            people = [element for element in temp[2].keys()]
+            spellCheckerToAdd.word_frequency.load_words(people)
         
 
     def load_files(self,yearList):
@@ -375,7 +388,14 @@ class GradesCog(commands.Cog):
         if prof_name not in self.global_master_prof_list:
             embed = discord.Embed(title="Grades", color=Colors.Error)
             result = 'That\'s not a professor at Clemson\n Are you sure you used the proper notation (ex: Brian Dean)?'
+            temp_append_of_name = ''
+            for name in self.spellChecker.candidates(prof_name_caps):
+                # the error case is a return of the original name
+                if name != prof_name_caps:
+                    temp_append_of_name += name + '\n'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
+            if len(temp_append_of_name) > 0:
+                embed.add_field(name="\nDid you mean:", value=temp_append_of_name, inline=False)
             await ctx.send(embed=embed)
             return
         
