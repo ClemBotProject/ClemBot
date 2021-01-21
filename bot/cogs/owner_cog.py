@@ -164,20 +164,22 @@ class OwnerCog(commands.Cog):
     @eval_bot.command()
     @commands.is_owner()
     async def bot(self, ctx, *, code):
+        code = code.replace('```python', '')
+        code = code.replace('`', '')
         locals_dict = locals()
         globals_dict = globals()
         await_list = [-1]
         current_index = 0
         try:
             # Check if returnEval is in code
-            return_index = code.index("returnEval ")
+            return_index = code.index('returnEval ')
         except ValueError:
-            await ctx.send("'returnEval' missing")
+            await ctx.send('"returnEval" missing')
             return
         while True:
             # Check to see if any lines have await in them
             try:
-                await_list.append(code.index("await ", await_list[-1] + 1))
+                await_list.append(code.index('await ', await_list[-1] + 1))
             except ValueError:
                 break
         await_list.pop(0)
@@ -185,17 +187,13 @@ class OwnerCog(commands.Cog):
             # If lines with await are present, run them independently from exec and await
             for i in await_list:
                 exec(code[current_index:i], globals_dict, locals_dict)
-                current_index = 1 + code.index("\n", i)
+                current_index = 1 + code.index('\n', i)
                 await eval(code[i+6:current_index], globals_dict, locals_dict)
-            # If the last line before the returnEval is an await line skip this part
-            if current_index != return_index:
-                # If the last line before returnEval isn't an await line, run that code segment
-                exec(code[current_index:return_index], globals_dict, locals_dict)
-            await ctx.send(eval(code[return_index + 10:], globals_dict, locals_dict))
+            exec(code[current_index:return_index], globals_dict, locals_dict)
         else:
             # If code doesnt contain await lines, exec everything except the returnEval, run that independently
             exec(code[:return_index], globals_dict, locals_dict)
-            await ctx.send(eval(code[return_index + 10:], globals_dict, locals_dict))
+        await ctx.send(eval(code[return_index + 10:], globals_dict, locals_dict))
 
     @eval_bot.command(aliases=['db'])
     @commands.is_owner()
