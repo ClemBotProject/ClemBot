@@ -1,6 +1,7 @@
 import json
 import logging
 from collections import deque
+import inspect
 
 import aiosqlite
 import discord
@@ -164,7 +165,13 @@ class OwnerCog(commands.Cog):
     @eval_bot.command()
     @commands.is_owner()
     async def bot(self, ctx, *, code):
-        await ctx.send(eval(code))
+        code = code.strip('`')
+        res = eval(code)
+        if inspect.isawaitable(res):
+            res = await res
+
+        
+        await ctx.send(res)
 
     @eval_bot.command(aliases=['db'])
     @commands.is_owner()
