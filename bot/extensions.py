@@ -1,5 +1,10 @@
-import dataclasses
+import typing as t
+from collections.abc import Iterable
+
 import discord.ext.commands
+from discord.ext.commands.errors import BadArgument
+
+from bot.consts import Claims
 
 
 def command(name=None, cls=None, **attrs):
@@ -35,7 +40,7 @@ as opposed to setting them in the ctor
 """
 def long_help(help_str: str):
     def wrapper(func):
-        if isinstance(func, HelpAttrs):
+        if isinstance(func, ExtBase):
             func.long_help = help_str
         else:
             setattr(func, 'long_help', help_str)
@@ -44,7 +49,7 @@ def long_help(help_str: str):
 
 def short_help(help_str: str):
     def wrapper(func):
-        if isinstance(func, HelpAttrs):
+        if isinstance(func, ExtBase):
             func.short_help = help_str
         else:
             setattr(func, 'short_help', help_str)
@@ -53,21 +58,54 @@ def short_help(help_str: str):
 
 def example(help_str: str):
     def wrapper(func):
-        if isinstance(func, HelpAttrs):
+        if isinstance(func, ExtBase):
             func.example = help_str
         else:
             setattr(func, 'example', help_str)
         return func
     return wrapper
 
+def required_claims(*claims):
+    def wrapper(func):
+        if any(not isinstance(c, Claims) for c in claims):
+            raise BadArgument('All required claims must be of type <Enum "Claim">')
+        set_claims = set(c.name for c in claims)
+        if isinstance(func, ExtBase):
+            func.claims.update(set_claims)
+        else:
+            setattr(func, 'claims', set_claims)
+        return func
+    return wrapper
 
-@dataclasses.dataclass(frozen=True)
-class HelpAttrs:
-    long_help: str
-    short_help: str
-    example: str
 
-class ClemBotCommand(discord.ext.commands.Command, HelpAttrs):
+class ExtBase:
+    def __init__(self, **kwargs) -> None:
+
+        self.long_help = kwargs.get('long_help', None)
+        self.short_help = kwargs.get('short_help', None)
+        self.example = kwargs.get('example', None)
+        self.claims = kwargs.get('claims', None) or set()
+
+    def claims_check(self, claims: t.List[Claims]) -> bool:
+        """
+        Checks if a given set of claims is valid for the current command
+
+        Args:
+            claims (t.List[str]): [description]
+
+        Returns:
+            bool: Authorization was successful
+        """
+
+        #check if there are any claims to check for if not authorize the command
+        if len(self.claims) == 0:
+            return True
+
+        #check for intersection of two sets of claims, if there is one we have a valid user
+        return len(set(claims).intersection(self.claims)) > 0
+
+
+class ClemBotCommand(discord.ext.commands.Command, ExtBase):
 
     def __init__(self, func, *, 
                 long_help: str=None, 
@@ -80,8 +118,9 @@ class ClemBotCommand(discord.ext.commands.Command, HelpAttrs):
         long_help = long_help or getattr(func, 'long_help', None)
         short_help = short_help or getattr(func, 'short_help', None)
         example = example or getattr(func, 'example', None)
+        claims = kwargs.get('claims', None) or getattr(func, 'claims', None)
 
-        HelpAttrs.__init__(self, long_help=long_help, short_help=short_help, example=example)
+        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example, claims=claims)
 
     def command(self, *args, **kwargs):
         """
@@ -111,7 +150,7 @@ def group(name=None, **attrs):
     attrs.setdefault('cls', ClemBotGroup)
     return command(name=name, **attrs)
 
-class ClemBotGroup(discord.ext.commands.Group, HelpAttrs):
+class ClemBotGroup(discord.ext.commands.Group, ExtBase):
 
     def __init__(self, func, *, 
                 long_help: str=None, 
@@ -125,7 +164,7 @@ class ClemBotGroup(discord.ext.commands.Group, HelpAttrs):
         short_help = short_help or getattr(func, 'short_help', None)
         example = example or getattr(func, 'example', None)
 
-        HelpAttrs.__init__(self, long_help=long_help, short_help=short_help, example=example)
+        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example)
 
 
     def command(self, *args, **kwargs):

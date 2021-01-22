@@ -12,9 +12,12 @@ from discord.ext import commands
 import bot.cogs as cogs
 import bot.services as services
 from bot.bot_secrets import BotSecrets
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels
+from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
+from bot.data.claims_repository import ClaimsRepository
 from bot.data.database import Database
 from bot.data.logout_repository import LogoutRepository
+import bot.extensions as ext
+from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
@@ -33,6 +36,8 @@ class ClemBot(commands.Bot):
 
         self.messenger = messenger
         self.scheduler = scheduler
+
+        self._before_invoke = self.command_claims_check
 
         self.load_cogs()
         self.active_services = {}
@@ -56,6 +61,36 @@ class ClemBot(commands.Bot):
         await self.messenger.publish(Events.on_broadcast_designated_channel, DesignatedChannels.startup_log, embed)
 
         log.info(f'Logged on as {self.user}')
+    
+    async def command_claims_check(self, ctx: commands.Context):
+        """
+        Before invoke hook to make sure a user has the correct claims to allow a command invocation
+        """
+        command = ctx.command
+        author = ctx.author
+        repo = ClaimsRepository()
+
+        if not isinstance(command, ext.ExtBase):
+            #If the command isnt an extension command let it through, we dont need to think about it
+            return
+
+        if len(command.claims) == 0:
+            #command requires no claims nothing else to do
+            return
+
+        if author.guild_permissions.administrator:
+            #Admins have full bot access no matter what
+            return
+
+        claims = await repo.fetch_all_claims_user(author)
+        
+        if claims and command.claims_check(claims):
+            #Author has valid claims
+            return
+        
+        claims_str = '\n'.join(command.claims)
+        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
+
 
     async def close(self) -> None:
         try:
@@ -154,7 +189,7 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback= tb)
 
-    async def on_command_error(self, ctx, e):
+    async def on_command_error(self, ctx, error):
         """
         Handler for cog level errors, if a command throws and isnt handled
         the exception will end up here
@@ -166,13 +201,14 @@ class ClemBot(commands.Bot):
         if ctx.cog:
             if commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
                 return
+        error = getattr(error , 'original', error)
 
-        embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
-        embed.add_field(name='Exception:', value= e)
+        embed = discord.Embed(title=f'ERROR: {type(error).__name__}', color=Colors.Error)
+        embed.add_field(name='Exception:', value=error)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         msg = await ctx.channel.send(embed= embed)
         await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
-        await self.global_error_handler(e)
+        await self.global_error_handler(error)
 
     async def global_error_handler(self, e, *, traceback: str = None):
         """

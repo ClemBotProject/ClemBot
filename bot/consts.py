@@ -22,6 +22,7 @@ class DesignatedChannels(DesignatedChannelBase):
     @staticmethod
     def has(member: str) -> bool:
         return member in DesignatedChannels.__members__
+
 class OwnerDesignatedChannels(DesignatedChannelBase):
 
     server_join_log = auto()
@@ -30,6 +31,28 @@ class OwnerDesignatedChannels(DesignatedChannelBase):
     @staticmethod
     def has(member: str) -> bool:
         return member in OwnerDesignatedChannels.__members__
+
+class Claims(Enum):
+    """Represents all possible authorization claims that server roles can have"""
+
+    designated_channel_view = auto()
+    designated_channel_modify = auto()
+    custom_prefix_set = auto()
+    welcome_message_view = auto()
+    welcome_message_modify = auto()
+    tag_add = auto()
+    tag_delete = auto()
+    assignable_roles_add = auto()
+    assignable_roles_delete = auto()
+    delete_message = auto()
+    emote_add = auto()
+    claims_view = auto()
+    claims_modify = auto()
+    manage_class_add = auto()
+
+    @staticmethod
+    def get_claims_str():
+        return '\n'.join(name for name, _ in Claims.__members__.items())
 
 class DiscordLimits:
     MessageLength = 1900

@@ -20,7 +20,7 @@ class HelpCog(commands.Cog):
         self.bot = bot
         self.commands = []
     
-    @commands.command()
+    @ext.command()
     async def help(self, ctx, *, command_name = None):
 
         if command_name:
@@ -131,7 +131,7 @@ class HelpCog(commands.Cog):
             #check to see if a command has been hidden from the public help command
             if command.hidden:
                 continue
-            if not isinstance(command, ext.HelpAttrs):
+            if not isinstance(command, ext.ExtBase):
                 log.warning(f'Help command invoked but none Clembot ext command found name: {command.name}, skipping command help')
                 continue
 

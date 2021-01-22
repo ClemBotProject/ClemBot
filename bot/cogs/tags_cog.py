@@ -8,7 +8,7 @@ from enum import Enum
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
+from bot.consts import Colors, Claims
 from bot.data.tag_repository import TagRepository
 import bot.extensions as ext
 from discord.ext.commands.errors import CheckFailure
@@ -86,6 +86,7 @@ class TagCog(commands.Cog):
                 channel=ctx.channel)
 
     @tag.command(aliases=['create', 'make'])
+    @ext.required_claims(Claims.tag_add)
     @ext.long_help(
         'Creates a tag with a given name and value that can be invoked at any time in the future' 
     )
@@ -129,6 +130,7 @@ class TagCog(commands.Cog):
 
 
     @tag.command(aliases=['remove', 'destroy'])
+    @ext.required_claims(Claims.tag_delete)
     @ext.long_help(
         'Deletes a tag with a given name, this command can only be run by '
         'server staff or the person who created the tag'
@@ -148,12 +150,6 @@ class TagCog(commands.Cog):
 
         if ctx.author.guild_permissions.administrator:
             await self._delete_tag(name, ctx)
-            return
-
-        if tag['fk_UserId'] != ctx.author.id:
-            embed = discord.Embed(title= f'Error: Tag {name} is not owned by {self.get_full_name(ctx.author)}',
-                color=Colors.Error)
-            await ctx.send(embed=embed)
             return
         
         await self._delete_tag(name, ctx)

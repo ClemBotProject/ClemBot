@@ -4,7 +4,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
-from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
+from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels, Claims
 from bot.data.designated_channel_repository import DesignatedChannelRepository
 
 log = logging.getLogger(__name__)
@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 class DesignatedChannelsCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command= True, aliases= ['channels'])
+    @ext.required_claims(Claims.designated_channel_view)
     @ext.long_help(
         'Designated channels are channels that you can set to for the bot to send a variety of info to ' 
         'You can register as many channels as youd like to any given category'
@@ -51,7 +52,7 @@ class DesignatedChannelsCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @channel.command(pass_context= True, aliases= ['register','set'])
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.designated_channel_modify)
     @ext.long_help(
         'Adds a channel to a given designated channel listing, use the "channel" command to ' 
         'see a listing of all current and available designated channels'
@@ -90,7 +91,7 @@ class DesignatedChannelsCog(commands.Cog):
         await ctx.send(embed= embed)
 
     @channel.command(pass_context= True, aliases= ['unregister'])
-    @commands.has_guild_permissions(administrator= True)
+    @ext.required_claims(Claims.designated_channel_modify)
     @ext.long_help(
         'Removes a channel from a given designated channel listing, use the "channel" command to ' 
         'see a listing of all current and available designated channels'

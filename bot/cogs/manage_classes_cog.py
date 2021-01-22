@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
+from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.user_choice import UserChoice
 import bot.extensions as ext
@@ -76,6 +76,7 @@ class ManageClassesCog(commands.Cog):
         pass
 
     @classes.command(pass_context= True, aliases=['create'])
+    @ext.required_claims(Claims.manage_class_add)
     @ext.long_help(
         'Command to initiate the new class creation wizard, optionally takes a ' 
         'class name as a parameter E.G "cpsc-1010"'
