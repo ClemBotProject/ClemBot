@@ -183,16 +183,12 @@ class OwnerCog(commands.Cog):
             except ValueError:
                 break
         await_list.pop(0)
-        if await_list:
-            # If lines with await are present, run them independently from exec and await
-            for i in await_list:
-                exec(code[current_index:i], globals_dict, locals_dict)
-                current_index = 1 + code.index('\n', i)
-                await eval(code[i+6:current_index], globals_dict, locals_dict)
-            exec(code[current_index:return_index], globals_dict, locals_dict)
-        else:
-            # If code doesnt contain await lines, exec everything except the returnEval, run that independently
-            exec(code[:return_index], globals_dict, locals_dict)
+        # If lines with await are present, run them independently from exec and await
+        for i in await_list:
+            exec(code[current_index:i], globals_dict, locals_dict)
+            current_index = 1 + code.index('\n', i)
+            await eval(code[i+6:current_index], globals_dict, locals_dict)
+        exec(code[current_index:return_index], globals_dict, locals_dict)
         await ctx.send(eval(code[return_index + 10:], globals_dict, locals_dict))
 
     @eval_bot.command(aliases=['db'])
