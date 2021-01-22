@@ -39,7 +39,7 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
     "irish": "ga",
     "italian": "it",
     "japanese": "ja",
-    "klingon": "tlh-Latn",
+    "klingon": "tlh-latn",
     "korean": "ko",
     "kurdish (central)": "ku-arab",
     "latvian": "lv",
@@ -141,7 +141,7 @@ class TranslateCog(commands.Cog):
 
         log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color = Colors.ClemsonOrange)
-        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
+        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value = response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
         
@@ -178,7 +178,7 @@ class TranslateCog(commands.Cog):
         log.info(response[0]['detectedLanguage'])
         log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color = Colors.ClemsonOrange)
-        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
+        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value = response[0]['translations'][0]['text'], inline=False)
         embed.add_field(name='Confidence Level:', value = response[0]['detectedLanguage']['score'], inline=True)
         embed.add_field(name='Detected Language:', value = LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']], inline=True)
