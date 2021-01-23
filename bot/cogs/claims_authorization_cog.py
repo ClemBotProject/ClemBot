@@ -23,18 +23,27 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.short_help('Claims authorization setup')
     @ext.example(('claims', 'claims @some_role', 'claims @some_user'))
     async def claims(self, ctx: commands.Context, listing: t.Union[discord.Role, discord.Member]=None):
-        user = None
-        role = None
+        listing = listing or ctx.author
 
         if isinstance(listing, discord.Role):
-            role = listing
-        elif isinstance(listing, discord.Member):
-            user = listing
+            if listing.permissions.administrator:
+                claims_str = self.get_all_claims()
+                embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
+                embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=embed)
+                return
 
-        if role:
-            await self._send_role_claims(ctx, role)
-        else:
-            await self._send_user_claims(ctx, user or ctx.author)
+            await self._send_role_claims(ctx,listing)
+
+        elif isinstance(listing, discord.Member):
+            if listing.guild_permissions.administrator:
+                claims_str = self.get_all_claims()
+                embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
+                embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=embed)
+                return
+
+            await self._send_user_claims(ctx, listing)
     
     async def _send_role_claims(self, ctx, role):
         repo = ClaimsRepository()
@@ -116,14 +125,17 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.short_help('Lists the available bot claims')
     @ext.example('claim list')
     async def list(self, ctx):
-        claims = [c for c, _ in Claims.__members__.items()]
-        claims.sort()
-        claims_str = '\n'.join(claims) if claims else 'No available claims'
+        claims_str = self.get_all_claims()
 
         embed = discord.Embed(title='Available Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
  
         await ctx.send(embed=embed)
+
+    def get_all_claims(self):
+        claims = [c for c, _ in Claims.__members__.items()]
+        claims.sort()
+        return '\n'.join(claims) if claims else 'No available claims'
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
