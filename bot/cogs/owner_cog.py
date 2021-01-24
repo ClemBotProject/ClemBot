@@ -168,9 +168,10 @@ class OwnerCog(commands.Cog):
         code = code.replace('```python', '')
         code = code.replace('`', '')
         code = code.replace('\n', '\n\t')
-        t=[None]
+        t = [None]
+        exec_globals = {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 't': t}
         code = 'async def foobar():\n\t' + code + '\nt[0] = loop.create_task(foobar())'
-        exec(code, {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 'self': self, 't': t})
+        exec(code, exec_globals)
         await asyncio.gather(t[0])
 
     @eval_bot.command(aliases=['db'])
