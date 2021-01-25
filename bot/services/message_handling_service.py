@@ -6,7 +6,7 @@ import json
 
 import discord
 
-from bot.consts import Colors, DesignatedChannels
+from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.data.message_repository import MessageRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -18,9 +18,20 @@ class MessageHandlingService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_message_recieved)
-    async def on_message_recieved(self, message: discord.Message) -> None:
-        log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
+    @BaseService.Listener(Events.on_message_received)
+    async def on_message_received(self, message: discord.Message) -> None:
+        
+        try:
+            log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
+        except AttributeError as err:
+            embed = discord.Embed(title= f'Bot DM from {message.author}',
+                                    color= Colors.ClemsonOrange,
+                                    description= f'"{message.content}"')
+            log.info(f'Message from {message.author}: "{message.content}" Guild Unknown (DM)')
+            await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
+            #await message.author.send('👋') # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
+            return
+
 
         await self.handle_message_links(message)
 
