@@ -1,7 +1,7 @@
+import asyncio
 import json
 import logging
 from collections import deque
-import inspect
 
 import aiosqlite
 import discord
@@ -165,13 +165,14 @@ class OwnerCog(commands.Cog):
     @eval_bot.command()
     @commands.is_owner()
     async def bot(self, ctx, *, code):
-        code = code.strip('`')
-        res = eval(code)
-        if inspect.isawaitable(res):
-            res = await res
-
-        
-        await ctx.send(res)
+        code = code.replace('```python', '')
+        code = code.replace('`', '')
+        code = code.replace('\n', '\n\t')
+        t = [None]
+        exec_globals = {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 't': t}
+        code = 'async def foobar():\n\t' + code + '\nt[0] = loop.create_task(foobar())'
+        exec(code, exec_globals)
+        await asyncio.gather(t[0])
 
     @eval_bot.command(aliases=['db'])
     @commands.is_owner()
