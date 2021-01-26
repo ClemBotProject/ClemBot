@@ -166,6 +166,7 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def bot(self, ctx, *, code):
         code = code.replace('```python', '')
+        code = code.replace('```py', '')
         code = code.replace('`', '')
         code = code.replace('\n', '\n\t')
         t = [None]
