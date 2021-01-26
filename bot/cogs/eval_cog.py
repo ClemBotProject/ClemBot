@@ -36,6 +36,7 @@ class EvalCog(commands.Cog):
     @ext.example('eval print("hello world")')
     async def eval(self, ctx, *, code= None) -> None:
         code = code.replace('```python', '')
+        code = code.replace('```py', '')
         code = code.replace('`', '')
         code = utils.escape_mentions(code)
 
