@@ -21,10 +21,7 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_message_received)
     async def on_message_received(self, message: discord.Message) -> None:
         
-        if isinstance(message.guild, discord.guild.Guild):
-            log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
-            log.info(f'{type(message.guild)}')
-        else:
+        if not isinstance(message.guild, discord.guild.Guild):
             embed = discord.Embed(title= f'Bot Direct Message',
                                     color= Colors.ClemsonOrange,
                                     description= f'{message.content}')
@@ -34,7 +31,8 @@ class MessageHandlingService(BaseService):
             await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
             #await message.author.send('👋') # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
             return
-
+        log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
+        log.info(f'{type(message.guild)}')
 
         await self.handle_message_links(message)
 
