@@ -127,7 +127,7 @@ class SourceCodeCog(commands.Cog):
             if not source:
                 return
 
-            if line_stop is not None and len(source.splitlines()) < line_stop:
+            if line_stop is not None and len(source.splitlines()) <= line_stop:
                 embed = discord.Embed(title= f'Error: End line number too high', color= Colors.Error)
                 await ctx.send(embed= embed)
                 return
