@@ -127,7 +127,7 @@ class SourceCodeCog(commands.Cog):
             if not source:
                 return
 
-            if line_stop is not None and len(source.splitlines()) <= line_stop:
+            if line_stop is not None and len(source.splitlines()) < line_stop:
                 embed = discord.Embed(title= f'Error: End line number too high', color= Colors.Error)
                 await ctx.send(embed= embed)
                 return
@@ -181,7 +181,7 @@ class SourceCodeCog(commands.Cog):
     
     def process_source(self, source: str, line_start: int = None, line_stop: int = None):
         split_source = [f'{i:03d} |  {value}' for i, value in enumerate(source.splitlines())]
-        filtered_source = split_source[line_start or 0: line_stop+1 or len(source)]
+        filtered_source = split_source[line_start or 0: line_stop+1 if line_stop is not None else len(source)]
 
         return filtered_source
     
