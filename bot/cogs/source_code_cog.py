@@ -182,7 +182,7 @@ class SourceCodeCog(commands.Cog):
     def process_source(self, source: str, line_start: int = None, line_stop: int = None):
         split_source = [f'{i+1:03d} |  {value}' for i, value in enumerate(source.splitlines())]
 
-        if line_start is not None and line_start <= 0:
+        if line_start and line_start <= 0:
             line_start = 1
         
         filtered_source = split_source[line_start-1 if line_start else 0: line_stop or len(source)]
