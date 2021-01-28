@@ -19,14 +19,24 @@ class EventsMeta(type):
         return 'on_example'
 
     @property
-    def on_message_received(self):
+    def on_guild_message_received(self):
         """
         Published whenever a message is sent in a server
         
         Args:
             message (Message) – The deleted message.
         """
-        return '_on_message_received'
+        return '_on_guild_message_received'
+
+    @property
+    def on_dm_message_received(self):
+        """
+        Published whenever a direct message is sent to ClemBot
+        
+        Args:
+            message (Message) – The deleted message.
+        """
+        return '_on_dm_message_received'
 
     @property
     def on_raw_message_edit(self):
