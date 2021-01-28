@@ -19,8 +19,8 @@ class TagService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
     
-    @BaseService.Listener(Events.on_message_received)
-    async def on_message_received(self, message: discord.Message) -> None:
+    @BaseService.Listener(Events.on_guild_message_received)
+    async def on_guild_message_received(self, message: discord.Message) -> None:
         if not isinstance(message.guild, discord.guild.Guild):
             return
         
