@@ -142,13 +142,13 @@ class RandomCog(commands.Cog):
         embed = await slotsrolling(f'{blank} | {blank} | {blank}','Spinning',0)
         msg = await ctx.send(embed = embed)
 
-        embed = await slotsrolling(f'{a} | {blank} | {blank}','Spinning',1.75)
+        embed = await slotsrolling(f'{a} | {blank} | {blank}','Spinning',1)
         await msg.edit(embed = embed)
 
-        embed = await slotsrolling(f'{a} | {b} | {blank}','Spinning',1.75)
+        embed = await slotsrolling(f'{a} | {b} | {blank}','Spinning',1)
         await msg.edit(embed = embed)
 
-        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1.75)
+        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1)
         await msg.edit(embed = embed)
 
     @ext.command()
