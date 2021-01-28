@@ -21,9 +21,6 @@ class TagService(BaseService):
     
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
-        if not isinstance(message.guild, discord.guild.Guild):
-            return
-        
         repo = TagRepository()
 
         tagsContent = []
