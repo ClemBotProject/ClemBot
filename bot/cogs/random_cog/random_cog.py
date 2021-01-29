@@ -108,7 +108,7 @@ class RandomCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @ext.command(aliases=['slotmachine','🎰'])
-    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
+    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.guild)
     @ext.long_help(
         'A slot machine inside discord with a chance to win fame and fortune'
     )
