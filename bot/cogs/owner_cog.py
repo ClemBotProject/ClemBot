@@ -37,7 +37,7 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
-        await server.leave(server)
+        await server.leave()
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()
