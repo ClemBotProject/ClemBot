@@ -70,6 +70,10 @@ class ClemBot(commands.Bot):
         author = ctx.author
         repo = ClaimsRepository()
 
+        if await self.is_owner(author):
+            #if the author owns the bot, authorize the command no matter what
+            return
+
         if not isinstance(command, ext.ExtBase):
             #If the command isnt an extension command let it through, we dont need to think about it
             return
