@@ -70,6 +70,10 @@ class ClemBot(commands.Bot):
         author = ctx.author
         repo = ClaimsRepository()
 
+        if await self.is_owner(author):
+            #if the author owns the bot, authorize the command no matter what
+            return
+
         if not isinstance(command, ext.ExtBase):
             #If the command isnt an extension command let it through, we dont need to think about it
             return
@@ -116,7 +120,10 @@ class ClemBot(commands.Bot):
             message ([type]): The d.py message object
         """
         if message.author.id != self.user.id:
-            await self.publish_with_error(Events.on_message_recieved, message)
+            if not isinstance(message.guild, discord.guild.Guild):
+                await self.publish_with_error(Events.on_dm_message_received, message)
+            else:
+                await self.publish_with_error(Events.on_guild_message_received, message)
 
     async def on_guild_join(self, guild):
         await self.publish_with_error(Events.on_guild_joined, guild)

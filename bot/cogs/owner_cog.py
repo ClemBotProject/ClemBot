@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from collections import deque
@@ -35,8 +36,8 @@ class OwnerCog(commands.Cog):
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
-        server = self.bot.get_server(id)
-        await self.bot.leave_server(server)
+        server = self.bot.get_guild(id)
+        await server.leave()
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()
@@ -164,7 +165,15 @@ class OwnerCog(commands.Cog):
     @eval_bot.command()
     @commands.is_owner()
     async def bot(self, ctx, *, code):
-        await ctx.send(eval(code))
+        code = code.replace('```python', '')
+        code = code.replace('```py', '')
+        code = code.replace('`', '')
+        code = code.replace('\n', '\n\t')
+        t = [None]
+        exec_globals = {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 't': t}
+        code = 'async def foobar():\n\t' + code + '\nt[0] = loop.create_task(foobar())'
+        exec(code, exec_globals)
+        await asyncio.gather(t[0])
 
     @eval_bot.command(aliases=['db'])
     @commands.is_owner()
