@@ -88,7 +88,7 @@ class SlotsCog(commands.Cog):
     )
     @ext.short_help('How lucky are you?')
     @ext.example('slots')
-    async def slots1(self, ctx):
+    async def slots(self, ctx):
         results = random.choices(Symbols.combined, weights=WEIGHTS, k=5)
         #await ctx.send(results)
         score = self.calculate_score(results)
