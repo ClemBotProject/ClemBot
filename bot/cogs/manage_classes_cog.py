@@ -119,7 +119,7 @@ class ManageClassesCog(commands.Cog):
         #We cant do anything more, bail out early
         if not category:
             embed = discord.Embed(
-                title=f'Error: Category {class_repr.category} not found an not created, Exiting Wizard',
+                title=f'Error: Category {class_repr.category} not found and not created, Exiting Wizard',
                 color= Colors.Error)
             await ctx.send(embed= embed)
             return

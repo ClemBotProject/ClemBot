@@ -38,7 +38,8 @@ class CalculatorCog(commands.Cog):
         """
         
         expression = " ".join(args)
-
+        # issue parsing ,'s. Better to remove them
+        expression = expression.replace(',','')
         try:
 
             embed = discord.Embed(title="🧮Calculator", color=Colors.ClemsonOrange)
