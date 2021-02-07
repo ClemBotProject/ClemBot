@@ -108,7 +108,7 @@ class SlotsCog(commands.Cog):
             slotembed.add_field(name = input, value = spinstatus, inline = False)
             return slotembed
 
-        msg = await ctx.send(embed=slots_rolling(output, 'Spinning!!'))
+        msg = await ctx.send(embed=slots_rolling(' | '.join(output), 'Spinning!!'))
 
         for i in range(len(results)):
             output[i] = results[i]
@@ -121,8 +121,6 @@ class SlotsCog(commands.Cog):
         await msg.edit(embed=final)
 
     def calculate_score(self, results: t.List[str]) -> int:
-
-
         groups = []
         curr_group = []
 
