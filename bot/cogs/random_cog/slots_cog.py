@@ -61,7 +61,7 @@ WEIGHTS = [
 PHRASES = [
     'Will you get lucky?',
     "You're feeling lucky I see",
-    "You're on a role",
+    "You're on a roll",
     'Keep going hotshot',
     'Good fortune in your future',
     "Dang you're good",
