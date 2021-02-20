@@ -205,6 +205,7 @@ class MessageHandlingService(BaseService):
             embed.add_field(name= 'Message Link', value= f'[Click Me]({link_message.jump_url})', inline= True)
 
             await source_channel.send(embed= embed)
+            await message.delete()
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
