@@ -20,10 +20,7 @@ class OwoCog(commands.Cog):
     @ext.long_help('Owo\'s the text given to the command')
     @ext.short_help('owo any string')
     @ext.example('!owo hello there')
-    async def owo(self, ctx):
-
-        message = ctx.message.content
-        message = message.replace(ctx.prefix + ctx.invoked_with + ' ', '')
+    async def owo(self, ctx, *, message = None) -> None:
         await ctx.send(self.owoify(message))
 
     def owoify(self, text):
