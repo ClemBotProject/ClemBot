@@ -107,14 +107,14 @@ class RandomCog(commands.Cog):
         embed = discord.Embed(title='🎱', description= f'{random.choice(responses)}',color = Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
-    @ext.command(aliases=['slotmachine','🎰'])
+    @ext.command(hidden=True)
     @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     @ext.long_help(
         'A slot machine inside discord with a chance to win fame and fortune'
     )
     @ext.short_help('How lucky are you?')
     @ext.example('slots')
-    async def slots(self, ctx):
+    async def ogslots(self, ctx):
 
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
         a = random.choice(emojis)

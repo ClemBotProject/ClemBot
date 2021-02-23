@@ -36,7 +36,7 @@ class MessageHandlingService(BaseService):
         embed.set_footer(text=message.author, icon_url=message.author.avatar_url)
         log.info(f'Message from {message.author}: "{message.content}" Guild Unknown (DM)')
         await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
-        #await message.author.send('👋') # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
+        await message.author.send('Hello there, I dont currently support DM commands. Please run my commands in a server') # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
@@ -204,8 +204,8 @@ class MessageHandlingService(BaseService):
             embed.add_field(name= 'Author', value=f'{self.get_full_name(link_message.author)}', inline= True)
             embed.add_field(name= 'Message Link', value= f'[Click Me]({link_message.jump_url})', inline= True)
 
-            await message.delete()
             await source_channel.send(embed= embed)
+            await message.delete()
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
