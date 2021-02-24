@@ -67,14 +67,14 @@ class WeatherCog(commands.Cog):
 
             # Building the Page
             page += f'Location: {city} ({Lat},{Lon})\n'
-            #page += f'Temperature: {round(temp,1)}°F\n'
-            page += f'Temperature: {temp}°F\n'
+            # page += f'Temperature: {round(temp,1)}°F\n'
+            page += f'Temperature: {temp}°F / {round((temp - 32) * (5 / 9), 2)}°C\n'
             page += f'Condition:\t{desc}\n\n'
 
-            page += f'Feels Like: {round(feels,1)}°F\n'
+            page += f'Feels Like: {round(feels, 1)}°F / {round((feels - 32) * (5 / 9), 2)}°C\n'
             page += f'Humidity: {round(hum)}%\n'
-            page += f'Wind: {round(wind,1)} mph ({wind_dir})'
-            
+            page += f'Wind: {round(wind, 1)} mph / {round(wind*1.609344,1)} kmh ({wind_dir})'
+
             pages.append(page)
             
         ######################
