@@ -18,7 +18,6 @@ log = logging.getLogger(__name__)
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
-TAG_COMMAND_COOLDOWN = 30
 TAG_CHUNK_SIZE = 15*3
 MAX_NON_ADMIN_LINE_LENGTH = 10
 
@@ -35,8 +34,6 @@ class TagCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self._cd = commands.CooldownMapping.from_cooldown(1.0, TAG_COMMAND_COOLDOWN, commands.BucketType.user)
-
     
     @ext.group(invoke_without_command= True, aliases=['tags'], case_insensitive=True)
     @ext.long_help(
@@ -190,30 +187,6 @@ class TagCog(commands.Cog):
         embed=discord.Embed(title=':white_check_mark: Tag successfully deleted', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=name, inline=True)
         await ctx.send(embed=embed)
-
-    async def cog_check(self, ctx):
-        bucket = self._cd.get_bucket(ctx.message)
-        retry_after = bucket.update_rate_limit()
-        if retry_after and ctx.message.author.guild_permissions.administrator:
-            return True
-        elif retry_after:
-            embed = discord.Embed(title='Error: Command on cooldown', color=Colors.Error)
-            embed.add_field(name='Cooldown remaining', value=f'{round(retry_after, 2)} seconds remaining')
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=embed)
-            return False
-        return True
-    
-    async def cog_command_error(self, ctx, e):
-        if isinstance(e, CheckFailure):
-            pass
-        else:
-            embed = discord.Embed(title="ERROR: Command exception", color=Colors.Error)
-            embed.add_field(name='Exception:', value= e)
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-            msg = await ctx.channel.send(embed= embed)
-            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
-            await self.bot.global_error_handler(e)
 
 
     def get_full_name(self, author) -> str: 

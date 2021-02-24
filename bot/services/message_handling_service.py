@@ -6,7 +6,7 @@ import json
 
 import discord
 
-from bot.consts import Colors, DesignatedChannels
+from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.data.message_repository import MessageRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -18,16 +18,25 @@ class MessageHandlingService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_message_recieved)
-    async def on_message_recieved(self, message: discord.Message) -> None:
+    @BaseService.Listener(Events.on_guild_message_received)
+    async def on_guild_message_received(self, message: discord.Message) -> None:
         log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
-
         await self.handle_message_links(message)
 
         #Primary entry point for handling commands
         await self.bot.process_commands(message)
 
         await MessageRepository().add_message(message, datetime.datetime.utcnow())
+
+    @BaseService.Listener(Events.on_dm_message_received)
+    async def on_dm_message_received(self, message: discord.Message) -> None:
+        embed = discord.Embed(title= f'Bot Direct Message',
+                                color= Colors.ClemsonOrange,
+                                description= f'{message.content}')
+        embed.set_footer(text=message.author, icon_url=message.author.avatar_url)
+        log.info(f'Message from {message.author}: "{message.content}" Guild Unknown (DM)')
+        await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
+        await message.author.send('Hello there, I dont currently support DM commands. Please run my commands in a server') # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
@@ -195,8 +204,8 @@ class MessageHandlingService(BaseService):
             embed.add_field(name= 'Author', value=f'{self.get_full_name(link_message.author)}', inline= True)
             embed.add_field(name= 'Message Link', value= f'[Click Me]({link_message.jump_url})', inline= True)
 
-            await message.delete()
             await source_channel.send(embed= embed)
+            await message.delete()
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
