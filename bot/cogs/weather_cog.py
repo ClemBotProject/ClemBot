@@ -71,7 +71,7 @@ class WeatherCog(commands.Cog):
             page += f'Temperature: {temp}°F / {round((temp - 32) * (5 / 9), 2)}°C\n'
             page += f'Condition:\t{desc}\n\n'
 
-            page += f'Feels Like: {round(feels, 1)}°F / {round((feels - 32) * (5 / 9), 2)}°C\n'
+            page += f'Feels Like: {round(feels, 1)}°F / {round((feels - 32) * (5 / 9), 1)}°C\n'
             page += f'Humidity: {round(hum)}%\n'
             page += f'Wind: {round(wind, 1)} mph / {round(wind*1.609344,1)} kmh ({wind_dir})'
 
