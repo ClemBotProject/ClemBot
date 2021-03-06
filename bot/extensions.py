@@ -35,6 +35,19 @@ def command(name=None, cls=None, **attrs):
     return wrapper
 
 """
+Decorator that enables the chaining of multiple commands
+"""
+def chainable_output( chainable: bool):
+    def wrapper(func):
+        if isinstance(func, ExtBase):
+            func.chainable_output = chainable
+        else:
+            setattr(func, 'chainable_output', chainable)
+        return func
+    return wrapper
+
+
+"""
 Helper decorators to allow for fluent style chain setting of Commmand attributes 
 as opposed to setting them in the ctor
 """
@@ -80,7 +93,7 @@ def required_claims(*claims):
 
 class ExtBase:
     def __init__(self, **kwargs) -> None:
-
+        self.chainable_output = kwargs.get('chainable_output', None)
         self.long_help = kwargs.get('long_help', None)
         self.short_help = kwargs.get('short_help', None)
         self.example = kwargs.get('example', None)
@@ -107,7 +120,8 @@ class ExtBase:
 
 class ClemBotCommand(discord.ext.commands.Command, ExtBase):
 
-    def __init__(self, func, *, 
+    def __init__(self, func, *,
+                chainable_output : bool=None,
                 long_help: str=None, 
                 short_help: str=None,
                 example: str=None, 
@@ -115,12 +129,13 @@ class ClemBotCommand(discord.ext.commands.Command, ExtBase):
 
         discord.ext.commands.Command.__init__(self, func, **kwargs)
 
+        chainable_output = chainable_output or getattr(func, 'chainable_output', None)
         long_help = long_help or getattr(func, 'long_help', None)
         short_help = short_help or getattr(func, 'short_help', None)
         example = example or getattr(func, 'example', None)
         claims = kwargs.get('claims', None) or getattr(func, 'claims', None)
 
-        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example, claims=claims)
+        ExtBase.__init__(self, chainable_output=chainable_output, long_help=long_help, short_help=short_help, example=example, claims=claims)
 
     def command(self, *args, **kwargs):
         """
@@ -152,7 +167,8 @@ def group(name=None, **attrs):
 
 class ClemBotGroup(discord.ext.commands.Group, ExtBase):
 
-    def __init__(self, func, *, 
+    def __init__(self, func, *,
+                chainable_output: bool=None,
                 long_help: str=None, 
                 short_help: str=None,
                 example: str=None, 
@@ -160,11 +176,12 @@ class ClemBotGroup(discord.ext.commands.Group, ExtBase):
 
         discord.ext.commands.Group.__init__(self, func, **kwargs)
 
+        chainable_output = chainable_output or getattr(func, 'chainable_output', None)
         long_help = long_help or getattr(func, 'long_help', None)
         short_help = short_help or getattr(func, 'short_help', None)
         example = example or getattr(func, 'example', None)
 
-        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example)
+        ExtBase.__init__(self, chainable_output=chainable_output, long_help=long_help, short_help=short_help, example=example)
 
 
     def command(self, *args, **kwargs):
