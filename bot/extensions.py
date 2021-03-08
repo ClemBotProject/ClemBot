@@ -37,7 +37,9 @@ def command(name=None, cls=None, **attrs):
 """
 Decorator that enables the chaining of multiple commands
 """
-def chainable_output( chainable: bool):
+
+
+def chainable_output(chainable: bool = True):
     def wrapper(func):
         if isinstance(func, ExtBase):
             func.chainable_output = chainable

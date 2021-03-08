@@ -105,7 +105,7 @@ class MemesCog(commands.Cog):
         await ctx.send(msg)
 
     @ext.command()
-    @ext.chainable_output(True)
+    @ext.chainable_output()
     @ext.long_help(
         'A fun command to spongebob meme text in discord' 
     )
