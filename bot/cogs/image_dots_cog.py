@@ -21,6 +21,7 @@ class DotCog(commands.Cog):
         self.THRESHOLD = int(150)
         self.PC_WIDTH = 59
         self.MOBILE_WIDTH = 23
+        self.INVERTED = 0
         # having this at the actual threshold of 2000 caused issues around
         # Just best to give some leniency
         self.CHAR_LIMIT = 1950
@@ -56,7 +57,7 @@ class DotCog(commands.Cog):
         # or simply not(...)
         # or the bitwise not operator on the result
         for i in range(len(dots)):
-            dots[i] = '1' if dots[i] >= self.THRESHOLD else '0'
+            dots[i] = chr(ord('1') - self.INVERTED) if dots[i] >= self.THRESHOLD else chr(ord('0') + self.INVERTED)
         # now we do some more vodoo magic
         # actually quite clever technique of binary representation of braille
         # again, see https://en.wikipedia.org/wiki/Braille_Patterns
@@ -112,13 +113,25 @@ class DotCog(commands.Cog):
     @ext.command()
     @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is mobile size.\
                     Choose a width of \'pc\', \'mobile\', or leave blank.\n \
-                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]')
+                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
+                    The final argument asks, do you want to invert the image or not?')
     @ext.short_help('Turn an image to a braille image.\nDefault width is mobile size.\nDefault threshold is 150.\n\
-                    To specify threshold you must include all required arguments.')
-    @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
+                    To specify threshold you must include all required arguments.\n \
+                    The same goes for all arguments')
+    @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
+    'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 'todots https://my-cool-image.com/stuff.jpg'))
-    async def todots(self, ctx, image, device = None, threshold = 150) -> None:
+    async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
         filename = image
+        if inverted in [0, 1]:
+            self.INVERTED = int(inverted)
+        else:
+            # return an error here
+            embed = discord.Embed(title=f'ERROR: inverted must be boolean value', color=Colors.Error)
+            embed.add_field(name='Exception:', value='inverted = 0 or 1')
+            await ctx.send(embed=embed)
+            return
+
         if device == None or device.lower() == 'pc':
             width = self.PC_WIDTH
         elif type(device) is str and device.lower() == 'mobile':
