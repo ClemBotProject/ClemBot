@@ -100,7 +100,6 @@ class DotCog(commands.Cog):
                 # want to get that subsection now. starting in corner (x,y) to (width,height).
                 # in our case we want ASCIIXDOTS width, and ASCIIYDOTS height
                 # referencing: https://stackoverflow.com/questions/38049214/how-to-obtain-a-subarray-in-python-3
-                # print ([i[3:6] for i in a[0:2]])
                 # we want to get a subset of the image. We can easily use a package like numpy, but
                 # relying on numpy makes the project dependencies huge.
                 line_of_braille += self.image_data_to_braille([sub[x:x+self.ASCIIXDOTS] for sub in two_d_array[y:y+self.ASCIIYDOTS]])
