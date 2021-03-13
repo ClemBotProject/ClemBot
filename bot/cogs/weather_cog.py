@@ -67,14 +67,14 @@ class WeatherCog(commands.Cog):
 
             # Building the Page
             page += f'Location: {city} ({Lat},{Lon})\n'
-            #page += f'Temperature: {round(temp,1)}°F\n'
-            page += f'Temperature: {temp}°F\n'
+            # page += f'Temperature: {round(temp,1)}°F\n'
+            page += f'Temperature: {temp}°F / {round((temp - 32) * (5 / 9), 2)}°C\n'
             page += f'Condition:\t{desc}\n\n'
 
-            page += f'Feels Like: {round(feels,1)}°F\n'
+            page += f'Feels Like: {round(feels, 1)}°F / {round((feels - 32) * (5 / 9), 1)}°C\n'
             page += f'Humidity: {round(hum)}%\n'
-            page += f'Wind: {round(wind,1)} mph ({wind_dir})'
-            
+            page += f'Wind: {round(wind, 1)} mph / {round(wind*1.609344,1)} kmh ({wind_dir})'
+
             pages.append(page)
             
         ######################
@@ -141,22 +141,22 @@ class WeatherCog(commands.Cog):
                 # Building the Page
                 if req_type == 'day':
                     if i > 1:
-                        page += f'{date_str}: {round(day_temp,1)}°F\n'
-                        page += f'{date_str} Night: {round(night_temp,1)}°F\n'
+                        page += f'{date_str}: {round(day_temp,1)}°F / {round((day_temp - 32) * (5 / 9), 1)}°C\n'
+                        page += f'{date_str} Night: {round(night_temp,1)}°F / {round((night_temp - 32) * (5 / 9), 1)}°C\n'
                     elif i == 1:
-                        page += f'Tomorrow: {round(day_temp,1)}°F\n'
-                        page += f'Tomorrow Night: {round(night_temp,1)}°F\n'
+                        page += f'Tomorrow: {round(day_temp,1)}°F / {round((day_temp - 32) * (5 / 9), 1)}°C\n'
+                        page += f'Tomorrow Night: {round(night_temp,1)}°F / {round((night_temp - 32) * (5 / 9), 1)}°C\n'
                     else:
-                        page += f'Today: {round(day_temp,1)}°F\n'
-                        page += f'Tonight: {round(night_temp,1)}°F\n'
+                        page += f'Today: {round(day_temp,1)}°F / {round((day_temp - 32) * (5 / 9), 1)}°C\n'
+                        page += f'Tonight: {round(night_temp,1)}°F / {round((night_temp - 32) * (5 / 9), 1)}°C\n'
                 else:
                     page += f'Time: {time_str}\n'
-                    page += f'Temperature: {round(temp,1)}°F\n'
+                    page += f'Temperature: {round(temp,1)}°F / {round((temp - 32) * (5 / 9), 1)}°C\n'
                 
                 page += f'Condition: {desc}\n\n'
                 page += f'Chance of Precipitation: {round(precp*100)}%\n'
                 page += f'Humidity: {round(hum)}%\n'
-                page += f'Wind: {round(wind,1)} mph ({wind_dir})\n\n'
+                page += f'Wind: {round(wind,1)} mph / {round(wind*1.609344,1)} kmh ({wind_dir})\n\n'
                 pages.append(page)
         
         return pages, num_hr, num_day
