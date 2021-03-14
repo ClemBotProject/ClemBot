@@ -23,21 +23,21 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help('Lists all roles that have been marked as assignable in this server')
     @ext.short_help('Defines custom assignable roles')
     @ext.example('roles')
-    async def roles(self, ctx, *, input_role: str = None) -> None:
-        if input_role is None:
+    async def roles(self, ctx, *, input_roles: str = None) -> None:
+        if input_roles is None:
             await self.send_role_list(ctx, 'Assignable Roles')
             return
-        
-        try:
-            role = await commands.RoleConverter().convert(ctx, input_role)
+        for input_role in input_roles.split(' '):
+            try:
+                role = await commands.RoleConverter().convert(ctx, input_role)
 
-            if not await self.check_role_assignable(ctx, input_role):
-                raise BadArgument
+                if not await self.check_role_assignable(ctx, input_role):
+                    raise BadArgument
 
-            await self.set_role(ctx, role)
+                await self.set_role(ctx, role)
         
-        except BadArgument:  # If RoleConverter failed
-            await self.find_possible_roles(ctx, input_role)
+            except BadArgument:  # If RoleConverter failed
+                await self.find_possible_roles(ctx, input_role)
 
     async def check_role_assignable(self, ctx, input_role: str) -> bool:
         assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
