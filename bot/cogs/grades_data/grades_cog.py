@@ -1,5 +1,6 @@
 import json
 import os
+import gzip
 
 import logging
 import collections
@@ -43,21 +44,11 @@ class GradesCog(commands.Cog):
         self.master_list = {}
         self.master_prof_list = {}
         self.global_master_prof_list = {}
-        
+        LOCAL_DICTIONARY = 'bot/cogs/grades_data/assets/professor_dictionary.json.gz'
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
-        self.spellChecker = SpellChecker()
-        # deliberately call this once.
-        self.initialize_professor_names(self.spellChecker)
-
-    def initialize_professor_names(self, spellCheckerToAdd):
-        # We need to parse the professor names from the main file
-        for year in self.year_list:
-            temp = self.initialize(year)
-            # temp[2] holds the professor name in a dictionary 
-            # i.e., yvon feaster: [{...}]
-            people = [element for element in temp[2].keys()]
-            spellCheckerToAdd.word_frequency.load_words(people)
+        # I do not want the default dictionary. Adding an empty dictionary
+        self.spellChecker = SpellChecker(local_dictionary=LOCAL_DICTIONARY)
         
 
     def load_files(self,yearList):
@@ -174,27 +165,30 @@ class GradesCog(commands.Cog):
     def initialize(self, year):
         #SKIP PARSE DATA WHEN NOT NECESSARY
         prof = None
-        if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
-            with open(f'bot/cogs/grades_data/assets/master-{year}.json', 'r') as f:
-                normal = json.load(f)
+        # want to reduce the code size by creating gzipped files
+        # found the following line of code here:
+        # https://stackoverflow.com/questions/56677516/how-to-open-a-json-gz-file-and-return-to-dictionary-in-python
+        if os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json.gz'): 
+            with gzip.open(f'bot/cogs/grades_data/assets/master-{year}.json.gz', 'rb') as f:
+                normal = json.loads(f.read(), encoding='utf-8')
         
-            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
-                with open(f'bot/cogs/grades_data/assets/master_prof-{year}.json', 'r') as f:
-                    prof = json.load(f)
+            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json.gz'):
+                with gzip.open(f'bot/cogs/grades_data/assets/master_prof-{year}.json.gz', 'rb') as f:
+                    prof = json.loads(f.read(), encoding='utf-8')
 
-            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof.json'):
-                with open(f'bot/cogs/grades_data/assets/master_prof.json', 'r') as f:
-                    totalProf = json.load(f)
-                    
+            if os.path.isfile(f'bot/cogs/grades_data/assets/master_prof.json.gz'):
+                with gzip.open(f'bot/cogs/grades_data/assets/master_prof.json.gz', 'rb') as f:
+                    totalProf = json.loads(f.read(), encoding='utf-8')
+
             return (normal, prof, totalProf)
         else:
             not_found = ''
             
-            if not os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json'): 
-                not_found += f'master-{year}.json '
+            if not os.path.isfile(f'bot/cogs/grades_data/assets/master-{year}.json.gz'): 
+                not_found += f'master-{year}.json.gz'
             
-            if not os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json'):
-                not_found += f'master_prof-{year}.json'
+            if not os.path.isfile(f'bot/cogs/grades_data/assets/master_prof-{year}.json.gz'):
+                not_found += f'master_prof-{year}.json.gz'
 
             log.error(f'{not_found} file not found, aborting grades command')
             
