@@ -13,6 +13,7 @@ import typing as t
 from bot.consts import Colors
 import bot.extensions as ext
 from spellchecker import SpellChecker # Here we will add a utility for correcting user input
+LOCAL_DICTIONARY = 'bot/cogs/grades_data/assets/professor_dictionary.json.gz'
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +45,6 @@ class GradesCog(commands.Cog):
         self.master_list = {}
         self.master_prof_list = {}
         self.global_master_prof_list = {}
-        LOCAL_DICTIONARY = 'bot/cogs/grades_data/assets/professor_dictionary.json.gz'
         self.year_list = ['2014','2015','2016','2017','2018','2019']
         self.load_files(self.year_list)
         # I do not want the default dictionary. Adding an empty dictionary
