@@ -1,8 +1,7 @@
 import logging
 import urllib.request
 import random
-from PIL import Image
-from PIL import UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError
 import math
 import requests
 
@@ -12,19 +11,18 @@ from bot.consts import Colors
 import bot.extensions as ext
 
 log = logging.getLogger(__name__)
-
+ASCIIYDOTS = 4
+ASCIIXDOTS = 2
+PC_WIDTH = 59
+MOBILE_WIDTH = 23
+# having this at the actual threshold of 2000 caused issues around
+# Just best to give some leniency
+CHAR_LIMIT = 1950
 class DotCog(commands.Cog):
 
     def __init__(self, bot):
-        self.ASCIIYDOTS = 4
-        self.ASCIIXDOTS = 2
-        self.THRESHOLD = int(150)
-        self.PC_WIDTH = 59
-        self.MOBILE_WIDTH = 23
-        self.INVERTED = 0
-        # having this at the actual threshold of 2000 caused issues around
-        # Just best to give some leniency
-        self.CHAR_LIMIT = 1950
+        self.threshold = 150
+        self.inverted = 0
         self.bot = bot
 
     # So, I made this from a copy of image-to-braille. I am modifying the
@@ -57,7 +55,7 @@ class DotCog(commands.Cog):
         # or simply not(...)
         # or the bitwise not operator on the result
         for i in range(len(dots)):
-            dots[i] = chr(ord('1') - self.INVERTED) if dots[i] >= self.THRESHOLD else chr(ord('0') + self.INVERTED)
+            dots[i] = chr(ord('1') - self.inverted) if dots[i] >= self.threshold else chr(ord('0') + self.inverted)
         # now we do some more vodoo magic
         # actually quite clever technique of binary representation of braille
         # again, see https://en.wikipedia.org/wiki/Braille_Patterns
@@ -73,18 +71,18 @@ class DotCog(commands.Cog):
         
         # new image height. Want to proportionately make the image fit the screen
         # not sure the exact conversion calculation here.
-        asciiHeight = math.ceil( asciiWidth * self.ASCIIXDOTS * ( height / width ) / self.ASCIIYDOTS )
+        asciiHeight = math.ceil( asciiWidth * ASCIIXDOTS * ( height / width ) / ASCIIYDOTS )
         # want equal number of asciiDots. i.e. 4x2 array
-        width = asciiWidth * self.ASCIIXDOTS
-        height = asciiHeight * self.ASCIIYDOTS
+        width = asciiWidth * ASCIIXDOTS
+        height = asciiHeight * ASCIIYDOTS
         rgb_pixels = rgb_pixels.resize((width,height)).getdata()
         # conversion of a 1d array to 2d array
         two_d_array = self.to_matrix(list(rgb_pixels), width)
         
         # fix the dimensions to not exceed Discord's character limit
-        while (width * height) / (self.ASCIIXDOTS * self.ASCIIYDOTS) > self.CHAR_LIMIT:
-            width -= self.ASCIIXDOTS
-            height -= self.ASCIIYDOTS
+        while (width * height) / (ASCIIXDOTS * ASCIIYDOTS) > CHAR_LIMIT:
+            width -= ASCIIXDOTS
+            height -= ASCIIYDOTS
 
         # now time for the magic
         finished_image = []
@@ -95,15 +93,15 @@ class DotCog(commands.Cog):
         # . .
         # . .
         # . .
-        for y in range(0,height, self.ASCIIYDOTS):
+        for y in range(0,height, ASCIIYDOTS):
             line_of_braille = ''
-            for x in range(0,width,self.ASCIIXDOTS):
+            for x in range(0,width,ASCIIXDOTS):
                 # want to get that subsection now. starting in corner (x,y) to (width,height).
                 # in our case we want ASCIIXDOTS width, and ASCIIYDOTS height
                 # referencing: https://stackoverflow.com/questions/38049214/how-to-obtain-a-subarray-in-python-3
                 # we want to get a subset of the image. We can easily use a package like numpy, but
                 # relying on numpy makes the project dependencies huge.
-                line_of_braille += self.image_data_to_braille([sub[x:x+self.ASCIIXDOTS] for sub in two_d_array[y:y+self.ASCIIYDOTS]])
+                line_of_braille += self.image_data_to_braille([sub[x:x+ASCIIXDOTS] for sub in two_d_array[y:y+ASCIIYDOTS]])
 
             finished_image.append(line_of_braille)
         return finished_image
@@ -123,8 +121,8 @@ class DotCog(commands.Cog):
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 'todots https://my-cool-image.com/stuff.jpg'))
     async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
         filename = image
-        if inverted in [0, 1]:
-            self.INVERTED = int(inverted)
+        if inverted in (0, 1):
+            self.inverted = int(inverted)
         else:
             # return an error here
             embed = discord.Embed(title=f'ERROR: inverted must be boolean value', color=Colors.Error)
@@ -132,20 +130,20 @@ class DotCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        if device == None or device.lower() == 'pc':
-            width = self.PC_WIDTH
-        elif type(device) is str and device.lower() == 'mobile':
-            width = self.MOBILE_WIDTH
+        if device is None or device.lower() == 'pc':
+            width = PC_WIDTH
+        elif device.lower() == 'mobile':
+            width = MOBILE_WIDTH
         else:
             # return an error here
             embed = discord.Embed(title=f'ERROR: Invalid image width', color=Colors.Error)
-            embed.add_field(name='Exception:', value='Width must either be \'mobile\' or \'pc\'.\n Default length is \'pc\' length.')
+            embed.add_field(name='Exception:', value="Width must either be 'mobile' or 'pc'.\n Default length is 'pc' length.")
             await ctx.send(embed=embed)
             return
 
         if threshold in range(0,256):
             # valid thresholds
-            self.THRESHOLD = threshold
+            self.threshold = threshold
         else:
             # errors
             embed = discord.Embed(title=f'ERROR: threshold must be 0 <= threshold <= 255', color=Colors.Error)
