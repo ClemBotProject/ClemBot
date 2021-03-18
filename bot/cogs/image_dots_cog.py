@@ -109,13 +109,13 @@ class DotCog(commands.Cog):
 
 
     @ext.command()
-    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is mobile size.\
+    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
                     Choose a width of \'pc\', \'mobile\', or leave blank.\n \
                     Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
                     The final argument asks, do you want to invert the image or not?\n \
                     When attachment specifier is used, you can upload an image directly. All other arguments \n \
                     are the same except you no longer need a url for the first argument')
-    @ext.short_help('Turn an image to a braille image.\nDefault width is mobile size.\nDefault threshold is 150.\n\
+    @ext.short_help('Turn an image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
                     To specify threshold you must include all required arguments.\n \
                     The same goes for all arguments')
     @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
