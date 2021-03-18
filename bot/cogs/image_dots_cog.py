@@ -112,14 +112,29 @@ class DotCog(commands.Cog):
     @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is mobile size.\
                     Choose a width of \'pc\', \'mobile\', or leave blank.\n \
                     Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
-                    The final argument asks, do you want to invert the image or not?')
+                    The final argument asks, do you want to invert the image or not?\n \
+                    When attachment specifier is used, you can upload an image directly. All other arguments \n \
+                    are the same except you no longer need a url for the first argument')
     @ext.short_help('Turn an image to a braille image.\nDefault width is mobile size.\nDefault threshold is 150.\n\
                     To specify threshold you must include all required arguments.\n \
                     The same goes for all arguments')
     @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
-    'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 'todots https://my-cool-image.com/stuff.jpg'))
+    'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 
+    'todots https://my-cool-image.com/stuff.jpg',
+    'todots attachment [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
+    'todots attachment [mobile|pc] [threshold = 0-255]',
+    'todots attachment [mobile|pc]',
+    'todots attachment'))
     async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
+        if image == 'attachment':
+            try:
+                image = ctx.message.attachments[0].url
+            except Exception as e:
+                embed = discord.Embed(title=f'ERROR: must include an attached image', color=Colors.Error)
+                embed.add_field(name='Exception:', value="upload an image when using 'attachment' specifier")
+                await ctx.send(embed=embed)
+                return
         filename = image
         if inverted in (0, 1):
             self.inverted = int(inverted)
