@@ -402,7 +402,17 @@ class EventsMeta(type):
         """
         return 'on_member_update'
 
+    @property
+    def on_set_reminder(self):
+        """
+            Published when a person sets a reminder 
 
+            Args:
+                userId (int)
+                wait (converters.Duration)
+                message (str)
+        """
+        return 'on_reminder_set'
 
 class Events(metaclass= EventsMeta):
     pass

@@ -115,3 +115,10 @@ CREATE TABLE IF NOT EXISTS ClaimsMapping (
         REFERENCES Guilds (id)
 );
 
+CREATE TABLE IF NOT EXISTS Reminders (
+    id                      VARCHAR(255)     NOT NULL,
+    user                    INTEGER          NOT NULL,
+    message                 TEXT             NOT NULL,
+    link                    TEXT             NOT NULL,
+    time                    INTEGER          NOT NULL
+);
