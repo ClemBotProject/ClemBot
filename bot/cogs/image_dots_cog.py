@@ -21,8 +21,6 @@ CHAR_LIMIT = 1950
 class DotCog(commands.Cog):
 
     def __init__(self, bot):
-        self.threshold = 150
-        self.inverted = 0
         self.bot = bot
 
     # So, I made this from a copy of image-to-braille. I am modifying the
@@ -42,7 +40,7 @@ class DotCog(commands.Cog):
     # requires grayscale images
     # https://stackoverflow.com/questions/31572425/list-all-rgba-values-of-an-image-with-pil
 
-    def image_data_to_braille(self, rgb_array):
+    def image_data_to_braille(self, rgb_array, inverted, threshold):
         # The original author used subarrays in this function.
         # I am taking a slightly different method than the original author, because the rgb_array is grayscale. 
         # Hence, why I do not need to get another subarray
@@ -55,7 +53,7 @@ class DotCog(commands.Cog):
         # or simply not(...)
         # or the bitwise not operator on the result
         for i in range(len(dots)):
-            dots[i] = chr(ord('1') - self.inverted) if dots[i] >= self.threshold else chr(ord('0') + self.inverted)
+            dots[i] = chr(ord('1') - inverted) if dots[i] >= threshold else chr(ord('0') + inverted)
         # now we do some more vodoo magic
         # actually quite clever technique of binary representation of braille
         # again, see https://en.wikipedia.org/wiki/Braille_Patterns
@@ -63,7 +61,7 @@ class DotCog(commands.Cog):
         dots.reverse()
         return str(chr(0x2800 + int(''.join(dots),2)))
 
-    def parse_image(self, image, asciiWidth):
+    def parse_image(self, image, asciiWidth, threshold, inverted):
         # necessary to have a gray scaled image. Can do this with a conversion
         # or simply finding the average of (r,g,b) per pixel value
         rgb_pixels = image.convert('L')
@@ -101,31 +99,14 @@ class DotCog(commands.Cog):
                 # referencing: https://stackoverflow.com/questions/38049214/how-to-obtain-a-subarray-in-python-3
                 # we want to get a subset of the image. We can easily use a package like numpy, but
                 # relying on numpy makes the project dependencies huge.
-                line_of_braille += self.image_data_to_braille([sub[x:x+ASCIIXDOTS] for sub in two_d_array[y:y+ASCIIYDOTS]])
+                line_of_braille += self.image_data_to_braille([sub[x:x+ASCIIXDOTS] for sub in two_d_array[y:y+ASCIIYDOTS]], inverted, threshold)
 
             finished_image.append(line_of_braille)
         return finished_image
 
-
-    @ext.group(invoke_without_command = True)
-    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
-                    Choose a width of \'pc\', \'mobile\', or leave blank.\n \
-                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
-                    The final argument asks, do you want to invert the image or not?\n \
-                    When attachment specifier is used, you can upload an image directly. All other arguments \n \
-                    are the same except you no longer need a url for the first argument')
-    @ext.short_help('Turn an image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
-                    To specify threshold you must include all required arguments.\n \
-                    The same goes for all arguments')
-    @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
-    'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
-    'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 
-    'todots https://my-cool-image.com/stuff.jpg'))
-    async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
+    async def todots_helper(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
         filename = image
-        if inverted in (0, 1):
-            self.inverted = int(inverted)
-        else:
+        if inverted not in (0, 1):
             # return an error here
             embed = discord.Embed(title=f'ERROR: inverted must be boolean value', color=Colors.Error)
             embed.add_field(name='Exception:', value='inverted = 0 or 1')
@@ -143,10 +124,7 @@ class DotCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        if threshold in range(0,256):
-            # valid thresholds
-            self.threshold = threshold
-        else:
+        if threshold not in range(0,256):
             # errors
             embed = discord.Embed(title=f'ERROR: threshold must be 0 <= threshold <= 255', color=Colors.Error)
             embed.add_field(name='Exception:', value='threshold not a valid int or in range.')
@@ -164,12 +142,29 @@ class DotCog(commands.Cog):
             filename = filename.replace('<', '').replace('>', '')
             with Image.open(requests.get(filename, stream=True).raw) as img:
                 # default asciiWidth I found online. Aparently over 500 gets laggy
-                new_img = self.parse_image(img, width)
+                new_img = self.parse_image(img, width, threshold, inverted)
                 await ctx.send('\n'.join(new_img))
         except UnidentifiedImageError as e:
             embed = discord.Embed(title=f'ERROR: unable to open message link', color=Colors.Error)
             embed.add_field(name='Exception:', value=filename + ' link does not exist, or is broken!')
             await ctx.send(embed=embed)
+
+    @ext.group(invoke_without_command = True)
+    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
+                    Choose a width of \'pc\', \'mobile\', or leave blank.\n \
+                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
+                    The final argument asks, do you want to invert the image or not?\n \
+                    When attachment specifier is used, you can upload an image directly. All other arguments \n \
+                    are the same except you no longer need a url for the first argument')
+    @ext.short_help('Turn an image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
+                    To specify threshold you must include all required arguments.\n \
+                    The same goes for all arguments')
+    @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
+    'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
+    'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 
+    'todots https://my-cool-image.com/stuff.jpg'))
+    async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
+        return await self.todots_helper(ctx,image,device,threshold,inverted)
 
     @todots.command()
     @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
@@ -177,7 +172,7 @@ class DotCog(commands.Cog):
                     Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
                     The final argument asks, do you want to invert the image or not?\n \
                     When attachment specifier is used, you can upload an image directly. Must attach an image.')
-    @ext.short_help('Turn an image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
+    @ext.short_help('Turn an attached image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
                     To specify threshold you must include all required arguments.\n \
                     The same goes for all arguments. Must attach an image')
     @ext.example(('todots attachment [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
@@ -185,7 +180,6 @@ class DotCog(commands.Cog):
     'todots attachment [mobile|pc]',
     'todots attachment'))
     async def attachment(self, ctx, device = None, threshold = 150, inverted = 0) -> None:
-        image = ''
         try:
             image = ctx.message.attachments[0].url
         except Exception as e:
@@ -193,7 +187,7 @@ class DotCog(commands.Cog):
             embed.add_field(name='Exception:', value="upload an image when using 'attachment' specifier")
             await ctx.send(embed=embed)
             return
-        return await self.todots(ctx, image, device, threshold, inverted)
+        return await self.todots_helper(ctx, image, device, threshold, inverted)
 
 def setup(bot): 
     bot.add_cog(DotCog(bot))
