@@ -127,7 +127,6 @@ class TagCog(commands.Cog):
 
 
     @tag.command(aliases=['remove', 'destroy'])
-    @ext.required_claims(Claims.tag_delete)
     @ext.long_help(
         'Deletes a tag with a given name, this command can only be run by '
         'server staff or the person who created the tag'
@@ -139,14 +138,16 @@ class TagCog(commands.Cog):
         repo = TagRepository()
 
         if not await repo.check_tag_exists(name, ctx.guild.id):
-            embed = discord.Embed(title= f'Error: Tag {name} does not exist', color=Colors.Error)
+            embed = discord.embed(title= f'Error: tag {name} does not exist', color=Colors.error)
             await ctx.send(embed=embed)
             return
 
+
         tag = await repo.get_tag(name, ctx.guild.id)
 
-        if ctx.author.guild_permissions.administrator:
-            await self._delete_tag(name, ctx)
+        if not (ctx.command.claims_check([Claims.tag_delete]) or tag['fk_UserId'] == ctx.author.id):
+            embed = discord.embed(title= f'Error: You do not have the tag_delete claim or you do not own this tag', color= Colors.error)
+            await ctx.send(embed=embed)
             return
         
         await self._delete_tag(name, ctx)
