@@ -70,6 +70,7 @@ class ClemBot(commands.Bot):
         author = ctx.author
         repo = ClaimsRepository()
 
+
         if await self.is_owner(author):
             #if the author owns the bot, authorize the command no matter what
             return
@@ -78,12 +79,16 @@ class ClemBot(commands.Bot):
             #If the command isnt an extension command let it through, we dont need to think about it
             return
 
+        if author.guild_permissions.administrator:
+            #Admins have full bot access no matter what
+            return
+
         if len(command.claims) == 0:
             #command requires no claims nothing else to do
             return
 
-        if author.guild_permissions.administrator:
-            #Admins have full bot access no matter what
+        if command.ignore_claims_pre_invoke:
+            #The command is going to check the claims in the command body, nothing else to do
             return
 
         claims = await repo.fetch_all_claims_user(author)

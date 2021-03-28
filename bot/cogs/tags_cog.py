@@ -123,9 +123,11 @@ class TagCog(commands.Cog):
 
 
     @tag.command(aliases=['remove', 'destroy'])
+    @ext.required_claims(Claims.tag_delete)
+    @ext.ignore_claims_pre_invoke()
     @ext.long_help(
         'Deletes a tag with a given name, this command can only be run by '
-        'server staff or the person who created the tag'
+        'those with the tag_delete claim or the person who created the tag'
     )
     @ext.short_help('Deletes a tag')
     @ext.example('tag delete mytagname mytagcontnt')
@@ -138,15 +140,19 @@ class TagCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-
         tag = await repo.get_tag(name, ctx.guild.id)
 
-        if not (ctx.command.claims_check([Claims.tag_delete]) or tag['fk_UserId'] == ctx.author.id):
-            embed = discord.Embed(title= f'Error: You do not have the tag_delete claim or you do not own this tag', color= Colors.Error)
-            await ctx.send(embed=embed)
+        if tag['fk_UserId'] == ctx.author.id:
+            await self._delete_tag(name, ctx)
+            return
+
+        if ctx.command.claims_check([Claims.tag_delete]):
+            await self._delete_tag(name, ctx)
             return
         
-        await self._delete_tag(name, ctx)
+        error_str = f'Error: You do not have the tag_delete claim or you do not own this tag'
+        embed = discord.Embed(title=error_str, color= Colors.Error)
+        await ctx.send(embed=embed)
 
     @tag.command(aliases=['about'])
     @ext.long_help(
