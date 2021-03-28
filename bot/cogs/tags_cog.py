@@ -1,9 +1,6 @@
-import functools
 import logging
-import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 
 import discord
 import discord.ext.commands as commands
@@ -11,7 +8,6 @@ import discord.ext.commands as commands
 from bot.consts import Colors, Claims
 from bot.data.tag_repository import TagRepository
 import bot.extensions as ext
-from discord.ext.commands.errors import CheckFailure
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
@@ -138,7 +134,7 @@ class TagCog(commands.Cog):
         repo = TagRepository()
 
         if not await repo.check_tag_exists(name, ctx.guild.id):
-            embed = discord.embed(title= f'Error: tag {name} does not exist', color=Colors.error)
+            embed = discord.Embed(title= f'Error: tag {name} does not exist', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
@@ -146,7 +142,7 @@ class TagCog(commands.Cog):
         tag = await repo.get_tag(name, ctx.guild.id)
 
         if not (ctx.command.claims_check([Claims.tag_delete]) or tag['fk_UserId'] == ctx.author.id):
-            embed = discord.embed(title= f'Error: You do not have the tag_delete claim or you do not own this tag', color= Colors.error)
+            embed = discord.Embed(title= f'Error: You do not have the tag_delete claim or you do not own this tag', color= Colors.Error)
             await ctx.send(embed=embed)
             return
         
