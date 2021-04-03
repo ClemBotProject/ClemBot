@@ -201,7 +201,7 @@ class TagCog(commands.Cog):
 
     async def _delete_tag(self, name, ctx):
         repo = TagRepository()
-        content = repo.get_tag_content(name, ctx.guild.id)
+        content = await repo.get_tag_content(name, ctx.guild.id)
 
         await repo.delete_tag(name, ctx.guild.id)
 
