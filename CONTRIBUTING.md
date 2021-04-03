@@ -4,7 +4,7 @@ This is a quick guide on how to develop and contribute to this project
 
 ## Dependencies
 Make sure you can run these commands and install them if not present.
-* python3
+* Python 3.8 or higher
 * pip3 (packaged as python3-pip)
 
 
