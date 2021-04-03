@@ -7,6 +7,7 @@ import discord.ext.commands as commands
 
 from bot.consts import Colors, Claims
 from bot.data.tag_repository import TagRepository
+from bot.data.claims_repository import ClaimsRepository
 import bot.extensions as ext
 from bot.messaging.events import Events
 
@@ -141,22 +142,25 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Deletes a tag')
     @ext.example('tag delete mytagname mytagcontnt')
-    async def delete(self, ctx, name):
+    async def delete(self, ctx: commands.Context, name):
 
-        repo = TagRepository()
+        tag_repo = TagRepository()
+        claims_repo = ClaimsRepository()
 
-        if not await repo.check_tag_exists(name, ctx.guild.id):
+        if not await tag_repo.check_tag_exists(name, ctx.guild.id):
             embed = discord.Embed(title= f'Error: tag {name} does not exist', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
-        tag = await repo.get_tag(name, ctx.guild.id)
+        tag = await tag_repo.get_tag(name, ctx.guild.id)
 
         if tag['fk_UserId'] == ctx.author.id:
             await self._delete_tag(name, ctx)
             return
 
-        if ctx.command.claims_check([Claims.tag_delete]):
+        claims = await claims_repo.fetch_all_claims_user(ctx.author)
+
+        if ctx.command.claims_check(claims):
             await self._delete_tag(name, ctx)
             return
         
@@ -196,9 +200,14 @@ class TagCog(commands.Cog):
         await ctx.send(embed=embed)
 
     async def _delete_tag(self, name, ctx):
-        await TagRepository().delete_tag(name, ctx.guild.id)
+        repo = TagRepository()
+        content = repo.get_tag_content(name, ctx.guild.id)
+
+        await repo.delete_tag(name, ctx.guild.id)
+
         embed=discord.Embed(title=':white_check_mark: Tag successfully deleted', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=name, inline=True)
+        embed.add_field(name='Content', value=content, inline=True)
         await ctx.send(embed=embed)
 
 
