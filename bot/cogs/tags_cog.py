@@ -33,13 +33,23 @@ class TagCog(commands.Cog):
     
     @ext.group(invoke_without_command= True, aliases=['tags'], case_insensitive=True)
     @ext.long_help(
-        'Lists all the possible tags in the current server' 
-        'tags are invoked with the command notation $<tag_name> anywhere in a message'
+        'Either invokes a given tag or, if no tag is provided, '
+        'Lists all the possible tags in the current server. ' 
+        'tags can also be invoked with the inline command notation '
+        '$<tag_name> anywhere in a message'
     )
     @ext.short_help('Supports custom tag functionality')
-    @ext.example('tag')
-    async def tag(self, ctx):
-        tags = await TagRepository().get_all_server_tags(ctx.guild.id)
+    @ext.example(('tag', 'tag mytag'))
+    async def tag(self, ctx, tag=None):
+        repo = TagRepository()
+
+        if tag:
+            if not await repo.check_tag_exists(tag, ctx.guild.id):
+                embed = discord.Embed(title=f'Error: Tag "{tag}" does not exist in this server', color=Colors.Error)
+                return await ctx.send(embed=embed)
+            return await ctx.send(await repo.get_tag_content(tag, ctx.guild.id))
+
+        tags = await repo.get_all_server_tags(ctx.guild.id)
 
         pages = []
         #check for if no tags exist in this server
