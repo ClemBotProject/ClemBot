@@ -38,14 +38,13 @@ class RemindCog(commands.Cog):
         'remind 3y1M4w1d5h9m2s Pi'
     ))
     async def remind(self, ctx: commands.Context, wait: converters.Duration, *args):
-        message = " ".join(args)
-        message = message or "None"
-        await ctx.message.add_reaction("⏰")
+
+        await ctx.message.add_reaction('⏰')
         await self.bot.messenger.publish(
             Events.on_set_reminder,
             ctx.author.id,
             wait,
-            message,
+            ctx.message.id,
             ctx.message.jump_url)        
 
 

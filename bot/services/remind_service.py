@@ -1,3 +1,4 @@
+from bot.data.message_repository import MessageRepository
 from datetime import datetime
 from uuid import uuid4
 import logging
@@ -26,14 +27,19 @@ class RemindService(BaseService):
     async def reminder_callback(self, id: str):       
         data = await RemindRepository().get_reminder(id)
         
-        user: discord.User = self.bot.get_user(data["user"])
+        user: discord.User = self.bot.get_user(data['fk_userId'])
 
-        embed = discord.Embed(title="⏰Reminder", color = Colors.ClemsonOrange)
+        message = await MessageRepository().get_message(data['fk_messageId'])
         
-        embed.add_field(name="Message", value = data['message'], inline= False)
+        message = message['content'].split(' ', 2)
+        if len(message) < 3:
+            message = 'None'
+        else:
+            message = message[2]
         
-        embed.add_field(name="Message Link", value=data["link"], inline=False)
-
+        embed = discord.Embed(title='⏰Reminder', color = Colors.ClemsonOrange)
+        embed.add_field(name='Message', value = message, inline= False)
+        embed.add_field(name='Message Link', value = data['link'], inline=False)
         await user.send(embed = embed)
         
         await RemindRepository().delete_reminder(id)
@@ -41,8 +47,8 @@ class RemindService(BaseService):
     async def load_service(self):
         reminders = await RemindRepository().get_all_reminders()
         for reminder in reminders:
-            wait: datetime = datetime.strptime(reminder[4], "%Y-%m-%d %H:%M:%S.%f")
+            wait: datetime = datetime.strptime(reminder['time'], '%Y-%m-%d %H:%M:%S.%f')
             if (wait - datetime.utcnow()).total_seconds() <= 0:
-                await self.reminder_callback(reminder[0])
+                await self.reminder_callback(reminder['id'])
             else:
-                self.bot.scheduler.schedule_at(self.reminder_callback(reminder[0]), time=wait)
+                self.bot.scheduler.schedule_at(self.reminder_callback(reminder['id']), time=wait)

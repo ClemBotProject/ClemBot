@@ -4,11 +4,11 @@ from bot.data.base_repository import BaseRepository
 
 class RemindRepository(BaseRepository):
 
-    async def insert_reminder(self, id: str, user: int, message: str, link: str, time):
+    async def insert_reminder(self, id: str, user: int, message: int, link: str, time):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
-                INSERT INTO Reminders (id, user, message, link, time) 
+                INSERT INTO Reminders (id, fk_userId, fk_messageId, link, time) 
                 VALUES (?, ?, ?, ?, ?)
                 """, (id, user, message, link, time,))
             await db.commit()
@@ -30,6 +30,5 @@ class RemindRepository(BaseRepository):
     async def get_all_reminders(self):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Reminders', ()) as c:
-                result = await c.fetchall()
-            temp = [(i, u, m, l, t) for i, u, m, l, t in result]
-            return temp
+                result = await self.fetcthall_as_dict(c)
+            return result
