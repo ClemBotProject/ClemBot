@@ -105,7 +105,7 @@ class MemesCog(commands.Cog):
         await ctx.send(msg)
 
     @ext.command()
-    @ext.chainable_output()
+    @ext.chainable()
     @ext.long_help(
         'A fun command to spongebob meme text in discord' 
     )
@@ -128,20 +128,7 @@ class MemesCog(commands.Cog):
             else:
                 result += str(i).lower()
 
-        embed = discord.Embed(title="SpOnGeBoB", color=Colors.ClemsonOrange)
-        result2 = ''
-
-        # Discord messages can only be 2k characters long, this block accounts for that
-        if len(result) >= 1024:
-            result2 = result[1024:len(result)]
-            result = result[:1023]
-        embed.add_field(name="TeXt", value=result, inline=False)
-
-        if result2:
-            embed.add_field(name="tExT", value=result2, inline=False)
-        
-
-        await ctx.send(embed=embed)
+        await ctx.send(result)
 
     @ext.command(aliases=['rave', '🦀'])
     @commands.cooldown(1, CRAB_COMMAND_COOLDOWN, commands.BucketType.guild)

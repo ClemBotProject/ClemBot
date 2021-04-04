@@ -1,82 +1,80 @@
 import logging
+import typing as t
 
 import discord
 import discord.ext.commands as commands
 from copy import copy
+import re
 
 import bot.extensions as ext
 
 log = logging.getLogger(__name__)
+
 
 class ChainCog(commands.Cog):
     """This cog handles the chaining of commands"""
 
     def __init__(self, bot):
         self.bot = bot
-        self.resultqueue = []
 
     @ext.command()
-    @ext.chainable_output(False)
+    @ext.chainable(False)
     @ext.long_help('Chains multiple chainable commands together')
     @ext.short_help('Chains commands')
     @ext.example('chain command1 command2 hello')
     async def chain(self, ctx, *, text: str):
-        prefix = str(await self.bot.current_prefix(ctx))
-        # Make a fake ctx to intercept values passed to send
-        fakectx = copy(ctx)
-        fakectx.send = self.fakesend
-        # The first command doesnt have to have a chainable output so processed later
-        try:
-            command1 = text[text.index(prefix)+1:text.index(' ')]
-        except ValueError:
-            await ctx.send("no valid first command")
+        prefix = await self.bot.get_prefix(ctx)
+        if not any(sub in text for sub in prefix):
+            await ctx.send(f'{prefix[2]}chain requires 1 or more commands to run')
             return
-        remainder = text[text.index(' ')+1:]
-        # Get output of the chainable output commands
-        while(True):
-            currentcommandindex = remainder.rfind(prefix)
-            if currentcommandindex == -1:
-                # If no more commands, break
-                break
-            currentcommand = self.find_command(self.bot, remainder[currentcommandindex+1:remainder.index(' ',currentcommandindex)])
-            if currentcommand is None:
-                # if the command isnt valid, stop execution
-                await ctx.send(remainder[currentcommandindex + 1:remainder.index(' ', currentcommandindex)]+' is not a valid command')
-                return
-            if currentcommand.chainable_output:
-                argname = str(next(reversed(currentcommand.params.values())))
-                buffer = argname.find('=')
-                if buffer != -1:
-                    argname = argname[:buffer]
-                # Run the command passing the fake ctx
-                await eval('currentcommand(' + argname + '= \''+remainder[remainder.index(' ', currentcommandindex)+1:]+'\', ctx=fakectx)')
-                # Create new remainder, getting rid of the command and replacing it with the result of the executed command
-                remainder = remainder[:currentcommandindex]
-                for buffer in self.resultqueue:
-                    if type(buffer)== discord.Embed:
-                        for field in buffer.fields:
-                            remainder += str(field.value)
-                    else:
-                        remainder += str(buffer)
-                self.resultqueue.clear()
-            else:
-                # if the command doesnt have a chainable output, stop execution
-                await ctx.send(currentcommand.qualified_name+' is not chainable')
-                return
-        # After all the chainable output commands have been ran, run the last command
-        command1func = self.find_command(self.bot, command1)
-        if command1func is None:
-            await ctx.send(command1+" is not a valid command")
-            return
-        argname = str(next(reversed(command1func.params.values())))
-        buffer = argname.find('=')
-        if buffer!=-1:
-            argname = argname[:buffer]
-        # Pass the real ctx as this is the last command to be executed
-        await eval('command1func('+argname+'=remainder, ctx=ctx)')
+        # Make a Fake ctx to intercept ctx send
+        fakectx = copy(ctx)  # We gotta use this as to not pass a reference to the ctx object
+        resultqueue = []  # Intercepted sends will be stored here
 
-    async def fakesend(self, embed):
-        self.resultqueue.append(embed)
+        # Actually does the intercepting
+        async def fakesend(embed):
+            if type(embed) == discord.Embed:
+                raise Exception('Chainable Command Output is not String')
+            resultqueue.append(str(embed))
+        fakectx.send = fakesend
+        pattern = f'[\w\d\s.](?={prefix[0]}|{prefix[1]}|\\{prefix[2]})'  # Divide our input by the prefixes
+        commandls = re.split(pattern, text)
+        isfirstcommandatfirst = any(sub in commandls[0] for sub in prefix)
+        for i in range(0, len(commandls)):
+            commandls[i] = commandls[i].replace(prefix[0], '')
+            commandls[i] = commandls[i].replace(prefix[1], '')
+            commandls[i] = commandls[i].replace(prefix[2], '')
+            commandls[i] = commandls[i].replace('\\'+prefix[2], prefix[2])  # Allows the use of escaped prefixes as
+            # regular characters without invoking command
+        # Main Loop
+        index = len(commandls)-1
+        while index > (not isfirstcommandatfirst):
+            buffer, err = await self.process_command(commandls.pop(index), True, fakectx)
+            if buffer == 1:
+                await ctx.send(err)
+                return
+            for i in range(0, len(resultqueue)):
+                commandls[index-1] += resultqueue[i]
+                if i!= len(resultqueue)-1:
+                    commandls[index-1]+= '\n'
+            resultqueue = []
+            index-=1
+        # Process the last command differently
+        if isfirstcommandatfirst:  # If there is nothing before the last command then use the real ctx
+            buffer, err = await self.process_command(commandls.pop(0), False, ctx)
+            if buffer == 1:
+                await ctx.send(err)
+                return
+        else:  # Otherwise pass the fake ctx so we can chain it
+            buffer, err = await self.process_command(commandls.pop(1), True, fakectx)
+            if buffer == 1:
+                await ctx.send(err)
+                return
+            for i in range(0, len(resultqueue)):
+                commandls[index-1] += resultqueue[i]
+                if i!= len(resultqueue)-1:
+                    commandls[index-1]+= '\n'
+            await ctx.send(commandls.pop(0))
 
 
     # Code Copied from help_cog.py
@@ -99,6 +97,74 @@ class ChainCog(commands.Cog):
                 if result := self.find_command(c, command_name):
                     return result
         return None
+
+    def boolcast(self, string):
+        if string == 'False':
+            return False
+        if string == 'True':
+            return True
+        raise ValueError
+
+    async def process_command(self, command, checkfordecorator, ctx):
+        func = self.find_command(self.bot, command.split()[0])
+        if func is None:
+            return 1, command.split()[0] + ' Is not a valid command'
+        if checkfordecorator and not func.chainable_output:
+            return 1, command.split()[0] + ' Is not a chainable command'
+        args = {'ctx': ctx}
+        temp = []
+        for arg in func.params:
+            if arg!= 'self' and arg != 'ctx':
+                temp.append(arg)
+        if len(temp) == 1:
+            index = command.find(' ')
+            arg = ''
+            if index != -1:
+                arg = command[index:]
+            args[temp[0]] = arg
+        elif len(temp) == 0:
+            return 1, command.split()[0] + ' Takes no arguments'
+        else:
+            remainder = command.split()
+            remainder.pop(0)
+            for i in range(0, len(temp)-1):
+                if type(func.params[temp[i]].annotation) == t._GenericAlias:
+                    for arg in func.params[temp[i]].annotation.__args__:
+                        try:
+                            if arg == type(None):
+                                pass
+                            elif arg == bool:
+                                args[temp[i]] = self.boolcast(remainder[0])
+                                remainder.pop(0)
+                                break
+                            else:
+                                args[temp[i]] = arg(remainder[0])
+                                remainder.pop(0)
+                                break
+                        except ValueError:
+                            pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
+                        except IndexError:
+                            break  # Out of values
+                elif func.params[temp[i]].annotation == bool:
+                    try:
+                        args[temp[i]] = self.boolcast(remainder[0])
+                        remainder.pop(0)
+                    except ValueError:
+                        pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
+                    except IndexError:
+                        break  # We ran out of arguments so continuing with command execution
+                else:
+                    try:
+                        args[temp[i]] = func.params[temp[i]].annotation(remainder[0])
+                        remainder.pop(0)
+                    except ValueError:
+                        pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
+                    except IndexError:
+                        break  # We ran out of arguments so continuing with command execution
+            args[temp[-1]] = ''.join(remainder)
+        await func(**args)
+        return 0, ''
+
 
 def setup(bot):
     bot.add_cog(ChainCog(bot))
