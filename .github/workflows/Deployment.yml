@@ -5,6 +5,12 @@ on:
     branches: [ master ]
     paths: 
       - "bot/**"
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Manual ClemBot workflow trigger'
+        required: true
+        default: 'Manual Deployment'
 
 jobs:
     deploy:
