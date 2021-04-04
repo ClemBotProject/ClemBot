@@ -141,7 +141,7 @@ class TagCog(commands.Cog):
         'those with the tag_delete claim or the person who created the tag'
     )
     @ext.short_help('Deletes a tag')
-    @ext.example('tag delete mytagname mytagcontnt')
+    @ext.example('tag delete mytagname')
     async def delete(self, ctx: commands.Context, name):
 
         tag_repo = TagRepository()

@@ -205,6 +205,11 @@ class GradesCog(commands.Cog):
 
 
     @grades.command(aliases=['list'])
+    @ext.long_help(
+        'Lists all available Courses, some Courses will just be a name with no data' 
+    )
+    @ext.short_help('Lists all courses')
+    @ext.example('grades list')
     async def list_grades(self, ctx):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_courses, 
@@ -241,6 +246,11 @@ class GradesCog(commands.Cog):
         return embeds
 
     @prof.command(aliases=['list'])
+    @ext.long_help(
+        'Lists all available professors, some professors will just be a name with no data' 
+    )
+    @ext.short_help('Lists all professors')
+    @ext.example('prof list')
     async def list_prof(self, ctx):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_profs, 
