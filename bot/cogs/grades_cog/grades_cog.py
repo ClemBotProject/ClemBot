@@ -214,7 +214,8 @@ class GradesCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_courses, 
                 author=ctx.author, 
-                channel=ctx.channel)
+                channel=ctx.channel,
+                timeout=360)
 
     def get_profs(self):
         profs = self.grades_df.groupby(['Instructor']).mean().iterrows()
@@ -255,7 +256,8 @@ class GradesCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_profs, 
                 author=ctx.author, 
-                channel=ctx.channel)
+                channel=ctx.channel,
+                timeout=360)
 
     def get_full_name(self, author) -> str: 
         return f'{author.name}#{author.discriminator}' 
