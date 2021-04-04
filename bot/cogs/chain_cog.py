@@ -165,7 +165,12 @@ class ChainCog(commands.Cog):
                         pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
                     except IndexError:
                         break  # We ran out of arguments so continuing with command execution
-            args[temp[-1]] = ''.join(remainder)
+            buffer = ''
+            for i in range(0, len(remainder)):
+                buffer+=remainder[i]
+                if i != len(remainder)-1:
+                    buffer += ' '
+            args[temp[-1]] = buffer
         await func(**args)
         return 0, ''
 
