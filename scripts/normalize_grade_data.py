@@ -13,7 +13,7 @@ if '.csv' not in file:
     exit('File must be a csv')
 
 if '2020' in file:
-    #2020 added some course designatins so we need to make extra columns
+    #2020 added some course designations so we need to make extra columns
     columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'H']
     data = pd.read_csv(file, names=columns)
     data = data.drop(['I', 'SCP', 'SCN', 'SCD'], 1)
