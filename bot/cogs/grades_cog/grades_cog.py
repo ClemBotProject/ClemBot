@@ -19,23 +19,6 @@ log = logging.getLogger(__name__)
 
 MIN_YEAR = 2014
 TAG_CHUNK_SIZE = 12*3
-CSV_FILES = [
-    '2014_Fall.csv',
-    '2015_Fall.csv',
-    '2015_Fall.csv',
-    '2016_Fall.csv',
-    '2017_Fall.csv',
-    '2018_Fall.csv',
-    '2019_Fall.csv',
-    '2020_Fall.csv',
-    '2014_Spring.csv',
-    '2015_Spring.csv',
-    '2015_Spring.csv',
-    '2016_Spring.csv',
-    '2017_Spring.csv',
-    '2018_Spring.csv',
-    '2019_Spring.csv',
-]
 
 ASSET_LOCATION = 'bot/cogs/grades_cog/assets/'
 
@@ -47,7 +30,7 @@ class GradesCog(commands.Cog):
 
     def load_data(self):
         self.grades_df = pd.DataFrame()
-        for file in CSV_FILES:
+        for file in os.listdir(ASSET_LOCATION):
             self.grades_df = self.grades_df.append(pd.read_csv(f'{ASSET_LOCATION}{file}'))
 
         self.grades_df.info()
@@ -132,7 +115,7 @@ class GradesCog(commands.Cog):
         """
     )
     @ext.short_help('Provides info about a given professor')
-    @ext.example(('prof brian dean', 'prof brian dean'))
+    @ext.example(['prof brian dean'])
     async def prof(self, ctx, *, prof: str):
         prof = prof.lower()
         normalized_name = prof.title()
@@ -141,11 +124,18 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
-            embed.add_field(name=f'Help:', value= f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what proffesors are available', inline=False)
-            return await ctx.send(embed=embed)#chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
+            embed.add_field(name=f'Help:', value= f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available', inline=False)
+            return await ctx.send(embed=embed)
 
         #check for if there is a 0% A rate, that means it was a pass fail class and we dont handle those
         df = self.grades_df[(self.grades_df.Instructor == prof) & (self.grades_df.A > 0)]
+
+        if df.empty:
+            embed = discord.Embed(title="Error: That professor has no available data", color=Colors.Error)
+            embed.add_field(name=f'Help:', value= f'This professors data might be under a different name, run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available', inline=False)
+            return await ctx.send(embed=embed)
+
+
         A = f'{int(df.A.mean().round(2) * 100)}%'
         B = f'{int(df.B.mean().round(2) * 100)}%'
         C = f'{int(df.C.mean().round(2) * 100)}%'
@@ -187,7 +177,7 @@ class GradesCog(commands.Cog):
     def get_courses(self):
         grades = self.grades_df.groupby(['CourseId']).mean().iterrows()
 
-        pages = []
+        embeds = []
 
         #begin generating paginated columns
         for chunk in self.chunk_list([prof.name for i, prof in grades], 51):
@@ -205,15 +195,18 @@ class GradesCog(commands.Cog):
 
             #Apped the content string to the list of pages to send to the paginator
             #Marked as a code block to ensure a monospaced font and even columns
-            pages.append(f'```{content}```')
+            
+            embed = discord.Embed(title='All Known Courses', color=Colors.ClemsonOrange)
+            embed.add_field(name='Listings:', value=f'```{content}```')
+            embed.add_field(name='Info:', value=f'Clemson provides incomplete and mangled data so there may be different versions of the same course, as well as other mangled names. This is just a byproduct of how the data is distributed by the university', inline=False)
+            
+            embeds.append(embed)
+        return embeds
 
-        return pages
 
     @grades.command(aliases=['list'])
     async def list_grades(self, ctx):
-        await self.bot.messenger.publish(Events.on_set_pageable_text,
-                embed_name='All Known Professors', 
-                field_title='Listing:',
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_courses, 
                 author=ctx.author, 
                 channel=ctx.channel)
@@ -221,7 +214,7 @@ class GradesCog(commands.Cog):
     def get_profs(self):
         profs = self.grades_df.groupby(['Instructor']).mean().iterrows()
 
-        pages = []
+        embeds = []
 
         #begin generating paginated columns
         #chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
@@ -240,15 +233,16 @@ class GradesCog(commands.Cog):
 
             #Apped the content string to the list of pages to send to the paginator
             #Marked as a code block to ensure a monospaced font and even columns
-            pages.append(f'```{content}```')
-
-        return pages
+            embed = discord.Embed(title='All Known Professors', color=Colors.ClemsonOrange)
+            embed.add_field(name='Listings:', value=f'```{content}```')
+            embed.add_field(name='Info:', value=f'Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other manglaed names. This is just a byproduct of how the data is distributed by the university', inline=False)
+            
+            embeds.append(embed)
+        return embeds
 
     @prof.command(aliases=['list'])
     async def list_prof(self, ctx):
-        await self.bot.messenger.publish(Events.on_set_pageable_text,
-                embed_name='All Known Professors', 
-                field_title='Listing:',
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
                 pages=self.all_profs, 
                 author=ctx.author, 
                 channel=ctx.channel)
