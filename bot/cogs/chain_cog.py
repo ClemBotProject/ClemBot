@@ -41,9 +41,10 @@ class ChainCog(commands.Cog):
         commandls = re.split(pattern, text)
         isfirstcommandatfirst = any(sub in commandls[0] for sub in prefix)
         for i in range(0, len(commandls)):
+            secondpattern = f'^\\{prefix[2]}'
             commandls[i] = commandls[i].replace(prefix[0], '')
             commandls[i] = commandls[i].replace(prefix[1], '')
-            commandls[i] = commandls[i].replace(prefix[2], '')
+            commandls[i] = re.sub(secondpattern, '', commandls[i])
             commandls[i] = commandls[i].replace('\\'+prefix[2], prefix[2])  # Allows the use of escaped prefixes as
             # regular characters without invoking command
         # Main Loop
@@ -106,7 +107,10 @@ class ChainCog(commands.Cog):
         raise ValueError
 
     async def process_command(self, command, checkfordecorator, ctx):
-        func = self.find_command(self.bot, command.split()[0])
+        try:
+            func = self.find_command(self.bot, command.split()[0])
+        except IndexError:
+            return 1, ' Empty command'
         if func is None:
             return 1, command.split()[0] + ' Is not a valid command'
         if checkfordecorator and not func.chainable_output:
