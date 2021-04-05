@@ -90,7 +90,7 @@ class GradesCog(commands.Cog):
             F = f'{int(row.F.round(2) * 100)}%'
             W = f'{int(row.W.round(2) * 100)}%'
 
-            val = f'```A: {A}%\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```'
+            val = f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```'
             embed.add_field(name=f"{row.name}'s distribution", value=val)
             embed.add_field(name='Total Number of Classes Analyzed', value=len(df), inline=False)
             embed.add_field(name='Total Number of Professors Found', value=len(df.groupby(['Instructor'])), inline=False)
@@ -162,7 +162,7 @@ class GradesCog(commands.Cog):
             F = f'{int(row.F.round(2) * 100)}%'
             W = f'{int(row.W.round(2) * 100)}%'
 
-            val = f'```A: {A}%\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```'
+            val = f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```'
             embed.add_field(name=f"{row.name}'s distribution", value=val)
             embed.add_field(name='Total Number of Classes Analyzed', value=len(df), inline=False)
             embed.add_field(name='Explanation',value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
