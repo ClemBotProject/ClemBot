@@ -1,17 +1,14 @@
-import functools
 import logging
-import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 
 import discord
 import discord.ext.commands as commands
 
 from bot.consts import Colors, Claims
 from bot.data.tag_repository import TagRepository
+from bot.data.claims_repository import ClaimsRepository
 import bot.extensions as ext
-from discord.ext.commands.errors import CheckFailure
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
@@ -37,13 +34,23 @@ class TagCog(commands.Cog):
     
     @ext.group(invoke_without_command= True, aliases=['tags'], case_insensitive=True)
     @ext.long_help(
-        'Lists all the possible tags in the current server' 
-        'tags are invoked with the command notation $<tag_name> anywhere in a message'
+        'Either invokes a given tag or, if no tag is provided, '
+        'Lists all the possible tags in the current server. ' 
+        'tags can also be invoked with the inline command notation '
+        '$<tag_name> anywhere in a message'
     )
     @ext.short_help('Supports custom tag functionality')
-    @ext.example('tag')
-    async def tag(self, ctx):
-        tags = await TagRepository().get_all_server_tags(ctx.guild.id)
+    @ext.example(('tag', 'tag mytag'))
+    async def tag(self, ctx, tag=None):
+        repo = TagRepository()
+
+        if tag:
+            if not await repo.check_tag_exists(tag, ctx.guild.id):
+                embed = discord.Embed(title=f'Error: Tag "{tag}" does not exist in this server', color=Colors.Error)
+                return await ctx.send(embed=embed)
+            return await ctx.send(await repo.get_tag_content(tag, ctx.guild.id))
+
+        tags = await repo.get_all_server_tags(ctx.guild.id)
 
         pages = []
         #check for if no tags exist in this server
@@ -128,28 +135,38 @@ class TagCog(commands.Cog):
 
     @tag.command(aliases=['remove', 'destroy'])
     @ext.required_claims(Claims.tag_delete)
+    @ext.ignore_claims_pre_invoke()
     @ext.long_help(
         'Deletes a tag with a given name, this command can only be run by '
-        'server staff or the person who created the tag'
+        'those with the tag_delete claim or the person who created the tag'
     )
     @ext.short_help('Deletes a tag')
-    @ext.example('tag delete mytagname mytagcontnt')
-    async def delete(self, ctx, name):
+    @ext.example('tag delete mytagname')
+    async def delete(self, ctx: commands.Context, name):
 
-        repo = TagRepository()
+        tag_repo = TagRepository()
+        claims_repo = ClaimsRepository()
 
-        if not await repo.check_tag_exists(name, ctx.guild.id):
-            embed = discord.Embed(title= f'Error: Tag {name} does not exist', color=Colors.Error)
+        if not await tag_repo.check_tag_exists(name, ctx.guild.id):
+            embed = discord.Embed(title= f'Error: tag {name} does not exist', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
-        tag = await repo.get_tag(name, ctx.guild.id)
+        tag = await tag_repo.get_tag(name, ctx.guild.id)
 
-        if ctx.author.guild_permissions.administrator:
+        if tag['fk_UserId'] == ctx.author.id:
+            await self._delete_tag(name, ctx)
+            return
+
+        claims = await claims_repo.fetch_all_claims_user(ctx.author)
+
+        if ctx.command.claims_check(claims):
             await self._delete_tag(name, ctx)
             return
         
-        await self._delete_tag(name, ctx)
+        error_str = f'Error: You do not have the tag_delete claim or you do not own this tag'
+        embed = discord.Embed(title=error_str, color= Colors.Error)
+        await ctx.send(embed=embed)
 
     @tag.command(aliases=['about'])
     @ext.long_help(
@@ -183,9 +200,14 @@ class TagCog(commands.Cog):
         await ctx.send(embed=embed)
 
     async def _delete_tag(self, name, ctx):
-        await TagRepository().delete_tag(name, ctx.guild.id)
+        repo = TagRepository()
+        content = await repo.get_tag_content(name, ctx.guild.id)
+
+        await repo.delete_tag(name, ctx.guild.id)
+
         embed=discord.Embed(title=':white_check_mark: Tag successfully deleted', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=name, inline=True)
+        embed.add_field(name='Content', value=content, inline=True)
         await ctx.send(embed=embed)
 
 

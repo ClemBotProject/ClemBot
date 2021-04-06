@@ -65,6 +65,19 @@ def example(help_str: str):
         return func
     return wrapper
 
+def ignore_claims_pre_invoke():
+    """
+    Tells the bot to not do a claim check before the command is invoked, allowing you to defer the check 
+    to inside the command
+    """
+    def wrapper(func):
+        if isinstance(func, ExtBase):
+            func.ignore_claims_pre_invoke = True
+        else:
+            setattr(func, 'ignore_claims_pre_invoke', True)
+        return func
+    return wrapper
+
 def required_claims(*claims):
     def wrapper(func):
         if any(not isinstance(c, Claims) for c in claims):
@@ -79,12 +92,13 @@ def required_claims(*claims):
 
 
 class ExtBase:
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, func, **kwargs) -> None:
 
-        self.long_help = kwargs.get('long_help', None)
-        self.short_help = kwargs.get('short_help', None)
-        self.example = kwargs.get('example', None)
-        self.claims = kwargs.get('claims', None) or set()
+        self.long_help = kwargs.get('long_help') or getattr(func, 'long_help', None)
+        self.short_help = kwargs.get('short_help') or getattr(func, 'short_help', None)
+        self.example = kwargs.get('example') or getattr(func, 'example', None)
+        self.claims = kwargs.get('claims') or getattr(func, 'claims', set())
+        self.ignore_claims_pre_invoke = getattr(func, 'ignore_claims_pre_invoke', False)
 
     def claims_check(self, claims: t.List[Claims]) -> bool:
         """
@@ -107,20 +121,11 @@ class ExtBase:
 
 class ClemBotCommand(discord.ext.commands.Command, ExtBase):
 
-    def __init__(self, func, *, 
-                long_help: str=None, 
-                short_help: str=None,
-                example: str=None, 
-                **kwargs) -> None:
+    def __init__(self, func, **kwargs) -> None:
 
         discord.ext.commands.Command.__init__(self, func, **kwargs)
 
-        long_help = long_help or getattr(func, 'long_help', None)
-        short_help = short_help or getattr(func, 'short_help', None)
-        example = example or getattr(func, 'example', None)
-        claims = kwargs.get('claims', None) or getattr(func, 'claims', None)
-
-        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example, claims=claims)
+        ExtBase.__init__(self, func, **kwargs)
 
     def command(self, *args, **kwargs):
         """
@@ -152,20 +157,10 @@ def group(name=None, **attrs):
 
 class ClemBotGroup(discord.ext.commands.Group, ExtBase):
 
-    def __init__(self, func, *, 
-                long_help: str=None, 
-                short_help: str=None,
-                example: str=None, 
-                **kwargs) -> None:
+    def __init__(self, func, **kwargs) -> None:
 
         discord.ext.commands.Group.__init__(self, func, **kwargs)
-
-        long_help = long_help or getattr(func, 'long_help', None)
-        short_help = short_help or getattr(func, 'short_help', None)
-        example = example or getattr(func, 'example', None)
-
-        ExtBase.__init__(self, long_help=long_help, short_help=short_help, example=example)
-
+        ExtBase.__init__(self, func, **kwargs)
 
     def command(self, *args, **kwargs):
         """A shortcut decorator that invokes :func:`.command` and adds it to
