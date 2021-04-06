@@ -5,6 +5,7 @@ from PIL import Image, UnidentifiedImageError
 import math
 import requests
 
+import typing as t
 import discord
 import discord.ext.commands as commands
 from bot.consts import Colors
@@ -150,15 +151,19 @@ class DotCog(commands.Cog):
             await ctx.send(embed=embed)
 
     @ext.group(invoke_without_command = True)
-    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
-                    Choose a width of \'pc\', \'mobile\', or leave blank.\n \
-                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
-                    The final argument asks, do you want to invert the image or not?\n \
-                    When attachment specifier is used, you can upload an image directly. All other arguments \n \
-                    are the same except you no longer need a url for the first argument')
-    @ext.short_help('Turn an image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
-                    To specify threshold you must include all required arguments.\n \
-                    The same goes for all arguments')
+    @ext.long_help('Takes any image, and returns the brailled image. '
+                    'Can specify mobile or pc width characteristics. '
+                    'Default width is pc size. '
+                    'Choose a width of \'pc\', \'mobile\', or leave blank. '
+                    'Threshold determines which pixels are white, and which are blank. Choose a value [0-255] '
+                    'The final argument asks, do you want to invert the image or not? '
+                    'When attachment specifier is used, you can upload an image directly. All other arguments '
+                    'are the same except you no longer need a url for the first argument')
+    @ext.short_help('Turn an image to a braille image. '
+                    'Default width is pc size. '
+                    'Default threshold is 150. '
+                    'To specify threshold you must include all required arguments. '
+                    'The same goes for all arguments')
     @ext.example(('todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 
@@ -167,19 +172,23 @@ class DotCog(commands.Cog):
         return await self.todots_helper(ctx,image,device,threshold,inverted)
 
     @todots.command()
-    @ext.long_help('Takes any image, and returns the brailled image.\nCan specify mobile or pc width characteristics.\nDefault width is pc size.\
-                    Choose a width of \'pc\', \'mobile\', or leave blank.\n \
-                    Threshold determines which pixels are white, and which are blank. Choose a value [0-255]\n\
-                    The final argument asks, do you want to invert the image or not?\n \
-                    When attachment specifier is used, you can upload an image directly. Must attach an image.')
-    @ext.short_help('Turn an attached image to a braille image.\nDefault width is pc size.\nDefault threshold is 150.\n\
-                    To specify threshold you must include all required arguments.\n \
-                    The same goes for all arguments. Must attach an image')
+    @ext.long_help('Takes any image, and returns the brailled image. '
+                    'Can specify mobile or pc width characteristics. '
+                    'Default width is pc size. '
+                    'Choose a width of \'pc\', \'mobile\', or leave blank. '
+                    'Threshold determines which pixels are white, and which are blank. Choose a value [0-255] '
+                    'The final argument asks, do you want to invert the image or not? '
+                    'When attachment specifier is used, you can upload an image directly. Must attach an image.')
+    @ext.short_help('Turn an attached image to a braille image. '
+                    'Default width is pc size. '
+                    'Default threshold is 150. '
+                    'To specify threshold you must include all required arguments. '
+                    'The same goes for all arguments. Must attach an image')
     @ext.example(('todots attachment [mobile|pc] [threshold = 0-255] [inverted = 0/1]',
     'todots attachment [mobile|pc] [threshold = 0-255]',
     'todots attachment [mobile|pc]',
     'todots attachment'))
-    async def attachment(self, ctx, device = None, threshold = 150, inverted = 0) -> None:
+    async def attachment(self, ctx, device = None, threshold = 150, inverted: t.Optional[bool] = False) -> None:
         try:
             image = ctx.message.attachments[0].url
         except Exception as e:
