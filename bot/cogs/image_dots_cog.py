@@ -168,7 +168,7 @@ class DotCog(commands.Cog):
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc] [threshold = 0-255]',
     'todots https://my-cool-image.com/stuff.jpg [mobile|pc]', 
     'todots https://my-cool-image.com/stuff.jpg'))
-    async def todots(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
+    async def todots(self, ctx, image, device = None, threshold = 150, inverted: t.Optional[bool] = False) -> None:
         return await self.todots_helper(ctx,image,device,threshold,inverted)
 
     @todots.command()
