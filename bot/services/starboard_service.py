@@ -62,7 +62,7 @@ class StarboardService(BaseService):
     # message formatting function
     def make_star_post(self, message: discord.Message, stars: int) -> discord.Embed:
 
-        title = f'{RANKINGS[math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS)]} | {stars} Star{"s" if stars > 1 else ""}'
+        title = f'{RANKINGS.get(math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS)), 5} | {stars} Star{"s" if stars > 1 else ""}'
 
         embed = discord.Embed(
             title= title,
