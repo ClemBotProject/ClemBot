@@ -105,14 +105,8 @@ class DotCog(commands.Cog):
             finished_image.append(line_of_braille)
         return finished_image
 
-    async def todots_helper(self, ctx, image, device = None, threshold = 150, inverted = 0) -> None:
+    async def todots_helper(self, ctx, image, device = None, threshold = 150, inverted = False) -> None:
         filename = image
-        if inverted not in (0, 1):
-            # return an error here
-            embed = discord.Embed(title=f'ERROR: inverted must be boolean value', color=Colors.Error)
-            embed.add_field(name='Exception:', value='inverted = 0 or 1')
-            await ctx.send(embed=embed)
-            return
 
         if device is None or device.lower() == 'pc':
             width = PC_WIDTH
