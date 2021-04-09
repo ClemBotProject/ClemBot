@@ -14,11 +14,11 @@ if '.csv' not in file:
 
 if '2020' in file:
     #2020 added some course designations so we need to make extra columns
-    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'H']
+    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'Honors']
     data = pd.read_csv(file, names=columns)
     data = data.drop(['I', 'SCP', 'SCN', 'SCD'], 1)
 else:
-    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'Instructor', 'H']
+    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'Instructor', 'Honors']
 
     data = pd.read_csv(file, names=columns)
 
@@ -37,10 +37,10 @@ data.Instructor = data.Instructor.str.lower()
 # Create course id field to query on
 data.CourseId = data.Course + '-' + data.Number.astype(str)
 
+data = data.replace({'Honors': {'H': True}})
+
 # create year field from the file name
 data.Year = file[:4]
-
-del data['H']
 
 if '2018' in file or '2020' in file:
     data.Instructor =data.Instructor.str.split(' ').str[1::].str.join(' ') + ' ' + data.Instructor.str.split(' ').str[::3].str.join(' ')
