@@ -191,15 +191,19 @@ class GradesCog(commands.Cog):
     @ext.short_help('Provides info about a given professor')
     @ext.example(('prof brian dean', 'prof kristi whitehead honors'))
     async def prof(self, ctx, *args):
-        honors = "all"
+        honors = ""
         if args[-1] in ("honors", "hon"):
             honors = "honors"
         elif args[-1] in ("non-honors", "non-hon", "regular", "normal"):
             honors = "non-honors"
+        elif args[-1] == "all":
+            honors = "all"
 
-        if honors != "all":
-            prof = " ".join(args[:-1])  # Everything except last item
+        if honors:
+            # User specified correct honors attribute; prof name is all but last word
+            prof = " ".join(args[:-1])
         else:
+            # No honors argument (or incorrect), assume prof name is entire string
             prof = " ".join(args)
 
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
