@@ -115,6 +115,7 @@ class GradesCog(commands.Cog):
                     self.grades_df.Honors != True)]
 
         log.info(df)
+        description = df.Title.tolist()[0]
 
         A = f'{int(df.A.mean().round(2) * 100)}%'
         B = f'{int(df.B.mean().round(2) * 100)}%'
@@ -134,7 +135,7 @@ class GradesCog(commands.Cog):
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-        embed.description = title
+        embed.description = description
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df)), inline=False)
         embed.add_field(name='Total Number of Professors Found', value=str(len(df.groupby(['Instructor']))), inline=False)
@@ -146,7 +147,7 @@ class GradesCog(commands.Cog):
 
         for i, row in df.groupby(['Instructor']).mean().iterrows():
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-            embed.description = title
+            embed.description = description
             embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
