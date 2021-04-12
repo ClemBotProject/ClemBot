@@ -14,11 +14,11 @@ if '.csv' not in file:
 
 if '2020' in file:
     #2020 added some course designations so we need to make extra columns
-    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'Honors', 'CourseId', 'Year']
+    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'Honors']
     data = pd.read_csv(file, names=columns)
     data = data.drop(['I', 'SCP', 'SCN', 'SCD'], 1)
 else:
-    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'Instructor', 'Honors',  'CourseId', 'Year']
+    columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'Instructor', 'Honors']
 
     data = pd.read_csv(file, names=columns)
 
@@ -42,8 +42,8 @@ data.CourseId = data.Course + '-' + data.Number.astype(str)
 r = re.findall(r"([0-9][0-9][0-9][0-9])", file)
 data.Year = r[0]
 
-# Change honors H --> True
-data = data.replace({'Honors': {'H': True}})
+# Change honors H --> True or NaN --> False
+data.Honors = data.Honors.apply(lambda x: True if x == 'H' else False)
 
 if '2018' in file or '2020' in file:
     data.Instructor =data.Instructor.str.split(' ').str[1::].str.join(' ') + ' ' + data.Instructor.str.split(' ').str[::3].str.join(' ')
@@ -62,4 +62,13 @@ data.dropna(subset=['Course'], inplace=True)
 print(data.info())
 print(data)
 
-data.to_csv(f'{file}', index=False)
+title = file
+# Try to derive the semester from the title
+if 'Fall' in file:
+    title = f'{r[0]}_Fall.csv'
+elif 'Spring' in file:
+    title = f'{r[0]}_Spring.csv'
+else:
+    print('Could not find semester in file title! Rewriting original file...')
+
+data.to_csv(f'{title}', index=False)

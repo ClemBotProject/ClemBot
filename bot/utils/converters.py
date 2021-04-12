@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import BadArgument, Context, Converter
 from discord.ext.commands.errors import ConversionError
-from bot.errors import ConversionError
+from bot.errors import ConversionError, ParserError
 from bot.consts import Claims
 
 """
@@ -71,4 +71,39 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
-        
+
+class HonorsConverter(Converter):
+    """Sanitize honors argument input for grades_cog"""
+
+    async def convert(self, ctx: Context, argument: str) -> str:
+        honors = None
+
+        if argument in ('honors', 'hon'):
+            honors = 'honors'
+        elif argument in ('non-honors', 'non-hon', 'regular', 'normal'):
+            honors = 'non-honors'
+        elif argument == 'all':
+            honors = 'all'
+        else:
+            raise ParserError('Are you sure you used the proper format (ex: math-2060 2017 honors)?')
+
+        return honors
+
+class ProfConverter(Converter):
+    """Sanitize input for prof command in grades_cog"""
+
+    def __init__(self, HonorsConverter):
+        self.honors_sanitizer = HonorsConverter.convert
+
+    async def convert(self, ctx: Context, argument: str) -> str:
+        prof = argument
+
+        try:
+            # Test if honors attribute was supplied
+            honors = await self.honors_sanitizer(self, ctx, argument.split()[-1])  # Send last item to the sanitizer
+            prof = " ".join(argument.split()[:-1])  # Remove last word from argument string
+        except ParserError:
+            # Honors attribute was not applied
+            honors = 'all'
+
+        return prof, honors
