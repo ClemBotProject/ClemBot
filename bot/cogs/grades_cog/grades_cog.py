@@ -185,7 +185,6 @@ class GradesCog(commands.Cog):
             title = "Error: That professor has no available data"
 
             if honors == 'honors':
-                title = "Error: That professor has no available data for honors"
                 title += ' for honors'
             elif honors == 'non-honors':
                 title += ' for non-honors'
@@ -223,9 +222,9 @@ class GradesCog(commands.Cog):
         title2 = f'Grade Distribution for {normalized_name}'
 
         if honors == 'honors':
-            title2 = f'Grade Distribution for {normalized_name} (Honors)'
+            title2 += ' (Honors)'
         elif honors == 'non-honors':
-            title2 = f'Grade Distribution for {normalized_name} (Non-Honors)'
+            title2 += ' (Non-Honors)'
 
         for i, row in df.groupby(['CourseId']).mean().iterrows():
             embed = discord.Embed(title=title2, color=Colors.ClemsonOrange)
