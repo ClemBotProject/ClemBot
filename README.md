@@ -70,7 +70,7 @@ To start developing and contributing to this project, please see [CONTRIBUTING.m
 
 # Architecture overview
 
-The bot is set up in a simple way. There are 3 layers, the Cog layer, the Service layer and the Data layer.
+The bot is set up in a simple way. There are 3 layers, the Cog layer, the Service layer and the Data layer. Cogs and Services communicate exclusively through the messenger. This allows us to maintain total decoupling of the layers. Repos are referenced directly in both.
 
 1. Cog layer - This is where the frontend bot command code resides. Anything that you directly use to interface with discord goes in this layer.
 2. Service layer - This is where all things that are bot related but not controlled through front end commands live. Things like user tracking, event handling etc all go in here.
