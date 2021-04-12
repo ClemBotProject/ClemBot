@@ -9,7 +9,7 @@ from bot.messaging.events import Events
 
 from bot.consts import Colors
 import bot.extensions as ext
-from bot.utils.converters import HonorsConverter, ProfConverter
+from bot.utils.converters import HonorsConverter
 
 log = logging.getLogger(__name__)
 
@@ -41,30 +41,33 @@ class GradesCog(commands.Cog):
         Attempts to give more information about courses at Clemson University.
         
         General usage:
-        `grades [course] (year) (honors|non-honors|all)`
+        `grades (non-honors|honors|all) (year) [course]`
         
-        Where `course` is required, but the `year` and `honors` arguments are optional.
+        Where `course` is required, but the `honors` and `year` arguments are optional.
         
-        Default `year`: `2014`.
-        Default `honors` argument: `all` (this averages grades for every section in a course, whether honors or non-honors).
+        Default `honors` argument: `non-honors`
+        Default `year`: `2014`
 
         DISCLAIMER:
-        Not every professor listed will be at Clemson, this is a tool built for better information but not complete information.
-        In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
-        In Addition, Clemson provides incomplete and mangled professor data so there will be multiple different versions of the same professor. This is just a byproduct of how the data is distributed from the university
+        Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
+        Data source: https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
         """
     )
     @ext.short_help('Attempts to give more information about courses at Clemson University')
     @ext.example(
-        ('grades math-2060', 'grades math-2060 2017', 'grades math-2060 honors', 'grades math-2060 2017 honors'))
-    async def grades(self, ctx, course: str, year: t.Optional[int] = MIN_YEAR, *, honors: HonorsConverter = 'all'):
+        ('grades math-2060', 'grades 2017 math-2060', 'grades honors math-2060', 'grades honors 2017 math-2060'))
+    async def grades(self, ctx, honors: t.Optional[HonorsConverter] = 'non-honors', year: t.Optional[int] = MIN_YEAR, *, course: str):
         course = course.upper()
 
         error_title = False
         error_message = False
 
         # Sanitize arguments
-        if not self.grades_df.CourseId.str.contains(course).any():
+        if len(course.split()) > 1:
+            # Optional arguments were specified, but invalid
+            error_title = 'Invalid argument(s)'
+            error_message = f'Are you sure you used the correct format? See `{await self.bot.current_prefix(ctx)}help grades` for info.'
+        elif not self.grades_df.CourseId.str.contains(course).any():
             error_title = 'Course doesn\'t exist'
             error_message = 'Are you sure you used the proper notation (ex: cpsc-2120)?'
         elif self.grades_df[(self.grades_df.CourseId == course)].Year.max() < year:
@@ -98,12 +101,7 @@ class GradesCog(commands.Cog):
         F = f'{int(df.F.mean().round(2) * 100)}%'
         W = f'{int(df.W.mean().round(2) * 100)}%'
 
-        title = f'Grades for {course} since {year}'
-
-        if honors == 'honors':
-            title = f'Grades for {course} (Honors) since {year}'
-        elif honors == 'non-honors':
-            title = f'Grades for {course} (Non-Honors) since {year}'
+        title = f'Grades for {course} ({honors.title()}) since {year}'
 
         embeds = []
 
@@ -148,23 +146,20 @@ class GradesCog(commands.Cog):
         Attempts to give more information about professor's grade distribution at Clemson.
         
         General usage:
-        `prof [name] (honors|non-honors|all)`
+        `prof (non-honors|honors|all) [name]`
         
         Where `name` is required, but the `honors` argument is optional.
         
-        Default `honors` argument: `all`
+        Default `honors` argument: `non-honors`
 
         DISCLAIMER:
-        Not every professor listed will be at Clemson, this is a tool built for better information but not complete information.
-        In addition, this system works on the Grade Distribution Releases located at https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
-        In Addition, Clemson provides incomplete and mangled professor data so there will be multiple different versions of the same professor. This is just a byproduct of how the data is distributed from the university
+        Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
+        Data source: https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
         """
     )
     @ext.short_help('Provides info about a given professor')
-    @ext.example(('prof brian dean', 'prof kristi whitehead honors'))
-    async def prof(self, ctx, *, professor: ProfConverter(HonorsConverter)):
-        prof, honors = professor
-
+    @ext.example(('prof brian dean', 'prof honors kristi whitehead'))
+    async def prof(self, ctx, honors: t.Optional[HonorsConverter] = 'non-honors', *, prof):
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title='Professors', color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
