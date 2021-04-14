@@ -35,6 +35,21 @@ def command(name=None, cls=None, **attrs):
     return wrapper
 
 """
+Decorator that enables the chaining of multiple commands
+"""
+
+
+def chainable(chainable: bool = True):
+    def wrapper(func):
+        if isinstance(func, ExtBase):
+            func.chainable_output = chainable
+        else:
+            setattr(func, 'chainable_output', chainable)
+        return func
+    return wrapper
+
+
+"""
 Helper decorators to allow for fluent style chain setting of Commmand attributes 
 as opposed to setting them in the ctor
 """
@@ -93,7 +108,7 @@ def required_claims(*claims):
 
 class ExtBase:
     def __init__(self, func, **kwargs) -> None:
-
+        self.chainable_output = kwargs.get('chainable_output', False) or getattr(func,'chainable_output', False)
         self.long_help = kwargs.get('long_help') or getattr(func, 'long_help', None)
         self.short_help = kwargs.get('short_help') or getattr(func, 'short_help', None)
         self.example = kwargs.get('example') or getattr(func, 'example', None)

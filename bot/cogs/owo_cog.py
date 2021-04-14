@@ -17,6 +17,7 @@ class OwoCog(commands.Cog):
         self.FACES = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"]
 
     @ext.command()
+    @ext.chainable()
     @ext.long_help('Owo\'s the text given to the command')
     @ext.short_help('owo any string')
     @ext.example('owo hello there')
