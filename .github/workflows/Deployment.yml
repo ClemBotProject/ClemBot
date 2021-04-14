@@ -3,8 +3,14 @@ name: ClemBot Master Deployment
 on:
   push:
     branches: [ master ]
-    paths-ignore:
-      - 'README.md'
+    paths: 
+      - "bot/**"
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Manual ClemBot workflow trigger'
+        required: true
+        default: 'Manual Deployment'
 
 jobs:
     deploy:
