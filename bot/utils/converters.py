@@ -78,11 +78,11 @@ class HonorsConverter(Converter):
     async def convert(self, ctx: Context, argument: str) -> str:
         honors = None
 
-        if argument in ('honors', 'hon'):
+        if argument in ('honors', 'hon', 'h'):
             honors = 'honors'
-        elif argument in ('non-honors', 'non-hon', 'regular', 'normal'):
+        elif argument in ('non-honors', 'non-hon', 'regular', 'normal', 'nh'):
             honors = 'non-honors'
-        elif argument == 'all':
+        elif argument in ('all', 'a'):
             honors = 'all'
         else:
             raise ConversionError()

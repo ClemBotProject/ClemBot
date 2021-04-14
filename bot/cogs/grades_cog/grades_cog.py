@@ -39,14 +39,14 @@ class GradesCog(commands.Cog):
     @ext.long_help(
         """
         Attempts to give more information about courses at Clemson University.
-        
+
         General usage:
-        `grades (non-honors|honors|all) (year) [course]`
-        
+        `grades (honors|non-honors|all) (year) [course]`
+
         Where `course` is required, but the `honors` and `year` arguments are optional.
-        
-        Default `honors` argument: `non-honors`
-        Default `year`: `2014`
+
+        Default `honors` argument: `non-honors` (only searches non-honors sections).
+        To search honors sections, write `honors` directly after `grades`. To search all sections, write `all` directly after `grades`.
 
         DISCLAIMER:
         Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
@@ -55,7 +55,7 @@ class GradesCog(commands.Cog):
     )
     @ext.short_help('Attempts to give more information about courses at Clemson University')
     @ext.example(
-        ('grades math-2060', 'grades 2017 math-2060', 'grades honors math-2060', 'grades honors 2017 math-2060'))
+        ('grades math-2060', 'grades honors math-2060', 'grades non-honors math-2060', 'grades all math-2060', 'grades 2017 math-2060', 'grades honors 2017 math-2060'))
     async def grades(self, ctx, honors: t.Optional[HonorsConverter] = 'non-honors', year: t.Optional[int] = MIN_YEAR, *, course: str):
         course = course.upper()
 
@@ -111,7 +111,7 @@ class GradesCog(commands.Cog):
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df)), inline=False)
         embed.add_field(name='Total Number of Professors Found', value=str(len(df.groupby(['Instructor']))), inline=False)
-        embed.add_field(name='Explanation', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
+        embed.add_field(name='Want honors sections or an explanation?', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
         embeds.append(embed)
 
         #group by the prof
@@ -158,7 +158,7 @@ class GradesCog(commands.Cog):
         """
     )
     @ext.short_help('Provides info about a given professor')
-    @ext.example(('prof brian dean', 'prof honors kristi whitehead'))
+    @ext.example(('prof brian dean', 'prof honors kristi whitehead', 'prof non-honors kristi whitehead', 'prof all kristi whitehead'))
     async def prof(self, ctx, honors: t.Optional[HonorsConverter] = 'non-honors', *, prof):
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title='Professors', color=Colors.Error)
@@ -214,15 +214,15 @@ class GradesCog(commands.Cog):
         embed.add_field(name='Explanation', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
         embeds.append(embed)
 
-        title2 = f'Grade Distribution for {normalized_name}'
+        title = f'Grade Distribution for {normalized_name}'
 
         if honors == 'honors':
-            title2 += ' (Honors)'
+            title += ' (Honors)'
         elif honors == 'non-honors':
-            title2 += ' (Non-Honors)'
+            title += ' (Non-Honors)'
 
         for i, row in df.groupby(['CourseId']).mean().iterrows():
-            embed = discord.Embed(title=title2, color=Colors.ClemsonOrange)
+            embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
@@ -248,7 +248,7 @@ class GradesCog(commands.Cog):
 
         embeds = []
 
-        # begin generating paginated columns
+        #begin generating paginated columns
         for chunk in self.chunk_list([prof.name for i, prof in grades], 51):
 
             #we need to create the columns on the page so chunk the list again
@@ -290,23 +290,23 @@ class GradesCog(commands.Cog):
 
         embeds = []
 
-        # begin generating paginated columns
-        # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
+        #begin generating paginated columns
+        #chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         for chunk in self.chunk_list([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
 
-            # we need to create the columns on the page so chunk the list again
+            #we need to create the columns on the page so chunk the list again
             content = ''
             for col in self.chunk_list(chunk, 2):
-                # the columns wont have the perfect number of elements every time, we need to append spaces if
-                # the list entries is less then the number of columns
+                #the columns wont have the perfect number of elements every time, we need to append spaces if
+                #the list entries is less then the number of columns
                 while len(col) < 3:
                     col.append(' ')
 
-                # Cocatenate the formatted column string to the page content string
+                #Cocatenate the formatted column string to the page content string
                 content += "{: <24}  {: <24}\n".format(*col)
 
-            # Apped the content string to the list of pages to send to the paginator
-            # Marked as a code block to ensure a monospaced font and even columns
+            #Append the content string to the list of pages to send to the paginator
+            #Marked as a code block to ensure a monospaced font and even columns
             embed = discord.Embed(title='All Known Professors', color=Colors.ClemsonOrange)
             embed.add_field(name='Listings:', value=f'```{content}```')
             embed.add_field(name='Info:',
