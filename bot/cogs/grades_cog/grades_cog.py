@@ -143,14 +143,15 @@ class GradesCog(commands.Cog):
     @ext.group(invoke_without_command= True, case_insensitive=True)
     @ext.long_help(
         """
-        Attempts to give more information about professor's grade distribution at Clemson.
-        
+        Attempts to give more information about courses at Clemson University.
+
         General usage:
-        `prof (non-honors|honors|all) [name]`
-        
+        `prof (honors|non-honors|all) [name]`
+
         Where `name` is required, but the `honors` argument is optional.
-        
-        Default `honors` argument: `non-honors`
+
+        Default `honors` argument: `non-honors` (only searches non-honors sections).
+        To search honors sections, write `honors` directly after `grades`. To search all sections, write `all` directly after `grades`.
 
         DISCLAIMER:
         Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
