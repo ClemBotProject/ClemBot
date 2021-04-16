@@ -271,6 +271,7 @@ class ManageClassesCog(commands.Cog):
         except:
             role = await ctx.guild.create_role(name=class_repr.role, mentionable=False)
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+        return role
 
     async def sync_perms(self, channel, role, cleanup):
         log.info(f'Syncing channel and role with cleanup')
