@@ -132,10 +132,8 @@ class ManageClassesCog(commands.Cog):
         #create a class role and mark it as assignable
         role = await self.create_role(ctx, class_repr)
 
-        #if cleanup role exists, sync perms
-        if (discord.utils.get(ctx.guild.roles,name="Cleanup")):
-            cleanup = discord.utils.get(ctx.guild.roles,name="Cleanup")
-            await self.sync_perms(channel, role, cleanup)
+        #sync perms with cleanup role
+        await self.sync_perms(ctx, channel, role)
 
     async def input_class(self, ctx, class_repr: ClassType) -> ClassType:
 
@@ -273,12 +271,19 @@ class ManageClassesCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
         return role
 
-    async def sync_perms(self, channel, role, cleanup):
+    async def sync_perms(self, ctx, channel, role):
+        #Check if cleanup role exists
+        if (discord.utils.get(ctx.guild.roles,name="Cleanup")):
+            cleanup = discord.utils.get(ctx.guild.roles,name="Cleanup")
+        else:
+            cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)
+            await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)
+        
         log.info(f'Syncing channel and role with cleanup')
         await channel.set_permissions(role, view_channel=True)
         await channel.set_permissions(cleanup, view_channel=False)
-        role.position=1
-        cleanup.position=0
+        await role.edit(position=2)
+        await cleanup.edit(position=1)
 
 
     @classes.command(pass_context= True, aliases= ['delete'])
