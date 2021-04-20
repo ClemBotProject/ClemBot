@@ -48,6 +48,15 @@ def chainable(chainable: bool = True):
         return func
     return wrapper
 
+def chainable_input(chainable: bool = True):
+    def wrapper(func):
+        if isinstance(func, ExtBase):
+            func.chainable_output = chainable
+        else:
+            setattr(func, 'chainable_input', chainable)
+        return func
+    return wrapper
+
 
 """
 Helper decorators to allow for fluent style chain setting of Commmand attributes 
@@ -109,6 +118,7 @@ def required_claims(*claims):
 class ExtBase:
     def __init__(self, func, **kwargs) -> None:
         self.chainable_output = kwargs.get('chainable_output', False) or getattr(func,'chainable_output', False)
+        self.chainable_input = kwargs.get('chainable_input', False) or getattr(func,'chainable_input', False)
         self.long_help = kwargs.get('long_help') or getattr(func, 'long_help', None)
         self.short_help = kwargs.get('short_help') or getattr(func, 'short_help', None)
         self.example = kwargs.get('example') or getattr(func, 'example', None)

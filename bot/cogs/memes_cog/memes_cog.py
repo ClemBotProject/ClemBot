@@ -136,6 +136,7 @@ class MemesCog(commands.Cog):
         'A fun command to generate a crab rave gif with specified text overlay'
     )
     @ext.short_help('Generates a crab rave gif')
+    @ext.chainable_input()
     @ext.example('crab hello from crab world')
     async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
         """

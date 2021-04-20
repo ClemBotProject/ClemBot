@@ -115,8 +115,10 @@ class ChainCog(commands.Cog):
             return 1, command.split()[0] + ' Is not a valid command'
         if checkfordecorator and not func.chainable_output:
             return 1, command.split()[0] + ' Is not a chainable command'
-        if len(func.claims) != 0 or len(func.checks)!=0:
-            return 1, 'Chain cannot be used with commands that require extra permissions'
+        if not checkfordecorator and not func.chainable_input and not func.chainable_output:
+            return 1, command.split()[0] + ' Is not a chainable input command'
+
+            
         args = {'ctx': ctx}
         temp = []
         for arg in func.params:
