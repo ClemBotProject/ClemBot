@@ -115,3 +115,21 @@ CREATE TABLE IF NOT EXISTS ClaimsMapping (
         REFERENCES Guilds (id)
 );
 
+
+CREATE TABLE IF NOT EXISTS Infractions (
+    id                       INTEGER      PRIMARY KEY,
+    fk_guildId               INTEGER      NOT NULL,
+    fk_authorId              INTEGER      NOT NULL,
+    fk_subjectId             INTEGER      NOT NULL,
+    FOREIGN KEY(fk_guildId)
+        REFERENCES Guilds (id),
+    FOREIGN KEY(fk_authorId)
+        REFERENCES Users (id),
+    FOREIGN KEY(fk_subjectId)
+        REFERENCES Users (id)
+)
+
+CREATE TABLE IF NOT EXISTS Bans (
+    id                       INTEGER      PRIMARY KEY,
+    fk_infractionId          INTEGER      NOT NULL,
+    
