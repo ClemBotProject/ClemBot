@@ -24,8 +24,8 @@ class TicTacToeSetup:
     #Creates the board
     @staticmethod
     def get_ttt_embed(player1, player2, data, move, final=False, tie=False):
-        embed = discord.Embed(title=f"Match of {player1} vs {player2}")
-        embed.color = Colors.ClemsonOrange 
+        embed = discord.Embed(title=f"Match of {player1} vs {player2}", color = Colors.ClemsonOrange)
+
         data_ = data.copy()
         for i in range(1, 10):
             if data[i] == 0:
@@ -98,7 +98,7 @@ class TicTacToeSetup:
 class TicTacToeCog(commands.Cog):
     
     def __init__(self, bot) -> None:
-        self.bot = bot;
+        self.bot = bot
     @ext.command(aliases=['tictactoe'],usage='[Member]')
     @ext.short_help('Mention an opponent to start a game!')
     @ext.long_help('Mention an opponent to start a game of tic-tac-toe')
@@ -175,12 +175,12 @@ class TicTacToeCog(commands.Cog):
                 await initial_embed.add_reaction(emoji)
             while True:
 
-                def check(reaction_, user):
+                def rcheck(reaction_, user):
                     return user.id == move_of.id and initial_embed.id == reaction_.message.id
 
                 # Wait for Reaction
                 try:
-                    reaction = await self.bot.wait_for('reaction_add', check=check, timeout=30)
+                    reaction = await self.bot.wait_for('reaction_add', check=rcheck, timeout=30)
                 except asyncio.TimeoutError:
                     await ctx.send('Timed Out..{} failed to use moves.'.format(move_of.mention))
                     return
