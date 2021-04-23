@@ -1,15 +1,16 @@
-from datetime import datetime
-import logging
 import datetime as datetime
+import logging
+from datetime import datetime
 
 import discord
 
+from bot.consts import Colors, DesignatedChannels
 from bot.data.user_repository import UserRepository
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-from bot.consts import Colors, DesignatedChannels
 
 log = logging.getLogger(__name__)
+
 
 class UserHandlingService(BaseService):
 
@@ -33,30 +34,30 @@ class UserHandlingService(BaseService):
 
     async def add_user(self, user, guild_id: int) -> None:
         await UserRepository().add_user(user, guild_id)
-    
+
     async def notify_user_join(self, user: discord.Member):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
-        embed.set_thumbnail(url= user.avatar_url_as(static_format= 'png'))
+        embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
         embed.set_footer(text=datetime.datetime.now().date())
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
-                DesignatedChannels.user_join_log, 
-                user.guild.id, 
-                embed)
+                                         DesignatedChannels.user_join_log,
+                                         user.guild.id,
+                                         embed)
 
     async def notify_user_remove(self, user: discord.Member):
         embed = discord.Embed(title='Guild User Left', color=Colors.Error)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
-        embed.set_thumbnail(url= user.avatar_url_as(static_format= 'png'))
+        embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
         embed.set_footer(text=datetime.datetime.now().date())
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
-                DesignatedChannels.user_leave_log, 
-                user.guild.id, 
-                embed)
+                                         DesignatedChannels.user_leave_log,
+                                         user.guild.id,
+                                         embed)
 
     async def load_users(self, guild: discord.Guild):
         for user in guild.members:
@@ -65,8 +66,8 @@ class UserHandlingService(BaseService):
             log.info(f'Loading user: {user_string} in Guild: {guild_string}')
             await self.add_user(user, guild.id)
 
-    def get_full_name(self, author) -> str: 
-        return f'{author.name}#{author.discriminator}' 
+    def get_full_name(self, author) -> str:
+        return f'{author.name}#{author.discriminator}'
 
     async def load_service(self) -> None:
         for guild in self.bot.guilds:

@@ -6,6 +6,7 @@ from bot.bot_secrets import BotSecrets
 
 log = logging.getLogger(__name__)
 
+
 class BaseRepository:
     """
     The base level repository that defines the fully resolved path for

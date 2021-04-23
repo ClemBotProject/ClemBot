@@ -1,14 +1,14 @@
-import logging
 import asyncio
+import logging
 
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import BadArgument
 
-from bot.data.role_repository import RoleRepository
-from bot.messaging.events import Events
 import bot.extensions as ext
 from bot.consts import Colors, Claims
+from bot.data.role_repository import RoleRepository
+from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ class AssignableRolesCog(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot = bot
-    
-    @ext.group(invoke_without_command= True, aliases= ['role'], case_insensitive=True)
+
+    @ext.group(invoke_without_command=True, aliases=['role'], case_insensitive=True)
     @ext.long_help('Lists all roles that have been marked as assignable in this server')
     @ext.short_help('Defines custom assignable roles')
     @ext.example('roles')
@@ -27,7 +27,7 @@ class AssignableRolesCog(commands.Cog):
         if input_role is None:
             await self.send_role_list(ctx, 'Assignable Roles')
             return
-        
+
         try:
             role = await commands.RoleConverter().convert(ctx, input_role)
 
@@ -35,19 +35,19 @@ class AssignableRolesCog(commands.Cog):
                 raise BadArgument
 
             await self.set_role(ctx, role)
-        
+
         except BadArgument:  # If RoleConverter failed
             await self.find_possible_roles(ctx, input_role)
 
     async def check_role_assignable(self, ctx, input_role: str) -> bool:
-        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
+        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id)
         return input_role in [ctx.guild.get_role(i['id']) for i in assignable_roles]
 
     async def find_possible_roles(self, ctx, input_role: str):
         # Casefold the roles
         str_input_role = str(input_role).casefold()
 
-        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id) 
+        assignable_roles = await RoleRepository().get_assignable_roles(ctx.guild.id)
         role_list = [ctx.guild.get_role(i['id']) for i in assignable_roles]
 
         str_role_list = [str(i).casefold() for i in role_list]  # Case-fold to do case insensitive matching
@@ -58,7 +58,7 @@ class AssignableRolesCog(commands.Cog):
         for j, val_j in enumerate(str_role_list):
             if str_input_role == val_j:
                 matching_roles.append(role_list[j])  # matching_roles.append(j)
-        
+
         role_count = len(matching_roles)
 
         if role_count == 0:  # If no matches found, report findings
@@ -67,13 +67,13 @@ class AssignableRolesCog(commands.Cog):
             await self.set_role(ctx, matching_roles[0])
         else:  # If multiple matches found, query user via emojis to select correct role
             await self.send_matching_roles_list(ctx, f'Multiple roles found for @{input_role}',
-                matching_roles, role_count)
+                                                matching_roles, role_count)
 
     async def send_matching_roles_list(self, ctx, title: str, matching_roles, role_count):
         names = ''
         reactions = ['\u0031\ufe0f\u20e3', '\u0032\ufe0f\u20e3', '\u0033\ufe0f\u20e3', '\u0034\ufe0f\u20e3',
-                    '\u0035\ufe0f\u20e3', '\u0036\ufe0f\u20e3', '\u0037\ufe0f\u20e3', '\u0038\ufe0f\u20e3',
-                    '\u0039\ufe0f\u20e3', '\U0001F51F']
+                     '\u0035\ufe0f\u20e3', '\u0036\ufe0f\u20e3', '\u0037\ufe0f\u20e3', '\u0038\ufe0f\u20e3',
+                     '\u0039\ufe0f\u20e3', '\U0001F51F']
         """
             USING EMOJIS WITH EMBEDDED TEXT
                 What I know works:
@@ -90,12 +90,12 @@ class AssignableRolesCog(commands.Cog):
             else:
                 emojis = ''
             names = f'{names}\n{emojis}{val_k}'
-        
-        embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
-        embed.add_field(name= 'Matching Roles:', value= names + choose)
 
-        mes = await ctx.send(embed= embed)
-        
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
+        embed.add_field(name='Matching Roles:', value=names + choose)
+
+        mes = await ctx.send(embed=embed)
+
         # Remove unnecessary extra emojis from reactions list
         if role_count < len(reactions):
             del reactions[role_count:len(reactions)]
@@ -130,19 +130,19 @@ class AssignableRolesCog(commands.Cog):
         def predicate(reaction: discord.Reaction, user: discord.Member) -> bool:
             # Test if the the answer is valid and can be evaluated.
             return (
-                reaction.message.id == mes.id         # The reaction is attached to the question we asked.
-                and user == ctx.author                # It's the user who triggered the initial role request.
-                and str(reaction.emoji) in reactions  # The reaction is one of the options.
+                    reaction.message.id == mes.id  # The reaction is attached to the question we asked.
+                    and user == ctx.author  # It's the user who triggered the initial role request.
+                    and str(reaction.emoji) in reactions  # The reaction is one of the options.
             )
 
         try:
             reaction, _ = await ctx.bot.wait_for("reaction_add", timeout=10.0, check=predicate)
         except asyncio.TimeoutError:
-            embed.add_field(name= 'Request Timeout:', value= 'User failed to respond in the alloted time', inline= 'false')
-            await mes.edit(embed= embed)
+            embed.add_field(name='Request Timeout:', value='User failed to respond in the alloted time', inline='false')
+            await mes.edit(embed=embed)
             await mes.clear_reactions()  # Remove reactions so use doesn't try to respond after timeout.
             return
-        
+
         answer = reactions.index(reaction.emoji)  # Get user reaction
         await self.set_role(ctx, matching_roles[answer])  # Attempt to assign user the requested role
         await mes.delete()  # Delete message now that user has made a successful choice
@@ -150,19 +150,19 @@ class AssignableRolesCog(commands.Cog):
     async def send_role_list(self, ctx, title: str):
         role_repo = RoleRepository()
 
-        CHUNK_SIZE= 15
+        CHUNK_SIZE = 15
 
         results = await role_repo.get_assignable_roles(ctx.guild.id)
 
-        embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
 
         if results:
             for chunk in self.chunk_list([role['name'] for role in results], CHUNK_SIZE):
-                embed.add_field(name= 'Available:', value= '\n'.join(chunk), inline= True)
+                embed.add_field(name='Available:', value='\n'.join(chunk), inline=True)
         else:
-            embed.add_field(name= 'Available:', value= 'No currently assignable roles.')
+            embed.add_field(name='Available:', value='No currently assignable roles.')
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
     async def set_role(self, ctx, role: discord.Role = None) -> None:
         role_repo = RoleRepository()
@@ -179,24 +179,24 @@ class AssignableRolesCog(commands.Cog):
     async def add_role(self, ctx, role: discord.Role):
         await ctx.author.add_roles(role)
 
-        embed = discord.Embed(title= f'Role Added  :white_check_mark:', color= Colors.ClemsonOrange)
-        embed.add_field(name= f'Role: ', value= f'{role.mention} :arrow_right:')
-        embed.add_field(name= 'User:', value= f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url= ctx.author.avatar_url_as(static_format= 'png'))
+        embed = discord.Embed(title=f'Role Added  :white_check_mark:', color=Colors.ClemsonOrange)
+        embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_right:')
+        embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
+        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
     async def remove_role(self, ctx, role: discord.Role):
         await ctx.author.remove_roles(role)
 
-        embed = discord.Embed(title= f'Role Removed  :white_check_mark:', color= Colors.ClemsonOrange)
-        embed.add_field(name= f'Role: ', value= f'{role.mention} :arrow_left:')
-        embed.add_field(name= 'User:', value= f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url= ctx.author.avatar_url_as(static_format= 'png'))
+        embed = discord.Embed(title=f'Role Removed  :white_check_mark:', color=Colors.ClemsonOrange)
+        embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_left:')
+        embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
+        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
-    @roles.command(pass_context= True, aliases= ['create'])
+    @roles.command(pass_context=True, aliases=['create'])
     @ext.required_claims(Claims.assignable_roles_add)
     @ext.long_help('Command to add a role as assignable in the current guild')
     @ext.short_help('Marks a role as user assignable')
@@ -205,11 +205,11 @@ class AssignableRolesCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
         title = f'Role @{role.name} Added as assignable :white_check_mark:'
-        embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
-    @roles.command(pass_context= True, aliases= ['delete'])
+    @roles.command(pass_context=True, aliases=['delete'])
     @ext.required_claims(Claims.assignable_roles_delete)
     @ext.long_help('Command to remove a role as assignable in the current guild')
     @ext.short_help('Removes a role as user assignable')
@@ -218,17 +218,18 @@ class AssignableRolesCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
         title = f'Role @{role.name} Removed as assignable :white_check_mark:'
-        embed = discord.Embed(title= title, color= Colors.ClemsonOrange)
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
-    def get_full_name(self, author) -> str: 
-        return f'{author.name}#{author.discriminator}' 
-    
+    def get_full_name(self, author) -> str:
+        return f'{author.name}#{author.discriminator}'
+
     def chunk_list(self, lst, n):
         """Yield successive n-sized chunks from lst."""
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
-def setup(bot): 
+
+def setup(bot):
     bot.add_cog(AssignableRolesCog(bot))

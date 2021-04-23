@@ -1,11 +1,11 @@
 import logging
 
 import aiosqlite
-from discord import guild
 
 from bot.data.base_repository import BaseRepository
 
 log = logging.getLogger(__name__)
+
 
 class RoleRepository(BaseRepository):
 
@@ -28,7 +28,7 @@ class RoleRepository(BaseRepository):
                     WHERE id = ?
                     """, (role_id,))
                 await db.commit()
-    
+
     async def get_role_ids(self, guild_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT (id) FROM Roles WHERE fk_guildid = ?', (guild_id,)) as c:
@@ -47,7 +47,7 @@ class RoleRepository(BaseRepository):
     async def get_assignable_roles(self, guild_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Roles WHERE fk_guildId = ? and isRoleAssignable = true',
-                    (guild_id,)) as c:
+                                  (guild_id,)) as c:
                 return await self.fetcthall_as_dict(c)
 
     async def check_is_role_assignable(self, role_id: int) -> bool:
@@ -59,4 +59,3 @@ class RoleRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Roles WHERE id = ?', (role_id,)) as c:
                 return await c.fetchone() is not None
-

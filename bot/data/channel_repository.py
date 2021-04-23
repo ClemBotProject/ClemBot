@@ -1,6 +1,6 @@
-import aiosqlite
 import logging
 
+import aiosqlite
 import discord
 
 from bot.data.base_repository import BaseRepository
@@ -15,7 +15,7 @@ class ChannelRepository(BaseRepository):
             return
 
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            values = (channel.id, channel.guild.id , channel.name)
+            values = (channel.id, channel.guild.id, channel.name)
             await db.execute('INSERT INTO Channels (id, fk_guildId, name) VALUES (?, ?, ?)', values)
             await db.commit()
 
@@ -23,7 +23,7 @@ class ChannelRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute('DELETE FROM Channels WHERE id = ?', (channel.id,))
             await db.commit()
-    
+
     async def update_channel(self, after):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(

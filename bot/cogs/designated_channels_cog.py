@@ -9,12 +9,13 @@ from bot.data.designated_channel_repository import DesignatedChannelRepository
 
 log = logging.getLogger(__name__)
 
+
 class DesignatedChannelsCog(commands.Cog):
 
-    @ext.group(case_insensitive=True, invoke_without_command= True, aliases= ['channels'])
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['channels'])
     @ext.required_claims(Claims.designated_channel_view)
     @ext.long_help(
-        'Designated channels are channels that you can set to for the bot to send a variety of info to ' 
+        'Designated channels are channels that you can set to for the bot to send a variety of info to '
         'You can register as many channels as youd like to any given category'
     )
     @ext.short_help('Designated channel configuration')
@@ -27,11 +28,11 @@ class DesignatedChannelsCog(commands.Cog):
 
         channel_repo = DesignatedChannelRepository()
 
-        embed = discord.Embed(title= f'Designated Channels', color= Colors.ClemsonOrange)
-        
+        embed = discord.Embed(title=f'Designated Channels', color=Colors.ClemsonOrange)
+
         if len(list(DesignatedChannels)) == 0:
-            embed.add_field(name= 'No possible designated channels', value= '')
-            await ctx.send(embed= embed)
+            embed.add_field(name='No possible designated channels', value='')
+            await ctx.send(embed=embed)
             return
 
         for i, channel in enumerate(DesignatedChannels):
@@ -40,21 +41,21 @@ class DesignatedChannelsCog(commands.Cog):
                 assigned_channels.append(ctx.bot.get_channel(channel_id))
 
             if len(assigned_channels) != 0:
-                embed_value = '\n'.join(c.mention for c in assigned_channels) 
+                embed_value = '\n'.join(c.mention for c in assigned_channels)
             else:
                 embed_value = 'No channel added'
 
             embed.add_field(
-                name= f'#{i+1} {channel.name}', 
-                value= embed_value,
-                inline= False)
-            
-        await ctx.send(embed= embed)
+                name=f'#{i + 1} {channel.name}',
+                value=embed_value,
+                inline=False)
 
-    @channel.command(pass_context= True, aliases= ['register','set'])
+        await ctx.send(embed=embed)
+
+    @channel.command(pass_context=True, aliases=['register', 'set'])
     @ext.required_claims(Claims.designated_channel_modify)
     @ext.long_help(
-        'Adds a channel to a given designated channel listing, use the "channel" command to ' 
+        'Adds a channel to a given designated channel listing, use the "channel" command to '
         'see a listing of all current and available designated channels'
     )
     @ext.short_help('Set a Designated channel')
@@ -65,7 +66,7 @@ class DesignatedChannelsCog(commands.Cog):
 
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
-                    f"""
+                f"""
                     The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
                     If you are the owner of the instance please reference owner_cog.py for more information
                     """)
@@ -78,22 +79,22 @@ class DesignatedChannelsCog(commands.Cog):
         if channel.id in await channel_repo.get_guild_designated_channels(channel_type, ctx.guild.id):
             await ctx.send(f'{channel.mention} already registered to `{channel_type}`')
             return
-        
+
         await channel_repo.register_designated_channel(channel_type, channel)
 
         embed = discord.Embed(
-            title= 'Designated Channel added', 
-            color= Colors.ClemsonOrange)
+            title='Designated Channel added',
+            color=Colors.ClemsonOrange)
         embed.add_field(
-            name= channel_type,
+            name=channel_type,
             value=f'Successfully added {channel.mention} to `{channel_type}`')
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
-    @channel.command(pass_context= True, aliases= ['unregister'])
+    @channel.command(pass_context=True, aliases=['unregister'])
     @ext.required_claims(Claims.designated_channel_modify)
     @ext.long_help(
-        'Removes a channel from a given designated channel listing, use the "channel" command to ' 
+        'Removes a channel from a given designated channel listing, use the "channel" command to '
         'see a listing of all current and available designated channels'
     )
     @ext.short_help('Removes a Designated channel listing')
@@ -110,7 +111,7 @@ class DesignatedChannelsCog(commands.Cog):
 
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
-                    f"""
+                f"""
                     The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
                     If you are the owner of the instance please reference owner_cog.py for more information
                     """)
@@ -127,14 +128,14 @@ class DesignatedChannelsCog(commands.Cog):
         await channel_repo.remove_from_designated_channel(channel_type, channel.id)
 
         embed = discord.Embed(
-            title= 'Designated Channel deleted', 
-            color= Colors.ClemsonOrange)
+            title='Designated Channel deleted',
+            color=Colors.ClemsonOrange)
         embed.add_field(
-            name= channel_type,
+            name=channel_type,
             value=f'Successfully deleted {channel.mention} from `{channel_type}`')
 
-        await ctx.send(embed= embed)
-    
+        await ctx.send(embed=embed)
 
-def setup(bot): 
+
+def setup(bot):
     bot.add_cog(DesignatedChannelsCog(bot))

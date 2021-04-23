@@ -8,11 +8,12 @@ from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
+
 class ChannelHandlingService(BaseService):
 
     def __init__(self, *, bot):
         super().__init__(bot)
-    
+
     @BaseService.Listener(Events.on_guild_channel_create)
     async def channel_create(self, channel):
         repo = ChannelRepository()
@@ -29,7 +30,7 @@ class ChannelHandlingService(BaseService):
     async def channel_update(self, before, after):
         repo = ChannelRepository()
         await repo.update_channel(after)
-    
+
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def new_guild_joined(self, guild: discord.Guild):
         repo = ChannelRepository()
