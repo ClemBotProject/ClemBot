@@ -2,6 +2,7 @@ import asyncio
 import random
 import discord
 import discord.ext.commands as commands
+from bot.consts import Colors
 
 import bot.extensions as ext
 
@@ -24,7 +25,7 @@ class TicTacToeSetup:
     @staticmethod
     def get_ttt_embed(player1, player2, data, move, final=False, tie=False):
         embed = discord.Embed(title=f"Match of {player1} vs {player2}")
-        embed.colour = move.colour if not final else player1.colour if move == player2 else player2.colour
+        embed.color = Colors.ClemsonOrange 
         data_ = data.copy()
         for i in range(1, 10):
             if data[i] == 0:
