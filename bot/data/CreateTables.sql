@@ -121,6 +121,9 @@ CREATE TABLE IF NOT EXISTS Infractions (
     fk_guildId               INTEGER      NOT NULL,
     fk_authorId              INTEGER      NOT NULL,
     fk_subjectId             INTEGER      NOT NULL,
+    iType                    TEXT CHECK(iType IN ('ban', 'mute', 'warn')) NOT NULL,
+    duration                 INTEGER,
+    reason                   TEXT,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id),
     FOREIGN KEY(fk_authorId)
@@ -128,8 +131,3 @@ CREATE TABLE IF NOT EXISTS Infractions (
     FOREIGN KEY(fk_subjectId)
         REFERENCES Users (id)
 )
-
-CREATE TABLE IF NOT EXISTS Bans (
-    id                       INTEGER      PRIMARY KEY,
-    fk_infractionId          INTEGER      NOT NULL,
-    

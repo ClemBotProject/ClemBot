@@ -54,6 +54,10 @@ class Claims(Enum):
     claims_view = auto()
     claims_modify = auto()
     manage_class_add = auto()
+    moderation_warn = auto()
+    moderation_ban = auto()
+    moderation_mute = auto()
+    moderation_purge = auto()
 
     @staticmethod
     def get_claims_str():
@@ -63,3 +67,8 @@ class Claims(Enum):
 class DiscordLimits:
     MessageLength = 1900
     EmbedFieldLength = 900
+
+class Infractions:
+    mute = 'mute'
+    ban = 'ban'
+    warn = 'warn'
