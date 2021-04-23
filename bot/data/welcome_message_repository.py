@@ -1,9 +1,10 @@
-import aiosqlite
 import typing as t
 
+import aiosqlite
 import discord
 
 from bot.data.base_repository import BaseRepository
+
 
 class WelcomeMessageRepository(BaseRepository):
 
@@ -25,10 +26,10 @@ class WelcomeMessageRepository(BaseRepository):
                 WHERE fk_guildId = ?
                 """, (guild.id,))
             await db.commit()
-    
+
     async def get_welcome_message(self, guild_id) -> t.Union[str, None]:
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute('SELECT content FROM WelcomeMessages WHERE fk_guildId = ?', 
-                    (guild_id,)) as c:
+            async with db.execute('SELECT content FROM WelcomeMessages WHERE fk_guildId = ?',
+                                  (guild_id,)) as c:
                 mes = await c.fetchone()
                 return mes[0] if mes else None

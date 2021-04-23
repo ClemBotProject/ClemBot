@@ -10,10 +10,8 @@ import discord.ext.commands as commands
 from bot.bot_secrets import BotSecrets
 from bot.consts import Colors, DiscordLimits, OwnerDesignatedChannels, DesignatedChannels
 from bot.data.base_repository import BaseRepository
-from bot.data.guild_repository import GuildRepository
 from bot.data.designated_channel_repository import DesignatedChannelRepository
 from bot.data.message_repository import MessageRepository
-from bot.data.user_repository import UserRepository
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +30,6 @@ class OwnerCog(commands.Cog):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
@@ -44,7 +41,7 @@ class OwnerCog(commands.Cog):
     async def channel(self, ctx):
         channel_repo = DesignatedChannelRepository()
 
-        embed = discord.Embed(title= f'Designated Channels', color= Colors.ClemsonOrange)
+        embed = discord.Embed(title=f'Designated Channels', color=Colors.ClemsonOrange)
 
         for i, channel in enumerate(OwnerDesignatedChannels):
             assigned_channels = []
@@ -52,18 +49,18 @@ class OwnerCog(commands.Cog):
                 assigned_channels.append(ctx.bot.get_channel(channel_id))
 
             if len(assigned_channels) != 0:
-                embed_value = '\n'.join(c.mention for c in assigned_channels) 
+                embed_value = '\n'.join(c.mention for c in assigned_channels)
             else:
                 embed_value = 'No channel added'
 
             embed.add_field(
-                name= f'#{i+1} {channel.name}', 
-                value= embed_value,
-                inline= False)
-            
-        await ctx.send(embed= embed)
+                name=f'#{i + 1} {channel.name}',
+                value=embed_value,
+                inline=False)
 
-    @channel.command(pass_context= True, aliases= ['register','set'])
+        await ctx.send(embed=embed)
+
+    @channel.command(pass_context=True, aliases=['register', 'set'])
     @commands.is_owner()
     async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
@@ -83,19 +80,19 @@ class OwnerCog(commands.Cog):
         if channel.id in await channel_repo.get_guild_designated_channels(channel_type, ctx.guild.id):
             await ctx.send(f'{channel.mention} already registered to `{channel_type}`')
             return
-        
+
         await channel_repo.register_designated_channel(channel_type, channel)
 
         embed = discord.Embed(
-            title= 'Owner Designated Channel added', 
-            color= Colors.ClemsonOrange)
+            title='Owner Designated Channel added',
+            color=Colors.ClemsonOrange)
         embed.add_field(
-            name= channel_type,
+            name=channel_type,
             value=f'Successfully added {channel.mention} to `{channel_type}`')
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
-    @channel.command(pass_context= True, aliases= ['unregister'])
+    @channel.command(pass_context=True, aliases=['unregister'])
     @commands.is_owner()
     async def delete(self, ctx, channel_type: str, channel: discord.TextChannel):
         """
@@ -118,13 +115,13 @@ class OwnerCog(commands.Cog):
         await channel_repo.remove_from_designated_channel(channel_type, channel.id)
 
         embed = discord.Embed(
-            title= 'Owner Designated Channel deleted', 
-            color= Colors.ClemsonOrange)
+            title='Owner Designated Channel deleted',
+            color=Colors.ClemsonOrange)
         embed.add_field(
-            name= channel_type,
+            name=channel_type,
             value=f'Successfully deleted {channel.mention} from `{channel_type}`')
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
@@ -158,7 +155,7 @@ class OwnerCog(commands.Cog):
         log_name = log.parent.handlers[0].baseFilename
         with open(log_name, 'r') as f:
             logs = "".join(deque(f, lines))
-            chunks = [logs[i:i+MAX_MESSAGE_SIZE] for i in range(0, len(logs), MAX_MESSAGE_SIZE)]
+            chunks = [logs[i:i + MAX_MESSAGE_SIZE] for i in range(0, len(logs), MAX_MESSAGE_SIZE)]
             for c in chunks:
                 await ctx.send(f'```{c}```')
 
@@ -184,9 +181,9 @@ class OwnerCog(commands.Cog):
         db_path = f'database/{database_name}'
         connect_mode = 'ro'
         json_params = {
-                'indent': 2, 
-                'separators': (',', ': ')
-            }
+            'indent': 2,
+            'separators': (',', ': ')
+        }
 
         async with aiosqlite.connect(f'file:{db_path}?mode={connect_mode}', uri=True) as db:
             async with db.execute(query) as c:
@@ -202,12 +199,12 @@ class OwnerCog(commands.Cog):
 
     @count.command()
     @commands.is_owner()
-    async def messages(self, ctx, guild_id: int=None):
+    async def messages(self, ctx, guild_id: int = None):
         count = await MessageRepository().get_message_count(guild_id)
         embed = discord.Embed(title='Current message count', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Guild: {guild_id}' if guild_id else 'Global', value=count)
         await ctx.send(embed=embed)
-    
+
     @count.command()
     @commands.is_owner()
     async def guilds(self, ctx):
@@ -220,7 +217,7 @@ class OwnerCog(commands.Cog):
 
     @count.command()
     @commands.is_owner()
-    async def users(self, ctx, guild_id: int=None):
+    async def users(self, ctx, guild_id: int = None):
         count = sum(len(i.members) for i in self.bot.guilds)
 
         embed = discord.Embed(title='Current user count', color=Colors.ClemsonOrange)
@@ -229,5 +226,5 @@ class OwnerCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot): 
+def setup(bot):
     bot.add_cog(OwnerCog(bot))

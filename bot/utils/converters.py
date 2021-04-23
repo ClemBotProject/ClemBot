@@ -2,15 +2,17 @@ import re
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-from discord.ext.commands import BadArgument, Context, Converter
+from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import ConversionError
-from bot.errors import ConversionError
+
 from bot.consts import Claims
+from bot.errors import ConversionError
 
 """
 This converter code was copied from the python discord bot
 https://github.com/python-discord/bot/blob/master/bot/converters.py
 """
+
 
 class DurationDelta(Converter):
     """Convert duration strings into dateutil.relativedelta.relativedelta objects."""
@@ -47,6 +49,7 @@ class DurationDelta(Converter):
 
         return delta
 
+
 class Duration(DurationDelta):
     """Convert duration strings into UTC datetime.datetime objects."""
 
@@ -63,6 +66,7 @@ class Duration(DurationDelta):
         except ValueError:
             raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
 
+
 class ClaimsConverter(Converter):
     """Convert a given claim string into its enum representation"""
 
@@ -71,4 +75,3 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
-        

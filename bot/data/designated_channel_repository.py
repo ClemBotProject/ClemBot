@@ -76,13 +76,13 @@ class DesignatedChannelRepository(BaseRepository):
 
             DesignatedChannelError: Raised when the TextChannel has already been registered to 
             this designated channel type
-        """        
-        
+        """
+
         if not await self.check_designated_channel(channel_type):
             raise DesignatedChannelError(f'The designated channel type {channel_type} does not exist')
 
         designated_id = await self.get_designated_id(channel_type)
-        
+
         if await self.check_channel_added(designated_id, added_channel.id):
             raise DesignatedChannelError(f'{added_channel.name} is already assigned to {channel_type}')
 
@@ -98,7 +98,7 @@ class DesignatedChannelRepository(BaseRepository):
         """
         Args:
             channel_type (str): The name of the designated_channel to add
-        """        
+        """
         if await self.check_designated_channel(channel_type):
             return
 
@@ -109,7 +109,7 @@ class DesignatedChannelRepository(BaseRepository):
                 VALUES (?)
                 """, (channel_type,))
             await db.commit()
-    
+
     async def remove_from_all_designated_channels(self, channel):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
@@ -118,7 +118,6 @@ class DesignatedChannelRepository(BaseRepository):
                 WHERE fk_channelsId = ?
                 """, (channel.id,))
             await db.commit()
-
 
     async def remove_from_designated_channel(self, channel_type: str, channel_id) -> None:
         """
@@ -135,7 +134,7 @@ class DesignatedChannelRepository(BaseRepository):
             DesignatedChannelError: Raised when the designated channel type doesnt exit
 
             DesignatedChannelError: Raised when the given channel id is not currently registered to that designated channel
-        """        
+        """
 
         if not await self.check_designated_channel(channel_type):
             raise DesignatedChannelError(f'The designated channel type {channel_type} does not exist')
@@ -164,7 +163,7 @@ class DesignatedChannelRepository(BaseRepository):
 
         Returns:
             int: the integer id of the designated channel
-        """        
+        """
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute(
                     """ 
@@ -182,7 +181,7 @@ class DesignatedChannelRepository(BaseRepository):
                     WHERE fk_channelsId = ? and fk_designatedChannelsId = ?
                     """, (added_channel_id, designated_channel_id)) as c:
                 return await c.fetchone() is not None
-    
+
     async def check_channel(self, channel) -> bool:
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute(

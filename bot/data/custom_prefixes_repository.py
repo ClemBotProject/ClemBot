@@ -19,5 +19,3 @@ class CustomPrefixesRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT prefix FROM CustomPrefixes WHERE fk_guildId = ?', (guild_id,)) as c:
                 return await c.fetchone()
-
-

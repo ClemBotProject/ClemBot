@@ -30,9 +30,9 @@ class DeleteMessageService(BaseService):
                                     author: discord.Member = None,
                                     timeout: int = None):
 
-        if not isinstance(msg , t.List):
+        if not isinstance(msg, t.List):
             msg = [msg]
-        if not isinstance(roles , t.List):
+        if not isinstance(roles, t.List):
             roles = [roles]
 
         # stores the message info
@@ -45,7 +45,7 @@ class DeleteMessageService(BaseService):
         # the emoji is placed on the last message in the list
         await msg[-1].add_reaction("🗑️")
         if timeout:
-            await asyncio.sleep(timeout) 
+            await asyncio.sleep(timeout)
             try:
                 await msg[-1].clear_reaction("🗑️")
                 del self.messages[msg[-1].id]

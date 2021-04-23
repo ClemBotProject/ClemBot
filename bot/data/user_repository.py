@@ -1,10 +1,10 @@
 import logging
 
 import aiosqlite
-
 import discord
 
 from bot.data.base_repository import BaseRepository
+
 log = logging.getLogger(__name__)
 
 
@@ -63,7 +63,7 @@ class UserRepository(BaseRepository):
                     """, (guild_id, user_id)) as c:
                 return await c.fetchone() is not None
 
-    async def get_user_count(self, guild_id: int=None) -> int:
+    async def get_user_count(self, guild_id: int = None) -> int:
         async with aiosqlite.connect(self.resolved_db_path) as db:
             try:
                 if guild_id:

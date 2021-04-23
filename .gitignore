@@ -1,6 +1,8 @@
 #ignore the database
 *.sqlite
 
+.idea
+
 .vscode/settings.json
 Logs/
 
