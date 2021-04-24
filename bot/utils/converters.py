@@ -75,3 +75,20 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
+
+class HonorsConverter(Converter):
+    """Sanitize honors argument input for grades_cog"""
+
+    async def convert(self, ctx: Context, argument: str) -> str:
+        honors = None
+
+        if argument in ('honors', 'hon', 'h'):
+            honors = 'honors'
+        elif argument in ('non-honors', 'non-hon', 'regular', 'normal', 'nh'):
+            honors = 'non-honors'
+        elif argument in ('all', 'a'):
+            honors = 'all'
+        else:
+            raise ConversionError()
+
+        return honors
