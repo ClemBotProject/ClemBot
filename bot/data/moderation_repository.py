@@ -114,7 +114,7 @@ class ModerationRepository(BaseRepository):
                                         SELECT * FROM Infractions 
                                         WHERE fk_guildId = ? 
                                         AND fk_subjectId = ? 
-                                        AND iType = {Infractions.mute}
+                                        AND iType = '{Infractions.mute}'
                                         AND active = ?
                                         """,
                                   (guild_id, member_id, True)) as c:
