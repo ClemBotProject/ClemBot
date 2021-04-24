@@ -23,7 +23,7 @@ class InfractionsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.group(aliases=['infraction', 'warnings'])
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['infraction', 'warnings'])
     @ext.long_help(
         'Lists infractions for yourself or for a given user in the guild'
     )
@@ -83,7 +83,7 @@ class InfractionsCog(commands.Cog):
 
         await repo.delete_infractions(ctx.guild.id, infraction_id)
 
-        embed = discord.Embed(color=Colors.Error)
+        embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'Infractions {infraction_id} deleted successfully  :white_check_mark:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         return await ctx.send(embed=embed)

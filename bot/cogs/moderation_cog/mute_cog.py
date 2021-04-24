@@ -53,6 +53,8 @@ class MuteCog(commands.Cog):
             mute_role = await ctx.guild.create_role(name=Moderation.mute_role_name)
             await mute_role.edit(position=ctx.guild.me.top_role.position - 1)
 
+            msg = await ctx.send('Configuring ClemBot Mute role (This might take a minute)')
+
             for channel in ctx.guild.channels:
                 await channel.set_permissions(mute_role,
                                               speak=False,
@@ -61,6 +63,8 @@ class MuteCog(commands.Cog):
                                               send_messages=False,
                                               send_tts_messages=False,
                                               add_reactions=False)
+            await msg.delete()
+
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = f'@{Moderation.mute_role_name} Successfully Configured  :white_check_mark:'
             await ctx.send(embed=embed)
