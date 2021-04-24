@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import typing as t
 
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
@@ -53,12 +54,12 @@ class DurationDelta(Converter):
 class Duration(DurationDelta):
     """Convert duration strings into UTC datetime.datetime objects."""
 
-    async def convert(self, ctx: Context, duration: str) -> datetime:
+    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` in the future.
         The converter supports the same symbols for each unit of time as its parent class.
         """
-        delta = await super().convert(ctx, duration)
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
 
         try:

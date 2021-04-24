@@ -10,10 +10,10 @@ from bot.consts import Infractions
 class ModerationRepository(BaseRepository):
 
     async def insert_ban(self, *,
-            guild_id: int, 
-            author_id: int, 
-            subject_id: int,
-            reason: str):
+                         guild_id: int,
+                         author_id: int,
+                         subject_id: int,
+                         reason: str):
         args = {
             'guild_id': guild_id,
             'author_id': author_id,
@@ -24,11 +24,11 @@ class ModerationRepository(BaseRepository):
         await self._insert_infraction(**args)
 
     async def insert_mute(self, *,
-            guild_id: int, 
-            author_id: int, 
-            subject_id: int,
-            reason: t.Optional[str] = None,
-            duration: datetime):
+                          guild_id: int,
+                          author_id: int,
+                          subject_id: int,
+                          reason: t.Optional[str] = None,
+                          duration: datetime):
         args = {
             'guild_id': guild_id,
             'author_id': author_id,
@@ -40,26 +40,26 @@ class ModerationRepository(BaseRepository):
         await self._insert_infraction(**args)
 
     async def insert_warn(self, *,
-            guild_id: int, 
-            author_id: int, 
-            subject_id: int,
-            reason: str):
+                          guild_id: int,
+                          author_id: int,
+                          subject_id: int,
+                          reason: str):
         args = {
             'guild_id': guild_id,
             'author_id': author_id,
             'subject_id': subject_id,
             'reason': reason,
-            'i_type': Infractions.warn 
+            'i_type': Infractions.warn
         }
         await self._insert_infraction(**args)
 
     async def _insert_infraction(self, *,
-            guild_id: int, 
-            author_id: int, 
-            subject_id: int,
-            reason: t.Optional[str] = None,
-            duration: t.Optional[datetime] = None,
-            i_type: Infractions):
+                                 guild_id: int,
+                                 author_id: int,
+                                 subject_id: int,
+                                 reason: t.Optional[str] = None,
+                                 duration: t.Optional[datetime] = None,
+                                 i_type: Infractions):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
@@ -70,18 +70,18 @@ class ModerationRepository(BaseRepository):
 
     async def get_all_bans(self, guild_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute("SELECT * FROM Infractions WHERE fk_guildId = ? and iType = 'ban'",
-                    (guild_id,)) as c:
+            async with db.execute(f"SELECT * FROM Infractions WHERE fk_guildId = ? and iType = '{Infractions.ban}'",
+                                  (guild_id,)) as c:
                 return await self.fetcthall_as_class(c)
 
     async def get_all_mutes(self, guild_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute("SELECT * FROM Infractions WHERE fk_guildId = ? and iType = 'mute'",
-                    (guild_id,)) as c:
+            async with db.execute(f"SELECT * FROM Infractions WHERE fk_guildId = ? and iType = '{Infractions.mute}'",
+                                  (guild_id,)) as c:
                 return await self.fetcthall_as_class(c)
 
     async def get_all_warns(self, guild_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute("SELECT * FROM Infractions WHERE fk_guildId = ? and iType = 'warn'",
-                    (guild_id,)) as c:
+            async with db.execute(f"SELECT * FROM Infractions WHERE fk_guildId = ? and iType = '{Infractions.warn}'",
+                                  (guild_id,)) as c:
                 return await self.fetcthall_as_class(c)

@@ -68,7 +68,12 @@ class DiscordLimits:
     MessageLength = 1900
     EmbedFieldLength = 900
 
+
 class Infractions:
     mute = 'mute'
     ban = 'ban'
     warn = 'warn'
+
+
+class Moderation:
+    mute_role_name = 'ClemBot Mute'
