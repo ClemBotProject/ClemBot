@@ -7,7 +7,6 @@ import typing as t
 import discord.ext.commands as commands
 from bot.messaging.events import Events
 
-from bot.consts import Colors
 import bot.extensions as ext
 from bot.utils.converters import HonorsConverter
 
@@ -35,7 +34,7 @@ class GradesCog(commands.Cog):
         self.all_profs = self.get_profs()
         self.all_courses = self.get_courses()
 
-    @ext.group(invoke_without_command= True, case_insensitive=True)
+    @ext.group(invoke_without_command=True, case_insensitive=True)
     @ext.long_help(
         """
         Attempts to give more information about courses at Clemson University.
@@ -140,7 +139,7 @@ class GradesCog(commands.Cog):
                                          channel=ctx.channel,
                                          timeout=360)
 
-    @ext.group(invoke_without_command= True, case_insensitive=True)
+    @ext.group(invoke_without_command=True, case_insensitive=True)
     @ext.long_help(
         """
         Attempts to give more information about courses at Clemson University.
@@ -249,10 +248,10 @@ class GradesCog(commands.Cog):
 
         embeds = []
 
-        #begin generating paginated columns
+        # begin generating paginated columns
         for chunk in self.chunk_list([prof.name for i, prof in grades], 51):
 
-            #we need to create the columns on the page so chunk the list again
+            # we need to create the columns on the page so chunk the list again
             content = ''
             for col in self.chunk_list(chunk, 3):
                 #the columns wont have the perfect number of elements every time, we need to append spaces if
@@ -260,7 +259,7 @@ class GradesCog(commands.Cog):
                 while len(col) < 3:
                     col.append(' ')
 
-                #Cocatenate the formatted column string to the page content string
+                # Cocatenate the formatted column string to the page content string
                 content += "{: <12} {: <12} {: <12}\n".format(*col)
 
             #Apped the content string to the list of pages to send to the paginator
@@ -291,11 +290,11 @@ class GradesCog(commands.Cog):
 
         embeds = []
 
-        #begin generating paginated columns
-        #chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
+        # begin generating paginated columns
+        # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         for chunk in self.chunk_list([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
 
-            #we need to create the columns on the page so chunk the list again
+            # we need to create the columns on the page so chunk the list again
             content = ''
             for col in self.chunk_list(chunk, 2):
                 #the columns wont have the perfect number of elements every time, we need to append spaces if
@@ -303,7 +302,7 @@ class GradesCog(commands.Cog):
                 while len(col) < 3:
                     col.append(' ')
 
-                #Cocatenate the formatted column string to the page content string
+                # Cocatenate the formatted column string to the page content string
                 content += "{: <24}  {: <24}\n".format(*col)
 
             #Append the content string to the list of pages to send to the paginator

@@ -3,6 +3,7 @@ This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 
+
 class EventsMeta(type):
     """Class that defines what events are exposed at the bot level"""
 
@@ -96,6 +97,7 @@ class EventsMeta(type):
         return '_on_reaction_add'
 
     _on_raw_reaction_add = 'on_raw_reaction_add'
+
     @property
     def on_raw_reaction_add(self):
         """
@@ -284,7 +286,7 @@ class EventsMeta(type):
             message (union[embed, str]) the message to be sent to the channels
         """
         return '_on_broadcast_designated_channel'
-    
+
     @property
     def on_set_custom_prefix(self):
         """
@@ -296,7 +298,7 @@ class EventsMeta(type):
             prefix (str): The prefix to be added
         """
         return 'on_set_custom_prefix'
-    
+
     @property
     def on_assignable_role_add(self):
         """
@@ -328,7 +330,7 @@ class EventsMeta(type):
             roles (str) Stores the roles needed to delete the message
         """
         return '_on_set_deletable'
-    
+
     @property
     def on_guild_channel_create(self):
         """
@@ -375,7 +377,6 @@ class EventsMeta(type):
         """
         return 'on_set_pageable_text'
 
-
     @property
     def on_set_pageable_embed(self):
         """
@@ -388,7 +389,7 @@ class EventsMeta(type):
             timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
         """
         return 'on_set_pageable_embed'
-    
+
     @property
     def on_member_update(self, before, after):
         """
@@ -403,6 +404,5 @@ class EventsMeta(type):
         return 'on_member_update'
 
 
-
-class Events(metaclass= EventsMeta):
+class Events(metaclass=EventsMeta):
     pass
