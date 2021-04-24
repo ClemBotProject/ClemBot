@@ -1,10 +1,10 @@
-from datetime import datetime
 import typing as t
+from datetime import datetime
 
 import aiosqlite
 
-from bot.data.base_repository import BaseRepository
 from bot.consts import Infractions
+from bot.data.base_repository import BaseRepository
 
 
 class ModerationRepository(BaseRepository):
@@ -96,8 +96,41 @@ class ModerationRepository(BaseRepository):
                                   (guild_id,)) as c:
                 return await self.fetcthall_as_class(c)
 
-    async def get_all_warns(self, guild_id):
+    async def get_all_active_mutes_member(self, guild_id, member_id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            async with db.execute(f"SELECT * FROM Infractions WHERE fk_guildId = ? and iType = '{Infractions.warn}'",
+            async with db.execute(f"""
+                                        SELECT * FROM Infractions 
+                                        WHERE fk_guildId = ? 
+                                        AND fk_subjectId = ? 
+                                        AND iType = {Infractions.mute}
+                                        AND active = ?
+                                        """,
+                                  (guild_id, member_id, True)) as c:
+                return await self.fetcthall_as_class(c)
+
+    async def get_all_warns_guild(self, guild_id):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(f"SELECT * FROM Infractions WHERE fk_guildId = ? AND iType = '{Infractions.warn}'",
                                   (guild_id,)) as c:
+                return await self.fetcthall_as_class(c)
+
+    async def get_all_warns_member(self, guild_id, member_id):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(f"""
+                                    SELECT * FROM Infractions 
+                                    WHERE fk_guildId = ? 
+                                    AND fk_subjectId = ? 
+                                    AND iType = '{Infractions.warn}'
+                                    """,
+                                  (guild_id, member_id)) as c:
+                return await self.fetcthall_as_class(c)
+
+    async def get_all_infractions_member(self, guild_id, member_id):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(f"""
+                                    SELECT * FROM Infractions 
+                                    WHERE fk_guildId = ? 
+                                    AND fk_subjectId = ? 
+                                    """,
+                                  (guild_id, member_id)) as c:
                 return await self.fetcthall_as_class(c)

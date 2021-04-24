@@ -58,6 +58,7 @@ class Claims(Enum):
     moderation_ban = auto()
     moderation_mute = auto()
     moderation_purge = auto()
+    moderation_infraction_view = auto()
 
     @staticmethod
     def get_claims_str():

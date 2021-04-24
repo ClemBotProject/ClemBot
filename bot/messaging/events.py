@@ -380,7 +380,7 @@ class EventsMeta(type):
     @property
     def on_set_pageable_embed(self):
         """
-        Published when a listof embeds is needed to be able to paginate
+        Published when a list of embeds is needed to be able to paginate
         
         Args:
             pages (list[discord.Embed]): a list of embeds to scroll through

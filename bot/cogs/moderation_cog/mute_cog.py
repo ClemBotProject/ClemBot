@@ -20,7 +20,7 @@ class MuteCog(commands.Cog):
 
     @ext.command()
     @ext.required_claims(Claims.moderation_mute)
-    async def mute(self, ctx: commands.Context, time: DurationDelta, subject: discord.Member, *, reason: t.Optional[str]):
+    async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
 
         duration_str = self._get_time_str(time)
         time = await Duration().convert(ctx, time)
@@ -93,7 +93,7 @@ class MuteCog(commands.Cog):
 
         # Dm the user who was muted
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'You have been muted'
+        embed.title = f'You have been muted  :mute:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(url=str(ctx.guild.icon_url))
         embed.add_field(name='Duration :timer:', value=duration_str)

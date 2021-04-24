@@ -17,6 +17,15 @@ class ModerationService(BaseService):
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
+    @BaseService.Listener(Events.on_bot_warn)
+    async def on_bot_warn(self, guild, author: discord.Member, subject: discord.Member, reason):
+        repo = ModerationRepository()
+
+        await repo.insert_warn(guild_id=guild.id,
+                               author_id=author.id,
+                               subject_id=subject.id,
+                               reason=reason)
+
     @BaseService.Listener(Events.on_bot_ban)
     async def on_bot_ban(self, guild, author: discord.Member, subject: discord.Member, reason):
         repo = ModerationRepository()
@@ -55,7 +64,7 @@ class ModerationService(BaseService):
         await repo.deactivate_mute(mute_id)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'You have been unmuted'
+        embed.title = f'You have been Unmuted'
         embed.set_thumbnail(url=str(guild.icon_url))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {guild.name}'
@@ -80,6 +89,26 @@ class ModerationService(BaseService):
                                          DesignatedChannels.moderation_log,
                                          guild.id,
                                          embed)
+
+    @BaseService.Listener(Events.on_user_joined)
+    async def on_joined(self, user: discord.Member):
+        repo = ModerationRepository()
+        mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
+
+        mutes = await repo.get_all_active_mutes_member(user.guild.id, user.id)
+
+        if len(mutes) > 0:
+            await user.add_roles(mute_role)
+            embed = discord.Embed(color=Colors.ClemsonOrange)
+            embed.title = 'Reapplied Mute'
+            embed.add_field(name=self.get_full_name(user), value=f'Id: {user.id}')
+            embed.add_field(name='Reason :page_facing_up:', value=f'```User left and rejoined```', inline=False)
+            embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
+
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                             DesignatedChannels.moderation_log,
+                                             user.guild.id,
+                                             embed)
 
     @BaseService.Listener(Events.on_member_ban)
     async def on_member_ban(self, guild, user):
