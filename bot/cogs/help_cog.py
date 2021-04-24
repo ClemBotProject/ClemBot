@@ -33,7 +33,7 @@ class HelpCog(commands.Cog):
         else:
             await self.send_default_help(ctx)
 
-    async def send_group_help(self, ctx, command: commands.Group):
+    async def send_group_help(self, ctx, command: ext.ClemBotGroup):
         prefix = await self.bot.current_prefix(ctx)
 
         embed = discord.Embed(title=f'```{prefix}{command.qualified_name}```',
@@ -59,7 +59,7 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def send_command_help(self, ctx, command: commands.Command):
+    async def send_command_help(self, ctx, command: ext.ClemBotCommand):
         prefix = await self.bot.current_prefix(ctx)
 
         embed = discord.Embed(title=f'```{prefix}{command.qualified_name}```', color=Colors.ClemsonOrange)

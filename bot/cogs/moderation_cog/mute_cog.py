@@ -19,6 +19,11 @@ class MuteCog(commands.Cog):
         self.bot = bot
 
     @ext.command()
+    @ext.long_help(
+        'Mutes a user for a given amount of time with an optional reason'
+    )
+    @ext.short_help('Mutes a user')
+    @ext.example(('mute @SomeUser 1d Timeout', 'mute @SomUser 2d1h5m A much longer timeout'))
     @ext.required_claims(Claims.moderation_mute)
     async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
 
@@ -118,7 +123,7 @@ class MuteCog(commands.Cog):
         if elapsed.days > 0:
             s += f'{elapsed.days} Day{"s" if elapsed.days > 1 else ""} '
         if elapsed.hours > 0:
-            s += f'{elapsed.hours} Hour{"s" if elapsed.hours> 1 else ""}'
+            s += f'{elapsed.hours} Hour{"s" if elapsed.hours > 1 else ""}'
         if elapsed.minutes > 0:
             s += f'{elapsed.minutes} Minute{"s" if elapsed.minutes > 1 else ""}'
         return s

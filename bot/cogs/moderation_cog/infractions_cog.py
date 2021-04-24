@@ -23,7 +23,12 @@ class InfractionsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.command()
+    @ext.command(aliases=['infraction', 'warnings'])
+    @ext.long_help(
+        'Lists infractions for yourself or for a given user in the guild'
+    )
+    @ext.short_help('Lists a users infractions')
+    @ext.example(('infractions', 'infractions @SomeUser'))
     @ext.required_claims(Claims.moderation_warn)
     async def infractions(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
         user = user or ctx.author

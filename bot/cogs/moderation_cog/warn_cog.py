@@ -16,6 +16,12 @@ class WarnCog(commands.Cog):
         self.bot = bot
 
     @ext.command()
+    @ext.long_help(
+        'Warns a user and applies an infraction to them'
+    )
+    @ext.short_help('Warns a user')
+    @ext.example('warn @SomeUser an example warning')
+    @ext.required_claims(Claims.moderation_mute)
     @ext.required_claims(Claims.moderation_warn)
     async def warn(self, ctx: commands.Context, subject: discord.Member, *, reason: str):
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
@@ -69,7 +75,6 @@ class WarnCog(commands.Cog):
                                          DesignatedChannels.moderation_log,
                                          ctx.guild.id,
                                          embed)
-
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'

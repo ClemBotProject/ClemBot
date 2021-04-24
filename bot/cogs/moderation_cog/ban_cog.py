@@ -16,6 +16,11 @@ class BanCog(commands.Cog):
         self.bot = bot
 
     @ext.command()
+    @ext.long_help(
+        'Bans a user from a server and tracks that ban as an infraction'
+    )
+    @ext.short_help('Bans a user')
+    @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll'))
     @ext.required_claims(Claims.moderation_ban)
     async def ban(self, ctx: commands.Context, subject: discord.Member, *, reason: str):
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
@@ -69,7 +74,6 @@ class BanCog(commands.Cog):
                                          DesignatedChannels.moderation_log,
                                          ctx.guild.id,
                                          embed)
-
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
