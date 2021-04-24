@@ -29,6 +29,8 @@
  
  
 A Discord bot for server and community management with a focus on school/programming/fun related commands. 
+   - <b>Moderation:</b>  Moderation and Moderation logging is made easy with ClemBot, Banning, Muting and Warning are all supported and easy to use
+
    - <b>Role Management:</b> Easily manage you and your users roles with designated assignable roles
    
    - <b>Starboard:</b> Allow your server to highlight the best or funniest messages by members with a starboard, simply assign the starboard channel and react with stars
@@ -52,9 +54,7 @@ A Discord bot for server and community management with a focus on school/program
    - <b>Weather Forecasts:</b> Clembot supports weather forecasts from anywhere in the world, simply run `!weather <location>` to get a full 7 day forecast for your area
   
    - <b>Translation:</b> Leveraging Azure translation services Clembot supports over 50 langauges world wide for instant translation!
-  
-   - <b>Moderation:</b>  Coming soon!!!
-   
+     
    and so much more
    
    Clembot is in current active development so check back often to see whats new!!
