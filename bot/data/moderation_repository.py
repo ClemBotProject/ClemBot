@@ -73,6 +73,18 @@ class ModerationRepository(BaseRepository):
             await db.commit()
             return id
 
+    async def check_infraction(self, guild_id: int, infra_id: int) -> bool :
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute('SELECT * FROM Infractions WHERE id = ? AND fk_guildId = ?',
+                                  (infra_id, guild_id)) as c:
+                return await c.fetchone() is not None
+
+    async def delete_infractions(self, guild_id: int, infra_id: int):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            await db.execute('DELETE FROM Infractions WHERE id = ? AND fk_guildId = ?',
+                             (infra_id, guild_id))
+            await db.commit()
+
     async def deactivate_mute(self, id):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute('UPDATE Infractions SET active = ? WHERE id = ?', (False, id))

@@ -23,7 +23,7 @@ class InfractionsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.command(aliases=['infraction', 'warnings'])
+    @ext.group(aliases=['infraction', 'warnings'])
     @ext.long_help(
         'Lists infractions for yourself or for a given user in the guild'
     )
@@ -63,6 +63,30 @@ class InfractionsCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel,
                                          timeout=120)
+
+    @infractions.command(aliases=['remove', 'clear', 'revoke'])
+    @ext.long_help(
+        'Removes an infraction from a user based on its unique Id, run the infractions command'
+        'to see a list of infractions for a given user'
+    )
+    @ext.short_help('Removes an infraction')
+    @ext.example(('infractions delete 1', 'infractions remove 2'))
+    @ext.required_claims(Claims.moderation_warn)
+    async def delete(self, ctx: commands.Context, infraction_id: int):
+        repo = ModerationRepository()
+
+        if not await repo.check_infraction(ctx.guild.id, infraction_id):
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = 'Error: Infraction does not exist'
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            return await ctx.send(embed=embed)
+
+        await repo.delete_infractions(ctx.guild.id, infraction_id)
+
+        embed = discord.Embed(color=Colors.Error)
+        embed.title = f'Infractions {infraction_id} deleted successfully  :white_check_mark:'
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        return await ctx.send(embed=embed)
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
