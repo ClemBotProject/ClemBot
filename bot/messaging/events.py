@@ -380,18 +380,18 @@ class EventsMeta(type):
     @property
     def on_set_pageable_embed(self):
         """
-        Published when a listof embeds is needed to be able to paginate
+        Published when a list of embeds is needed to be able to paginate
         
         Args:
             pages (list[discord.Embed]): a list of embeds to scroll through
-            author (discord.Member): member who called the bot 
+            author (discord.Member): member who called the bot
             channel (discord.TextChannel): the channel to send the embed
-            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
+            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s
         """
         return 'on_set_pageable_embed'
 
     @property
-    def on_member_update(self, before, after):
+    def on_member_update(self):
         """
         This is called when one or more of the following things change:
 
@@ -402,6 +402,68 @@ class EventsMeta(type):
             pending
         """
         return 'on_member_update'
+
+    @property
+    def on_bot_mute(self):
+        """
+        Published when a user is warned with clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the mute happened
+            author (discord.Member): member who called the bot
+            subject (discord.Member): The moderated user
+            reason (Optional[str]): The reason for the mute
+        """
+        return 'on_bot_mute'
+
+    @property
+    def on_bot_unmute(self):
+        """
+        Published when a user is unmuted by clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the unmute happened
+            subject (discord.Member): The moderated user
+            reason (Optional[str]): The reason for the unmute
+        """
+        return 'on_bot_unmute'
+
+    @property
+    def on_bot_warn(self):
+        """
+        Published when a user is warned with clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the warn happened
+            author (discord.Member): member who called the bot
+            subject (discord.Member): The moderated user
+            reason (Optional[str]): The reason for the warn
+        """
+        return 'on_bot_warn'
+
+    @property
+    def on_bot_ban(self):
+        """
+        Published when a user is banned with clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the ban happened
+            author (discord.Member): member who called the bot
+            subject (discord.Member): The moderated user
+            reason (Optional[str]): The reason for the ban
+        """
+        return 'on_bot_ban'
+
+    @property
+    def on_member_ban(self):
+        """
+        Published when a user is banned with clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the ban happened
+            user (discord.Member): member who was banned
+        """
+        return 'on_member_ban'
 
 
 class Events(metaclass=EventsMeta):

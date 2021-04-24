@@ -158,6 +158,9 @@ class ClemBot(commands.Bot):
 
     async def on_member_remove(self, user):
         await self.publish_with_error(Events.on_user_removed, user)
+    
+    async def on_member_ban(self, guild, user):
+        await self.publish_with_error(Events.on_member_ban, guild, user)
 
     async def on_message_edit(self, before, after):
         if before.author.id != self.user.id and len(before.embeds) == 0:

@@ -40,7 +40,7 @@ class UserHandlingService(BaseService):
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
         embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
-        embed.set_footer(text=datetime.datetime.now().date())
+        embed.set_footer(text=str(datetime.now().date()))
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.user_join_log,
@@ -52,7 +52,7 @@ class UserHandlingService(BaseService):
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
         embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
-        embed.set_footer(text=datetime.datetime.now().date())
+        embed.set_footer(text=str(datetime.now().date()))
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.user_leave_log,

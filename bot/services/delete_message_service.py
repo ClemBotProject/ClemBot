@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class DeleteMessageService(BaseService):
     """
     This service allows for messages sent by the bot to be deleted
-    The messags by default are allowed by deleted by admins and the person who called the bot
+    The messages by default are allowed by deleted by admins and the person who called the bot
     """
 
     def __init__(self, *, bot):
