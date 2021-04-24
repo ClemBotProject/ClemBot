@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS Infractions (
     iType                    TEXT CHECK(iType IN ('ban', 'mute', 'warn')) NOT NULL,
     duration                 INTEGER,
     reason                   TEXT,
+    active                   BOOLEAN,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id),
     FOREIGN KEY(fk_authorId)

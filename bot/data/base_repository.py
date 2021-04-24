@@ -44,7 +44,7 @@ class BaseRepository:
         Returns:
             [cls]: a list of classes with row names as attributes
         """
-        return [type('query', (), dict(zip([column[0] for column in cursor.description], row)))
+        return [type('Query', (), dict(zip([column[0] for column in cursor.description], row)))
                 for row in await cursor.fetchall()]
 
     async def fetcthone_as_dict(self, cursor: aiosqlite.Cursor):
@@ -73,4 +73,4 @@ class BaseRepository:
         Returns:
             [dict]: a class with row names as attributes
         """
-        return type('query', (), dict(zip([column[0] for column in cursor.description], await cursor.fetchone())))
+        return type('Query', (), dict(zip([column[0] for column in cursor.description], await cursor.fetchone())))

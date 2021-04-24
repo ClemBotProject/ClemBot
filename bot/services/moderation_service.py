@@ -1,7 +1,9 @@
 import logging
+from datetime import datetime
 
 import discord
 
+from bot.clem_bot import ClemBot
 from bot.services.base_service import BaseService
 from bot.messaging.events import Events
 from bot.data.moderation_repository import ModerationRepository
@@ -12,7 +14,7 @@ log = logging.getLogger(__name__)
 
 class ModerationService(BaseService):
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_bot_ban)
@@ -27,17 +29,57 @@ class ModerationService(BaseService):
                               reason=reason)
 
     @BaseService.Listener(Events.on_bot_mute)
-    async def on_bot_mute(self, guild, author: discord.Member, subject: discord.Member, reason, duration):
+    async def on_bot_mute(self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason, duration):
         repo = ModerationRepository()
 
         mute_role = discord.utils.get(author.guild.roles, name=Moderation.mute_role_name)
         await subject.add_roles(mute_role)
 
-        await repo.insert_mute(guild_id=guild.id,
-                               author_id=author.id,
-                               subject_id=subject.id,
-                               duration=duration,
-                               reason=reason)
+        mute_id = await repo.insert_mute(guild_id=guild.id,
+                                         author_id=author.id,
+                                         subject_id=subject.id,
+                                         duration=duration,
+                                         reason=reason)
+
+        self.bot.scheduler.schedule_at(self._unmute_callback(subject, mute_id), time=duration)
+
+    @BaseService.Listener(Events.on_bot_unmute)
+    async def on_bot_unmute(self, guild: discord.Guild, subject: discord.Member, mute_id, reason):
+        repo = ModerationRepository()
+        mute_role = discord.utils.get(guild.roles, name=Moderation.mute_role_name)
+
+        if mute_role not in subject.roles:
+            return
+
+        await subject.remove_roles(mute_role)
+        await repo.deactivate_mute(mute_id)
+
+        embed = discord.Embed(color=Colors.ClemsonOrange)
+        embed.title = f'You have been unmuted'
+        embed.set_thumbnail(url=str(guild.icon_url))
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.description = f'**Guild:** {guild.name}'
+
+        try:
+            await subject.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(color=Colors.ClemsonOrange)
+            embed.title = f'Dm unmute to {self.get_full_name(subject)} forbidden'
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                             DesignatedChannels.moderation_log,
+                                             guild.id,
+                                             embed)
+
+        embed = discord.Embed(color=Colors.ClemsonOrange)
+        embed.title = 'Guild Member Unmuted'
+        embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.set_thumbnail(url=subject.avatar_url_as(static_format='png'))
+
+        await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                         DesignatedChannels.moderation_log,
+                                         guild.id,
+                                         embed)
 
     @BaseService.Listener(Events.on_member_ban)
     async def on_member_ban(self, guild, user):
@@ -59,5 +101,25 @@ class ModerationService(BaseService):
                                          guild.id,
                                          embed)
 
+    async def _unmute_callback(self, user: discord.Member, mute_id):
+        await self.bot.messenger.publish(Events.on_bot_unmute, user.guild, user, mute_id, 'Mute Time Expired')
+
+    def get_full_name(self, author) -> str:
+        return f'{author.name}#{author.discriminator}'
+
     async def load_service(self):
-        pass
+        repo = ModerationRepository()
+
+        for guild in self.bot.guilds:
+            mutes = await repo.get_all_active_mutes(guild.id)
+            for mute in mutes:
+                wait: datetime = datetime.strptime(mute.duration, '%Y-%m-%d %H:%M:%S.%f')
+                member = guild.get_member(mute.fk_subjectId)
+
+                if not member:
+                    continue
+
+                if (wait - datetime.utcnow()).total_seconds() <= 0:
+                    await self._unmute_callback(member, mute.id)
+                else:
+                    self.bot.scheduler.schedule_at(self._unmute_callback(member, mute.id), time=wait)

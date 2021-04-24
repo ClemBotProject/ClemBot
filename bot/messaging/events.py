@@ -417,6 +417,18 @@ class EventsMeta(type):
         return 'on_bot_mute'
 
     @property
+    def on_bot_unmute(self):
+        """
+        Published when a user is unmuted by clembot
+
+        Args:
+            guild (discord.Guild): Guild id where the unmute happened
+            subject (discord.Member): The moderated user
+            reason (Optional[str]): The reason for the unmute
+        """
+        return 'on_bot_unmute'
+
+    @property
     def on_bot_warn(self):
         """
         Published when a user is warned with clembot

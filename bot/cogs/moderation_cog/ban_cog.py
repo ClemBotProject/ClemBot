@@ -25,6 +25,24 @@ class BanCog(commands.Cog):
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
             return await ctx.send(embed=embed)
 
+        # Dm the user who was banned
+        embed = discord.Embed(color=Colors.ClemsonOrange)
+        embed.title = f'You have been banned from Guild {ctx.guild.name}'
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=str(ctx.guild.icon_url))
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.description = f'**Guild:** {ctx.guild.name}'
+
+        try:
+            await subject.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(color=Colors.ClemsonOrange)
+            embed.title = f'Dm Ban to {self.get_full_name(subject)} forbidden'
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                             DesignatedChannels.moderation_log,
+                                             ctx.guild.id,
+                                             embed)
+
         await self.bot.messenger.publish(Events.on_bot_ban,
                                          guild=ctx.guild,
                                          author=ctx.author,
@@ -51,6 +69,7 @@ class BanCog(commands.Cog):
                                          DesignatedChannels.moderation_log,
                                          ctx.guild.id,
                                          embed)
+
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
