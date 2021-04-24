@@ -4,10 +4,10 @@ from datetime import datetime
 import discord
 
 from bot.clem_bot import ClemBot
-from bot.services.base_service import BaseService
-from bot.messaging.events import Events
-from bot.data.moderation_repository import ModerationRepository
 from bot.consts import Colors, DesignatedChannels, Moderation
+from bot.data.moderation_repository import ModerationRepository
+from bot.messaging.events import Events
+from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +94,10 @@ class ModerationService(BaseService):
     async def on_joined(self, user: discord.Member):
         repo = ModerationRepository()
         mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
+
+        # no mute role configured, do nothing
+        if not mute_role:
+            return
 
         mutes = await repo.get_all_active_mutes_member(user.guild.id, user.id)
 
