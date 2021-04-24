@@ -1,13 +1,14 @@
-import os
 import logging
+import os
+import typing as t
 
 import discord
-import pandas as pd
-import typing as t
 import discord.ext.commands as commands
-from bot.messaging.events import Events
+import pandas as pd
 
 import bot.extensions as ext
+from bot.consts import Colors
+from bot.messaging.events import Events
 from bot.utils.converters import HonorsConverter
 
 log = logging.getLogger(__name__)
@@ -54,7 +55,8 @@ class GradesCog(commands.Cog):
     )
     @ext.short_help('Attempts to give more information about courses at Clemson University')
     @ext.example(
-        ('grades math-2060', 'grades honors math-2060', 'grades non-honors math-2060', 'grades all math-2060', 'grades 2017 math-2060', 'grades honors 2017 math-2060'))
+        ('grades math-2060', 'grades honors math-2060', 'grades non-honors math-2060', 'grades all math-2060', 'grades 2017 math-2060',
+         'grades honors 2017 math-2060'))
     async def grades(self, ctx, honors: t.Optional[HonorsConverter] = 'non-honors', year: t.Optional[int] = MIN_YEAR, *, course: str):
         course = course.upper()
 
@@ -79,7 +81,8 @@ class GradesCog(commands.Cog):
         if error_title:
             embed = discord.Embed(title='Grades', color=Colors.Error)
             embed.add_field(name='ERROR: ' + error_title, value=error_message, inline=False)
-            embed.add_field(name=f'Help:', value= f'Run `{await self.bot.current_prefix(ctx)}grades list` to find what courses are available', inline=False)
+            embed.add_field(name=f'Help:', value=f'Run `{await self.bot.current_prefix(ctx)}grades list` to find what courses are available',
+                            inline=False)
             return await ctx.send(embed=embed)
 
         # Default: no honors preference
@@ -110,7 +113,8 @@ class GradesCog(commands.Cog):
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df)), inline=False)
         embed.add_field(name='Total Number of Professors Found', value=str(len(df.groupby(['Instructor']))), inline=False)
-        embed.add_field(name='Want honors sections or an explanation?', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
+        embed.add_field(name='Want honors sections or an explanation?',
+                        value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
         embeds.append(embed)
 
         #group by the prof
@@ -164,7 +168,8 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title='Professors', color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
-            embed.add_field(name=f'Help:', value=f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available', inline=False)
+            embed.add_field(name=f'Help:', value=f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available',
+                            inline=False)
             return await ctx.send(embed=embed)
 
         # check for if there is a 0% A rate, that means it was a pass fail class and we dont handle those
@@ -267,7 +272,9 @@ class GradesCog(commands.Cog):
 
             embed = discord.Embed(title='All Known Courses', color=Colors.ClemsonOrange)
             embed.add_field(name='Listings:', value=f'```{content}```')
-            embed.add_field(name='Info:', value=f'Clemson provides incomplete and mangled data so there may be different versions of the same course, as well as other mangled names. This is just a byproduct of how the data is distributed by the university', inline=False)
+            embed.add_field(name='Info:',
+                            value=f'Clemson provides incomplete and mangled data so there may be different versions of the same course, as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
+                            inline=False)
 
             embeds.append(embed)
         return embeds
