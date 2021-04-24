@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels, Moderation
+from bot.data.moderation_repository import ModerationRepository
 from bot.messaging.events import Events
 from bot.utils.converters import Duration, DurationDelta
 from bot.utils.user_choice import UserChoice
@@ -118,6 +119,38 @@ class MuteCog(commands.Cog):
                                              DesignatedChannels.moderation_log,
                                              ctx.guild.id,
                                              embed)
+
+    @ext.command()
+    @ext.long_help(
+        'UnMutes a user for a with an optional reason'
+    )
+    @ext.short_help('UnMutes a user')
+    @ext.example(('Unmute @SomeUser Timeout'))
+    @ext.required_claims(Claims.moderation_mute)
+    async def unmute(self, ctx: commands.Context, user: discord.Member, *, reason: t.Optional[str]):
+        repo = ModerationRepository()
+        mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
+
+        if not mute_role:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Error: Mute role not found'
+            embed.add_field(name='Reason', value='Run the mute command to initiate mute role activation')
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            return await ctx.send(embed=embed)
+
+        mutes = await repo.get_all_active_mutes_member(user.guild.id, user.id)
+
+        if not mutes:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Error: This user has no active mutes'
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            return await ctx.send(embed=embed)
+
+        await user.remove_roles(mute_role)
+
+        for mute in mutes:
+            await repo.deactivate_mute(mute.id)
+
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'

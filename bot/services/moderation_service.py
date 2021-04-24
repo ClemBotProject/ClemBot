@@ -114,6 +114,23 @@ class ModerationService(BaseService):
                                              user.guild.id,
                                              embed)
 
+    @BaseService.Listener(Events.on_guild_channel_create)
+    async def on_joined(self, channel: discord.TextChannel):
+        mute_role = discord.utils.get(channel.guild.roles, name=Moderation.mute_role_name)
+
+        # no mute role configured, do nothing
+        if not mute_role:
+            return
+
+        log.info(f'Setting mute role perms for channel: {channel.name} in guild {channel.guild.id} ')
+        await channel.set_permissions(mute_role,
+                                      speak=False,
+                                      connect=False,
+                                      stream=False,
+                                      send_messages=False,
+                                      send_tts_messages=False,
+                                      add_reactions=False)
+
     @BaseService.Listener(Events.on_member_ban)
     async def on_member_ban(self, guild, user):
         log = (await guild.audit_logs(limit=1, action=discord.AuditLogAction.ban).flatten())[0]
