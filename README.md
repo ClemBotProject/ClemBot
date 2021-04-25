@@ -35,7 +35,7 @@ A Discord bot for server and community management with a focus on school/program
    
    - <b>Starboard:</b> Allow your server to highlight the best or funniest messages by members with a starboard, simply assign the starboard channel and react with stars
 
-   - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix with  `!prefix set <prefix>`
+   - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix with  `!prefix <prefix>`
     
    - <b>Python Repl:</b> Coding is fun, Discord is fun. Put them together and collaborative learning is easy with a built in python interpreter. Just type your python code into discord and run it with `!eval` and watch the bot evaluate your code.
     
