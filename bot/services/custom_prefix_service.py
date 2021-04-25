@@ -12,7 +12,7 @@ class GuildHandlingService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    #this only supports one prefix per guild atm, can be easily swapped to support more per guild
+    # this only supports one prefix per guild atm, can be easily swapped to support more per guild
     async def load_service(self):
         repo = CustomPrefixesRepository()
         for guild in self.bot.guilds:

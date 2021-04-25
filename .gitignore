@@ -1,6 +1,8 @@
 #ignore the database
 *.sqlite
 
+.idea
+
 .vscode/settings.json
 Logs/
 
@@ -43,6 +45,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.idea/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

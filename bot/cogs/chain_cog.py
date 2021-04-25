@@ -1,10 +1,10 @@
 import logging
+import re
 import typing as t
+from copy import copy
 
 import discord
 import discord.ext.commands as commands
-from copy import copy
-import re
 
 import bot.extensions as ext
 
@@ -36,6 +36,7 @@ class ChainCog(commands.Cog):
             if type(embed) == discord.Embed:
                 raise Exception('Chainable Command Output is not String')
             resultqueue.append(str(embed))
+
         fakectx.send = fakesend
         pattern = f'[\w\d\s.](?={prefix[0]}|{prefix[1]}|\\{prefix[2]})'  # Divide our input by the prefixes
         commandls = re.split(pattern, text)
@@ -45,21 +46,21 @@ class ChainCog(commands.Cog):
             commandls[i] = commandls[i].replace(prefix[0], '')
             commandls[i] = commandls[i].replace(prefix[1], '')
             commandls[i] = re.sub(secondpattern, '', commandls[i])
-            commandls[i] = commandls[i].replace('\\'+prefix[2], prefix[2])  # Allows the use of escaped prefixes as
+            commandls[i] = commandls[i].replace('\\' + prefix[2], prefix[2])  # Allows the use of escaped prefixes as
             # regular characters without invoking command
         # Main Loop
-        index = len(commandls)-1
+        index = len(commandls) - 1
         while index > (not isfirstcommandatfirst):
             buffer, err = await self.process_command(commandls.pop(index), True, fakectx)
             if buffer == 1:
                 await ctx.send(err)
                 return
             for i in range(0, len(resultqueue)):
-                commandls[index-1] += resultqueue[i]
-                if i!= len(resultqueue)-1:
-                    commandls[index-1]+= '\n'
+                commandls[index - 1] += resultqueue[i]
+                if i != len(resultqueue) - 1:
+                    commandls[index - 1] += '\n'
             resultqueue = []
-            index-=1
+            index -= 1
         # Process the last command differently
         if isfirstcommandatfirst:  # If there is nothing before the last command then use the real ctx
             buffer, err = await self.process_command(commandls.pop(0), False, ctx)
@@ -72,11 +73,10 @@ class ChainCog(commands.Cog):
                 await ctx.send(err)
                 return
             for i in range(0, len(resultqueue)):
-                commandls[index-1] += resultqueue[i]
-                if i!= len(resultqueue)-1:
-                    commandls[index-1]+= '\n'
+                commandls[index - 1] += resultqueue[i]
+                if i != len(resultqueue) - 1:
+                    commandls[index - 1] += '\n'
             await ctx.send(commandls.pop(0))
-
 
     # Code Copied from help_cog.py
     def find_command(self, parent, command_name: str):
@@ -118,11 +118,10 @@ class ChainCog(commands.Cog):
         if not checkfordecorator and not func.chainable_input and not func.chainable_output:
             return 1, command.split()[0] + ' Is not a chainable input command'
 
-            
         args = {'ctx': ctx}
         temp = []
         for arg in func.params:
-            if arg!= 'self' and arg != 'ctx':
+            if arg != 'self' and arg != 'ctx':
                 temp.append(arg)
         if len(temp) == 1:
             index = command.find(' ')
@@ -135,7 +134,7 @@ class ChainCog(commands.Cog):
         else:
             remainder = command.split()
             remainder.pop(0)
-            for i in range(0, len(temp)-1):
+            for i in range(0, len(temp) - 1):
                 if type(func.params[temp[i]].annotation) == t._GenericAlias:
                     for arg in func.params[temp[i]].annotation.__args__:
                         try:
@@ -171,8 +170,8 @@ class ChainCog(commands.Cog):
                         break  # We ran out of arguments so continuing with command execution
             buffer = ''
             for i in range(0, len(remainder)):
-                buffer+=remainder[i]
-                if i != len(remainder)-1:
+                buffer += remainder[i]
+                if i != len(remainder) - 1:
                     buffer += ' '
             args[temp[-1]] = buffer
         await func(**args)

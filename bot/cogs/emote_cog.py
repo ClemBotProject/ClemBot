@@ -1,14 +1,14 @@
 import logging
 
-import discord
 import aiohttp
+import discord
 import discord.ext.commands as commands
-from discord.ext.commands.errors import BadArgument
 
 import bot.extensions as ext
 from bot.consts import Colors, Claims
 
 log = logging.getLogger(__name__)
+
 
 class EmoteCog(commands.Cog):
 
@@ -22,7 +22,6 @@ class EmoteCog(commands.Cog):
     @emote.command()
     @ext.required_claims(Claims.emote_add)
     async def add(self, ctx: commands.Context, emote, name: str):
-
         emote_id = emote.split(':')[2][:-1]
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp:
@@ -41,5 +40,6 @@ class EmoteCog(commands.Cog):
         embed.set_footer(text=f'Created By: {fullName}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
-def setup(bot): 
+
+def setup(bot):
     bot.add_cog(EmoteCog(bot))

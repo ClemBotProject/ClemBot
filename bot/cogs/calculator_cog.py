@@ -4,9 +4,9 @@ import re
 import discord
 import discord.ext.commands as commands
 
-from bot.errors import ParserError
-from bot.consts import Colors
 import bot.extensions as ext
+from bot.consts import Colors
+from bot.errors import ParserError
 
 log = logging.getLogger(__name__)
 
@@ -36,25 +36,25 @@ class CalculatorCog(commands.Cog):
             $calc -4*-3^5
             $calc (-10-4)/5
         """
-        
+
         expression = " ".join(args)
         # issue parsing ,'s. Better to remove them
-        expression = expression.replace(',','')
+        expression = expression.replace(',', '')
         try:
 
             embed = discord.Embed(title="🧮Calculator", color=Colors.ClemsonOrange)
 
             result = self.parse_postfix(self.parse_expression(expression))
-            
+
             embed.add_field(name="Expression", value=expression, inline=True)
 
             embed.add_field(name="Result", value=result, inline=False)
-            
+
         except ParserError as error:
             embed = discord.Embed(title="🧮Calculator", color=Colors.Error)
 
             embed.add_field(name="Error", value=error)
-    
+
         await ctx.send(embed=embed)
 
     # compares the precedence of two operators
@@ -106,7 +106,7 @@ class CalculatorCog(commands.Cog):
                 operators += 1
             elif self.isNum(token):
                 numbers += 1
-        
+
         if numbers <= operators:
             return False
         return True
@@ -124,7 +124,7 @@ class CalculatorCog(commands.Cog):
                 if currentToken == ")" and nextToken == "(":
                     processed += f"{currentToken} * "
                     index += 1
-                #Checks for implicit negative conversions
+                # Checks for implicit negative conversions
                 elif currentToken == "-" and (index == 0 or (self.isOp(expression[index - 1]) and expression[index - 1] != ")")):
                     processed += "-1 * "
                     index += 1
@@ -161,14 +161,14 @@ class CalculatorCog(commands.Cog):
                 index += 1
 
         # adds the last token
-        processed += f"{expression[len(expression)-1]}"
+        processed += f"{expression[len(expression) - 1]}"
 
         return processed
 
     def parse_expression(self, expression):
 
         expression = self.preprocess(expression)
-        
+
         # parse expression into a list of numbers and symbols
         tokens = re.findall(r"-?\d*\.?\d*|[+^/*()-]", expression)
 

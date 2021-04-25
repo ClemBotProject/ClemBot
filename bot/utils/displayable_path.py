@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 class DisplayablePath(object):
     display_filename_prefix_middle = '├──'
     display_filename_prefix_last = '└──'
@@ -48,7 +49,7 @@ class DisplayablePath(object):
     @classmethod
     def _default_criteria(cls, path):
         return True
-    
+
     @staticmethod
     def get_tree(*args, **kwargs):
         paths = DisplayablePath.make_tree(*args, **kwargs)

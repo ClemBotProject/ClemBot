@@ -29,7 +29,7 @@ class BaseService(abc.ABC):
         pass
 
     @classmethod
-    def Listener(cls, event= None):
+    def Listener(cls, event=None):
         """
         The method decorator to allow for service methods to be marked as a callback 
         for application level events
@@ -38,6 +38,7 @@ class BaseService(abc.ABC):
             event ([Str], optional): The event that the method is subscribing too.
             Defaults to None.
         """
+
         def wrapper(func):
             actual = func
             if isinstance(actual, staticmethod):
@@ -47,4 +48,5 @@ class BaseService(abc.ABC):
             actual.__event_listener__ = event or actual.__name__
 
             return func
+
         return wrapper

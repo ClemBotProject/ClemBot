@@ -1,15 +1,16 @@
-import typing as t
-import weakref as wr
+import asyncio
 import inspect
 import logging
-import asyncio
+import typing as t
+import weakref as wr
 
 log = logging.getLogger(__name__)
+
 
 class Messenger:
     """This is the global message bus that handles all application level events"""
 
-    def __init__(self, name = None) -> None:
+    def __init__(self, name=None) -> None:
         log.info(f'New messenger created with name: {name}')
         self.name = name
         self._events: t.Dict[str, t.Awaitable] = {}
