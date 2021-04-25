@@ -60,7 +60,7 @@ A Discord bot for server and community management with a focus on school/program
    Clembot is in current active development so check back often to see whats new!!
 
 # Bot Invite
-To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=2081291511&scope=bot)
+To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1409404150&scope=bot)
 
 ## Community
 We are a community focused on learning and acceptance; anyone is welcome. If you have an idea or a feature you would like to contribute, feel free to open an issue and we as a community can begin discussion. 
