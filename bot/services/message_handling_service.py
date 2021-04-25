@@ -202,6 +202,12 @@ class MessageHandlingService(BaseService):
             embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color=Colors.ClemsonOrange)
             embed.set_author(name=f'Quoted by: {self.get_full_name(message.author)}', icon_url=avi)
             embed.add_field(name='Content', value=link_message.content, inline=False)
+            if link_message.attachments:
+                att = link_message.attachments[0]
+                image = att.proxy_url
+                embed.add_field(name="Attachments", value=f"[{att.filename}]({att.url})", inline=False)
+            if image:
+                embed.set_image(url=image)
             embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
             embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
 
