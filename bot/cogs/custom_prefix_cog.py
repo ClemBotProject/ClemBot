@@ -1,4 +1,5 @@
 import logging
+import typing as t
 
 import discord
 import discord.ext.commands as commands
@@ -19,29 +20,21 @@ class CustomPrefixCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['prefixs'])
     @ext.long_help(
-        'Allows configuring the command prefix that the bot will respond too'
+        'Lists the current prefix or configures the command prefix that the bot will respond too'
     )
     @ext.short_help('Configure a custom command prefix')
-    @ext.example('prefix')
-    async def prefix(self, ctx):
+    @ext.example(('prefix', 'prefix ?', 'prefix >>'))
+    async def prefix(self, ctx, *, prefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global so we dont care about them
         prefixes = (await self.bot.get_prefix(ctx.message))[2:]
 
-        embed = discord.Embed(title='Current Active Prefixes',
-                              description=f'```{", ".join(prefixes)}```',
-                              color=Colors.ClemsonOrange)
+        if not prefix:
+            embed = discord.Embed(title='Current Active Prefixes',
+                                  description=f'```{", ".join(prefixes)}```',
+                                  color=Colors.ClemsonOrange)
 
-        await ctx.send(embed=embed)
-
-    @prefix.command(pass_context=True, aliases=['add'])
-    @ext.required_claims(Claims.custom_prefix_set)
-    @ext.long_help(
-        'Sets the bot prefix to any given valid string'
-    )
-    @ext.short_help('set a custom prefix')
-    @ext.example('prefix set +')
-    async def set(self, ctx, prefix: str):
+            return await ctx.send(embed=embed)
 
         if prefix in await self.bot.get_prefix(ctx.message):
             embed = discord.Embed(title='Error', color=Colors.Error)
