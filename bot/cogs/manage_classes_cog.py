@@ -278,6 +278,13 @@ class ManageClassesCog(commands.Cog):
         else:
             cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)
             await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)
+
+            # Upon detecting first time user, show embed showing how to use commands
+            embed=discord.Embed(title="Welcome to ClemBot class management!",color= Colors.ClemsonOrange)
+            embed.add_field(name="To assign your class year or a specific class, run the command:", value="```!roles <year>``` or ```!roles cpsc-<class-number>```", inline=False)
+            embed.add_field(name="To see a list of assignable roles run:", value="```!roles```", inline=False)
+            embed.add_field(name="If you would like to hide all class channels you are not in, run:", value="```!roles cleanup```", inline=False)
+            await ctx.send(embed=embed)
         
         log.info(f'Syncing channel and role with cleanup')
         await channel.set_permissions(role, view_channel=True)
