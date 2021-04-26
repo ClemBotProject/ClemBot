@@ -65,10 +65,10 @@ class ModerationRepository(BaseRepository):
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute(
                     """
-                INSERT INTO Infractions (fk_guildId, fk_authorId, fk_subjectId, iType, duration, reason, active) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Infractions (fk_guildId, fk_authorId, fk_subjectId, iType, duration, reason, active, time) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                    (guild_id, author_id, subject_id, i_type, duration, reason, active)) as c:
+                    (guild_id, author_id, subject_id, i_type, duration, reason, active, datetime.now())) as c:
                 id = c.lastrowid
             await db.commit()
             return id

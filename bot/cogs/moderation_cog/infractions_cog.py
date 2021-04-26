@@ -1,5 +1,6 @@
 import logging
 import typing as t
+from datetime import datetime
 
 import discord
 import discord.ext.commands as commands
@@ -51,8 +52,9 @@ class InfractionsCog(commands.Cog):
             embed.set_author(name=self.get_full_name(user), icon_url=user.avatar_url)
 
             for infraction in chunk:
+                time = datetime.strptime(infraction.time, '%Y-%m-%d %H:%M:%S.%f')
                 embed.add_field(name=f'#{infraction.id} {infraction.iType.title()}  {INFRACTION_EMOJI_MAP[infraction.iType]}',
-                                value=f'```{infraction.reason}```',
+                                value=f'**Reason:** {infraction.reason}\n**Date:** {time.strftime("%m/%d/%Y")}',
                                 inline=False)
 
             embeds.append(embed)

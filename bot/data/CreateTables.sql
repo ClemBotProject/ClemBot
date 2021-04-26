@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS Infractions (
     duration                 INTEGER,
     reason                   TEXT,
     active                   BOOLEAN,
+    time                     TEXT,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id),
     FOREIGN KEY(fk_authorId)
