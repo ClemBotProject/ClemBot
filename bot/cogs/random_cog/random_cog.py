@@ -1,22 +1,24 @@
+import asyncio
+import json
 import logging
 import random
-import asyncio
 import time
 import typing
-import aiohttp
-import  json
+from datetime import datetime
 
+import aiohttp
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
-from bot.utils.converters import Duration
-from datetime import datetime
-from bot.messaging.events import Events
 import bot.extensions as ext
+from bot.consts import Colors
+from bot.messaging.events import Events
+from bot.utils.converters import Duration
 
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
+
+
 class RandomCog(commands.Cog):
 
     def __init__(self, bot):
@@ -49,7 +51,7 @@ class RandomCog(commands.Cog):
 
         await ctx.send(embed=embed, file=attachment)
 
-    @ext.command(aliases = ['roll','dice'])
+    @ext.command(aliases=['roll', 'dice'])
     @ext.long_help(
         """
         Rolls dice in a XdY format where X is the number of dice and Y is the number of sides on the dice.
@@ -62,7 +64,7 @@ class RandomCog(commands.Cog):
     )
     @ext.short_help('Rolls any type of dice in discord')
     @ext.example(('roll 1d6', 'roll 4d20'))
-    async def diceroll(self, ctx, dice : str):
+    async def diceroll(self, ctx, dice: str):
         try:
             rolls, limit = map(int, dice.split('d'))
         except Exception:
@@ -71,11 +73,11 @@ class RandomCog(commands.Cog):
 
         result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
 
-        embed = discord.Embed(title ='Dice Roller', description = f'{ctx.message.author.mention} rolled **{dice}**', color = Colors.ClemsonOrange)
-        embed.add_field(name ='Here are the results of their rolls: ', value = result, inline = False)
-        await ctx.send(embed = embed)
+        embed = discord.Embed(title='Dice Roller', description=f'{ctx.message.author.mention} rolled **{dice}**', color=Colors.ClemsonOrange)
+        embed.add_field(name='Here are the results of their rolls: ', value=result, inline=False)
+        await ctx.send(embed=embed)
 
-    @ext.command(aliases=['8ball','🎱'])
+    @ext.command(aliases=['8ball', '🎱'])
     @ext.long_help(
         'Rolls a magic 8ball to tell you your future, guarenteed to work!'
     )
@@ -103,8 +105,8 @@ class RandomCog(commands.Cog):
             'My sources say no.',
             'Outlook not so good.',
             'Very doubtful.'
-            ]
-        embed = discord.Embed(title='🎱', description= f'{random.choice(responses)}',color = Colors.ClemsonOrange)
+        ]
+        embed = discord.Embed(title='🎱', description=f'{random.choice(responses)}', color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
     @ext.command(hidden=True)
@@ -133,23 +135,24 @@ class RandomCog(commands.Cog):
 
         slotstitle = '💎 Slot Machine 💎'
 
-        async def slotsrolling(input, spinstatus,waittime):
-            slotembed = discord.Embed(title = f'{slotstitle}', color = Colors.ClemsonOrange, description = f'**{ctx.message.author.name} has rolled the slots**')
-            slotembed.add_field(name = input, value = spinstatus, inline = False)
+        async def slotsrolling(input, spinstatus, waittime):
+            slotembed = discord.Embed(title=f'{slotstitle}', color=Colors.ClemsonOrange,
+                                      description=f'**{ctx.message.author.name} has rolled the slots**')
+            slotembed.add_field(name=input, value=spinstatus, inline=False)
             await asyncio.sleep(waittime)
             return slotembed
 
-        embed = await slotsrolling(f'{blank} | {blank} | {blank}','Spinning',0)
-        msg = await ctx.send(embed = embed)
+        embed = await slotsrolling(f'{blank} | {blank} | {blank}', 'Spinning', 0)
+        msg = await ctx.send(embed=embed)
 
-        embed = await slotsrolling(f'{a} | {blank} | {blank}','Spinning',1)
-        await msg.edit(embed = embed)
+        embed = await slotsrolling(f'{a} | {blank} | {blank}', 'Spinning', 1)
+        await msg.edit(embed=embed)
 
-        embed = await slotsrolling(f'{a} | {b} | {blank}','Spinning',1)
-        await msg.edit(embed = embed)
+        embed = await slotsrolling(f'{a} | {b} | {blank}', 'Spinning', 1)
+        await msg.edit(embed=embed)
 
-        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**',1)
-        await msg.edit(embed = embed)
+        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**', 1)
+        await msg.edit(embed=embed)
 
     @ext.command()
     @ext.long_help(
@@ -164,8 +167,8 @@ class RandomCog(commands.Cog):
             delay_time = time
 
         description = f'Raffle for {reason}\nReact with :tickets: to enter the raffle'
-        embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
-        msg = await ctx.send(embed = embed)
+        embed = discord.Embed(title='RAFFLE', color=Colors.ClemsonOrange, description=description)
+        msg = await ctx.send(embed=embed)
         await msg.add_reaction('🎟️')
         await asyncio.sleep(delay_time)
 
@@ -174,16 +177,16 @@ class RandomCog(commands.Cog):
             if reaction.emoji == '🎟️':
                 if reaction.count == 1:
                     description += '\n\nNo one entered the raffle :('
-                    embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
-                    await msg.edit(embed = embed)
+                    embed = discord.Embed(title='RAFFLE', color=Colors.ClemsonOrange, description=description)
+                    await msg.edit(embed=embed)
                 else:
                     reactors = await reaction.users().flatten()
                     # remove first user b/c first user is always bot
                     reactors.pop(0)
                     winner = random.choice(reactors).name
                     description += f'\n\n🎉 Winner is {winner} 🎉'
-                    embed = discord.Embed(title = 'RAFFLE', color=Colors.ClemsonOrange, description = description)
-                    await msg.edit(embed = embed)
+                    embed = discord.Embed(title='RAFFLE', color=Colors.ClemsonOrange, description=description)
+                    await msg.edit(embed=embed)
 
     @ext.command(aliases=['relevant'])
     @ext.long_help(
@@ -194,7 +197,7 @@ class RandomCog(commands.Cog):
     async def xkcd(self, ctx):
         async with aiohttp.ClientSession() as session:
             async with await session.get(url='https://c.xkcd.com/random/comic/') as resp:
-                if(resp.status == 200):
+                if (resp.status == 200):
                     msg = await ctx.send(resp.url)
                     await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
                 else:
@@ -203,6 +206,7 @@ class RandomCog(commands.Cog):
                     embed.add_field(name='Error', value=f"{response_info['status']}: {response_info['msg']}")
                     msg = await ctx.send(embed=embed)
                     await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
-        
+
+
 def setup(bot):
     bot.add_cog(RandomCog(bot))

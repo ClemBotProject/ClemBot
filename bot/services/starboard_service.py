@@ -5,6 +5,7 @@ import typing as t
 import uuid
 
 import discord
+
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -25,11 +26,13 @@ RANKINGS = {
     5: '🏆 ***GOD-TIER***',
 }
 
+
 @dataclasses.dataclass
 class StarboardPost:
     star_posts: t.List[discord.Message]
     star_num: int
     star_users: t.Set[int] = dataclasses.field(default_factory=set)
+
 
 class StarboardService(BaseService):
 
@@ -62,24 +65,24 @@ class StarboardService(BaseService):
     # message formatting function
     def make_star_post(self, message: discord.Message, stars: int) -> discord.Embed:
 
-        title = f'{RANKINGS[math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS)]} | {stars} Star{"s" if stars > 1 else ""}'
+        title = f'{RANKINGS.get(math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS), 5)} | {stars} Star{"s" if stars > 1 else ""}'
 
         embed = discord.Embed(
-            title= title,
-            color= Colors.ClemsonOrange,
-            description= f'_Posted in {message.channel.mention}_ by {message.author.mention}'
+            title=title,
+            color=Colors.ClemsonOrange,
+            description=f'_Posted in {message.channel.mention}_ by {message.author.mention}'
         )
 
-        embed.set_thumbnail(url= message.author.avatar_url_as(static_format='png'))
-        embed.set_footer(text= f'Sent on {message.created_at.strftime("%m/%d/%Y")}')
+        embed.set_thumbnail(url=message.author.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f'Sent on {message.created_at.strftime("%m/%d/%Y")}')
 
         if len(message.content) > 0:
             for i, chunk in enumerate(self.chunk_iterable(message.content, DiscordLimits.EmbedFieldLength)):
-                embed.add_field(name= 'Message' if i < 1 else 'Continued', value= chunk, inline=False)
-    
+                embed.add_field(name='Message' if i < 1 else 'Continued', value=chunk, inline=False)
+
         if len(message.attachments) > 0:
-            embed.set_image(url= message.attachments[0].url)
-        
+            embed.set_image(url=message.attachments[0].url)
+
         embed.add_field(name='Link', value=f'[Click Me!]({message.jump_url})')
         return embed
 
@@ -91,7 +94,7 @@ class StarboardService(BaseService):
         self.curr_posts[reaction.message.id] = StarboardPost(None, reaction.count)
         self.curr_posts[reaction.message.id].star_users.add(user)
 
-        #create unique callback id
+        # create unique callback id
         callback_id = uuid.uuid4()
         self.call_back_ids[callback_id] = reaction.message.id
 
@@ -117,15 +120,15 @@ class StarboardService(BaseService):
         msg = reaction.message
         curr_post = self.curr_posts[msg.id]
 
-        #if the user has already reacted to this post return so we dont count it twice
+        # if the user has already reacted to this post return so we dont count it twice
         if user in curr_post.star_users:
             return
 
-        #add the user and increment the stars
+        # add the user and increment the stars
         curr_post.star_users.add(user)
         curr_post.star_num += 1
 
-        #create the new embed and loop over all the starboard posts
+        # create the new embed and loop over all the starboard posts
         edit = self.make_star_post(msg, curr_post.star_num)
         for post in curr_post.star_posts:
             await post.edit(embed=edit)

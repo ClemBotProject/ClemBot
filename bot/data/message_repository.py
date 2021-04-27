@@ -8,7 +8,7 @@ class MessageRepository(BaseRepository):
     async def add_message(self, message, time):
         if await self.check_message(message.id):
             return
-        
+
         async with aiosqlite.connect(self.resolved_db_path) as db:
             await db.execute(
                 """
@@ -45,7 +45,7 @@ class MessageRepository(BaseRepository):
                 """, (message_id,))
             await db.commit()
 
-    async def get_message_count(self, guild_id: int=None) -> int:
+    async def get_message_count(self, guild_id: int = None) -> int:
         async with aiosqlite.connect(self.resolved_db_path) as db:
             try:
                 if guild_id:

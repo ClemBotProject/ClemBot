@@ -12,11 +12,12 @@ from discord.ext.commands.errors import BadArgument
 
 log = logging.getLogger(__name__)
 
+
 class Scheduler:
 
     def __init__(self) -> None:
         self._scheduled_tasks: t.Dict[t.Hashable, asyncio.Task] = {}
-    
+
     def schedule_at(self, callback: t.Awaitable, *, time: datetime) -> uuid4:
         """Schedules a callback for execution at a given datetime object
 
@@ -71,7 +72,7 @@ class Scheduler:
             raise BadArgument('Scheduled task contained invalid negative time')
 
         return self._schedule(time, callback)
-    
+
     def get_task(self, task_id: int) -> t.Union[None, uuid.uuid4]:
         if task_id in self._scheduled_tasks.keys():
             return self._scheduled_tasks[task_id]
@@ -89,7 +90,7 @@ class Scheduler:
             raise
 
         del self._scheduled_tasks[task_id]
-    
+
     def _schedule(self, time, coro: t.Awaitable):
 
         task_id = uuid.uuid4()
@@ -97,10 +98,10 @@ class Scheduler:
         log.info(f'Scheduling coroutine - Id: {task_id} for exectution in {time} seconds')
 
         del_coro = self._delayed_coro(time, coro, task_id)
-        #creates a non blocking task that elides the await
+        # creates a non blocking task that elides the await
         task = asyncio.create_task(del_coro)
 
-        #add the callback so the task can be closed and removed from the internal list
+        # add the callback so the task can be closed and removed from the internal list
         task.add_done_callback(partial(self._end_scheduled_task, task_id))
 
         self._scheduled_tasks[task_id] = task
@@ -108,14 +109,14 @@ class Scheduler:
 
     async def _delayed_coro(self, delay: t.Union[float, int], coro: t.Awaitable, task_id):
         try:
-            #await the timed delay
+            # await the timed delay
             log.debug(f'Waiting {delay} seconds before executing coroutine with Id: {task_id}')
             await asyncio.sleep(delay)
 
-            #time is up, execute the callback
+            # time is up, execute the callback
             log.debug(f'Delay complete for coroutine {task_id}; executing coroutine')
             await asyncio.shield(coro)
-        #use a finally so that the coro is closed even if it throws
+        # use a finally so that the coro is closed even if it throws
         finally:
             if inspect.getcoroutinestate(coro) == 'CORO_CREATED':
                 log.debug(f'Explicitly closing the coroutine for #{task_id}.')

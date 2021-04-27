@@ -1,16 +1,19 @@
 import re
 from datetime import datetime
+import typing as t
 
 from dateutil.relativedelta import relativedelta
-from discord.ext.commands import BadArgument, Context, Converter
+from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import ConversionError
-from bot.errors import ConversionError
+
 from bot.consts import Claims
+from bot.errors import ConversionError
 
 """
 This converter code was copied from the python discord bot
 https://github.com/python-discord/bot/blob/master/bot/converters.py
 """
+
 
 class DurationDelta(Converter):
     """Convert duration strings into dateutil.relativedelta.relativedelta objects."""
@@ -47,21 +50,23 @@ class DurationDelta(Converter):
 
         return delta
 
+
 class Duration(DurationDelta):
     """Convert duration strings into UTC datetime.datetime objects."""
 
-    async def convert(self, ctx: Context, duration: str) -> datetime:
+    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` in the future.
         The converter supports the same symbols for each unit of time as its parent class.
         """
-        delta = await super().convert(ctx, duration)
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
 
         try:
             return now + delta
         except ValueError:
             raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+
 
 class ClaimsConverter(Converter):
     """Convert a given claim string into its enum representation"""
@@ -71,4 +76,20 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
-        
+
+class HonorsConverter(Converter):
+    """Sanitize honors argument input for grades_cog"""
+
+    async def convert(self, ctx: Context, argument: str) -> str:
+        honors = None
+
+        if argument in ('honors', 'hon', 'h'):
+            honors = 'honors'
+        elif argument in ('non-honors', 'non-hon', 'regular', 'normal', 'nh'):
+            honors = 'non-honors'
+        elif argument in ('all', 'a'):
+            honors = 'all'
+        else:
+            raise ConversionError()
+
+        return honors

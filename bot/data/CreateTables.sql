@@ -126,3 +126,21 @@ CREATE TABLE IF NOT EXISTS Reminders (
     FOREIGN KEY(fk_userId)
         REFERENCES Users(id)
 );
+
+CREATE TABLE IF NOT EXISTS Infractions (
+    id                       INTEGER      PRIMARY KEY,
+    fk_guildId               INTEGER      NOT NULL,
+    fk_authorId              INTEGER      NOT NULL,
+    fk_subjectId             INTEGER      NOT NULL,
+    iType                    TEXT CHECK(iType IN ('ban', 'mute', 'warn')) NOT NULL,
+    duration                 INTEGER,
+    reason                   TEXT,
+    active                   BOOLEAN,
+    time                     TEXT,
+    FOREIGN KEY(fk_guildId)
+        REFERENCES Guilds (id),
+    FOREIGN KEY(fk_authorId)
+        REFERENCES Users (id),
+    FOREIGN KEY(fk_subjectId)
+        REFERENCES Users (id)
+)
