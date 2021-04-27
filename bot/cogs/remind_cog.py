@@ -1,4 +1,8 @@
+from discord import embeds
+from bot.consts import Colors
 import logging
+import discord
+from discord import colour
 
 import discord.ext.commands as commands
 
@@ -37,16 +41,22 @@ class RemindCog(commands.Cog):
         'remind 4y Graduation',
         'remind 3y1M4w1d5h9m2s Pi'
     ))
-    async def remind(self, ctx: commands.Context, wait: converters.Duration, *args):
+    async def remind(self, ctx: commands.Context, wait: converters.Duration):
 
-        await ctx.message.add_reaction('⏰')
-        await self.bot.messenger.publish(
-            Events.on_set_reminder,
-            ctx.author.id,
-            wait,
-            ctx.message.id,
-            ctx.message.jump_url)        
-
+        embed = discord.Embed(title="⏰Reminder", color = Colors.ClemsonOrange)
+        try:
+            await self.bot.messenger.publish(
+               Events.on_set_reminder,
+               ctx.author.id,
+               wait,
+               ctx.message.id,
+               ctx.message.jump_url)
+            embed.add_field(name="Status", value = "Reminder Created") 
+        except Exception:
+            embed.color = Colors.Error
+            embed.add_field(name="Status", value = "Error")
+        await ctx.send(embed=embed)
+            
 
 def setup(bot):
     bot.add_cog(RemindCog(bot))

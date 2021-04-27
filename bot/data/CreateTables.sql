@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS ClaimsMapping (
 );
 
 CREATE TABLE IF NOT EXISTS Reminders (
-    id                      VARCHAR(255)     PRIMARY KEY,
+    id                      INTEGER          PRIMARY KEY,
     fk_userId               INTEGER          NOT NULL,
     fk_messageId            INTEGER          NOT NULL,
     link                    TEXT             NOT NULL,
