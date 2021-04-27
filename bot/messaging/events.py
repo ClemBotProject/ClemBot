@@ -407,6 +407,13 @@ class EventsMeta(type):
     def on_set_reminder(self):
         """
             Published when a person sets a reminder 
+            Args:
+                userId (int)
+                wait (converters.Duration)
+                message (str)
+        """
+        return 'on_reminder_set'
+
     def on_bot_mute(self):
         """
         Published when a user is warned with clembot
@@ -467,13 +474,6 @@ class EventsMeta(type):
             user (discord.Member): member who was banned
         """
         return 'on_member_ban'
-
-            Args:
-                userId (int)
-                wait (converters.Duration)
-                message (str)
-        """
-        return 'on_reminder_set'
 
 class Events(metaclass=EventsMeta):
     pass
