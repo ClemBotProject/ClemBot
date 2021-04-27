@@ -41,7 +41,7 @@ class SourceCodeCog(commands.Cog):
                     path = os.path.join(root, f)
                     self.bot_files[f] = FilePaths(path, path.split(root_dir)[1])
 
-    @ext.group(case_insensitive=True, invoke_without_command=True)
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['src'])
     @ext.long_help(
         """
         Links the bots repository or optionally a specicifc file within the bots source tree
