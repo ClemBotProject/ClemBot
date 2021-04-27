@@ -1,17 +1,18 @@
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
 import bot.extensions as ext
+from bot.consts import Colors
+
 
 class BaseConverterCog(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot = bot
 
-    @ext.group(pass_context= True, invoke_without_command= True, aliases= ['convert','baseconvert'])
+    @ext.group(pass_context=True, invoke_without_command=True, aliases=['convert', 'baseconvert'])
     @ext.long_help(
-        'A simple base converter that takes in a base number an a value, ' 
+        'A simple base converter that takes in a base number an a value, '
         'then displays the value in binary, octal, decimal, and hexadecimal'
     )
     @ext.short_help('Mathematic base converter')
@@ -31,7 +32,7 @@ class BaseConverterCog(commands.Cog):
         desc = 'Available Bases Include:\n binary (bin),\n decimal(dec),\n hexadecimal(hex),\n octal(oct)'
         embed = discord.Embed(title='Available Bases', description=desc, color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
-        
+
     async def result(self, ctx, number) -> None:
         b = bin(number)
         d = int(number)
@@ -39,18 +40,18 @@ class BaseConverterCog(commands.Cog):
         o = oct(number)
 
         attachment = discord.File(filename="Code.gif",
-                             fp="bot/cogs/base_converter/assets/Code.gif")
+                                  fp="bot/cogs/base_converter/assets/Code.gif")
 
-        embed = discord.Embed(title='Conversions', description =f'Numerical Conversions of {number}', color = Colors.ClemsonOrange)
-        embed.set_thumbnail(url = 'attachment://Code.gif')
+        embed = discord.Embed(title='Conversions', description=f'Numerical Conversions of {number}', color=Colors.ClemsonOrange)
+        embed.set_thumbnail(url='attachment://Code.gif')
         embed.add_field(name='Binary', value=b, inline=False)
         embed.add_field(name='Decimal', value=d, inline=False)
         embed.add_field(name='Hexadecimal', value=h, inline=False)
         embed.add_field(name='Octal', value=o, inline=False)
-        
+
         await ctx.send(embed=embed, file=attachment)
 
-    @bconvert.command(pass_context= True, aliases= ['binary'])
+    @bconvert.command(pass_context=True, aliases=['binary'])
     async def bin(self, ctx, *, number) -> None:
         """
         Example: bconvert [bin / binary] [11 / 0b11]
@@ -58,7 +59,7 @@ class BaseConverterCog(commands.Cog):
         number = int(number, 2)
         await self.result(ctx, number)
 
-    @bconvert.command(pass_context= True, aliases= ['decimal'])
+    @bconvert.command(pass_context=True, aliases=['decimal'])
     async def dec(self, ctx, *, number) -> None:
         """
         Example: bconvert [dec / decimal] [99]
@@ -66,7 +67,7 @@ class BaseConverterCog(commands.Cog):
         number = int(number)
         await self.result(ctx, number)
 
-    @bconvert.command(pass_context= True, aliases= ['hexadecimal'])
+    @bconvert.command(pass_context=True, aliases=['hexadecimal'])
     async def hex(self, ctx, *, number) -> None:
         """
         Example: bconvert [hex / hexadecimal] [FF / 0xFF]
@@ -74,13 +75,14 @@ class BaseConverterCog(commands.Cog):
         number = int(number, 16)
         await self.result(ctx, number)
 
-    @bconvert.command(pass_context= True, aliases= ['octal'])
+    @bconvert.command(pass_context=True, aliases=['octal'])
     async def oct(self, ctx, *, number) -> None:
         """
         Example: bconvert [oct / octal] [77 / 0o77]
         """
         number = int(number, 8)
         await self.result(ctx, number)
+
 
 def setup(bot):
     bot.add_cog(BaseConverterCog(bot))

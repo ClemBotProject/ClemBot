@@ -1,36 +1,38 @@
 import asyncio
 import logging
-import typing as t
 from dataclasses import dataclass
 
 import discord
 import discord.ext.commands as commands
 
+import bot.extensions as ext
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.user_choice import UserChoice
-import bot.extensions as ext
 
 log = logging.getLogger(__name__)
 
 TIMEOUT = 60
 
+
 @dataclass
 class ClassType:
     _abbv: str = None
+
     @property
     def abbv(self) -> str:
         return self._abbv
-    
+
     @abbv.setter
     def abbv(self, val):
         self._abbv = val.lower()
 
     _teacher: str = None
+
     @property
     def teacher(self) -> str:
         return self._teacher
-    
+
     @teacher.setter
     def teacher(self, val):
         self._teacher = val.lower()
@@ -62,23 +64,24 @@ class ClassType:
         Class Professor: ** {self.teacher}**
         """
 
+
 class ManageClassesCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.group(pass_context= True, aliases=['class'], case_insensitive=True)
+    @ext.group(pass_context=True, aliases=['class'], case_insensitive=True)
     @ext.long_help(
-        'Command group for the manage classes functionality' 
+        'Command group for the manage classes functionality'
     )
     @ext.short_help('Academic class creation functionality')
     async def classes(self, ctx):
         pass
 
-    @classes.command(pass_context= True, aliases=['create'])
+    @classes.command(pass_context=True, aliases=['create'])
     @ext.required_claims(Claims.manage_class_add)
     @ext.long_help(
-        'Command to initiate the new class creation wizard, optionally takes a ' 
+        'Command to initiate the new class creation wizard, optionally takes a '
         'class name as a parameter E.G "cpsc-1010"'
     )
     @ext.short_help('Starts the class creation wizard')
@@ -96,36 +99,35 @@ class ManageClassesCog(commands.Cog):
         class_repr = ClassType()
 
         if class_name:
-            #try to parse the class name given, if its not in the correct format split will throw
+            # try to parse the class name given, if its not in the correct format split will throw
             abbv, num = class_name.split('-')
             class_repr.abbv = abbv
             class_repr.number = int(num)
 
-        #get the user class input and store it in the dataclass
+        # get the user class input and store it in the dataclass
         class_repr = await self.input_class(ctx, class_repr=class_repr)
         if not class_repr:
             return
 
         category = None
         try:
-            #attempt to get the category to add the class too
+            # attempt to get the category to add the class too
             category = await commands.converter.CategoryChannelConverter().convert(ctx, class_repr.category)
         except:
-            #the category wasnt found, ask if we want to create one
+            # the category wasnt found, ask if we want to create one
             log.info(f'Class creation category {class_repr.category} non existent, Create a new one?')
-            category = await self.create_category(ctx, class_repr) 
+            category = await self.create_category(ctx, class_repr)
 
-        #Finding the category and creating one failed
-        #We cant do anything more, bail out early
+            # Finding the category and creating one failed
+        # We cant do anything more, bail out early
         if not category:
             embed = discord.Embed(
                 title=f'Error: Category {class_repr.category} not found and not created, Exiting Wizard',
-                color= Colors.Error)
-            await ctx.send(embed= embed)
+                color=Colors.Error)
+            await ctx.send(embed=embed)
             return
-        
 
-        #Create the class channel in the given category
+        # Create the class channel in the given category
         channel = await self.create_channel(category, class_repr)
         await channel.send(f'Here is your generated class channel {ctx.author.mention}, Good luck!')
 
@@ -140,130 +142,129 @@ class ManageClassesCog(commands.Cog):
         def input_check(msg: discord.Message) -> bool:
             return msg.author == ctx.author and ctx.channel == msg.channel
 
-        #check if the initial command contained a class abbv and number
+        # check if the initial command contained a class abbv and number
         if not class_repr.abbv:
-            embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color= Colors.ClemsonOrange)
-            avi = ctx.author.avatar_url_as(static_format= 'png')
-            embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
-                icon_url= avi)
-            embed.add_field(name= '**Current values**', value=class_repr)
+            embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color=Colors.ClemsonOrange)
+            avi = ctx.author.avatar_url_as(static_format='png')
+            embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+                             icon_url=avi)
+            embed.add_field(name='**Current values**', value=class_repr)
             embed.add_field(
-                name= 'Please enter the class abbreviation and name E.G.',
+                name='Please enter the class abbreviation and name E.G.',
                 value='cpsc-1010',
-                inline= False)
+                inline=False)
 
-            await ctx.send(embed= embed)
+            await ctx.send(embed=embed)
 
             try:
-                msg = await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)
+                msg = await self.bot.wait_for('message', timeout=TIMEOUT, check=input_check)
                 abbv, number = msg.content.split('-')
                 class_repr.abbv = abbv
                 class_repr.number = int(number)
             except asyncio.TimeoutError:
                 await self.input_timeout(ctx)
-                return 
+                return
         else:
-            embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color= Colors.ClemsonOrange)
-            await ctx.send(embed= embed)
-
+            embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color=Colors.ClemsonOrange)
+            await ctx.send(embed=embed)
 
         embed = discord.Embed(
             title=f'Class "{class_repr.abbv}-{class_repr.number}" set',
-            color= Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
-            icon_url= avi)
-        embed.add_field(name= '**Current values**', value=class_repr)
+            color=Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format='png')
+        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+                         icon_url=avi)
+        embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
-            name= 'Please enter the class name or "None" to skip this step E.G.',
+            name='Please enter the class name or "None" to skip this step E.G.',
             value='Introduction to C',
-            inline= False)
+            inline=False)
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
         try:
-            val = (await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)).content
+            val = (await self.bot.wait_for('message', timeout=TIMEOUT, check=input_check)).content
             if val != 'None':
                 class_repr.name = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return 
+            return
 
-        embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color= Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
-            icon_url= avi)
-        embed.add_field(name= '**Current values**', value=class_repr)
+        embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color=Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format='png')
+        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+                         icon_url=avi)
+        embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
-            name= 'Please enter the class description (must be less than 256 characters) or "None" to skip this step E.G.',
+            name='Please enter the class description (must be less than 256 characters) or "None" to skip this step E.G.',
             value='An overview of programming fundamentals using the C programming langauge',
-            inline= False)
+            inline=False)
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
         try:
-            #Keep retrying to get the description until we get a less then 256 characters one or the wait times out
-            while(len(val := (await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)).content)) > 255:
+            # Keep retrying to get the description until we get a less then 256 characters one or the wait times out
+            while (len(val := (await self.bot.wait_for('message', timeout=TIMEOUT, check=input_check)).content)) > 255:
                 await ctx.send('Error: Description needs to be less than 256 characters\nPlease try again')
             if val != 'None':
                 class_repr.description = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return 
+            return
 
         embed = discord.Embed(
             title=f'Class description: "{class_repr.description}" set',
-            color= Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format= 'png')
-        embed.set_footer(text= f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
-            icon_url= avi)
-        embed.add_field(name= '**Current values**', value=class_repr)
+            color=Colors.ClemsonOrange)
+        avi = ctx.author.avatar_url_as(static_format='png')
+        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+                         icon_url=avi)
+        embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
-            name= 'Please enter the class professors last name or "None" to skip this step E.G.',
+            name='Please enter the class professors last name or "None" to skip this step E.G.',
             value='Plis',
-            inline= False)
+            inline=False)
 
-        await ctx.send(embed= embed)
+        await ctx.send(embed=embed)
 
         try:
-            val = (await self.bot.wait_for('message', timeout=TIMEOUT, check= input_check)).content
+            val = (await self.bot.wait_for('message', timeout=TIMEOUT, check=input_check)).content
             if val != 'None':
                 class_repr.teacher = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return 
+            return
 
         embed = discord.Embed(
             title=f'Class and role "{class_repr.role}" created in category "{class_repr.category}" ',
-            color= Colors.ClemsonOrange)
-        embed.add_field(name= '**Current values**', value=class_repr)
-        await ctx.send(embed= embed)
+            color=Colors.ClemsonOrange)
+        embed.add_field(name='**Current values**', value=class_repr)
+        await ctx.send(embed=embed)
 
         return class_repr
-    
+
     async def create_category(self, ctx, class_repr):
         get_input = UserChoice(ctx=ctx, timeout=TIMEOUT)
         choice = await get_input.send_confirmation(
-            content= f"""
+            content=f"""
             Error: Category "{class_repr.category}" not found
             Would you like to create it?
             """,
             is_error=True)
-        
+
         if not choice:
             return None
-        
+
         log.info(f'Creating category "{class_repr.category}" in guild: "{ctx.guild.name}"')
         return await ctx.guild.create_category(class_repr.category)
 
     async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType):
         log.info(f'Creating new Class channel "{class_repr.name}""')
-        return await category.create_text_channel(class_repr.channel, 
-            topic= f'{class_repr.name} - {class_repr.description}')
+        return await category.create_text_channel(class_repr.channel,
+                                                  topic=f'{class_repr.name} - {class_repr.description}')
 
     async def create_role(self, ctx, class_repr):
         log.info(f'Creating new class role "{class_repr.role}""')
-        #Attempt to convert the role, if we cant then we create a new one
+        # Attempt to convert the role, if we cant then we create a new one
         try:
             role = await commands.converter.RoleConverter().convert(ctx, class_repr.role)
         except:
@@ -293,20 +294,21 @@ class ManageClassesCog(commands.Cog):
         await cleanup.edit(position=1)
 
 
-    @classes.command(pass_context= True, aliases= ['delete'])
-    @commands.has_guild_permissions(administrator= True)
+    @classes.command(pass_context=True, aliases=['delete'])
+    @commands.has_guild_permissions(administrator=True)
     async def archive(self, ctx, channel: discord.TextChannel):
         pass
 
     async def input_timeout(self, ctx):
         await ctx.send('Response timed out please redo the class wizard')
-    
-    def get_full_name(self, author) -> str: 
-        return f'{author.name}#{author.discriminator}' 
+
+    def get_full_name(self, author) -> str:
+        return f'{author.name}#{author.discriminator}'
 
 
 def round_down(num, divisor):
-    return num - (num%divisor)
+    return num - (num % divisor)
 
-def setup(bot): 
+
+def setup(bot):
     bot.add_cog(ManageClassesCog(bot))

@@ -1,23 +1,17 @@
-
-
+import asyncio
 import logging
 import random
-import asyncio
 import typing as t
-from collections import Counter
 
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors
-from bot.utils.converters import Duration
-from datetime import datetime
-from bot.messaging.events import Events
 import bot.extensions as ext
+from bot.consts import Colors
+
 
 class Symbols:
-
-    combined='🍎🍐🍇🍊🍋🍓🍒💎'
+    combined = '🍎🍐🍇🍊🍋🍓🍒💎'
 
     apple = '🍎'
     pear = '🍐'
@@ -27,6 +21,7 @@ class Symbols:
     cherry = '🍒'
     strawberry = '🍓'
     jackpot = '💎'
+
 
 PAY_TABLE = {
     Symbols.apple: 1,
@@ -75,13 +70,13 @@ PHRASES = [
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 60
 
+
 class SlotsCog(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot = bot;
 
-
-    @ext.command(aliases=['slotmachine','🎰'])
+    @ext.command(aliases=['slotmachine', '🎰'])
     @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     @ext.long_help(
         'A slot machine inside discord with a chance to win fame and fortune'
@@ -90,22 +85,23 @@ class SlotsCog(commands.Cog):
     @ext.example('slots')
     async def slots(self, ctx):
         results = random.choices(Symbols.combined, weights=WEIGHTS, k=5)
-        #await ctx.send(results)
+        # await ctx.send(results)
         score = self.calculate_score(results)
-        #await ctx.send(score)
+        # await ctx.send(score)
 
         output = list('⬜' * len(results))
 
         quote = random.choice(PHRASES)
 
         slotstitle = '💎 ClemBot Slot Machine 💎'
-        def slots_rolling(input, spinstatus):
-            slotembed = discord.Embed(title = f'{slotstitle}',
-                color = Colors.ClemsonOrange, 
-                description = quote)
 
-            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url= ctx.author.avatar_url)
-            slotembed.add_field(name = input, value = spinstatus, inline = False)
+        def slots_rolling(input, spinstatus):
+            slotembed = discord.Embed(title=f'{slotstitle}',
+                                      color=Colors.ClemsonOrange,
+                                      description=quote)
+
+            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.avatar_url)
+            slotembed.add_field(name=input, value=spinstatus, inline=False)
             return slotembed
 
         msg = await ctx.send(embed=slots_rolling(' | '.join(output), 'Spinning!!'))
@@ -115,7 +111,7 @@ class SlotsCog(commands.Cog):
             await msg.edit(embed=slots_rolling(' | '.join(output), 'Spinning!!'))
             await asyncio.sleep(1)
 
-        final = slots_rolling(' | '.join(output),'Spin Complete')
+        final = slots_rolling(' | '.join(output), 'Spin Complete')
         final.add_field(name='SCORE!!', value=score)
 
         await msg.edit(embed=final)
@@ -132,7 +128,7 @@ class SlotsCog(commands.Cog):
             else:
                 groups.append(curr_group)
                 curr_group = [val]
-            
+
         groups.append(curr_group)
 
         total_score = 0
@@ -141,7 +137,9 @@ class SlotsCog(commands.Cog):
 
         return total_score
 
-    def get_full_name(self, author) -> str: 
-        return f'{author.name}#{author.discriminator}' 
+    def get_full_name(self, author) -> str:
+        return f'{author.name}#{author.discriminator}'
+
+
 def setup(bot):
     bot.add_cog(SlotsCog(bot))

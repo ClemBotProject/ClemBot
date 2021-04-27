@@ -21,8 +21,8 @@ class GuildHandlingService(BaseService):
 
         await GuildRepository().add_guild(guild)
 
-        #The guild has been initialized, broadcast this to the rest
-        #of the services
+        # The guild has been initialized, broadcast this to the rest
+        # of the services
         await self.bot.messenger.publish(Events.on_new_guild_initialized, guild)
         log.info(f'Guild {guild.name}: {guild.id} loaded')
 
@@ -35,9 +35,9 @@ class GuildHandlingService(BaseService):
         embed.add_field(name='User Count', value=guild.member_count)
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
-                OwnerDesignatedChannels.server_join_log,
-                embed
-            )
+                                         OwnerDesignatedChannels.server_join_log,
+                                         embed
+                                         )
 
     @BaseService.Listener(Events.on_guild_leave)
     async def on_guild_leave(self, guild) -> None:
@@ -45,9 +45,9 @@ class GuildHandlingService(BaseService):
         await GuildRepository().set_guild_status(guild.id, False)
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
-                OwnerDesignatedChannels.server_join_log,
-                f'Bot removed from {guild.name}: {guild.id}'
-            )
+                                         OwnerDesignatedChannels.server_join_log,
+                                         f'Bot removed from {guild.name}: {guild.id}'
+                                         )
 
     async def add_guild(self, guild) -> None:
         await GuildRepository().add_guild(guild)
@@ -55,7 +55,7 @@ class GuildHandlingService(BaseService):
     async def load_service(self):
         guild_repo = GuildRepository()
 
-        db_guilds =  await guild_repo.get_all_guilds_ids()
+        db_guilds = await guild_repo.get_all_guilds_ids()
         api_guilds = [r.id for r in self.bot.guilds]
 
         for removed_id in set(db_guilds) - set(api_guilds):

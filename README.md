@@ -29,11 +29,13 @@
  
  
 A Discord bot for server and community management with a focus on school/programming/fun related commands. 
+   - <b>Moderation:</b>  Moderation and Moderation logging is made easy with ClemBot, Banning, Muting and Warning are all supported and easy to use
+
    - <b>Role Management:</b> Easily manage you and your users roles with designated assignable roles
    
    - <b>Starboard:</b> Allow your server to highlight the best or funniest messages by members with a starboard, simply assign the starboard channel and react with stars
 
-   - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix with  `!prefix set <prefix>`
+   - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix with  `!prefix <prefix>`
     
    - <b>Python Repl:</b> Coding is fun, Discord is fun. Put them together and collaborative learning is easy with a built in python interpreter. Just type your python code into discord and run it with `!eval` and watch the bot evaluate your code.
     
@@ -52,15 +54,13 @@ A Discord bot for server and community management with a focus on school/program
    - <b>Weather Forecasts:</b> Clembot supports weather forecasts from anywhere in the world, simply run `!weather <location>` to get a full 7 day forecast for your area
   
    - <b>Translation:</b> Leveraging Azure translation services Clembot supports over 50 langauges world wide for instant translation!
-  
-   - <b>Moderation:</b>  Coming soon!!!
-   
+     
    and so much more
    
    Clembot is in current active development so check back often to see whats new!!
 
 # Bot Invite
-To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=2081291511&scope=bot)
+To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1409412343&scope=bot)
 
 ## Community
 We are a community focused on learning and acceptance; anyone is welcome. If you have an idea or a feature you would like to contribute, feel free to open an issue and we as a community can begin discussion. 
