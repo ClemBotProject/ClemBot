@@ -43,8 +43,8 @@ class RemindCog(commands.Cog):
     ))
     async def remind(self, ctx: commands.Context, wait: converters.Duration):
 
-        embed = discord.Embed(title="⏰Reminder", color = Colors.ClemsonOrange)
         try:
+            embed = discord.Embed(title="⏰Reminder", color = Colors.ClemsonOrange)
             await self.bot.messenger.publish(
                Events.on_set_reminder,
                ctx.author.id,
@@ -53,7 +53,8 @@ class RemindCog(commands.Cog):
                ctx.message.jump_url)
             embed.add_field(name="Status", value = "Reminder Created") 
         except Exception:
-            embed.color = Colors.Error
+
+            embed = discord.Embed(title="⏰Reminder", color = Colors.Error)
             embed.add_field(name="Status", value = "Error")
         await ctx.send(embed=embed)
             
