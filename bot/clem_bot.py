@@ -63,7 +63,7 @@ class ClemBot(commands.Bot):
 
         log.info(f'Logged on as {self.user}')
 
-    async def command_claims_check(self, ctx: commands.Context):
+    async def claims_check(self, ctx: commands.Context, command_claims):
         """
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
@@ -73,32 +73,42 @@ class ClemBot(commands.Bot):
 
         if await self.is_owner(author):
             # if the author owns the bot, authorize the command no matter what
-            return
+            return True
 
         if not isinstance(command, ext.ExtBase):
             # If the command isnt an extension command let it through, we dont need to think about it
-            return
+            return True
 
         if author.guild_permissions.administrator:
             # Admins have full bot access no matter what
-            return
+            return True
 
-        if len(command.claims) == 0:
+        if len(command_claims) == 0:
             # command requires no claims nothing else to do
-            return
+            return True
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
-            return
+            return True
 
         claims = await repo.fetch_all_claims_user(author)
 
         if claims and command.claims_check(claims):
             # Author has valid claims
-            return
+            return True
 
-        claims_str = '\n'.join(command.claims)
-        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
+        return False
+        
+
+    async def command_claims_check(self, ctx: commands.Context):
+        command = ctx.command
+        author = ctx.author
+        repo = ClaimsRepository()
+        if not await self.claims_check(ctx, command.claims) is True:
+            return
+        else:
+            claims_str = '\n'.join(command.claims)
+            raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
 
     async def close(self) -> None:
         try:
