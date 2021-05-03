@@ -63,7 +63,7 @@ class ClemBot(commands.Bot):
 
         log.info(f'Logged on as {self.user}')
 
-    async def claims_check(self, ctx: commands.Context, command_claims):
+    async def claims_check(self, ctx: commands.Context):
         """
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
@@ -83,12 +83,8 @@ class ClemBot(commands.Bot):
             # Admins have full bot access no matter what
             return True
 
-        if len(command_claims) == 0:
+        if len(command.claims) == 0:
             # command requires no claims nothing else to do
-            return True
-
-        if command.ignore_claims_pre_invoke:
-            # The command is going to check the claims in the command body, nothing else to do
             return True
 
         claims = await repo.fetch_all_claims_user(author)
@@ -104,7 +100,10 @@ class ClemBot(commands.Bot):
         command = ctx.command
         author = ctx.author
         repo = ClaimsRepository()
-        if not await self.claims_check(ctx, command.claims) is True:
+        if command.ignore_claims_pre_invoke:
+            # The command is going to check the claims in the command body, nothing else to do
+            return 
+        if await self.claims_check(ctx) is True:
             return
         else:
             claims_str = '\n'.join(command.claims)
