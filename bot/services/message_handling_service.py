@@ -22,7 +22,7 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
         log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
-        await self.handle_message_links(message)
+        # await self.handle_message_links(message)
 
         # Primary entry point for handling commands
         await self.bot.process_commands(message)
