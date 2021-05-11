@@ -71,19 +71,13 @@ class MessageRepository(BaseRepository):
 
     async def get_user_message_count(self, user_id, guild_id) -> int:
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            try:
-                async with db.execute('SELECT count(*) FROM Messages WHERE fk_guildId = ? AND fk_authorId = ?', (guild_id, user_id,)) as c:
-                    return (await c.fetchone())[0]
-            finally:
-                c.close()
+            async with db.execute('SELECT count(*) FROM Messages WHERE fk_guildId = ? AND fk_authorId = ?', (guild_id, user_id,)) as c:
+                return (await c.fetchone())[0]
+            
 
     async def get_user_message_count_range(self, user_id, guild_id, days: int) -> int:
         if not isinstance(days, int):
             raise TypeError("Days parameter must be an int")
         async with aiosqlite.connect(self.resolved_db_path) as db:
-            try:
-                c = await db.execute(
-                    f'SELECT count(*) FROM Messages WHERE fk_guildId = ? AND fk_authorId = ? AND strftime("%Y-%m-%d", time) >= date("now","{-days} days")', (guild_id, user_id,))
-                return (await c.fetchone())[0]
-            finally:
-                c.close()
+            c = await db.execute(f'SELECT count(*) FROM Messages WHERE fk_guildId = ? AND fk_authorId = ? AND strftime("%Y-%m-%d", time) >= date("now","{-days} days")', (guild_id, user_id,))
+            return (await c.fetchone())[0]

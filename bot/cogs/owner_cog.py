@@ -150,7 +150,7 @@ class OwnerCog(commands.Cog):
     async def log(self, ctx):
         pass
 
-    @log.group()
+    @log.command()
     @commands.is_owner()
     async def get(self, ctx, lines: int):
         log_name = log.parent.handlers[0].baseFilename
