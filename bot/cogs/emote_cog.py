@@ -24,10 +24,17 @@ class EmoteCog(commands.Cog):
     async def add(self, ctx: commands.Context, emote, name: str):
         emote_id = emote.split(':')[2][:-1]
         async with aiohttp.ClientSession() as session:
-            async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp:
-                test = await resp.read()
+            async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.gif?v=1') as resp:
+                test_gif = await resp.read()
+    
+        async with aiohttp.ClientSession() as session2:
+            async with session2.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp2:
+                test_png = await resp2.read()
 
-        emote = await ctx.guild.create_custom_emoji(name=name, image=test)
+        try:
+            emote = await ctx.guild.create_custom_emoji(name=name, image=test_gif)
+        except: # Exception as err:
+            emote = await ctx.guild.create_custom_emoji(name=name, image=test_png)
 
         log.info(f'Emote added in guild: {ctx.guild.id}, name: {emote.name}, by: {ctx.author.id}')
 

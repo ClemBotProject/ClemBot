@@ -131,8 +131,11 @@ class ManageClassesCog(commands.Cog):
         channel = await self.create_channel(category, class_repr)
         await channel.send(f'Here is your generated class channel {ctx.author.mention}, Good luck!')
 
-        # create a class role and mark it as assignable
-        await self.create_role(ctx, class_repr)
+        #create a class role and mark it as assignable
+        role = await self.create_role(ctx, class_repr)
+
+        #sync perms with cleanup role
+        await self.sync_perms(ctx, channel, role)
 
     async def input_class(self, ctx, class_repr: ClassType) -> ClassType:
 
@@ -267,6 +270,29 @@ class ManageClassesCog(commands.Cog):
         except:
             role = await ctx.guild.create_role(name=class_repr.role, mentionable=False)
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+        return role
+
+    async def sync_perms(self, ctx, channel, role):
+        #Check if cleanup role exists
+        if (discord.utils.get(ctx.guild.roles,name="Cleanup")):
+            cleanup = discord.utils.get(ctx.guild.roles,name="Cleanup")
+        else:
+            cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)
+            await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)
+
+            # Upon detecting first time user, show embed showing how to use commands
+            embed=discord.Embed(title="Welcome to ClemBot class management!",color= Colors.ClemsonOrange)
+            embed.add_field(name="To assign your class year or a specific class, run the command:", value="```!roles <year>``` or ```!roles cpsc-<class-number>```", inline=False)
+            embed.add_field(name="To see a list of assignable roles run:", value="```!roles```", inline=False)
+            embed.add_field(name="If you would like to hide all class channels you are not in, run:", value="```!roles cleanup```", inline=False)
+            await ctx.send(embed=embed)
+        
+        log.info(f'Syncing channel and role with cleanup')
+        await channel.set_permissions(role, view_channel=True)
+        await channel.set_permissions(cleanup, view_channel=False)
+        await role.edit(position=2)
+        await cleanup.edit(position=1)
+
 
     @classes.command(pass_context=True, aliases=['delete'])
     @commands.has_guild_permissions(administrator=True)

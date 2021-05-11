@@ -22,7 +22,7 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
         log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
-        await self.handle_message_links(message)
+        # await self.handle_message_links(message)
 
         # Primary entry point for handling commands
         await self.bot.process_commands(message)
@@ -183,30 +183,44 @@ class MessageHandlingService(BaseService):
         pattern = r'^http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})\n*$'  # noqa: E501
 
         result = re.search(pattern, message.content)
-        if result:
-            matches = result.groupdict()
-            avi = message.author.avatar_url_as(static_format='png')
 
-            source_channel = message.channel
-            link_channel = await self.bot.fetch_channel(matches['channel_id'])
-            link_message = await link_channel.fetch_message(matches['message_id'])
+        if not result:
+            return
 
-            if len(link_message.embeds) > 0:
-                embed = link_message.embeds[0]
-                full_name = f'{self.get_full_name(message.author)}'
-                embed.add_field(name=f'Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
-                await message.delete()
-                await source_channel.send(embed=embed)
-                return
+        matches = result.groupdict()
+        avi = message.author.avatar_url_as(static_format='png')
 
-            embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color=Colors.ClemsonOrange)
-            embed.set_author(name=f'Quoted by: {self.get_full_name(message.author)}', icon_url=avi)
-            embed.add_field(name='Content', value=link_message.content, inline=False)
-            embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
-            embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
+        source_channel = message.channel
+        link_channel = await self.bot.fetch_channel(matches['channel_id'])
+        link_message = await link_channel.fetch_message(matches['message_id'])
 
-            await source_channel.send(embed=embed)
+        if len(link_message.embeds) > 0:
+            embed = link_message.embeds[0]
+            full_name = f'{self.get_full_name(message.author)}'
+            embed.add_field(name=f'Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
             await message.delete()
+            await source_channel.send(embed=embed)
+            return
+
+        embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color=Colors.ClemsonOrange)
+        embed.set_author(name=f'Quoted by: {self.get_full_name(message.author)}', icon_url=avi)
+
+        if link_message.content:
+            embed.add_field(name='Content', value=link_message.content, inline=False)
+
+        image = None
+        if link_message.attachments:
+            att = link_message.attachments[0]
+            image = att.proxy_url
+            embed.add_field(name="Attachments", value=f"[{att.filename}]({att.url})", inline=False)
+
+        if image:
+            embed.set_image(url=image)
+        embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
+        embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
+
+        await source_channel.send(embed=embed)
+        await message.delete()
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'

@@ -115,6 +115,17 @@ CREATE TABLE IF NOT EXISTS ClaimsMapping (
         REFERENCES Guilds (id)
 );
 
+CREATE TABLE IF NOT EXISTS Reminders (
+    id                      INTEGER          PRIMARY KEY,
+    fk_userId               INTEGER          NOT NULL,
+    fk_messageId            INTEGER          NOT NULL,
+    link                    TEXT             NOT NULL,
+    time                    INTEGER          NOT NULL,
+    FOREIGN KEY(fk_messageId)
+        REFERENCES Messages(id),
+    FOREIGN KEY(fk_userId)
+        REFERENCES Users(id)
+);
 
 CREATE TABLE IF NOT EXISTS Infractions (
     id                       INTEGER      PRIMARY KEY,
@@ -125,6 +136,7 @@ CREATE TABLE IF NOT EXISTS Infractions (
     duration                 INTEGER,
     reason                   TEXT,
     active                   BOOLEAN,
+    time                     TEXT,
     FOREIGN KEY(fk_guildId)
         REFERENCES Guilds (id),
     FOREIGN KEY(fk_authorId)

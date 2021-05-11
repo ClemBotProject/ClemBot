@@ -104,7 +104,10 @@ class ClemBot(commands.Bot):
         if await self.claims_check(ctx) is True:
             return
         claims_str = '\n'.join(command.claims)
-        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
+        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
+                                f'\n **Help:** For more information on how claims work please see the wiki [Link!]('
+                                f'https://github.com/ClemsonCPSC-Discord/ClemBot/wiki/Authorization-Claims)\n'
+                                f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
 
     async def close(self) -> None:
         try:
