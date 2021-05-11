@@ -6,6 +6,7 @@ from collections import deque
 import aiosqlite
 import discord
 import discord.ext.commands as commands
+import bot.extensions as ext
 
 from bot.bot_secrets import BotSecrets
 from bot.consts import Colors, DiscordLimits, OwnerDesignatedChannels, DesignatedChannels
@@ -24,13 +25,13 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(hidden=True, invoke_without_command=True, case_insensitive=True)
+    @ext.group(invoke_without_command=True, case_insensitive=True, hidden=True)
     @commands.is_owner()
     async def owner(self, ctx):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @owner.group(invoke_without_command=True)
+    @owner.command(invoke_without_command=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
@@ -149,7 +150,7 @@ class OwnerCog(commands.Cog):
     async def log(self, ctx):
         pass
 
-    @log.command()
+    @log.group()
     @commands.is_owner()
     async def get(self, ctx, lines: int):
         log_name = log.parent.handlers[0].baseFilename
@@ -224,7 +225,6 @@ class OwnerCog(commands.Cog):
         embed.add_field(name=f'Guild: {guild_id}' if guild_id else 'Global', value=count)
 
         await ctx.send(embed=embed)
-
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))

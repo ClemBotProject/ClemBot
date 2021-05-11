@@ -98,16 +98,13 @@ class ClemBot(commands.Bot):
 
     async def command_claims_check(self, ctx: commands.Context):
         command = ctx.command
-        author = ctx.author
-        repo = ClaimsRepository()
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
             return 
         if await self.claims_check(ctx) is True:
             return
-        else:
-            claims_str = '\n'.join(command.claims)
-            raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
+        claims_str = '\n'.join(command.claims)
+        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```')
 
     async def close(self) -> None:
         try:
