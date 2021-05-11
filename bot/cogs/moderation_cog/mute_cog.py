@@ -113,8 +113,15 @@ class MuteCog(commands.Cog):
         try:
             await subject.send(embed=embed)
         except discord.Forbidden:
-            embed = discord.Embed(color=Colors.ClemsonOrange)
+            embed = discord.Embed(color=Colors.Error)
             embed.title = f'Dm Mute to {self.get_full_name(subject)} forbidden'
+            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                             DesignatedChannels.moderation_log,
+                                             ctx.guild.id,
+                                             embed)
+        except discord.HTTPException:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Dm Mute to {self.get_full_name(subject)} failed'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                              DesignatedChannels.moderation_log,
                                              ctx.guild.id,
