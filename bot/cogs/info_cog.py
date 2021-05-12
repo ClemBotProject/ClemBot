@@ -25,7 +25,6 @@ class InfoCog(commands.Cog):
         #If the command is invoked without a specified user, it will return info on the calling user
         if not user:
             user = ctx.author
-        
         log.info(f'User {ctx.author} has ran info command on user {user.name}')
 
         embed = discord.Embed(title = f'Guild Member Information', color=Colors.ClemsonOrange)
