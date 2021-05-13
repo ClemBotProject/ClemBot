@@ -146,3 +146,12 @@ class ModerationRepository(BaseRepository):
                                     """,
                                   (guild_id, member_id)) as c:
                 return await self.fetcthall_as_class(c)
+    
+    async def get_global_bans(self, member_id):
+        async with aiosqlite.connect(self.resolved_db_path) as db:
+            async with db.execute(f"""
+                                    SELECT * FROM Infractions
+                                    WHERE fk_subjectId = ?
+                                    """,
+                                    (member_id,)) as c:
+                return await self.fetcthall_as_class(c)

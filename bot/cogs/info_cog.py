@@ -25,6 +25,7 @@ class InfoCog(commands.Cog):
         #If the command is invoked without a specified user, it will return info on the calling user
         if not user:
             user = ctx.author
+        
         log.info(f'User {ctx.author} has ran info command on user {user.name}')
 
         embed = discord.Embed(title = f'Guild Member Information', color=Colors.ClemsonOrange)
@@ -44,21 +45,25 @@ class InfoCog(commands.Cog):
             moderation_info = f'» **Warnings:** {len(await ModerationRepository().get_all_warns_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Active Mutes:** {len(await ModerationRepository().get_all_active_mutes_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Total Infractions:** {len(await ModerationRepository().get_all_infractions_member(ctx.guild.id, user.id))}'
+            moderation_info += f'\n» **Total Global Bans:** {len(await ModerationRepository().get_global_bans(user.id))}'
             embed.add_field(name='**Moderation Info:**', value=moderation_info)
 
-        if ctx.guild.get_member(user.id): 
+        #since member objects include guild ID's and information, we try to get a member object for the target user
+        member = ctx.guild.get_member(user.id)
+        #check to see if the target user is in the calling context's guild. If None then the user isn't in the calling server
+        if member:
             guild_info = ''
             if await self.bot.claims_check(ctx=ctx) is True:
                 #prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
-                guild_info = '» **Joined:** ' + user.joined_at.strftime('%b %d %Y %I:%M:%S %p') 
-            guild_info += f'\n» **Message count (last 30 days):** {await MessageRepository().get_user_message_count_range(user.id, user.guild.id, 30)}'
+                guild_info = '» **Joined:** ' + member.joined_at.strftime('%b %d %Y %I:%M:%S %p') 
+            guild_info += f'\n» **Message count (last 30 days):** {await MessageRepository().get_user_message_count_range(member.id, ctx.guild.id, 30)}'
             guild_info += f'\n» **Roles:** '
-            log.info(f'User has roles: {user.roles}')
+            log.info(f'User has roles: {member.roles}')
             #skipping the first index because it is just @everyone
-            for i in user.roles[1::]:
+            for i in member.roles[1::]:
                 guild_info += f'{i.mention}'
-            guild_info += f'\n» **Highest role:** {user.top_role.mention}'
-            guild_info += '\n» **Nitro boost date:** '+ (user.premium_since.strftime('%b %d %Y %I:%M:%S %p') if user.premium_since is not None else 'Not boosting')  
+            guild_info += f'\n» **Highest role:** {member.top_role.mention}'
+            guild_info += '\n» **Nitro boost date:** '+ member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting'  
             embed.add_field(name='**Guild Information:**', value=guild_info, inline=False)
         
         embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
