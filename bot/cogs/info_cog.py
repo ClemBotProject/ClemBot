@@ -33,8 +33,8 @@ class InfoCog(commands.Cog):
 
         user_info = f'» **Nickname:** {user.mention}'
         user_info += f'\n» **ID:** {user.id}'
-        #Some info doesn't need to be available to anyone to check
-        if await self.bot.claims_check(ctx=ctx):
+        #Some info doesn't need to be available to anyone to check on for other users
+        if (await self.bot.claims_check(ctx=ctx)) or (ctx.author.id == user.id):
             #prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
             user_info += '\n» **Created:** ' + user.created_at.strftime('%b %d %Y %I:%M:%S %p')
         embed.add_field(name='**User ID:**', value=user_info)
@@ -53,7 +53,7 @@ class InfoCog(commands.Cog):
         #check to see if the target user is in the calling context's guild. If None then the user isn't in the calling server
         if member:
             guild_info = ''
-            if await self.bot.claims_check(ctx=ctx) is True:
+            if (await self.bot.claims_check(ctx=ctx)) or (ctx.author.id == user.id):
                 #prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
                 guild_info = '» **Joined:** ' + member.joined_at.strftime('%b %d %Y %I:%M:%S %p') 
             guild_info += f'\n» **Message count (last 30 days):** {await MessageRepository().get_user_message_count_range(member.id, ctx.guild.id, 30)}'
