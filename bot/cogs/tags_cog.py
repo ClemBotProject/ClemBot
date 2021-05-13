@@ -198,7 +198,9 @@ class TagCog(commands.Cog):
         embed.add_field(name='Creation Date: ', value=tag['CreationDate'], inline=False)
         embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
 
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+        return
 
     async def _delete_tag(self, name, ctx):
         repo = TagRepository()
