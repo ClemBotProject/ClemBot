@@ -41,7 +41,7 @@ class InfoCog(commands.Cog):
         embed.set_thumbnail(url=user.avatar_url)
             
         #We don't want moderation info available for regular guild users to check on others
-        if await self.bot.claims_check(ctx=ctx) is True:
+        if (await self.bot.claims_check(ctx=ctx)) or (ctx.author.id == user.id):
             moderation_info = f'» **Warnings:** {len(await ModerationRepository().get_all_warns_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Active Mutes:** {len(await ModerationRepository().get_all_active_mutes_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Total Infractions:** {len(await ModerationRepository().get_all_infractions_member(ctx.guild.id, user.id))}'
@@ -63,7 +63,7 @@ class InfoCog(commands.Cog):
             for i in member.roles[1::]:
                 guild_info += f'{i.mention}'
             guild_info += f'\n» **Highest role:** {member.top_role.mention}'
-            guild_info += '\n» **Nitro boost date:** '+ member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting'  
+            guild_info += '\n» **Nitro boost date:** ' + (member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting')
             embed.add_field(name='**Guild Information:**', value=guild_info, inline=False)
         
         embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
