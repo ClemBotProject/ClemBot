@@ -45,7 +45,6 @@ class InfoCog(commands.Cog):
             moderation_info = f'» **Warnings:** {len(await ModerationRepository().get_all_warns_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Active Mutes:** {len(await ModerationRepository().get_all_active_mutes_member(ctx.guild.id, user.id))}'
             moderation_info += f'\n» **Total Infractions:** {len(await ModerationRepository().get_all_infractions_member(ctx.guild.id, user.id))}'
-            moderation_info += f'\n» **Total Global Bans:** {len(await ModerationRepository().get_global_bans(user.id))}'
             embed.add_field(name='**Moderation Info:**', value=moderation_info)
 
         #since member objects include guild ID's and information, we try to get a member object for the target user
@@ -60,8 +59,9 @@ class InfoCog(commands.Cog):
             guild_info += f'\n» **Roles:** '
             log.info(f'User has roles: {member.roles}')
             #skipping the first index because it is just @everyone
-            for i in member.roles[1::]:
-                guild_info += f'{i.mention}'
+            for i in member.roles[1::len(member.roles)-1]:
+                guild_info += f'{i.mention}\t'
+            # guild_info += f'{member.roles[-1::]}'
             guild_info += f'\n» **Highest role:** {member.top_role.mention}'
             guild_info += '\n» **Nitro boost date:** ' + (member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting')
             embed.add_field(name='**Guild Information:**', value=guild_info, inline=False)
