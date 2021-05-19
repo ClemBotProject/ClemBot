@@ -59,7 +59,7 @@ class TagCog(commands.Cog):
             embed = discord.Embed(title=f'Available Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Available:', value='No currently available tags')
             msg = await ctx.send(embed=embed)
-            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
             return
 
         # begin generating paginated columns
@@ -188,7 +188,8 @@ class TagCog(commands.Cog):
 
         tag = await repo.get_tag(name, ctx.guild.id)
 
-        author = self.bot.get_user(tag['fk_UserId'])
+        #uses the fetch_user API call so it can get tag information for tags where the owner left the server
+        author = await self.bot.fetch_user(tag['fk_UserId'])
 
         embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
         embed.add_field(name='Name ', value=tag['name'])
@@ -199,7 +200,7 @@ class TagCog(commands.Cog):
         embed.set_footer(text=fullNameGet, icon_url=author.avatar_url)
 
         msg = await ctx.send(embed=embed)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
         return
 
     async def _delete_tag(self, name, ctx):
