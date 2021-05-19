@@ -188,8 +188,7 @@ class TagCog(commands.Cog):
 
         tag = await repo.get_tag(name, ctx.guild.id)
 
-        #uses the fetch_user API call so it can get tag information for tags where the owner left the server
-        author = await self.bot.fetch_user(tag['fk_UserId'])
+        author = self.bot.get_user(tag['fk_UserId'])
 
         embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
         embed.add_field(name='Name ', value=tag['name'])
