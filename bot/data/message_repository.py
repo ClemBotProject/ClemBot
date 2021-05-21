@@ -1,6 +1,18 @@
 import aiosqlite
+from cryptography.fernet import Fernet
 
+from bot.bot_secrets import BotSecrets
 from bot.data.base_repository import BaseRepository
+
+
+def _encrypt_message(message: str):
+    fernet = Fernet(BotSecrets.get_instance().message_encryption_key)
+    return fernet.encrypt(message.encode())
+
+
+def _decrypt_message(message: str):
+    fernet = Fernet(bytes(BotSecrets.get_instance().message_encryption_key))
+    return fernet.decrypt(bytes(message)).decode()
 
 
 class MessageRepository(BaseRepository):
@@ -10,16 +22,22 @@ class MessageRepository(BaseRepository):
             return
 
         async with aiosqlite.connect(self.resolved_db_path) as db:
+            content = _encrypt_message(message.content)
+
+            # Message deletion to comply with discords message retention policies
+            await db.execute("DELETE FROM Messages WHERE Time <= date('now','-30 day')")
             await db.execute(
                 """
                 INSERT INTO Messages
                 (id, fk_guildId, fk_channelId, fk_authorId, content, time)
                 VALUES
                 (?, ?, ?, ?, ?, ?)
-                """, (message.id, message.guild.id, message.channel.id, message.author.id, message.content, time))
+                """, (message.id, message.guild.id, message.channel.id, message.author.id, content, time))
             await db.commit()
 
     async def edit_message_content(self, message_id, content):
+        content = _encrypt_message(content)
+
         if not await self.check_message(message_id):
             return
 
@@ -62,7 +80,10 @@ class MessageRepository(BaseRepository):
 
         async with aiosqlite.connect(self.resolved_db_path) as db:
             async with db.execute('SELECT * FROM Messages WHERE id = ?', (message_id,)) as c:
-                return await self.fetcthone_as_dict(c)
+                message = await self.fetcthone_as_dict(c)
+
+        message['content'] = _decrypt_message(message['content'])
+        return message
 
     async def check_message(self, message_id: int) -> bool:
         async with aiosqlite.connect(self.resolved_db_path) as db:
@@ -74,7 +95,6 @@ class MessageRepository(BaseRepository):
             async with db.execute('SELECT count(*) FROM Messages WHERE fk_guildId = ? AND fk_authorId = ?', (guild_id, user_id,)) as c:
                 return (await c.fetchone())[0]
             
-
     async def get_user_message_count_range(self, user_id, guild_id, days: int) -> int:
         if not isinstance(days, int):
             raise TypeError("Days parameter must be an int")
