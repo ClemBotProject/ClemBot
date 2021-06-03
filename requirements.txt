@@ -8,9 +8,11 @@ attrs==19.3.0
 bandit==1.6.2
 CacheControl==0.12.6
 certifi==2020.6.20
+cffi==1.14.5
 chardet==3.0.4
 colorama==0.4.3
 contextlib2==0.6.0
+cryptography==3.4.7
 dateutils==0.6.8
 discord.py==1.6.0
 distlib==0.3.1
@@ -46,6 +48,7 @@ pluggy==0.13.1
 progress==1.5
 py==1.10.0
 pycodestyle==2.5.0
+pycparser==2.20
 pyflakes==2.1.1
 pylint==2.4.4
 pyparsing==2.4.7

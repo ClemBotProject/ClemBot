@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -36,6 +37,7 @@ class BotSecrets:
         self._geocode_key = None
         self._merriam_key = None
         self._azure_translate_key = None
+        self._message_encryption_key = None
 
     @property
     def client_token(self) -> str:
@@ -202,6 +204,18 @@ class BotSecrets:
             raise ConfigAccessError(f'azure_translate_key has already been initialized')
         self._azure_translate_key = value
 
+    @property
+    def message_encryption_key(self):
+        if not self._message_encryption_key:
+            raise ConfigAccessError(f'message_encryption_key has not been initialized')
+        return self._message_encryption_key
+
+    @message_encryption_key.setter
+    def message_encryption_key(self, value: str) -> None:
+        if self._message_encryption_key:
+            raise ConfigAccessError(f'message_encryption_key has already been initialized')
+        self._message_encryption_key = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
         log.info('Bot Secrets Loaded')
@@ -218,6 +232,9 @@ class BotSecrets:
         self.weather_key = secrets['WeatherKey']
         self.geocode_key = secrets['GeocodeKey']
         self.azure_translate_key = secrets['AzureTranslateKey']
+        # Use a default key for development purposes
+        # Not for production use
+        self.message_encryption_key = b'7jeNGNuZ-jtYTJftNyDyeft3Rc-y7opcJYfq-qliX9k='
 
     def load_production_secrets(self) -> None:
 
@@ -233,5 +250,6 @@ class BotSecrets:
         self.weather_key = os.environ.get('WEATHER_KEY')
         self.geocode_key = os.environ.get('GEOCODE_KEY')
         self.azure_translate_key = os.environ.get('AZURE_TRANSLATE_KEY')
+        self.message_encryption_key = base64.urlsafe_b64encode(os.environ.get('MESSAGE_ENCRYPTION_KEY').encode())
 
         log.info('Production keys loaded')
