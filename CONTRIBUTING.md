@@ -77,7 +77,7 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 * `WeatherKey`:(Optional) Weather forecast api token
 * `GeocodeKey`:(Optional) Geocode weather service api token
 * `AzureTranslateKey`:(Optional) Azure translation api token
-* `BotOnly`: (optional) Puts ClemBot.Bot into Bot only mode which deactivates the api and allows for limited functionality. Mainly used when a feature only requires discord and needs no persistence/database
+* `BotOnly`: (optional) If set to true, puts ClemBot.Bot into Bot only mode which deactivates the api and allows for limited functionality. Mainly used when a feature only requires discord and needs no persistence/database
 
 ## Setting up the ClemBot.Bot build environment
 Setup a virtual environment:  
@@ -103,4 +103,4 @@ The bot should show up in the test server and respond to commands (test with `<y
 * Click the run button in your preferred IDE
 
 ## Final Notes
-The ClemBot.Api and the ClemBot.Bot projects talk to eachother over http, both projects need to be run simultaneasouly if you are not working in BotOnly mode.
+The ClemBot.Api and the ClemBot.Bot projects talk to each other over http, both projects need to be run simultaneously if you are not working in BotOnly mode.
