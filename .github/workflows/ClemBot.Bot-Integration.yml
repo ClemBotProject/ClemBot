@@ -12,6 +12,8 @@ on:
     branches: [ master ]
     paths: 
       - "ClemBot.Bot/**"
+  workflow_dispatch:
+  
 jobs:
   build: 
 
@@ -19,15 +21,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Enter ClemBot.Bot directory
-      run: |
-        cd ClemBot.Bot
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        cd ClemBot.Bot
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Lint with pylint
