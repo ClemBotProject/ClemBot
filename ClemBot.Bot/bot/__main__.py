@@ -25,14 +25,6 @@ def setup_logger() -> None:
 def main():
     if not os.path.exists('Logs'):
         os.makedirs('Logs')
-    # sets up the logging for discord.py
-    disc_log = logging.getLogger('discord')
-    disc_log.setLevel(logging.DEBUG)
-    disc_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H.%M.%S")}_discord.log')
-    handler = logging.FileHandler(filename=disc_log_name, encoding='utf-8', mode='w')
-    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-    disc_log.addHandler(handler)
-
     # creates the logger for the Bot Itself
     setup_logger()
     bot_log = logging.getLogger('bot')
@@ -46,6 +38,15 @@ def main():
         bot_log.info('Production env var found, loading production environment')
         bot_secrets.secrets.load_production_secrets()
     else:
+
+        # sets up the logging for discord.py
+        disc_log = logging.getLogger('discord')
+        disc_log.setLevel(logging.DEBUG)
+        disc_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H.%M.%S")}_discord.log')
+        handler = logging.FileHandler(filename=disc_log_name, encoding='utf-8', mode='w')
+        handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+        disc_log.addHandler(handler)
+
         try:
             bot_log.info(f'Attempting to load BotSecrets.json from {os.getcwd()}')
             with open("BotSecrets.json") as f:

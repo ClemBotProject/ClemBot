@@ -273,8 +273,8 @@ class BotSecrets:
         self.client_secret = os.environ.get('CLIENT_SECRET')
         self.bot_token = os.environ.get('BOT_TOKEN')
         self.bot_prefix = os.environ.get('BOT_PREFIX')
-        self.startup_log_channel_ids = os.environ.get('STARTUP_LOG_CHANNEL_IDS')
-        self.error_log_channel_ids = os.environ.get('ERROR_LOG_CHANNEL_IDS')
+        self.startup_log_channel_ids = [int(n) for n in os.environ.get('STARTUP_LOG_CHANNEL_IDS').split(',')]
+        self.error_log_channel_ids = [int(n) for n in os.environ.get('ERROR_LOG_CHANNEL_IDS').split(',')]
         self.bot_only = os.environ.get('BOT_ONLY')
         self.gif_me_token = os.environ.get('GIF_ME_TOKEN')
         self.repl_url = os.environ.get('REPL_URL')
