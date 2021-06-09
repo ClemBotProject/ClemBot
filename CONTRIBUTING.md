@@ -48,7 +48,7 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 
 * After you have started up and configured PostgresSQL with your desired username and password you need to set the Connection string for ClemBot.Api
 * `cd` into ClemBot/ClemBot.Api/ClemBot.Api.Core
-* Run `dotnet user-secrets set "ClemBotConectionString" "YourConnectionSttring"` (Example:  "Server=127.0.0.1;Port=5432;Database=clembotdb;User Id=XXXXX;Password=XXXXX;")
+* Run `dotnet user-secrets set "ClemBotConnectionString" "YourConnectionString"` (Example:  "Server=127.0.0.1;Port=5432;Database=clembotdb;User Id=XXXXX;Password=XXXXX;")
 * Generate a `BotApiKey` with this website [Link](https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx)
 * Run `dotnet user-secrets set "BotApiKey" "KeyYouGeneratedAbove"`
 
