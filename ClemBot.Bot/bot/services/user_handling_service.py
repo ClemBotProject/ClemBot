@@ -66,13 +66,6 @@ class UserHandlingService(BaseService):
                                          user.guild.id,
                                          embed)
 
-    async def load_users(self, guild: discord.Guild):
-        for user in guild.members:
-            user_string = f'{self.get_full_name(user)}:{user.id}'
-            guild_string = f'{guild.name}:{guild.id}'
-            log.info(f'Loading user: {user_string} in Guild: {guild_string}')
-            await self.add_user(user, guild.id)
-
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
 
