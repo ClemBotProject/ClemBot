@@ -6,9 +6,12 @@ name: ClemBot Master integration
 on:
   push:
     branches: [ master ]
+    paths: 
+      - "ClemBot.Bot/**"
   pull_request:
     branches: [ master ]
-
+    paths: 
+      - "ClemBot.Bot/**"
 jobs:
   build: 
 
