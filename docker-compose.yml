@@ -1,27 +1,34 @@
 version: "3.7"
 services:
+  # Create the api first
+  clembot.api:
+    restart: always
+    build: ClemBot.Api/
+    networks:
+        - ClemBotNet
+    env_file: 
+        - ClemBot.Api/ClemBot.Api_env.env
+  # Create the python eval container for sandboxed python code execution
   snekbox:
     image: pythondiscord/snekbox:latest
     init: true
     ipc: none
     networks: 
       - ClemBotNet
-    ports:
-      - "8060:8060"
     privileged: true
-  clembot:
-    build: .
+  # Create the Bot process to server as the dapi frontend
+  clembot.bot:
+    build: ClemBot.Bot/
     restart: always
     user: root
     depends_on: 
-      - snekbox
+      - clembot.api
     networks: 
       - ClemBotNet
     env_file: 
-      - bot_env.env
+      - ClemBot.Bot/ClemBot.Bot_env.env
     volumes:
-      - ~/database:/ClemBot/database
-      - ~/Logs:/ClemBot/Logs
+      - ~/Logs:/ClemBot.Bot/Logs
     
 networks:
   ClemBotNet:

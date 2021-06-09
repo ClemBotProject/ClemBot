@@ -70,15 +70,29 @@ To start developing and contributing to this project, please see [CONTRIBUTING.m
 
 # Architecture overview
 
+The Bot utilizes a standard three tier architecture, the ClemBot.Bot project makes requests to the ClemBot.Api project which then subsequently queries the PostgreSQL database
+
+## ClemBot.Bot
 The bot is set up in a simple way. There are 3 layers, the Cog layer, the Service layer and the Data layer. Cogs and Services communicate exclusively through the messenger. This allows us to maintain total decoupling of the layers. Repos are referenced directly in both.
 
 1. Cog layer - This is where the frontend bot command code resides. Anything that you directly use to interface with discord goes in this layer.
 2. Service layer - This is where all things that are bot related but not controlled through front end commands live. Things like user tracking, event handling etc all go in here.
-3. Data layer - This is the abstraction on top of the sqlite database. This layer is a collection of repositories which contain the code to query and insert from the DB.
+3. Route layer - This is the route abstraction on top of the ApiClient. This layer defines methods that correspond to routes that are sent back to the ClemBot.Api project
 
 The bot loads Cogs and Services dynamically. To create a new command simply create a class that inherits from Command.Cog and defines a setup function in module scope at the bottom. See [example_cog.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/cogs/example_cog.py) for an example. 
 
 The bot does the same thing for services, to see how to define a service, see [example_service.py](https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/bot/services/example_service.py)
+
+## ClemBot.Api
+The Api utilizes the following technologies
+* Asp.Net [Link](https://dotnet.microsoft.com/apps/aspnet)
+* Entity Framework [Link](https://docs.microsoft.com/en-us/ef/)
+* Mediatr [Link](https://github.com/jbogard/MediatR)
+* Serilog [Link](https://serilog.net/)
+
+ClemBot.Api.Data folder contains the Entity Framework Code first db models and contexts
+</br>
+ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in the `Features` folder
 
 ![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
 ![ClemBot Master Integration](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20integration/badge.svg?branch=master)
