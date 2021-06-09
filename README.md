@@ -68,7 +68,7 @@ We are a community focused on learning and acceptance; anyone is welcome. If you
 # Development
 To start developing and contributing to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
-# ArShitecture overview
+# Architecture overview
 
 The Bot utilizes a standard three tier architecture, the ClemBot.Bot project makes requests to the ClemBot.Api project which then subsequently queries the PostgreSQL database
 
