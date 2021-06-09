@@ -1,10 +1,14 @@
-name: ClemBot Master Deployment
+name: ClemBot.Bot Prod Deployment
 
 on:
   push:
     branches: [ master ]
     paths: 
-      - "bot/**"
+      - "ClemBot.Bot/**"
+  pull_request:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Bot/**"
   workflow_dispatch:
     inputs:
       name:
@@ -18,11 +22,12 @@ jobs:
         runs-on: [self-hosted]
         steps:
             - uses: actions/checkout@v2
-            - name: Run Deploy Script
-              run: ~/deploy.sh
+            - name: Run Deploy Commands
+              run: |
+                docker-compose up -d --force-recreate --no-deps --build clembot.bot
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
               uses: "Ilshidur/action-discord@0.3.0"
               with:
-                args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
+                args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.Bot has been deployed.'
