@@ -16,9 +16,7 @@ on:
   
 jobs:
   build: 
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -32,9 +30,11 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with pylint
       run: |
+        cd ClemBot.Bot
         pip install pylint
         pylint bot -E -r y
     - name: Test with pytest
       run: |
+        cd ClemBot.Bot
         pip install pytest
         pytest
