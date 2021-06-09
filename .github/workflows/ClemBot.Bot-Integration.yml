@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Enter ClemBot.Bot directory
+      run: |
+        cd ClemBot.Bot
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
