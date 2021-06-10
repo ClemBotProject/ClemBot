@@ -24,7 +24,7 @@ namespace ClemBot.Api.Core
 
             try
             {
-                Log.Information("Starting web host");
+                Log.Information("Starting ClemBot.Api web host");
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
