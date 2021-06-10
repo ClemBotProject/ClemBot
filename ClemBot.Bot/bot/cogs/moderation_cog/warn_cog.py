@@ -31,6 +31,13 @@ class WarnCog(commands.Cog):
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
             return await ctx.send(embed=embed)
 
+        # Log the warning first so if it throws we notify and dont dm people
+        await self.bot.messenger.publish(Events.on_bot_warn,
+                                         guild=ctx.guild,
+                                         author=ctx.author,
+                                         subject=subject,
+                                         reason=reason)
+
         # Dm the user who was warned
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been warned in Guild {ctx.guild.name}  :warning:'
@@ -49,11 +56,6 @@ class WarnCog(commands.Cog):
                                              ctx.guild.id,
                                              embed)
 
-        await self.bot.messenger.publish(Events.on_bot_warn,
-                                         guild=ctx.guild,
-                                         author=ctx.author,
-                                         subject=subject,
-                                         reason=reason)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'{self.get_full_name(subject)} Warned  :warning:'

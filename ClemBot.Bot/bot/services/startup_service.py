@@ -25,10 +25,7 @@ class StartupService(BaseService):
         await asyncio.gather(*tasks)
 
     async def load_users(self):
-        db_users = await self.bot.user_route.get_users_ids()
-        new_users = [u for u in self.bot.users if u.id not in db_users]
-
-        await self.bot.user_route.create_user_bulk(new_users)
+        await self.bot.user_route.create_user_bulk(self.bot.users)
 
     async def load_users_guilds(self):
         await self.bot.guild_route.update_guild_users(self.bot.guilds)
