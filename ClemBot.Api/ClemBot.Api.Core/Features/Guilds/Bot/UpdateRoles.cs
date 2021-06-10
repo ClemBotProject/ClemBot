@@ -116,7 +116,6 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     }
                 }
 
-
                 await _context.SaveChangesAsync();
 
                 return QueryResult<IEnumerable<ulong>>.Success(request.Guilds.Select(x => x.GuildId));

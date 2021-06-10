@@ -67,3 +67,5 @@ class StartupService(BaseService):
         # Reset active channels, send all channels to the backend and delete any not present and add any that are new
         log.info('Resetting Guild Channels state')
         await self.load_channels()
+
+        self.bot.is_starting_up = False
