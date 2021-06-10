@@ -1,5 +1,3 @@
-import asyncio
-import datetime
 import importlib
 import logging
 import pkgutil
@@ -7,10 +5,10 @@ import traceback
 import typing as t
 from types import ModuleType
 
-import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.api import *
 import bot.api as api
 import bot.cogs as cogs
 import bot.extensions as ext
@@ -49,17 +47,17 @@ class ClemBot(commands.Bot):
 
         self._before_invoke = self.command_claims_check
 
-        self.guild_route: api.guild_route.GuildRoute = None
-        self.user_route: api.user_route.UserRoute = None
-        self.role_route: api.role_route.RoleRoute = None
-        self.channel_route: api.channel_route.ChannelRoute = None
-        self.message_route: api.message_route.MessageRoute = None
-        self.tag_route: api.tag_route.TagRoute = None
-        self.designated_channel_route: api.designated_channel_route.DesignatedChannelRoute = None
-        self.welcome_message_route: api.welcome_message_route.WelcomeMessageRoute = None
-        self.custom_prefix_route: api.custom_prefix_route.CustomPrefixRoute = None
-        self.moderation_route: api.moderation_route.ModerationRoute = None
-        self.claim_route: api.claim_route.ClaimRoute = None
+        self.guild_route: guild_route.GuildRoute = None
+        self.user_route: user_route.UserRoute = None
+        self.role_route: role_route.RoleRoute = None
+        self.channel_route: channel_route.ChannelRoute = None
+        self.message_route: message_route.MessageRoute = None
+        self.tag_route: tag_route.TagRoute = None
+        self.designated_channel_route: designated_channel_route.DesignatedChannelRoute = None
+        self.welcome_message_route: welcome_message_route.WelcomeMessageRoute = None
+        self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None
+        self.moderation_route: moderation_route.ModerationRoute = None
+        self.claim_route: claim_route.ClaimRoute = None
 
         self.load_cogs()
         self.active_services = {}
