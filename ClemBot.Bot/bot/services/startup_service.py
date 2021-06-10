@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import os
 
 from bot.services.base_service import BaseService
+import bot.bot_secrets as bot_secrets
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +44,15 @@ class StartupService(BaseService):
 
     async def load_service(self):
 
-        log.info('Starting bot startup internal state reset')
+        # The startup load is too heavy on prod to reset state everytime we restart,
+        # So we should only do this on dev bots. We rely on the 24/7 uptime of the bot to
+        # Keep the database in sync. Future solutions to this problem
+        # Should be heavily researched
+        if bool(os.environ.get('PROD')):
+            log.warning('Skipping internal state reset on prod deployment')
+            return
+
+        log.info('Starting development bot startup internal state reset')
 
         # First load any new guilds so that we can reference them
         log.info('Resetting Guilds')
