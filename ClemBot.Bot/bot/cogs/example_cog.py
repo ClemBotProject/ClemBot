@@ -52,7 +52,7 @@ class ExampleCog(commands.Cog):
         if self._last_member is None or self._last_member.id != member.id:
             msg = await ctx.send(f'Hello {member.name}!')
         else:
-            await ctx.send(f'Hello {member.name}... This feels familiar.')
+            await ctx.send(f'Hello {member.name}... This feels familiar :thinking:')
         self._last_member = member
 
     # temporary placement till i can do it better
