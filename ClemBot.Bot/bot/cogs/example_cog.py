@@ -50,7 +50,7 @@ class ExampleCog(commands.Cog):
         # it provodes contextual metadata about how the command was invoked
         member = member or ctx.author
         if self._last_member is None or self._last_member.id != member.id:
-            msg = await ctx.send(f'Hello {member.name}~')
+            msg = await ctx.send(f'Hello {member.name}!')
         else:
             await ctx.send(f'Hello {member.name}... This feels familiar.')
         self._last_member = member
