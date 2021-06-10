@@ -24,9 +24,8 @@ jobs:
             - uses: actions/checkout@v2
             - name: Run Deploy Commands
               run: |
-                rm -rf ClemBot
-                git clone https://github.com/ClemsonCPSC-Discord/ClemBot.git
-                cd ClemBot
+                cd ~/ClemBot
+                git pull origin master
                 docker-compose up -d --force-recreate --no-deps --build clembot.api
             - name: Discord notification
               env:
