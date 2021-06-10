@@ -26,4 +26,4 @@ class MessageRoute(BaseRoute):
         await self._client.patch('messages', data=json)
 
     async def get_message(self, message_id: int):
-        return (await self._client.get(f'messages/{message_id}')).value
+        return await self._client.get(f'messages/{message_id}')
