@@ -76,9 +76,6 @@ class GuildRoute(BaseRoute):
                 'Id': r.id,
                 'Name': r.name,
                 'Admin': r.permissions.administrator,
-                'Members': [
-                    m.id for m in r.members
-                ]
             }
                 for r in g.roles]
         }

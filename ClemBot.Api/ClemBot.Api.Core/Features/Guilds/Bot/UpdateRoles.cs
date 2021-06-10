@@ -21,8 +21,6 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             public string? Name { get; set; }
 
             public bool Admin { get; set; }
-
-            public List<ulong> Members { get; set; } = new();
         }
 
         public record GuildDto
@@ -85,34 +83,8 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                             IsAssignable = false
                         };
 
-                        var members = await _context.Users
-                            .Where(x => role.Members.Contains(x.Id))
-                            .ToListAsync();
-
-                        roleEntity.Users = members;
-
                         _context.Roles.Add(roleEntity);
                         guildEntity.Roles?.Add(roleEntity);
-                    }
-
-                    // Reset Role Member mappings
-                    foreach (var roleDto in requestGuild.Roles)
-                    {
-                        var role = await _context.Roles
-                            .Include(y => y.Users)
-                            .FirstOrDefaultAsync(x => roleDto.Id == x.Id);
-
-                        var members = await _context.Users
-                            .Where(x => roleDto.Members.Contains(x.Id))
-                            .ToListAsync();
-
-                        if (role is null)
-                        {
-                            continue;
-                        }
-
-                        role.Users.Clear();
-                        role.Users = members;
                     }
                 }
 
