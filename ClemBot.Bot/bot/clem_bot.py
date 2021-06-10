@@ -3,6 +3,7 @@ import logging
 import pkgutil
 import traceback
 import typing as t
+import datetime
 from types import ModuleType
 
 import discord
@@ -47,6 +48,7 @@ class ClemBot(commands.Bot):
 
         self._before_invoke = self.command_claims_check
 
+        # pylint: disable=no-member
         self.guild_route: guild_route.GuildRoute = None
         self.user_route: user_route.UserRoute = None
         self.role_route: role_route.RoleRoute = None
