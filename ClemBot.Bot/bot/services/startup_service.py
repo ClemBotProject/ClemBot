@@ -31,26 +31,13 @@ class StartupService(BaseService):
         await self.bot.user_route.create_user_bulk(new_users)
 
     async def load_users_guilds(self):
-        tasks = []
-        for guild in self.bot.guilds:
-            log.info(f'Reloading guild {guild.name}: {guild.id} internal User state')
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_users(guild.id, guild.members)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_users(self.bot.guilds)
 
     async def load_roles(self):
-        tasks = []
-        for g in self.bot.guilds:
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_roles(g.id, g.roles)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_roles(self.bot.guilds)
 
     async def load_channels(self):
-        tasks = []
-        for g in self.bot.guilds:
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_channels(g.id, g.channels)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_channels(self.bot.guilds)
 
     @staticmethod
     def get_full_name(author) -> str:

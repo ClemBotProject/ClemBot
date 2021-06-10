@@ -97,30 +97,30 @@ namespace ClemBot.Api.Core.Features.Guilds
                 _ => NotFound()
             };
 
-        [HttpPatch("bot/[controller]/{Id}/Update/Users")]
+        [HttpPatch("bot/[controller]/Update/Users")]
         [Authorize(Policy = Policies.BotMaster)]
-        public async Task<IActionResult> UpdateUsers(ulong Id, Bot.UpdateUsers.Command command) =>
-            await _mediator.Send(command with { GuildId = Id }) switch
+        public async Task<IActionResult> UpdateUsers(Bot.UpdateUsers.Command command) =>
+            await _mediator.Send(command) switch
             {
                 { Status: QueryStatus.Success } result => Ok(result.Value),
                 { Status: QueryStatus.NotFound } => NotFound(),
                 _ => throw new InvalidOperationException()
             };
 
-        [HttpPatch("bot/[controller]/{Id}/Update/Roles")]
+        [HttpPatch("bot/[controller]/Update/Roles")]
         [BotMasterAuthorize]
-        public async Task<IActionResult> UpdateRoles(ulong Id, Bot.UpdateRoles.Command command) =>
-            await _mediator.Send(command with { GuildId = Id }) switch
+        public async Task<IActionResult> UpdateRoles(Bot.UpdateRoles.Command command) =>
+            await _mediator.Send(command) switch
             {
                 { Status: QueryStatus.Success } result => Ok(result.Value),
                 { Status: QueryStatus.NotFound } => NotFound(),
                 _ => throw new InvalidOperationException()
             };
 
-        [HttpPatch("bot/[controller]/{Id}/Update/Channels")]
+        [HttpPatch("bot/[controller]/Update/Channels")]
         [BotMasterAuthorize]
-        public async Task<IActionResult> UpdateChannels(ulong Id, Bot.UpdateChannels.Command command) =>
-            await _mediator.Send(command with { GuildId = Id }) switch
+        public async Task<IActionResult> UpdateChannels(Bot.UpdateChannels.Command command) =>
+            await _mediator.Send(command) switch
             {
                 { Status: QueryStatus.Success } result => Ok(result.Value),
                 { Status: QueryStatus.NotFound } => NotFound(),
