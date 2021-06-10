@@ -20,3 +20,18 @@ jobs:
         working-directory: ClemBot.Api
     steps:
     - uses: actions/checkout@v2
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Add dotnet-format problem matcher
+      uses: xt0rted/dotnet-format-problem-matcher@v1
+
+    - name: Restore format dependencies
+      run: dotnet tool restore
+
+    - name: Run dotnet format
+      uses: xt0rted/dotnet-format@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}on:
+
