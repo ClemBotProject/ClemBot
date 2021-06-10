@@ -50,6 +50,7 @@ class StartupService(BaseService):
         # Should be heavily researched
         if bool(os.environ.get('PROD')):
             log.warning('Skipping internal state reset on prod deployment')
+            self.bot.is_starting_up = False
             return
 
         log.info('Starting development bot startup internal state reset')
