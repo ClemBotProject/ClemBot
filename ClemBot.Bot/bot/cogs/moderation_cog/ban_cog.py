@@ -48,6 +48,7 @@ class BanCog(commands.Cog):
                                              ctx.guild.id,
                                              embed)
 
+        # Ban AFTER dming the user, that way we know that we still share a guild with them
         await self.bot.messenger.publish(Events.on_bot_ban,
                                          guild=ctx.guild,
                                          author=ctx.author,

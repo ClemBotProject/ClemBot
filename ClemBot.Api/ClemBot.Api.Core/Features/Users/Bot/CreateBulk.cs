@@ -29,7 +29,13 @@ namespace ClemBot.Api.Core.Features.Users.Bot
         {
             public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                foreach (var user in request.Users)
+                var dbUsers = await _context.Users.ToListAsync();
+
+                var newUsers = request.Users
+                    .Where(x => dbUsers.All(y => y.Id != x.Id))
+                    .ToList();
+
+                foreach (var user in newUsers)
                 {
                     var userEntity = new User()
                     {
@@ -41,7 +47,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot
 
                 await _context.SaveChangesAsync();
 
-                return QueryResult<IEnumerable<ulong>>.Success(request.Users.Select(x => x.Id));
+                return QueryResult<IEnumerable<ulong>>.Success(newUsers.Select(x => x.Id));
             }
         }
     }

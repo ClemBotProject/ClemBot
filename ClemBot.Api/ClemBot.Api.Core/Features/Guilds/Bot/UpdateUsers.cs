@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
@@ -14,75 +13,73 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
 {
     public class UpdateUsers
     {
-        public class Validator : AbstractValidator<Command>
-        {
-            public Validator()
-            {
-                RuleFor(p => p.GuildId).NotNull();
-                RuleFor(p => p.Users).NotEmpty();
-            }
-        }
-
         public class UserDto
         {
-            public ulong Id { get; set; }
+            public ulong UserId { get; set; }
 
             public string? Name { get; set; }
         }
 
-        public record Command : IRequest<Result<ulong, QueryStatus>>
+        public record GuildDto
         {
             public ulong GuildId { get; init; }
 
             public IReadOnlyList<UserDto> Users { get; set; } = new List<UserDto>();
         }
 
-        public record Handler(ClemBotContext _context)
-            : IRequestHandler<Command, Result<ulong, QueryStatus>>
+        public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
         {
-            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            public IReadOnlyList<GuildDto> Guilds { get; set; } = new List<GuildDto>();
+        }
+
+        public record Handler(ClemBotContext _context)
+            : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+        {
+            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var guild = await _context.Guilds
-                    .Where(x => x.Id == request.GuildId)
+                var guilds = await _context.Guilds
                     .Include(y => y.Users)
-                    .FirstOrDefaultAsync();
+                    .ToListAsync();
 
                 var users = await _context.Users.ToListAsync();
 
-                if (guild is null)
+                foreach (var guild in request.Guilds)
                 {
-                    return QueryResult<ulong>.Conflict();
-                }
+                    var guildEntity = guilds.FirstOrDefault(x => x.Id == guild.GuildId);
 
-                foreach (var user in request.Users)
-                {
-                    var dbUser = users.FirstOrDefault(x => x.Id == user.Id);
-
-                    if (dbUser is null)
+                    if (guildEntity is null)
                     {
-                        var userEntity = new User
+                        continue;
+                    }
+
+                    foreach (var user in guild.Users)
+                    {
+                        var dbUser = users.FirstOrDefault(x => x.Id == user.UserId);
+
+                        if (dbUser is null)
                         {
-                            Id = user.Id,
-                            Name = user.Name
-                        };
-                        _context.Users.Add(userEntity);
-                        guild.Users.Add(userEntity);
+                            var userEntity = new User {Id = user.UserId, Name = user.Name};
+                            _context.Users.Add(userEntity);
+
+                            guildEntity.Users.Add(userEntity);
+                        }
+                        else if (!guildEntity.Users.Contains(dbUser))
+                        {
+                            guildEntity.Users.Add(dbUser);
+                        }
                     }
-                    else if (!guild.Users.Contains(dbUser))
+
+                    foreach (var user in guildEntity.Users
+                        .Where(x => guild.Users.All(y => y.UserId != x.Id)))
                     {
-                        guild.Users.Add(dbUser);
+                        _context.Users.Remove(user);
                     }
                 }
 
-                foreach (var user in guild.Users
-                    .Where(x => request.Users.All(y => y.Id != x.Id)).ToList())
-                {
-                    _context.Users.Remove(user);
-                }
 
                 await _context.SaveChangesAsync();
 
-                return QueryResult<ulong>.Success(request.GuildId);
+                return QueryResult<IEnumerable<ulong>>.Success(request.Guilds.Select(x => x.GuildId));
             }
         }
     }

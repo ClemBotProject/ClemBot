@@ -10,7 +10,7 @@ Logs/
 ClemBot.Bot/BotSecrets.json
 
 # Environments
-.env
+*.env
 .venv
 env/
 venv/

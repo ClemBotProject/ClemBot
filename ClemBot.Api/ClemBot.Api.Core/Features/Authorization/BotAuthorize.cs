@@ -35,14 +35,36 @@ namespace ClemBot.Api.Core.Features.Authorization
             public string Token { get; set; } = null!;
         }
 
-        public record Handler(ClemBotContext _context,
-                ILogger<BotAuthorize> _logger,
-                IHttpContextAccessor _httpContextAccessor,
-                IJwtAuthManager _jwtAuthManager,
-                JwtTokenConfig _jwtTokenConfig,
-                ApiKey _apiKey)
-            : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
+        public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
         {
+
+            private readonly ClemBotContext _context;
+
+            private readonly ILogger<BotAuthorize> _logger;
+
+            private readonly IHttpContextAccessor _httpContextAccessor;
+
+            private readonly IJwtAuthManager _jwtAuthManager;
+
+            private readonly JwtTokenConfig _jwtTokenConfig;
+
+            private readonly ApiKey _apiKey;
+
+            public Handler(ClemBotContext context,
+                ILogger<BotAuthorize> logger,
+                IHttpContextAccessor httpContextAccessor,
+                IJwtAuthManager jwtAuthManager,
+                JwtTokenConfig jwtTokenConfig,
+                ApiKey apiKey)
+            {
+                _context = context;
+                _logger = logger;
+                _httpContextAccessor = httpContextAccessor;
+                _jwtAuthManager = jwtAuthManager;
+                _jwtTokenConfig = jwtTokenConfig;
+                _apiKey = apiKey;
+            }
+
             public Task<Result<Model, AuthorizeStatus>> Handle(Query request,
                 CancellationToken cancellationToken)
             {
