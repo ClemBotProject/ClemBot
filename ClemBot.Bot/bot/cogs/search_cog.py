@@ -115,10 +115,11 @@ class SearchCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
 
     async def duck_search(self, query: str) -> SearchResult:
-        data = urlencode({ 
+        data = urlencode({
             "q": query,
             "format": "json",
             "pretty": 1,
+            "skip_disambig": 1,
             "t": "ClemBot"
         })
         log.debug(f'Search URL: {search_url}?{data}')
@@ -130,12 +131,10 @@ class SearchCog(commands.Cog):
         return SearchResult(response)
 
     async def results(self, ctx, result: SearchResult) -> discord.Message:
-        embed = discord.Embed(title=f'{result.title()} - {result.category().name()}', color=Colors.ClemsonOrange,
-                              description=result.abstract())
+        embed = discord.Embed(title=f'[{result.category().name()}] {result.title()} - {result.source()}',
+                              color=Colors.ClemsonOrange,
+                              description=f'{result.abstract()}\n\n**Link**: [{result.title()}]({result.url()})')
         embed.set_footer(text='Result provided by DuckDuckGo.', icon_url=icon_url)
-        details = f'**Link**: [{result.title()}]({result.url()})\n'
-        details += f'**Source**: {result.source()}'
-        embed.add_field(name='Details', value=details, inline=False)
         if result.has_related_topics():
             embed.add_field(name='Related Topics', value=result.related_topics_formatted(), inline=False)
         if result.has_thumbnail():
