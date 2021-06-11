@@ -112,10 +112,10 @@ class SearchCog(commands.Cog):
     async def search(self, ctx, *, query: str):
         result = await self.duck_search(query)
         msg = await self.results(ctx, result) if result.has_result() else await self.no_results(ctx, query)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=30)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
 
     async def duck_search(self, query: str) -> SearchResult:
-        data = urlencode({
+        data = urlencode({ 
             "q": query,
             "format": "json",
             "pretty": 1,
