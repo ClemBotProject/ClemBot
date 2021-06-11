@@ -4,8 +4,10 @@ appdirs==1.4.3
 astroid==2.3.3
 async-timeout==3.0.1
 asynctest==0.13.0
+atomicwrites==1.4.0
 attrs==19.3.0
 bandit==1.6.2
+beautifulsoup4==4.9.3
 CacheControl==0.12.6
 certifi==2020.6.20
 chardet==3.0.4
@@ -31,6 +33,8 @@ isort==4.3.21
 lazy-object-proxy==1.4.3
 lockfile==0.12.2
 markdownify==0.9.0
+marshmallow==3.12.1
+marshmallow-enum==1.5.1
 mccabe==0.6.1
 mock==4.0.2
 more-itertools==8.4.0
@@ -61,11 +65,15 @@ PyYAML==5.4
 requests==2.24.0
 retrying==1.3.3
 rope==0.17.0
-six==1.14.0
+six==1.16.0
 smmap==3.0.2
+soupsieve==2.2.1
 stevedore==1.32.0
+stringcase==1.2.0
 toml==0.10.1
 typed-ast==1.4.1
+typing-extensions==3.10.0.0
+typing-inspect==0.7.1
 urllib3==1.25.9
 virtualenv==20.0.31
 webencodings==0.5.1
