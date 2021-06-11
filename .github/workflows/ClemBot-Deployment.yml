@@ -21,9 +21,9 @@ jobs:
             - name: Run Deploy Commands
               run: |
                 cd ~/ClemBot
-                git pull origin master
-                docker-compose up -d --force-recreate --no-deps --build clembot.api
-                docker-compose up -d --force-recreate --no-deps --build clembot.bot
+                git pull origin master --rebase
+                docker-compose build
+                docker-compose up -d
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
