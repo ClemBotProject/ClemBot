@@ -102,11 +102,11 @@ class ModerationRoute(BaseRoute):
     async def get_infraction(self, infraction_id: int) -> t.Optional[Infraction]:
         return await self._client.get(f'infractions/{infraction_id}')
 
-    async def get_guild_infractions(self, guild_id: int) -> t.Optional[t.Iterator[Infraction]]:
+    async def get_guild_infractions(self, guild_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'guilds/{guild_id}/infractions')
 
         if not resp:
-            return None
+            return []
 
         return [Infraction.from_dict(i) for i in resp]
 
