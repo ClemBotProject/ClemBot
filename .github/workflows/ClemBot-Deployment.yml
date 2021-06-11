@@ -3,8 +3,6 @@ name: ClemBot.Api Prod Deployment
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
   workflow_dispatch:
     inputs:
       name:
