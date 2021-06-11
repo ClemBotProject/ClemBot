@@ -30,6 +30,7 @@ ipaddr==2.2.0
 isort==4.3.21
 lazy-object-proxy==1.4.3
 lockfile==0.12.2
+markdownify==0.9.0
 mccabe==0.6.1
 mock==4.0.2
 more-itertools==8.4.0
