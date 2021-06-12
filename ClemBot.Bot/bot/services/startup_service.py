@@ -53,6 +53,11 @@ class StartupService(BaseService):
             self.bot.is_starting_up = False
             return
 
+        if bot_secrets.secrets.bot_only:
+            log.warning('Skipping internal state reset in bot_only deployment')
+            self.bot.is_starting_up = False
+            return
+
         log.info('Starting development bot startup internal state reset')
 
         # First load any new guilds so that we can reference them
