@@ -64,6 +64,10 @@ class ClemBot(commands.Bot):
         self.load_cogs()
         self.active_services = {}
 
+        # Bool to indicate if the bot is still in its startup procedure, if it is then
+        # Dont forward events until its done
+        self.is_starting_up = True
+
         # Create a task to handle service and api startup
         self.loop.create_task(self.bot_startup())
 
@@ -254,7 +258,8 @@ class ClemBot(commands.Bot):
 
     async def publish_with_error(self, *args, **kwargs):
         try:
-            await self.messenger.publish(*args, **kwargs)
+            if not self.is_starting_up:
+                await self.messenger.publish(*args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)

@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import os
 
 from bot.services.base_service import BaseService
+import bot.bot_secrets as bot_secrets
 
 log = logging.getLogger(__name__)
 
@@ -25,32 +27,16 @@ class StartupService(BaseService):
         await asyncio.gather(*tasks)
 
     async def load_users(self):
-        db_users = await self.bot.user_route.get_users_ids()
-        new_users = [u for u in self.bot.users if u.id not in db_users]
-
-        await self.bot.user_route.create_user_bulk(new_users)
+        await self.bot.user_route.create_user_bulk(self.bot.users)
 
     async def load_users_guilds(self):
-        tasks = []
-        for guild in self.bot.guilds:
-            log.info(f'Reloading guild {guild.name}: {guild.id} internal User state')
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_users(guild.id, guild.members)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_users(self.bot.guilds)
 
     async def load_roles(self):
-        tasks = []
-        for g in self.bot.guilds:
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_roles(g.id, g.roles)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_roles(self.bot.guilds)
 
     async def load_channels(self):
-        tasks = []
-        for g in self.bot.guilds:
-            tasks.append(asyncio.create_task(self.bot.guild_route.update_guild_channels(g.id, g.channels)))
-
-        await asyncio.gather(*tasks)
+        await self.bot.guild_route.update_guild_channels(self.bot.guilds)
 
     @staticmethod
     def get_full_name(author) -> str:
@@ -58,7 +44,21 @@ class StartupService(BaseService):
 
     async def load_service(self):
 
-        log.info('Starting bot startup internal state reset')
+        # The startup load is too heavy on prod to reset state everytime we restart,
+        # So we should only do this on dev bots. We rely on the 24/7 uptime of the bot to
+        # Keep the database in sync. Future solutions to this problem
+        # Should be heavily researched
+        if bool(os.environ.get('PROD')):
+            log.warning('Skipping internal state reset on prod deployment')
+            self.bot.is_starting_up = False
+            return
+
+        if bot_secrets.secrets.bot_only:
+            log.warning('Skipping internal state reset in bot_only deployment')
+            self.bot.is_starting_up = False
+            return
+
+        log.info('Starting development bot startup internal state reset')
 
         # First load any new guilds so that we can reference them
         log.info('Resetting Guilds')
@@ -80,3 +80,5 @@ class StartupService(BaseService):
         # Reset active channels, send all channels to the backend and delete any not present and add any that are new
         log.info('Resetting Guild Channels state')
         await self.load_channels()
+
+        self.bot.is_starting_up = False

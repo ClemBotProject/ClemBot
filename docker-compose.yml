@@ -10,7 +10,7 @@ services:
         - ClemBot.Api/ClemBot.Api_env.env
   # Create the python eval container for sandboxed python code execution
   snekbox:
-    image: pythondiscord/snekbox:latest
+    image: ghcr.io/python-discord/snekbox:latest
     init: true
     ipc: none
     networks: 

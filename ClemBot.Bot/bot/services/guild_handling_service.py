@@ -20,9 +20,9 @@ class GuildHandlingService(BaseService):
 
         await self.bot.guild_route.add_guild(guild.id, guild.name)
 
-        await self.bot.guild_route.update_guild_users(guild.id, guild.members)
+        await self.bot.guild_route.update_guild_users([guild])
 
-        await self.bot.guild_route.update_guild_roles(guild.id, guild.roles)
+        await self.bot.guild_route.update_guild_roles([guild])
 
         # The guild has been initialized, broadcast this to the rest
         # of the services

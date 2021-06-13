@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Core.Security;
 using ClemBot.Api.Core.Security.JwtToken;
 using ClemBot.Api.Core.Security.Policies;
@@ -65,6 +66,7 @@ namespace ClemBot.Api.Core
             services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
             services.AddMediatR(typeof(Startup));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
             // Specify Swagger startup options
             services.AddSwaggerGen(o => {

@@ -169,9 +169,6 @@ class ModerationService(BaseService):
         for guild in self.bot.guilds:
             mutes = await self.bot.moderation_route.get_guild_infractions(guild.id)
 
-            if not mutes:
-                mutes = []
-
             for mute in (m for m in mutes if m.type == Infractions.mute and m.active):
                 wait: datetime = datetime.strptime(mute.duration, '%Y-%m-%dT%H:%M:%S.%f')
                 member = guild.get_member(mute.subject_id)
