@@ -18,9 +18,10 @@ class TagRoute(BaseRoute):
         }
         await self._client.post('tags', data=json, **kwargs)
 
-    async def edit_tag(self, guild_id: int, name: str, content: str, **kwargs):
+    async def edit_tag(self, guild_id: int, user_id: int, name: str, content: str, **kwargs):
         json = {
             'GuildId': guild_id,
+            'UserId': user_id,
             'Name': name,
             'Content': content
         }
@@ -29,7 +30,7 @@ class TagRoute(BaseRoute):
     async def get_tag(self, guild_id: int, name: str):
         json = {
             'GuildId': guild_id,
-            'Name': name,
+            'Name': name.lower(),
         }
         return await self._client.get('tags', data=json)
 

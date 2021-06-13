@@ -51,7 +51,6 @@ class TagCog(commands.Cog):
 
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
 
-        pages = []
         # check for if no tags exist in this server
         if not tags:
             embed = discord.Embed(title=f'Available Tags', color=Colors.ClemsonOrange)
@@ -62,22 +61,7 @@ class TagCog(commands.Cog):
 
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
-        for chunk in self.chunk_list([role['name'] for role in tags], TAG_CHUNK_SIZE):
-
-            # we need to create the columns on the page so chunk the list again
-            content = ''
-            for col in self.chunk_list(chunk, 3):
-                # the columns wont have the perfect number of elements every time, we need to append spaces if
-                # the list entries is less then the number of columns
-                while len(col) < 3:
-                    col.append(' ')
-
-                # Concatenate the formatted column string to the page content string
-                content += "{: <20} {: <20} {: <20}\n".format(*col)
-
-            # Append the content string to the list of pages to send to the paginator
-            # Marked as a code block to ensure a monospaced font and even columns
-            pages.append(f'```{content}```')
+        pages = self.chunked_pages([role['name'] for role in tags], TAG_CHUNK_SIZE)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_text,
@@ -93,11 +77,8 @@ class TagCog(commands.Cog):
         'Creates a tag with a given name and value that can be invoked at any time in the future'
     )
     @ext.short_help('Creates a tag')
-    @ext.example('tag add mytagname mytagcontnt')
+    @ext.example('tag add mytagname mytagcontent')
     async def add(self, ctx, name: str, *, content: str):
-
-        name = name.lower()
-
         is_admin = ctx.author.guild_permissions.administrator
         if len(content.split('\n')) > MAX_NON_ADMIN_LINE_LENGTH and not is_admin:
             embed = discord.Embed(title=f'Error: Tag line number exceeds  {MAX_NON_ADMIN_LINE_LENGTH} lines', color=Colors.Error)
@@ -171,25 +152,74 @@ class TagCog(commands.Cog):
     @ext.short_help('Provides info about tag')
     @ext.example('tag info mytagname')
     async def info(self, ctx, name):
-
-        name = name.lower()
-
         if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name)):
             embed = discord.Embed(title=f'Error: Tag {name} does not exist', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
-        author = self.bot.get_user(tag['userId'])
-
-        embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange)
+        author = ctx.guild.get_member(tag['userId'])
+        description = '⚠️ This tag is unclaimed.' if author is None else ''
+        embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange, description=description)
         embed.add_field(name='Name ', value=tag['name'])
-        embed.add_field(name='Content ', value=tag['content'])
-        embed.add_field(name='Uses ', value=tag['useCount'], inline=False)
-        full_name_get = self.get_full_name(author)
-        embed.add_field(name='Creation Date: ', value=tag['time'], inline=False)
-        embed.set_footer(text=full_name_get, icon_url=author.avatar_url)
-
+        embed.add_field(name='Content ', value=tag['content'], inline=False)
+        embed.add_field(name='Uses ', value=tag['useCount'], inline=True)
+        embed.add_field(name='Creation Date', value=tag['time'], inline=True)
+        if author is not None:
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
         await ctx.send(embed=embed)
+
+    @tag.command()
+    @ext.required_claims(Claims.tag_add)
+    @ext.long_help('Claims a tag with the given name as your own')
+    @ext.example('tag claim mytagname')
+    async def claim(self, ctx, name: str):
+        tag = await self.bot.tag_route.get_tag(ctx.guild.id, name)
+        if not tag:
+            embed = discord.Embed(title=f'Error: Tag {name} does not exist', color=Colors.Error)
+            await ctx.send(embed=embed)
+            return
+
+        author = ctx.guild.get_member(tag['userId'])
+        if author is not None:
+            embed = discord.Embed(title=f'Error: Tag {name} is already claimed', color=Colors.Error)
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+            await ctx.send(embed=embed)
+            return
+
+        await self.bot.tag_route.edit_tag(ctx.guild.id, ctx.message.author.id, tag['name'], tag['content'])
+        embed = discord.Embed(title=f':white_check_mark: Tag successfully claimed', color=Colors.ClemsonOrange)
+        embed.add_field(name='Name', value=tag['name'], inline=True)
+        embed.add_field(name='Content', value=tag['content'], inline=True)
+        await ctx.send(embed=embed)
+
+    @tag.command(aliases=['unowned'])
+    @ext.long_help('Gets a list of all unowned tags available to be claimed')
+    @ext.example(['tag unclaimed', 'tag unowned'])
+    async def unclaimed(self, ctx):
+        guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
+        unclaimed_tags = list[str]()
+        for t in guild_tags[0::]:
+            if ctx.guild.get_member(t['userId']) is None:
+                unclaimed_tags.append(t['name'])
+
+        author = ctx.author
+        if len(unclaimed_tags) == 0:
+            embed = discord.Embed(title='No Unclaimed Tags', color=Colors.Error,
+                                  description='There are no unclaimed tags in this guild.')
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+            await ctx.send(embed=embed)
+            return
+
+        # chunk the unclaimed tags into pages
+        pages = self.chunked_pages(unclaimed_tags, TAG_CHUNK_SIZE)
+
+        # send the pages to the paginator service
+        await self.bot.messenger.publish(Events.on_set_pageable_text,
+                                         embed_name='Unclaimed Tags',
+                                         field_title='Unclaimed:',
+                                         pages=pages,
+                                         author=ctx.author,
+                                         channel=ctx.channel)
 
     async def _delete_tag(self, name, ctx):
         content = await self.bot.tag_route.get_tag_content(ctx.guild.id, name)
@@ -208,6 +238,25 @@ class TagCog(commands.Cog):
         """Yield successive n-sized chunks from lst."""
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
+
+    def chunked_pages(self, tags_list: list, n: int):
+        """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
+        pages = []
+        for chunk in self.chunk_list(tags_list, n):
+            content = ''
+            for col in self.chunk_list(chunk, 3):
+                # the columns wont have the perfect number of elements every time, we need to append spaces if
+                # the list entries is less then the number of columns
+                while len(col) < 3:
+                    col.append(' ')
+
+                # Concatenate the formatted column string to the page content string
+                content += "{: <20} {: <20} {: <20}\n".format(*col)
+
+            # Append the content string to the list of pages to send to the paginator
+            # Marked as a code block to ensure a monospaced font and even columns
+            pages.append(f'```{content}```')
+        return pages
 
 
 def setup(bot):

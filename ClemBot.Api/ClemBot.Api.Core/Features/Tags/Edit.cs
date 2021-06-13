@@ -31,9 +31,11 @@ namespace ClemBot.Api.Core.Features.Tags
         {
             public ulong GuildId { get; set; }
 
-            public string Name { get; set; } = null!;
+            public string? Name { get; set; }
 
-            public string Content { get; set; } = null!;
+            public string? Content { get; set; }
+
+            public ulong? UserId { get; set; }
         }
 
         public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<TagDto, QueryStatus>>
@@ -48,7 +50,9 @@ namespace ClemBot.Api.Core.Features.Tags
                     return QueryResult<TagDto>.NotFound();
                 }
 
-                tag.Content = request.Content;
+                tag.Content = request.Content ?? tag.Content;
+                tag.Name = request.Name ?? tag.Name;
+                tag.UserId = request.UserId ?? tag.UserId;
                 await _context.SaveChangesAsync();
 
                 return QueryResult<TagDto>.Success(new TagDto()
