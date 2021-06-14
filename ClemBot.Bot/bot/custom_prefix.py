@@ -5,6 +5,7 @@ from discord.ext import commands
 
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
+from bot.errors import PrefixRequestError
 
 log = logging.getLogger(__name__)
 
@@ -27,8 +28,9 @@ class CustomPrefix:
                 # Try to grab the prefixes from the db, raise an error on failure
                 # so we know to fallback to the default prefix
                 prefixes = await bot.custom_prefix_route.get_custom_prefixes(message.guild.id, raise_on_error=True)
-            except Exception:
-                pass
+            except Exception as e:
+                log.error(f'Custom prefix request failed with error: {e}')
+                raise PrefixRequestError('Requesting custom prefix from the api failed')
 
         if len(prefixes) == 0:
             prefixes = [self.default]
