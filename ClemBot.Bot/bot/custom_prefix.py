@@ -28,8 +28,8 @@ class CustomPrefix:
                 # Try to grab the prefixes from the db, raise an error on failure
                 # so we know to fallback to the default prefix
                 prefixes = await bot.custom_prefix_route.get_custom_prefixes(message.guild.id, raise_on_error=True)
-            except Exception:
-                log.error('Custom prefix request failed: falling back to mention as the default')
+            except Exception as e:
+                log.error(f'Custom prefix request failed with error: {e}')
                 raise PrefixRequestError('Requesting custom prefix from the api failed')
 
         if len(prefixes) == 0:
