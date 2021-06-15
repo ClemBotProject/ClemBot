@@ -181,7 +181,7 @@ class ApiClient:
             req_args['json'] = body
 
         async with self.session.request(**req_args) as resp:
-            if resp.status == 200:
+            if resp.status == HTTPStatus.OK:
                 return Result(resp.status, await resp.json())
 
             log.error(f'Request at endpoint "{endpoint}" returned non 200 error code {resp.status}')
@@ -193,6 +193,7 @@ class ApiClient:
         raise_on_error = kwargs.get('raise_on_error', False),
         body = kwargs.get('data', None)
 
+        # If we are in bot_only mode stop the request and report that
         if self.bot_only:
             raise BotOnlyRequestError("Request Failed: Bot is in bot_only mode")
 
@@ -206,27 +207,90 @@ class ApiClient:
                                        raise_on_error=raise_on_error,
                                        body=body)
 
+        # The request errored out and had raise_for_status enabled
+        except aiohttp.ClientResponseError as e:
+            # Check if the error was an HTTP 401 Unauthorized, this means we need to try
+            # and reconnect to the api before we raise the error further
+            if e.status == HTTPStatus.UNAUTHORIZED:
+                asyncio.create_task(self._disconnected())
+            # Rethrow the error so it can be reported by the handlers
+            raise e
+
+        # The request failed because the Api didn't respond
+        # put the client in reconnect mode and raise an error
         except aiohttp.ClientConnectorError:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
-        if resp.status == 401:
+        # Check if the response returned an HTTP 401 Unauthorized with raise_for_status set to False
+        # We still need to handle that case and put the client in reconnect mode
+        if resp.status == HTTPStatus.UNAUTHORIZED:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
         return resp.value
 
     async def get(self, endpoint: str, **kwargs):
+        """
+        Sends an HTTP GET Method to ClemBot.Api
+
+        @param endpoint: The route to make a request too
+        @param kwargs:
+            data: (Optional) The json request body
+            raise_on_error: (Optional) (Defaults to False) Flag to tell the client to raise an exception
+            for status codes above 400
+        @return:
+        """
         return await self._request_or_reconnect(HttpRequestType.get, endpoint, **kwargs)
 
     async def post(self, endpoint: str, **kwargs):
+        """
+        Sends an HTTP POST Method to ClemBot.Api
+
+        @param endpoint: The route to make a request too
+        @param kwargs:
+            data: (Optional) The json request body
+            raise_on_error: (Optional) (Defaults to False) Flag to tell the client to raise an exception
+            for status codes above 400
+        @return:
+        """
         return await self._request_or_reconnect(HttpRequestType.post, endpoint, **kwargs)
 
     async def patch(self, endpoint: str, **kwargs):
+        """
+        Sends an HTTP PATCH Method to ClemBot.Api
+
+        @param endpoint: The route to make a request too
+        @param kwargs:
+            data: (Optional) The json request body
+            raise_on_error: (Optional) (Defaults to False) Flag to tell the client to raise an exception
+            for status codes above 400
+        @return:
+        """
         return await self._request_or_reconnect(HttpRequestType.patch, endpoint, **kwargs)
 
     async def put(self, endpoint: str, **kwargs):
+        """
+        Sends an HTTP PUT Method to ClemBot.Api
+
+        @param endpoint: The route to make a request too
+        @param kwargs:
+            data: (Optional) The json request body
+            raise_on_error: (Optional) (Defaults to False) Flag to tell the client to raise an exception
+            for status codes above 400
+        @return:
+        """
         return await self._request_or_reconnect(HttpRequestType.put, endpoint, **kwargs)
 
     async def delete(self, endpoint: str, **kwargs):
+        """
+        Sends an HTTP DELETE Method to ClemBot.Api
+
+        @param endpoint: The route to make a request too
+        @param kwargs:
+            data: (Optional) The json request body
+            raise_on_error: (Optional) (Defaults to False) Flag to tell the client to raise an exception
+            for status codes above 400
+        @return:
+        """
         return await self._request_or_reconnect(HttpRequestType.delete, endpoint, **kwargs)
