@@ -18,10 +18,7 @@ jobs:
             - uses: actions/checkout@v2
             - name: Run Deploy Commands
               run: |
-                cd ~/ClemBot
-                git pull origin master --rebase
-                docker-compose build
-                docker-compose up -d
+                ~/deploy.sh
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
