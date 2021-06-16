@@ -18,14 +18,14 @@ namespace ClemBot.Api.Core.Features.ClaimMappings.Bot
         {
             public Validator()
             {
-                RuleFor(p => p.BotAuthClaim).NotNull();
+                RuleFor(p => p.Claim).NotNull();
                 RuleFor(p => p.RoleId).NotNull();
             }
         }
 
         public class Command : IRequest<Result<ulong, QueryStatus>>
         {
-            public BotAuthClaims BotAuthClaim { get; set; }
+            public BotAuthClaims Claim { get; set; }
 
             public ulong RoleId { get; set; }
         }
@@ -36,7 +36,7 @@ namespace ClemBot.Api.Core.Features.ClaimMappings.Bot
             {
                 var claimMapping = new ClaimsMapping
                 {
-                    Claim = request.BotAuthClaim,
+                    Claim = request.Claim,
                     RoleId = request.RoleId
                 };
 
@@ -48,7 +48,7 @@ namespace ClemBot.Api.Core.Features.ClaimMappings.Bot
                 }
 
                 var dbClaim = await _context.ClaimsMappings
-                    .FirstOrDefaultAsync(x => x.RoleId == request.RoleId && x.Claim == request.BotAuthClaim);
+                    .FirstOrDefaultAsync(x => x.RoleId == request.RoleId && x.Claim == request.Claim);
 
                 if (dbClaim is null)
                 {

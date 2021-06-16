@@ -43,7 +43,7 @@ class ClaimRoute(BaseRoute):
         return claims
 
     async def check_claim_role(self, claim: Claims, role: discord.Role) -> bool:
-        return claim in await self.get_claims_role(role.id)
+        return claim.name in await self.get_claims_role(role.id)
 
     async def check_claim_user(self, claim: Claims, user: discord.Member) -> bool:
-        return claim in await self.get_claims_user(user)
+        return claim.name in await self.get_claims_user(user)
