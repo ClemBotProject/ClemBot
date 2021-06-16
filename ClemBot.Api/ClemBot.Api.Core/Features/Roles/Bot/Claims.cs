@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -30,6 +31,12 @@ namespace ClemBot.Api.Core.Features.Roles.Bot
                 if (role is null)
                 {
                     return QueryResult<IEnumerable<BotAuthClaims>>.NotFound();
+                }
+
+                // Role is admin and has full claim permissions no matter what
+                if (role.Admin)
+                {
+                    return QueryResult<IEnumerable<BotAuthClaims>>.Success(Enum.GetValues<BotAuthClaims>());
                 }
 
                 return QueryResult<IEnumerable<BotAuthClaims>>.Success(role.Claims.Select(x => x.Claim));
