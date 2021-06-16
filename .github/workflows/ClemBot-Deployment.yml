@@ -16,9 +16,21 @@ jobs:
         runs-on: [self-hosted]
         steps:
             - uses: actions/checkout@v2
-            - name: Run Deploy Commands
+            - name: Navigate to repo
               run: |
-                ~/deploy.sh
+                cd ~/ClemBot
+            - name: Pull latest changes
+              run: |
+                git pull origin master --rebase
+            - name: Build updated Docker Images
+              run: |
+                docker-compose build
+            - name: Deploy updated images
+              run: |
+                docker-compose up -d
+            - name: Prune old images and containers
+              run: |
+                docker system prune -f
             - name: Discord notification
               env:
                 DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
