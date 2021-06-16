@@ -25,9 +25,11 @@ jobs:
             - uses: actions/checkout@v2
             - name: Pull latest changes
               run: |
+                ls
                 git pull origin master --rebase
             - name: Build updated Docker Images
               run: |
+                ls
                 docker-compose build
             - name: Deploy updated images
               run: |
