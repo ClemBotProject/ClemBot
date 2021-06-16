@@ -63,3 +63,9 @@ class BotOnlyRequestError(Exception):
 
     def __init__(self, message):
         self.message = message
+
+
+class PrefixRequestError(Exception):
+
+    def __init__(self, message):
+        self.message = message
