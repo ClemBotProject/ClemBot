@@ -1,10 +1,10 @@
 import logging
-from dataclasses import dataclass
-
 import discord
+import typing as t
+import bot.extensions as ext
 import discord.ext.commands as commands
 
-import bot.extensions as ext
+from bot.api.tag_route import Tag
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 
@@ -14,15 +14,6 @@ MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
 TAG_CHUNK_SIZE = 15 * 3
 MAX_NON_ADMIN_LINE_LENGTH = 10
-
-
-@dataclass
-class Tag:
-    name: str
-    content: str
-    creation_date: str
-    guild_id: int
-    user_id: int
 
 
 class TagCog(commands.Cog):
@@ -129,8 +120,6 @@ class TagCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        # tag = await tag_repo.get_tag(name, ctx.guild.id)
-
         if tag['userId'] == ctx.author.id:
             await self._delete_tag(name, ctx)
             return
@@ -173,13 +162,10 @@ class TagCog(commands.Cog):
     @ext.long_help('Claims a tag with the given name as your own')
     @ext.example('tag claim mytagname')
     async def claim(self, ctx, name: str):
-        tag = await self.bot.tag_route.get_tag(ctx.guild.id, name)
+        tag = self._check_tag_exists(ctx, name)
         if not tag:
-            embed = discord.Embed(title=f'Error: Tag {name} does not exist', color=Colors.Error)
-            await ctx.send(embed=embed)
             return
-
-        author = ctx.guild.get_member(tag['userId'])
+        author = ctx.guild.get_member(tag.)
         if author is not None:
             embed = discord.Embed(title=f'Error: Tag {name} is already claimed', color=Colors.Error)
             embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
@@ -188,7 +174,7 @@ class TagCog(commands.Cog):
 
         await self.bot.tag_route.edit_tag(ctx.guild.id, ctx.message.author.id, tag['name'], tag['content'])
         embed = discord.Embed(title=f':white_check_mark: Tag successfully claimed', color=Colors.ClemsonOrange)
-        embed.add_field(name='Name', value=tag['name'], inline=True)
+        embed.add_field(name='Name', value, inline=True)
         embed.add_field(name='Content', value=tag['content'], inline=True)
         await ctx.send(embed=embed)
 
@@ -198,9 +184,9 @@ class TagCog(commands.Cog):
     async def unclaimed(self, ctx):
         guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
         unclaimed_tags = list[str]()
-        for t in guild_tags[0::]:
-            if ctx.guild.get_member(t['userId']) is None:
-                unclaimed_tags.append(t['name'])
+        for tag in guild_tags[0::]:
+            if ctx.guild.get_member(tag.user_id) is None:
+                unclaimed_tags.append(tag.name)
 
         author = ctx.author
         if len(unclaimed_tags) == 0:
@@ -221,6 +207,13 @@ class TagCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel)
 
+    @tag.command(aliases=['give'])
+    @ext.required_claims(Claims.tag_add)
+    @ext.long_help('Transfers the tag to the given user.')
+    @ext.example(['tag transfer tagname @user', 'tag give tagname @user'])
+    async def transfer(self, ctx, name: str, user: discord.User):
+        pass
+
     async def _delete_tag(self, name, ctx):
         content = await self.bot.tag_route.get_tag_content(ctx.guild.id, name)
 
@@ -230,6 +223,24 @@ class TagCog(commands.Cog):
         embed.add_field(name='Name', value=name, inline=True)
         embed.add_field(name='Content', value=content, inline=True)
         await ctx.send(embed=embed)
+
+    async def _check_tag_exists(self, ctx, name: str) -> None:
+        """
+        Checks if the given tag exists.
+        If so, returns the tag.
+        If not, sends message and returns nothing.
+        """
+        tag = await self.bot.tag_route.get_tag(ctx.guild.id, name)
+        if not tag:
+            embed = discord.Embed(title=f'Error', color=Colors.Error,
+                                  description=f"Requested tag '{name}' does not exist.")
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=embed)
+            return None
+        return tag
+
+    async def _check_tag_owner(self, ctx, tag: Tag) -> t.Optional[discord.User]:
+        pass
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
