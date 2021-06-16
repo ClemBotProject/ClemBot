@@ -6,6 +6,7 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Messages.Bot
 {
@@ -49,6 +50,11 @@ namespace ClemBot.Api.Core.Features.Messages.Bot
                     UserId = request.UserId,
                     ChannelId = request.ChannelId
                 };
+
+                if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
+                {
+                    return QueryResult<ulong>.NotFound();
+                }
 
                 message.Contents.Add(new MessageContent()
                 {
