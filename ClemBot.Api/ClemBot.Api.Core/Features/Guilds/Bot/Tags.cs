@@ -22,7 +22,13 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
 
             public string Content { get; init; } = null!;
 
+            public string CreationDate { get; init; } = null!;
+
+            public ulong GuildId { get; init; }
+
             public ulong UserId { get; init; }
+
+            public int UseCount { get; init; }
         }
 
         public record QueryHandler(ClemBotContext _context)
@@ -41,7 +47,15 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                 }
 
                 return QueryResult<IEnumerable<Model>>.Success(tags
-                    .Select(tag => new Model { Name = tag.Name, Content = tag.Content, UserId = tag.UserId }));
+                    .Select(tag => new Model
+                    {
+                        Name = tag.Name,
+                        Content = tag.Content,
+                        CreationDate = tag.Time.ToLongDateString(),
+                        UserId = tag.UserId,
+                        GuildId = tag.GuildId,
+                        UseCount = tag.TagUses.Count
+                    }));
             }
         }
     }

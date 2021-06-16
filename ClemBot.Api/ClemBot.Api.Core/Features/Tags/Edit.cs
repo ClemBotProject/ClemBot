@@ -59,8 +59,8 @@ namespace ClemBot.Api.Core.Features.Tags
                     return QueryResult<TagDto>.NotFound();
                 }
 
+                tag.Name = request.Name;
                 tag.Content = request.Content ?? tag.Content;
-                tag.Name = request.Name ?? tag.Name;
                 tag.UserId = request.UserId ?? tag.UserId;
                 await _context.SaveChangesAsync();
 

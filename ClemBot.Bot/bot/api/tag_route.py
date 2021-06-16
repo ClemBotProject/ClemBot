@@ -13,6 +13,7 @@ class Tag(DataClassJsonMixin):
     creation_date: str
     guild_id: int
     user_id: int
+    use_count: int
 
 
 class TagRoute(BaseRoute):
@@ -20,7 +21,7 @@ class TagRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def create_tag(self, name: str, content: str, guild_id: int, user_id: int, **kwargs) -> Tag:
+    async def create_tag(self, name: str, content: str, guild_id: int, user_id: int, **kwargs) -> t.Optional[Tag]:
         json = {
             'Name': name.lower(),
             'Content': content,
@@ -29,8 +30,7 @@ class TagRoute(BaseRoute):
         }
         return Tag.from_dict(await self._client.post('tags', data=json, **kwargs))
 
-    async def edit_tag(self, guild_id: int, name: str,
-                       content: t.Optional[str] = None, user_id: t.Optional[int] = None, **kwargs) -> Tag:
+    async def edit_tag(self, guild_id: int, name: str, content: str, user_id: int, **kwargs) -> t.Optional[Tag]:
         json = {
             'GuildId': guild_id,
             'UserId': user_id,

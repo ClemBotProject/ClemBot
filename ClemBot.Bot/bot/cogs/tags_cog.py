@@ -38,7 +38,7 @@ class TagCog(commands.Cog):
                 embed = discord.Embed(title=f'Error: Tag "{tag_name}" does not exist in this server', color=Colors.Error)
                 return await ctx.send(embed=embed)
             await self.bot.tag_route.add_tag_use(ctx.guild.id, tag_name, ctx.channel.id, ctx.author.id)
-            return await ctx.send(tag['content'])
+            return await ctx.send(tag.content)
 
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
 
@@ -52,7 +52,7 @@ class TagCog(commands.Cog):
 
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
-        pages = self.chunked_pages([role['name'] for role in tags], TAG_CHUNK_SIZE)
+        pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_text,
@@ -72,12 +72,12 @@ class TagCog(commands.Cog):
     async def add(self, ctx, name: str, *, content: str):
         is_admin = ctx.author.guild_permissions.administrator
         if len(content.split('\n')) > MAX_NON_ADMIN_LINE_LENGTH and not is_admin:
-            embed = discord.Embed(title=f'Error: Tag line number exceeds  {MAX_NON_ADMIN_LINE_LENGTH} lines', color=Colors.Error)
+            embed = discord.Embed(title=f'Error: Tag line number exceeds {MAX_NON_ADMIN_LINE_LENGTH} lines', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
         if len(content) > MAX_TAG_CONTENT_SIZE:
-            embed = discord.Embed(title=f'Error: Tag content exceeds  {MAX_TAG_CONTENT_SIZE} characters', color=Colors.Error)
+            embed = discord.Embed(title=f'Error: Tag content exceeds {MAX_TAG_CONTENT_SIZE} characters', color=Colors.Error)
             await ctx.send(embed=embed)
             return
 
@@ -110,17 +110,10 @@ class TagCog(commands.Cog):
     @ext.short_help('Deletes a tag')
     @ext.example('tag delete mytagname')
     async def delete(self, ctx: commands.Context, name):
-
-        name = name.lower()
-
-        tag = await self.bot.tag_route.get_tag(ctx.guild.id, name)
-
-        if not tag:
-            embed = discord.Embed(title=f'Error: tag {name} does not exist', color=Colors.Error)
-            await ctx.send(embed=embed)
+        if not (tag := await self._check_tag_exists(ctx, name)):
             return
 
-        if tag['userId'] == ctx.author.id:
+        if tag.user_id == ctx.author.id:
             await self._delete_tag(name, ctx)
             return
 
@@ -130,8 +123,9 @@ class TagCog(commands.Cog):
             await self._delete_tag(name, ctx)
             return
 
-        error_str = f'Error: You do not have the tag_delete claim or you do not own this tag'
-        embed = discord.Embed(title=error_str, color=Colors.Error)
+        embed = discord.Embed(title='Error', color=Colors.Error,
+                              description='You do not have the `tag_delete` claim or you do not own this tag.')
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['about'])
@@ -140,45 +134,42 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Provides info about tag')
     @ext.example('tag info mytagname')
-    async def info(self, ctx, name):
-        if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name)):
-            embed = discord.Embed(title=f'Error: Tag {name} does not exist', color=Colors.Error)
-            await ctx.send(embed=embed)
+    async def info(self, ctx, name: str):
+        if not (tag := await self._check_tag_exists(ctx, name)):
             return
-
-        author = ctx.guild.get_member(tag['userId'])
-        description = '⚠️ This tag is unclaimed.' if author is None else ''
-        embed = discord.Embed(title='Tag Information:', color=Colors.ClemsonOrange, description=description)
-        embed.add_field(name='Name ', value=tag['name'])
-        embed.add_field(name='Content ', value=tag['content'], inline=False)
-        embed.add_field(name='Uses ', value=tag['useCount'], inline=True)
-        embed.add_field(name='Creation Date', value=tag['time'], inline=True)
+        author = ctx.guild.get_member(tag.user_id)
+        description = ':warning: This tag is unclaimed.' if author is None else ''
+        embed = discord.Embed(title='Tag Information', color=Colors.ClemsonOrange, description=description)
+        embed.add_field(name='Name ', value=tag.name)
+        embed.add_field(name='Content ', value=tag.content, inline=False)
+        embed.add_field(name='Uses ', value=f'{tag.use_count}', inline=True)
+        embed.add_field(name='Creation Date', value=tag.creation_date, inline=True)
         if author is not None:
             embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
         await ctx.send(embed=embed)
 
     @tag.command()
     @ext.required_claims(Claims.tag_add)
+    @ext.short_help('Claims a tag')
     @ext.long_help('Claims a tag with the given name as your own')
     @ext.example('tag claim mytagname')
     async def claim(self, ctx, name: str):
-        tag = self._check_tag_exists(ctx, name)
-        if not tag:
+        if not (tag := await self._check_tag_exists(ctx, name)):
             return
-        author = ctx.guild.get_member(tag.)
+        author = ctx.guild.get_member(tag.user_id)
         if author is not None:
             embed = discord.Embed(title=f'Error: Tag {name} is already claimed', color=Colors.Error)
             embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
             await ctx.send(embed=embed)
             return
-
-        await self.bot.tag_route.edit_tag(ctx.guild.id, ctx.message.author.id, tag['name'], tag['content'])
+        await self.bot.tag_route.edit_tag(ctx.guild.id, tag.name, tag.content, ctx.message.author.id)
         embed = discord.Embed(title=f':white_check_mark: Tag successfully claimed', color=Colors.ClemsonOrange)
-        embed.add_field(name='Name', value, inline=True)
-        embed.add_field(name='Content', value=tag['content'], inline=True)
+        embed.add_field(name='Name', value=tag.name, inline=True)
+        embed.add_field(name='Content', value=tag.content, inline=True)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['unowned'])
+    @ext.short_help('Lists all unclaimed tags')
     @ext.long_help('Gets a list of all unowned tags available to be claimed')
     @ext.example(['tag unclaimed', 'tag unowned'])
     async def unclaimed(self, ctx):
@@ -209,10 +200,34 @@ class TagCog(commands.Cog):
 
     @tag.command(aliases=['give'])
     @ext.required_claims(Claims.tag_add)
+    @ext.short_help('Gives your tag to someone else.')
     @ext.long_help('Transfers the tag to the given user.')
     @ext.example(['tag transfer tagname @user', 'tag give tagname @user'])
     async def transfer(self, ctx, name: str, user: discord.User):
-        pass
+        if not (tag := await self._check_tag_exists(ctx, name)):
+            return
+        author = ctx.author
+        if user.id == author.id and tag.user_id == user.id:
+            embed = discord.Embed(title='Error', color=Colors.Error,
+                                  description='Why are you giving a tag you own to yourself...?')
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+            await ctx.send(embed=embed)
+            return
+        is_admin = author.guild_permissions.administrator
+        if author.id != tag.user_id and not is_admin:
+            embed = discord.Embed(title='Error', color=Colors.Error,
+                                  description=f"You do not own the tag '{tag.name}'.")
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+            await ctx.send(embed=embed)
+            return
+        await self.bot.tag_route.edit_tag(ctx.guild.id, name, tag.content, user.id)
+        embed = discord.Embed(title=':white_check_mark: Tag Transferred', color=Colors.ClemsonOrange)
+        original_owner = ctx.guild.get_member(tag.user_id)
+        embed.add_field(name='From', value=f'{original_owner.mention} :arrow_right:')
+        embed.add_field(name='To', value=user.mention)
+        embed.add_field(name='Name', value=tag.name, inline=False)
+        embed.add_field(name='Content', value=tag.content, inline=False)
+        await ctx.send(embed=embed)
 
     async def _delete_tag(self, name, ctx):
         content = await self.bot.tag_route.get_tag_content(ctx.guild.id, name)
@@ -224,7 +239,7 @@ class TagCog(commands.Cog):
         embed.add_field(name='Content', value=content, inline=True)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx, name: str) -> None:
+    async def _check_tag_exists(self, ctx, name: str) -> t.Optional[Tag]:
         """
         Checks if the given tag exists.
         If so, returns the tag.
@@ -232,7 +247,7 @@ class TagCog(commands.Cog):
         """
         tag = await self.bot.tag_route.get_tag(ctx.guild.id, name)
         if not tag:
-            embed = discord.Embed(title=f'Error', color=Colors.Error,
+            embed = discord.Embed(title='Error', color=Colors.Error,
                                   description=f"Requested tag '{name}' does not exist.")
             embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
             await ctx.send(embed=embed)
