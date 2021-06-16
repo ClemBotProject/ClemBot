@@ -17,11 +17,12 @@ jobs:
     deploy:
         name: Deploy
         runs-on: [self-hosted]
+        defaults:
+          run:
+            shell: bash
+            working-directory: ~/ClemBot
         steps:
             - uses: actions/checkout@v2
-            - name: Navigate to repo
-              run: |
-                cd ~/ClemBot
             - name: Pull latest changes
               run: |
                 git pull origin master --rebase
