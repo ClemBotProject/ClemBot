@@ -28,36 +28,53 @@ class TagRoute(BaseRoute):
             'GuildId': guild_id,
             'UserId': user_id,
         }
-        return Tag.from_dict(await self._client.post('tags', data=json, **kwargs))
+        tag_dict = await self._client.post('tags', data=json, **kwargs)
+        return None if tag_dict is None else Tag.from_dict(tag_dict)
 
-    async def edit_tag(self, guild_id: int, name: str, content: str, user_id: int, **kwargs) -> t.Optional[Tag]:
+    async def temp_edit_tag(self, guild_id: int, name: str, content: str, user_id: int) -> t.Optional[Tag]:
+        # TODO: Remove before merging back into master. This is temporary.
         json = {
             'GuildId': guild_id,
-            'UserId': user_id,
+            'Name': name.lower(),
+            'Content': content,
+            'UserId': user_id
+        }
+        tag_dict = await self._client.patch('tags', data=json)
+        return None if tag_dict is None else Tag.from_dict(tag_dict)
+
+    async def edit_tag_content(self, guild_id: int, name: str, content: str, **kwargs) -> t.Optional[Tag]:
+        json = {
+            'GuildId': guild_id,
             'Name': name.lower(),
             'Content': content
         }
-        return Tag.from_dict(await self._client.patch('tags', data=json, **kwargs))
+        tag_dict = await self._client.patch('tags', data=json, **kwargs)
+        return None if tag_dict is None else Tag.from_dict(tag_dict)
 
-    async def get_tag(self, guild_id: int, name: str) -> Tag:
+    async def edit_tag_owner(self, guild_id: int, name: str, user_id: int, **kwargs) -> t.Optional[Tag]:
+        json = {
+            'GuildId': guild_id,
+            'Name': name.lower(),
+            'UserId': user_id
+        }
+        tag_dict = await self._client.patch('tags', data=json, **kwargs)
+        return None if tag_dict is None else Tag.from_dict(tag_dict)
+
+    async def get_tag(self, guild_id: int, name: str) -> t.Optional[Tag]:
         json = {
             'GuildId': guild_id,
             'Name': name.lower(),
         }
-        return Tag.from_dict(await self._client.get('tags', data=json))
+        tag_dict = await self._client.get('tags', data=json)
+        return None if tag_dict is None else Tag.from_dict(tag_dict)
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
         json = {
             'GuildId': guild_id,
             'Name': name.lower(),
         }
-
         resp = await self._client.get('tags', data=json)
-
-        if not resp:
-            return None
-
-        return resp['content']
+        return None if resp is None else resp['content']
 
     async def delete_tag(self, guild_id: int, name: str, **kwargs):
         """
