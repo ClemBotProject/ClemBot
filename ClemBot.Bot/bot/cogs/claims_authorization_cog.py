@@ -26,42 +26,32 @@ class ClaimsAuthorizationCog(commands.Cog):
         listing = listing or ctx.author
 
         if isinstance(listing, discord.Role):
-            if listing.permissions.administrator:
-                claims_str = self.get_all_claims()
-                embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
-                embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed)
-                return
-
             await self._send_role_claims(ctx, listing)
-
         elif isinstance(listing, discord.Member):
-            if listing.guild_permissions.administrator:
-                claims_str = self.get_all_claims()
-                embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
-                embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed)
-                return
-
             await self._send_user_claims(ctx, listing)
 
     async def _send_role_claims(self, ctx, role):
         claims = await self.bot.claim_route.get_claims_role(role.id)
 
-        embed = self._build_claims_embed(ctx, claims)
+        embed = self._build_claims_embed(ctx, claims, role)
         await ctx.send(embed=embed)
 
     async def _send_user_claims(self, ctx, user):
         claims = await self.bot.claim_route.get_claims_user(user)
 
-        embed = self._build_claims_embed(ctx, claims)
+        embed = self._build_claims_embed(ctx, claims, user)
         await ctx.send(embed=embed)
 
-    def _build_claims_embed(self, ctx, claims) -> discord.Embed:
+    def _build_claims_embed(self,
+                            ctx: commands.Context,
+                            claims: t.Iterable[str],
+                            subject: t.Union[discord.Role, discord.User]) -> discord.Embed:
 
         claims_str = '\n'.join(sorted(list(claims))) if claims else 'No current claims'
 
-        embed = discord.Embed(title='Current Valid Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
+        embed = discord.Embed(title='Current Valid Claims',
+                              color=Colors.ClemsonOrange,
+                              description=f'For: {subject.mention}\n```\n{claims_str}```')
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
         return embed
 
