@@ -168,7 +168,7 @@ class TagCog(commands.Cog):
     @ext.example(['tag unclaimed', 'tag unowned'])
     async def unclaimed(self, ctx):
         guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
-        unclaimed_tags = list[str]()
+        unclaimed_tags = list()
         for tag in guild_tags:
             if ctx.guild.get_member(tag.user_id) is None:
                 unclaimed_tags.append(tag.name)
