@@ -124,7 +124,7 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp.value]
+        return [Infraction.from_dict(i) for i in resp]
 
     async def get_guild_mutes_user(self, guild_id: int, user_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'users/infractions/{user_id}/{guild_id}/mute')
