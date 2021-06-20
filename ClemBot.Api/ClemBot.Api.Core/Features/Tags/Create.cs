@@ -33,8 +33,6 @@ namespace ClemBot.Api.Core.Features.Tags
             public ulong GuildId { get; set; }
 
             public ulong UserId { get; set; }
-
-            public int UseCount { get; set; }
         }
 
         public class Command : IRequest<Result<TagDto, QueryStatus>>
@@ -72,8 +70,7 @@ namespace ClemBot.Api.Core.Features.Tags
                     Content = tag.Content,
                     CreationDate = tag.Time.ToLongDateString(),
                     GuildId = tag.GuildId,
-                    UserId = tag.UserId,
-                    UseCount = tag.TagUses.Count
+                    UserId = tag.UserId
                 });
 
             }

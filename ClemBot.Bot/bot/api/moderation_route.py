@@ -1,26 +1,10 @@
 import datetime
 import typing as t
-from dataclasses import dataclass
-
-from dataclasses_json import LetterCase, DataClassJsonMixin, dataclass_json
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 from bot.consts import Infractions
-
-
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Infraction(DataClassJsonMixin):
-    id: int
-    guild_id: int
-    author_id: int
-    subject_id: int
-    type: str
-    reason: str
-    duration: int
-    time: str
-    active: int
+from bot.models import Infraction
 
 
 class ModerationRoute(BaseRoute):

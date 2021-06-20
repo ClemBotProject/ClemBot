@@ -17,7 +17,6 @@ namespace ClemBot.Api.Core.Features.Tags
             {
                 RuleFor(p => p.GuildId).NotNull();
                 RuleFor(p => p.Name).NotNull();
-                RuleFor(p => p.Content).NotNull();
             }
         }
 
