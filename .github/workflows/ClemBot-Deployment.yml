@@ -25,7 +25,7 @@ jobs:
                 cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
             - name: Stop ClemBot Containers
               run: |
-                docker stop $(docker ps -q --filter ancestor=clembot_clembot )
+                docker stop $(docker ps -q)
             - name: Build updated Docker Images
               run: |
                 ls
