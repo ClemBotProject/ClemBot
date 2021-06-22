@@ -21,6 +21,8 @@ namespace ClemBot.Api.Core.Features.Tags
             public ulong Id { get; init; }
 
             public string? Name { get; init; }
+
+            public string? Content { get; init; }
         }
 
         public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, Result<Model, QueryStatus>>
@@ -42,7 +44,8 @@ namespace ClemBot.Api.Core.Features.Tags
                 return QueryResult<Model>.Success(new Model()
                 {
                     Id = tag.GuildId,
-                    Name = tag.Name
+                    Name = tag.Name,
+                    Content = tag.Content
                 });
             }
         }

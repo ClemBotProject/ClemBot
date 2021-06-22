@@ -24,7 +24,7 @@ namespace ClemBot.Api.Core.Features.Tags
 
             public string Content { get; set; } = null!;
 
-            public DateTime Time { get; set; }
+            public string CreationDate { get; set; } = null!;
 
             public ulong GuildId { get; set; }
 
@@ -51,7 +51,7 @@ namespace ClemBot.Api.Core.Features.Tags
                 {
                     Name = tag.Name,
                     Content = tag.Content,
-                    Time = tag.Time,
+                    CreationDate = tag.Time.ToLongDateString(),
                     GuildId = tag.GuildId,
                     UserId = tag.UserId,
                     UseCount = tag.TagUses.Count

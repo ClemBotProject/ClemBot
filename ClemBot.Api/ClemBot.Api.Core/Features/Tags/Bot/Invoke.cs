@@ -22,7 +22,7 @@ namespace ClemBot.Api.Core.Features.Tags.Bot
         }
         public class Model
         {
-            public ulong Id { get; init; }
+            public ulong GuildId { get; init; }
 
             public string? Name { get; init; }
         }
@@ -59,7 +59,7 @@ namespace ClemBot.Api.Core.Features.Tags.Bot
 
                 return QueryResult<Model>.Success(new Model()
                 {
-                    Id = tag.GuildId,
+                    GuildId = tag.GuildId,
                     Name = tag.Name
                 });
 

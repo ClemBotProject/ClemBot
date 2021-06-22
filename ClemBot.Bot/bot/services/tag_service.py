@@ -32,7 +32,7 @@ class TagService(BaseService):
             tag_found = True
 
             # tags_content.append(await repo.get_tag_content(match, message.guild.id))
-            tags_content.append(tag['content'])
+            tags_content.append(tag.content)
 
             await self.bot.tag_route.add_tag_use(message.guild.id, match, message.channel.id, message.author.id)
 
