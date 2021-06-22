@@ -22,7 +22,7 @@ jobs:
             - name: Copy Secrets
               run: |
                 cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
-                cp ~/ClemBot.Bot_env.env ./ClemBot.BotClemBot.Bot_env.env
+                cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
             - name: Build updated Docker Images
               run: |
                 ls
