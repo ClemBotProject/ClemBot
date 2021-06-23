@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ClemBot.png" width="275" height= "275">
+  <img src="Branding/ClemBot.png" width="275" height= "275">
 </p>
 
 # ClemBot 
