@@ -33,7 +33,8 @@ class SourceCodeCog(commands.Cog):
         self.allowed_file_types = ['py', 'vue', 'cs', 'css', 'scss', 'sass', 'html', 'ts']
         self.repo_url = bot_secrets.secrets.github_url
 
-        # Some path manipulation
+        # We have to do some ugly string path manipulation here
+        # Hold tight
 
         # Get the Current working directory
         root = os.getcwd()
