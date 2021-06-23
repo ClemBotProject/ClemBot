@@ -42,15 +42,10 @@ class SourceCodeCog(commands.Cog):
         # Split on the path delimiters, on linux its '/'
         root_list = root.split('/')
 
-        # Pop off the last folder, in this case ClemBot.Bot so that we can also get the
-        # source for the other projects in ClemBots project root
-        root_list.pop()
-
-        # Set the root dir for clembot to the last entry in the last after the Bot
-        # folder was popped off the list
+        # Set the root dir for clembot
         root_dir = root_list[-1]
 
-        # Recreate the path with the Bots project folder removed
+        # Recreate the path
         root = '/'.join(root_list)
 
         # Set the global project root so we can use it later
@@ -91,7 +86,7 @@ class SourceCodeCog(commands.Cog):
             return
 
         relative_url = self.bot_files[file].relative
-        gh_url = f'{self.repo_url}/tree/master/{relative_url}'
+        gh_url = f'{self.repo_url}/tree/master/ClemBot.Bot/{relative_url}'
 
         embed = discord.Embed(title=f"Here's the source for {file}",
                               color=Colors.ClemsonOrange,
