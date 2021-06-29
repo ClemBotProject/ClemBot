@@ -145,7 +145,7 @@ class ClemBot(commands.Bot):
             # The command is going to check the claims in the command body, nothing else to do
             return 
 
-        if await self.claims_check(ctx) is True:
+        if await self.claims_check(ctx):
             return      
 
         claims_str = '\n'.join(command.claims)
