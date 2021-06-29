@@ -86,7 +86,7 @@ Setup a virtual environment:
 `virtualenv venv`  windows: `py -m venv venv`
 
 Enter the virtualenv with:  
-`source venv/bin/activate` windows: `source .\env\Scripts\activate`
+`source venv/bin/activate` windows: `source .\venv\Scripts\activate`
 
 Then allow pip to get the latest libraries:  
 `pip3 install -r requirements.txt` windows: `py -m pip install -r requirements.txt`
