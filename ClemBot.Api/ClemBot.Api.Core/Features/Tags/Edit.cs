@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
@@ -16,7 +17,6 @@ namespace ClemBot.Api.Core.Features.Tags
             {
                 RuleFor(p => p.GuildId).NotNull();
                 RuleFor(p => p.Name).NotNull();
-                RuleFor(p => p.Content).NotNull();
             }
         }
 
@@ -25,6 +25,14 @@ namespace ClemBot.Api.Core.Features.Tags
             public string Name { get; set; } = null!;
 
             public string Content { get; set; } = null!;
+
+            public string CreationDate { get; set; } = null!;
+
+            public ulong GuildId { get; set; }
+
+            public ulong UserId { get; set; }
+
+            public int UseCount { get; set; }
         }
 
         public class Command : IRequest<Result<TagDto, QueryStatus>>
@@ -33,7 +41,9 @@ namespace ClemBot.Api.Core.Features.Tags
 
             public string Name { get; set; } = null!;
 
-            public string Content { get; set; } = null!;
+            public string? Content { get; set; }
+
+            public ulong? UserId { get; set; }
         }
 
         public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<TagDto, QueryStatus>>
@@ -48,13 +58,19 @@ namespace ClemBot.Api.Core.Features.Tags
                     return QueryResult<TagDto>.NotFound();
                 }
 
-                tag.Content = request.Content;
+                tag.Name = request.Name;
+                tag.Content = request.Content ?? tag.Content;
+                tag.UserId = request.UserId ?? tag.UserId;
                 await _context.SaveChangesAsync();
 
                 return QueryResult<TagDto>.Success(new TagDto()
                 {
                     Name = tag.Name,
-                    Content = tag.Content
+                    Content = tag.Content,
+                    CreationDate = tag.Time.ToLongDateString(),
+                    GuildId = tag.GuildId,
+                    UserId = tag.UserId,
+                    UseCount = tag.TagUses.Count
                 });
             }
 

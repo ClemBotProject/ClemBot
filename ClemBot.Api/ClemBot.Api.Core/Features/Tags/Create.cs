@@ -27,6 +27,12 @@ namespace ClemBot.Api.Core.Features.Tags
             public string Name { get; set; } = null!;
 
             public string Content { get; set; } = null!;
+
+            public string CreationDate { get; set; } = null!;
+
+            public ulong GuildId { get; set; }
+
+            public ulong UserId { get; set; }
         }
 
         public class Command : IRequest<Result<TagDto, QueryStatus>>
@@ -61,7 +67,10 @@ namespace ClemBot.Api.Core.Features.Tags
                 return QueryResult<TagDto>.Success(new TagDto()
                 {
                     Name = tag.Name,
-                    Content = tag.Content
+                    Content = tag.Content,
+                    CreationDate = tag.Time.ToLongDateString(),
+                    GuildId = tag.GuildId,
+                    UserId = tag.UserId
                 });
 
             }

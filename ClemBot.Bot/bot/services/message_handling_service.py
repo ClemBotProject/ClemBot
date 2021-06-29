@@ -124,7 +124,7 @@ class MessageHandlingService(BaseService):
                                                  int(payload.data['guild_id']),
                                                  embed)
         except KeyError as e:
-            log.error(f'raw_message_edit Error: {e} \nContent: {json.dumps(payload)}')
+            log.error(f'raw_message_edit Error: {e} \n')
 
     @BaseService.Listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):

@@ -29,29 +29,55 @@ class SourceCodeCog(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.bot_files = {}
-        self.ignored = ['Logs', 'venv', '__pycache__', 'database', '.git', '.pytest_cache', 'bot_env.env']
+        self.ignored = ['Logs', 'venv', '__pycache__', 'database', '.git', '.pytest_cache', 'node_modules']
+        self.allowed_file_types = ['py', 'vue', 'cs', 'css', 'scss', 'sass', 'html', 'ts']
         self.repo_url = bot_secrets.secrets.github_url
 
+        # We have to do some ugly string path manipulation here
+        # Hold tight
+
+        # Get the Current working directory
         root = os.getcwd()
-        root_dir = root.split('/')[-1]
+
+        # Split on the path delimiters, on linux its '/'
+        root_list = root.split('/')
+
+        # Set the root dir for clembot
+        root_dir = root_list[-1]
+
+        # Recreate the path
+        root = '/'.join(root_list)
+
+        # Set the global project root so we can use it later
+        self.project_root = root
+
+        # Walk this new path and ignore all folders in the ignore list and all invalid file types
         for root, dirs, files in os.walk(root, topdown=True):
+
+            # Remove hidden directories from dirs to prevent them from being traversed into further
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             if not any(folder in f'{root}/' for folder in self.ignored):
+                # Loop over the files in the directory
                 for f in files:
+                    # Check if the file is a valid file type, we dont want to expose
+                    # anything that's not in the public repo
+                    if f.split('.')[-1] not in self.allowed_file_types:
+                        continue
+
                     path = os.path.join(root, f)
-                    self.bot_files[f] = FilePaths(path, path.split(root_dir)[1])
+                    self.bot_files[f] = FilePaths(path, path.split(f'/{root_dir}/')[1])
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['src'])
     @ext.long_help(
         """
-        Links the bots repository or optionally a specicifc file within the bots source tree
+        Links the bots repository or optionally a specific file within the bots source tree
         """
     )
     @ext.short_help('Links the bots source repo')
     @ext.example(('source', 'source clem_bot.py'))
     async def source(self, ctx, file: str = None):
         if not file:
-            embed = discord.Embed(title='Heres my source repository',
+            embed = discord.Embed(title="Here's my source repository",
                                   color=Colors.ClemsonOrange,
                                   description=f'Feel free to contribute :grin:')
             embed.add_field(name='Link', value=f'[Source]({self.repo_url})')
@@ -60,9 +86,9 @@ class SourceCodeCog(commands.Cog):
             return
 
         relative_url = self.bot_files[file].relative
-        gh_url = f'{self.repo_url}/tree/master{relative_url}'
+        gh_url = f'{self.repo_url}/tree/master/ClemBot.Bot/{relative_url}'
 
-        embed = discord.Embed(title=f'Heres the source for {file}',
+        embed = discord.Embed(title=f"Here's the source for {file}",
                               color=Colors.ClemsonOrange,
                               description=f'Feel free to contribute :grin:')
         embed.add_field(name='Link', value=f'[Source]({gh_url})')
@@ -99,7 +125,9 @@ class SourceCodeCog(commands.Cog):
     @ext.example(('source print __main__.py', 'source print __main__.py 10 20'))
     async def print(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
 
-        if file == 'BotSecrets.json' or file == 'bot_env.env':
+        file_type = file.split('.')[-1]
+
+        if file_type == 'json' or file_type == 'env':
             embed = discord.Embed(title=f'Error: Restricted access', color=Colors.Error)
             await ctx.send(embed=embed)
             return
@@ -148,7 +176,7 @@ class SourceCodeCog(commands.Cog):
             temp_list = []
             for _, value in enumerate(source_with_length):
                 if value[1] < break_point:
-                    # we havent reached the message char limit, keep going
+                    # we haven't reached the message char limit, keep going
                     temp_list.append(value[0])
                 else:
                     # we hit the limit, stop and append to the chunk list
@@ -165,11 +193,11 @@ class SourceCodeCog(commands.Cog):
             # we enumerated over the whole list, append whats left to the chunks to send list
             chunks_to_send.append('\n'.join(temp_list))
 
-            # loop over the chunks and send them one by one with correct python formatting
+            # loop over the chunks and send them one by one with correct highlighting based on file type
             sent_messages = []
             for chunk in chunks_to_send:
                 backslash = '\\'
-                msg = await ctx.send(f"```py\n{chunk.replace('`', f'{backslash}`')}```")
+                msg = await ctx.send(f"```{file_type}\n{chunk.replace('`', f'{backslash}`')}```")
                 sent_messages.append(msg)
 
             await self.bot.messenger.publish(Events.on_set_deletable, msg=sent_messages, author=ctx.author)

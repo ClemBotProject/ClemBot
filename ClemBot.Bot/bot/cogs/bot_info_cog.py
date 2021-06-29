@@ -40,8 +40,8 @@ class InviteCog(commands.Cog):
         embed.description = f'{len(self.bot.guilds)} Guilds\n{len(self.bot.users)} Users'
         embed.title = f'{self.bot.user.name}#{self.bot.user.discriminator}'
         embed.add_field(name='Owner', value=owner.mention)
-        embed.add_field(name='Repository', value='[Link!](https://github.com/ClemsonCPSC-Discord/ClemBot)')
-        embed.add_field(name='Wiki', value='[Link!](https://github.com/ClemsonCPSC-Discord/ClemBot/wiki)')
+        embed.add_field(name='Repository', value='[Link!](https://github.com/ClemBotProject/ClemBot)')
+        embed.add_field(name='Wiki', value='[Link!](https://github.com/ClemBotProject/ClemBot/wiki)')
         embed.set_thumbnail(url=self.bot.user.avatar_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
