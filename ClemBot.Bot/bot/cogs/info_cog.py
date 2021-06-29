@@ -22,7 +22,7 @@ class InfoCog(commands.Cog):
         log.info(f'User {ctx.author} has ran info command on user {user.name}')
 
         embed = discord.Embed(title = f'Guild Member Information', color=Colors.ClemsonOrange)
-        embed.set_author(name=f'{user.name}#{user.discriminator}', icon_url=user.avatar_url)
+        embed.set_author(name=str(user), icon_url=user.avatar_url)
 
         user_info = f'» **Nickname:** {user.mention}'
         user_info += f'\n» **ID:** {user.id}'
@@ -40,7 +40,7 @@ class InfoCog(commands.Cog):
         if member:
 
             # We don't want moderation info available for regular guild users to check on others
-            if (await self.bot.claims_check(ctx=ctx)): 
+            if await self.bot.claims_check(ctx=ctx): 
                 warnings = await self.bot.moderation_route.get_guild_warns_user(ctx.guild.id, user.id)
                 mutes = await self.bot.moderation_route.get_guild_mutes_user(ctx.guild.id, user.id)
                 infractions = await self.bot.moderation_route.get_guild_infractions_user(ctx.guild.id, user.id)
@@ -60,7 +60,7 @@ class InfoCog(commands.Cog):
             guild_info += f'\n» **Roles:** '
             log.info(f'User has roles: {member.roles}')
             #skipping the first index because it is just @everyone
-            for i in member.roles[1::]:
+            for i in member.roles[1:]:
                 guild_info += f'{i.mention}\t'
             guild_info += f'\n» **Highest role:** {member.top_role.mention}'
             guild_info += '\n» **Nitro boost date:** ' + (member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting')
@@ -70,7 +70,6 @@ class InfoCog(commands.Cog):
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         return
-
 
 def setup(bot):
     # This adds the cog internally by creating a cog instance and registering that
