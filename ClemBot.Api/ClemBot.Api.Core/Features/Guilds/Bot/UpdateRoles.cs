@@ -12,6 +12,7 @@ using CsvHelper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot
 {
@@ -33,11 +34,14 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             public string RoleCsv { get; set; } = null!;
         }
 
-        public record Handler(ClemBotContext _context)
+        public record Handler(ClemBotContext _context, ILogger<UpdateRoles> _logger)
             : IRequestHandler<Command, Result<ulong, QueryStatus>>
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
+
+                _logger.LogInformation("Beginning UpdateRoles CSV Deserialization");
+
                 using var csvReader = new CsvReader(new StringReader(request.RoleCsv), CultureInfo.InvariantCulture);
                 var roles = csvReader.GetRecords<RoleDto>().ToList();
 
