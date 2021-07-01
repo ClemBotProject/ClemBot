@@ -53,17 +53,17 @@ namespace ClemBot.Api.Core.Features.Messages.Bot
 
                 if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
                 {
-                    return QueryResult<ulong>.NotFound(request.UserId);
+                    return QueryResult<ulong>.Conflict();
                 }
 
                 if (!await _context.Guilds.AnyAsync(x => x.Id == request.GuildId))
                 {
-                    return QueryResult<ulong>.NotFound(request.GuildId);
+                    return QueryResult<ulong>.Conflict();
                 }
 
                 if (!await _context.Channels.AnyAsync(x => x.Id == request.ChannelId))
                 {
-                    return QueryResult<ulong>.NotFound(request.ChannelId);
+                    return QueryResult<ulong>.Conflict();
                 }
 
                 message.Contents.Add(new MessageContent()
