@@ -30,6 +30,20 @@ class OwnerCog(commands.Cog):
         server = self.bot.get_guild(id)
         await server.leave()
 
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def reload(self, ctx, id: int):
+        guild = self.bot.get_guild(id)
+        await ctx.send(f'reloading {guild.name} users')
+        await self.bot.guild_route.update_guild_users(guild)
+        await ctx.send(f'reloading {guild.name} roles')
+        await self.bot.guild_route.update_guild_roles(guild)
+        await ctx.send(f'reloading {guild.name} role user mappings')
+        await self.bot.guild_route.update_guild_role_user_mappings(guild)
+        await ctx.send(f'reloading {guild.name} channels')
+        await self.bot.guild_route.update_guild_channels(guild)
+        await ctx.send(f'{guild.name} reloaded')
+
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()
     async def channel(self, ctx):

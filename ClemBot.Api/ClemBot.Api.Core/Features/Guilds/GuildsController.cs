@@ -127,6 +127,16 @@ namespace ClemBot.Api.Core.Features.Guilds
                 _ => throw new InvalidOperationException()
             };
 
+        [HttpPatch("bot/[controller]/Update/RoleUserMappings")]
+        [BotMasterAuthorize]
+        public async Task<IActionResult> UpdateChannels(Bot.UpdateRolesUserMappings.Command command) =>
+            await _mediator.Send(command) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
+
         [HttpGet("bot/[controller]/{Id}/Roles")]
         [BotMasterAuthorize]
         public async Task<IActionResult> Roles([FromRoute] Bot.Roles.Query query) =>

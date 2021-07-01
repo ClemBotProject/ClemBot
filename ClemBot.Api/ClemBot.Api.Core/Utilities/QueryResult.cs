@@ -5,7 +5,7 @@ namespace ClemBot.Api.Core.Utilities
         public static Result<T, QueryStatus> Success(T? val = default)
             => new(val, QueryStatus.Success);
 
-        public static Result<T, QueryStatus> NotFound()
+        public static Result<T, QueryStatus> NotFound(T? val = default)
             => new(default, QueryStatus.NotFound);
 
         public static Result<T, QueryStatus> Conflict()

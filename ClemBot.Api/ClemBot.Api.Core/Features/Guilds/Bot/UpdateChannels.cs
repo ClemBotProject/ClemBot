@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +8,7 @@ using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using CsvHelper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,79 +24,73 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             public string? Name { get; set; }
         }
 
-        public record GuildDto
+        public record Command : IRequest<Result<ulong, QueryStatus>>
         {
             public ulong GuildId { get; init; }
 
-            public IReadOnlyList<ChannelDto> Channels { get; set; } = new List<ChannelDto>();
-        }
-
-
-        public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
-        {
-            public IReadOnlyList<GuildDto> Guilds { get; set; } = new List<GuildDto>();
+            public string ChannelCsv { get; set; } = null!;
         }
 
         public record Handler(ClemBotContext _context)
-            : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+            : IRequestHandler<Command, Result<ulong, QueryStatus>>
         {
-            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
+                using var csvReader = new CsvReader(new StringReader(request.ChannelCsv), CultureInfo.InvariantCulture);
+                var channels = csvReader.GetRecords<ChannelDto>().ToList();
+
                 var guildEntities = await _context.Guilds
                     .Include(y => y.Channels)
                     .ToListAsync();
 
-                foreach (var requestGuild in request.Guilds)
+                var guildEntity = guildEntities.FirstOrDefault(x => x.Id == request.GuildId);
+
+                if (guildEntity is null)
                 {
-                    var guildEntity = guildEntities.FirstOrDefault(x => x.Id == requestGuild.GuildId);
+                    return QueryResult<ulong>.NotFound();
+                }
 
-                    if (guildEntity is null)
+                var channelsEntity = guildEntity.Channels ?? new List<Channel>();
+
+                // Get all channels that are common to both enumerables and check for a name change
+                foreach (var channelId in channelsEntity
+                    .Select(x => x.Id)
+                    .Intersect(channels
+                        .Select(x => x.ChannelId)))
+                {
+                    var role = channelsEntity.First(x => x.Id == channelId);
+                    role.Name = channels.First(x => x.ChannelId == channelId).Name;
+                }
+
+                // Get all channels that have been deleted
+                foreach (var channel in channelsEntity
+                    .Where(x =>
+                        channels.All(y => y.ChannelId != x.Id))
+                    .ToList())
+                {
+                    _context.Channels.Remove(channel);
+                }
+
+                // get new channels
+                foreach (var channel in channels
+                    .Where(x =>
+                        channelsEntity.All(y => y.Id != x.ChannelId))
+                    .ToList())
+                {
+                    var channelEntity = new Channel
                     {
-                        continue;
-                    }
-
-                    var channels = guildEntity.Channels ?? new List<Channel>();
-
-                    // Get all roles that are common to both enumerables and check for a name change
-                    foreach (var channelId in channels
-                        .Select(x => x.Id)
-                        .Intersect(requestGuild.Channels
-                            .Select(x => x.ChannelId)))
-                    {
-                        var role = channels.First(x => x.Id == channelId);
-                        role.Name = requestGuild.Channels.First(x => x.ChannelId == channelId).Name;
-                    }
-
-                    // Get all roles that have been deleted
-                    foreach (var channel in channels
-                        .Where(x =>
-                            requestGuild.Channels.All(y => y.ChannelId != x.Id))
-                        .ToList())
-                    {
-                        _context.Channels.Remove(channel);
-                    }
-
-                    // get new channels
-                    foreach (var channel in requestGuild.Channels
-                        .Where(x =>
-                            channels.All(y => y.Id != x.ChannelId))
-                        .ToList())
-                    {
-                        var channelEntity = new Channel
-                        {
-                            Id = channel.ChannelId,
-                            Name = channel.Name,
-                            GuildId = requestGuild.GuildId
-                        };
-                        _context.Channels.Add(channelEntity);
-                        guildEntity?.Channels?.Add(channelEntity);
-                    }
+                        Id = channel.ChannelId,
+                        Name = channel.Name,
+                        GuildId = request.GuildId
+                    };
+                    _context.Channels.Add(channelEntity);
+                    guildEntity?.Channels?.Add(channelEntity);
                 }
 
 
                 await _context.SaveChangesAsync();
 
-                return QueryResult<IEnumerable<ulong>>.Success(request.Guilds.Select(x => x.GuildId));
+                return QueryResult<ulong>.Success(request.GuildId);
             }
         }
     }

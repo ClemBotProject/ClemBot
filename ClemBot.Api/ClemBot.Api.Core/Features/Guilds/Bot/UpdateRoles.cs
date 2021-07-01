@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +8,7 @@ using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using CsvHelper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,62 +26,58 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             public bool Admin { get; set; }
         }
 
-        public record GuildDto
+        public record Command : IRequest<Result<ulong, QueryStatus>>
         {
             public ulong GuildId { get; init; }
 
-            public IReadOnlyList<RoleDto> Roles { get; set; } = new List<RoleDto>();
-        }
-
-        public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
-        {
-            public IReadOnlyList<GuildDto> Guilds { get; set; } = new List<GuildDto>();
+            public string RoleCsv { get; set; } = null!;
         }
 
         public record Handler(ClemBotContext _context)
-            : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+            : IRequestHandler<Command, Result<ulong, QueryStatus>>
         {
-            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
+                using var csvReader = new CsvReader(new StringReader(request.RoleCsv), CultureInfo.InvariantCulture);
+                var roles = csvReader.GetRecords<RoleDto>().ToList();
+
                 var guilds = await _context.Guilds
                     .Include(y => y.Roles)
                     .ToListAsync();
 
-                foreach (var requestGuild in request.Guilds)
-                {
-                    var guildEntity = guilds.FirstOrDefault(x => x.Id == requestGuild.GuildId);
+                    var guildEntity = guilds.FirstOrDefault(x => x.Id == request.GuildId);
 
                     if (guildEntity is null)
                     {
-                        continue;
+                        return QueryResult<ulong>.NotFound();
                     }
-                    var roles = guildEntity.Roles ?? new List<Role>();
+                    var rolesEntity = guildEntity.Roles ?? new List<Role>();
 
                     // Get all roles that are common to both enumerables and check for a name change
-                    foreach (var roleId in roles
+                    foreach (var roleId in rolesEntity
                         .Select(x => x.Id)
-                        .Intersect(requestGuild.Roles
+                        .Intersect(roles
                             .Select(x => x.Id)))
                     {
-                        var role = roles.First(x => x.Id == roleId);
-                        role.Name = requestGuild.Roles.First(x => x.Id == roleId).Name;
-                        role.Admin = requestGuild.Roles.First(x => x.Id == roleId).Admin;
+                        var role = rolesEntity.First(x => x.Id == roleId);
+                        role.Name = roles.First(x => x.Id == roleId).Name;
+                        role.Admin = roles.First(x => x.Id == roleId).Admin;
                     }
 
                     // Get all roles that have been deleted
-                    foreach (var role in roles.Where(x => requestGuild.Roles.All(y => y.Id != x.Id)).ToList())
+                    foreach (var role in rolesEntity.Where(x => roles.All(y => y.Id != x.Id)).ToList())
                     {
                         _context.Roles.Remove(role);
                     }
 
                     // get new roles
-                    foreach (var role in requestGuild.Roles.Where(x => roles.All(y => y.Id != x.Id)))
+                    foreach (var role in roles.Where(x => rolesEntity.All(y => y.Id != x.Id)))
                     {
                         var roleEntity = new Role
                         {
                             Id = role.Id,
                             Name = role.Name,
-                            GuildId = requestGuild.GuildId,
+                            GuildId = request.GuildId,
                             Admin = role.Admin,
                             IsAssignable = false
                         };
@@ -86,11 +85,10 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                         _context.Roles.Add(roleEntity);
                         guildEntity.Roles?.Add(roleEntity);
                     }
-                }
 
                 await _context.SaveChangesAsync();
 
-                return QueryResult<IEnumerable<ulong>>.Success(request.Guilds.Select(x => x.GuildId));
+                return QueryResult<ulong>.Success(request.GuildId);
             }
         }
     }
