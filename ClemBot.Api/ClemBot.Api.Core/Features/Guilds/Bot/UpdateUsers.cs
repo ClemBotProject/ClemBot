@@ -10,6 +10,7 @@ using ClemBot.Api.Data.Models;
 using CsvHelper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot
 {
@@ -29,13 +30,17 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             public string UserCsv { get; set; } = null!;
         }
 
-        public record Handler(ClemBotContext _context)
+        public record Handler(ClemBotContext _context, ILogger<UpdateUsers> _logger)
             : IRequestHandler<Command, Result<ulong, QueryStatus>>
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
+                _logger.LogInformation("Beginning UpdateUsers CSV Deserialization");
+
                 using var csvReader = new CsvReader(new StringReader(request.UserCsv), CultureInfo.InvariantCulture);
                 var users = csvReader.GetRecords<UserDto>().ToList();
+
+                _logger.LogInformation("UpdateUsers CSV Deserialization succeeded");
 
                 var guilds = await _context.Guilds
                     .Include(y => y.Users)
@@ -52,10 +57,12 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
 
                 foreach (var user in users)
                 {
+                    _logger.LogInformation("Updating {user}", user);
                     var dbUser = usersDb.FirstOrDefault(x => x.Id == user.UserId);
 
                     if (dbUser is null)
                     {
+                        _logger.LogInformation("Adding new {user}", user);
                         var userEntity = new User {Id = user.UserId, Name = user.Name};
                         _context.Users.Add(userEntity);
 
@@ -63,6 +70,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     }
                     else if (!guildEntity.Users.Contains(dbUser))
                     {
+                        _logger.LogInformation("Adding new user guild mapping {user}", user);
                         guildEntity.Users.Add(dbUser);
                     }
                 }
@@ -73,6 +81,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     _context.Users.Remove(user);
                 }
 
+                _logger.LogInformation("Saving UpdateUser Changes");
 
                 await _context.SaveChangesAsync();
 
