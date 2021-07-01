@@ -27,6 +27,10 @@ class MessageHandlingService(BaseService):
         # Primary entry point for handling commands
         await self.bot.process_commands(message)
 
+        if not message.content:
+            log.warning('Invalid Message event received')
+            return
+
         await self.bot.message_route.create_message(message.id,
                                                     message.content,
                                                     message.guild.id,

@@ -1,6 +1,7 @@
 import typing as t
 
 import discord
+import pandas as pd
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
@@ -51,55 +52,69 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch('guilds', data=json)
 
-    async def update_guild_users(self, guilds: t.List[discord.Guild]):
+    async def update_guild_users(self, guild: discord.Guild):
 
-        guilds = [{
-            'GuildId': g.id,
-            'Users': [{
+        users = [{
                 'UserId': u.id,
                 'Name': u.name
             }
-                for u in g.members]
-        }
-            for g in guilds]
+                for u in guild.members]
+
+        df: pd.DataFrame = pd.DataFrame.from_records(users)
 
         json = {
-            'Guilds': guilds
+            'GuildId': guild.id,
+            'UserCsv': df.to_csv(index=False)
         }
 
         await self._client.patch(f'guilds/update/users', data=json)
 
-    async def update_guild_roles(self, guilds: t.List[discord.Guild]):
-        guilds = [{
-            'GuildId': g.id,
-            'Roles': [{
+    async def update_guild_roles(self, guild: discord.Guild):
+        roles = [{
                 'Id': r.id,
                 'Name': r.name,
                 'Admin': r.permissions.administrator,
             }
-                for r in g.roles]
-        }
-            for g in guilds]
+                for r in guild.roles]
+
+        df: pd.DataFrame = pd.DataFrame.from_records(roles)
 
         json = {
-            'Guilds': guilds
+            'GuildId': guild.id,
+            'RoleCsv': df.to_csv(index=False)
         }
 
         await self._client.patch(f'guilds/update/roles', data=json)
 
-    async def update_guild_channels(self, guilds: t.List[discord.Guild]):
+    async def update_guild_role_user_mappings(self, guild: discord.Guild):
 
-        guilds = [{
-            'GuildId': g.id,
-            'Channels': [{
+        mappings = []
+        for role in guild.roles:
+            for user in role.members:
+                mappings.append({'RoleId': role.id, 'UserId': user.id})
+
+        df: pd.DataFrame = pd.DataFrame.from_records(mappings)
+
+        json = {
+            'GuildId': guild.id,
+            'RoleMappingCsv': df.to_csv(index=False)
+        }
+
+        await self._client.patch(f'guilds/update/RoleUserMappings', data=json)
+
+    async def update_guild_channels(self, guild: discord.Guild):
+
+        channels = [{
                 'ChannelId': c.id,
                 'Name': c.name
             }
-                for c in g.channels]
-        }
-            for g in guilds]
+                for c in guild.channels]
+
+        df: pd.DataFrame = pd.DataFrame.from_records(channels)
 
         json = {
-            'Guilds': guilds
+            'GuildId': guild.id,
+            'ChannelCsv': df.to_csv(index=False)
         }
+
         await self._client.patch(f'guilds/update/channels', data=json)

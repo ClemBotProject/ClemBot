@@ -30,13 +30,19 @@ class StartupService(BaseService):
         await self.bot.user_route.create_user_bulk(self.bot.users)
 
     async def load_users_guilds(self):
-        await self.bot.guild_route.update_guild_users(self.bot.guilds)
+        for guild in self.bot.guilds:
+            await self.bot.guild_route.update_guild_users(guild)
 
     async def load_roles(self):
-        await self.bot.guild_route.update_guild_roles(self.bot.guilds)
+        for guild in self.bot.guilds:
+            await self.bot.guild_route.update_guild_roles(guild)
+
+        for guild in self.bot.guilds:
+            await self.bot.guild_route.update_guild_role_user_mappings(guild)
 
     async def load_channels(self):
-        await self.bot.guild_route.update_guild_channels(self.bot.guilds)
+        for guild in self.bot.guilds:
+            await self.bot.guild_route.update_guild_channels(guild)
 
     @staticmethod
     def get_full_name(author) -> str:

@@ -18,18 +18,6 @@ class GuildHandlingService(BaseService):
     async def on_guild_joined(self, guild: discord.Guild) -> None:
         log.info(f'Loading guild {guild.name}: {guild.id}')
 
-        await self.bot.guild_route.add_guild(guild.id, guild.name)
-
-        await self.bot.guild_route.update_guild_users([guild])
-
-        await self.bot.guild_route.update_guild_roles([guild])
-
-        # The guild has been initialized, broadcast this to the rest
-        # of the services
-        await self.bot.messenger.publish(Events.on_new_guild_initialized, guild)
-
-        log.info(f'Guild {guild.name}: {guild.id} loaded')
-
         embed = discord.Embed(title=f'{self.bot.user.name} added to a new guild', color=Colors.ClemsonOrange)
         embed.set_author(name=f'Owner: {guild.owner.name}#{guild.owner.discriminator}', icon_url=guild.owner.avatar_url)
         embed.set_thumbnail(url=guild.icon_url)
@@ -41,6 +29,29 @@ class GuildHandlingService(BaseService):
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
                                          OwnerDesignatedChannels.server_join_log,
                                          embed
+                                         )
+
+        await self.bot.guild_route.add_guild(guild.id, guild.name)
+        log.info(f'Finished Loading guild {guild.name}: {guild.id}')
+
+        await self.bot.guild_route.update_guild_users(guild)
+        log.info(f'Finished Loading guild users {guild.name}: {guild.id}')
+
+        await self.bot.guild_route.update_guild_roles(guild)
+        log.info(f'Finished Loading guild roles {guild.name}: {guild.id}')
+
+        await self.bot.guild_route.update_guild_role_user_mappings(guild)
+        log.info(f'Finished Loading guild role_user mappings {guild.name}: {guild.id}')
+
+        # The guild has been initialized, broadcast this to the rest
+        # of the services
+        await self.bot.messenger.publish(Events.on_new_guild_initialized, guild)
+
+        log.info(f'Guild {guild.name}: {guild.id} loaded')
+
+        await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
+                                         OwnerDesignatedChannels.server_join_log,
+                                         f'{guild.name}: {guild.id} initialization successful'
                                          )
 
     @BaseService.Listener(Events.on_guild_leave)

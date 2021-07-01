@@ -44,7 +44,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot
                     return QueryResult<IEnumerable<ulong>>.NotFound();
                 }
 
-                user.Roles.RemoveAll(x => x.GuildId == roles[0].GuildId);
+                user.Roles.RemoveAll(x => x.GuildId == roles.First().GuildId);
                 user.Roles.AddRange(roles);
                 await _context.SaveChangesAsync();
 
