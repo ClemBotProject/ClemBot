@@ -31,12 +31,12 @@ class MessageHandlingService(BaseService):
             log.warning('Invalid Message event received')
             return
 
-        await self.bot.message_route.create_message(message.id,
-                                                    message.content,
-                                                    message.guild.id,
-                                                    message.author.id,
-                                                    message.channel.id,
-                                                    raise_on_error=False)
+        #await self.bot.message_route.create_message(message.id,
+        #                                            message.content,
+        #                                            message.guild.id,
+        #                                            message.author.id,
+        #                                            message.channel.id,
+        #                                            raise_on_error=False)
 
     @BaseService.Listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
