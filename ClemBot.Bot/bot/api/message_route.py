@@ -7,7 +7,13 @@ class MessageRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def create_message(self, message_id: int, content: str, guild_id: int, author_id: int, channel_id: int):
+    async def create_message(self,
+                             message_id: int,
+                             content: str,
+                             guild_id: int,
+                             author_id: int,
+                             channel_id: int,
+                             **kwargs):
         json = {
             'Id': message_id,
             'Content': content,
@@ -15,7 +21,7 @@ class MessageRoute(BaseRoute):
             'UserId': author_id,
             'ChannelId': channel_id
         }
-        await self._client.post('messages', data=json)
+        await self._client.post('messages', data=json, **kwargs)
 
     async def edit_message(self, message_id: int, content: str):
         json = {

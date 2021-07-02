@@ -35,7 +35,8 @@ class MessageHandlingService(BaseService):
                                                     message.content,
                                                     message.guild.id,
                                                     message.author.id,
-                                                    message.channel.id)
+                                                    message.channel.id,
+                                                    raise_on_error=False)
 
     @BaseService.Listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
