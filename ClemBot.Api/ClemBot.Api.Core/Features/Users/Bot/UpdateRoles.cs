@@ -39,7 +39,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot
                     .Include(y => y.Roles)
                     .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-                if (roles is null || user is null)
+                if (roles is null || !roles.Any() || user is null)
                 {
                     return QueryResult<IEnumerable<ulong>>.NotFound();
                 }
