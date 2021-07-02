@@ -54,7 +54,7 @@ class MessageHandlingService(BaseService):
         log.info(f'Message edited in #{before.channel.name} By: \
             {self.get_full_name(before.author)} \nBefore: {before.content} \nAfter: {after.content}')
 
-        await self.bot.message_route.edit_message(after.id, after.content)
+        #await self.bot.message_route.edit_message(after.id, after.content)
 
         embed = discord.Embed(title=f':repeat: **Message Edited in #{before.channel.name}**', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Message Link', value=f'[Click Here]({after.jump_url})')
