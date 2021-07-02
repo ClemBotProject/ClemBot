@@ -10,6 +10,9 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using CsvHelper;
 using FluentValidation;
+using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.EntityFrameworkCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,27 +42,23 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                 using var csvReader = new CsvReader(new StringReader(request.RoleMappingCsv), CultureInfo.InvariantCulture);
                 var mappings = csvReader.GetRecords<RoleMappingDto>().ToList();
 
-                var roles = _context.Roles
-                    .Where(x =>
-                        mappings.Select(y => y.RoleId).Contains(x.Id))
-                    .Include(y => y.Users)
-                    .ToList();
+                var roleSet = mappings
+                    .Select(y => y.RoleId)
+                    .ToHashSet();
 
-                var users = _context.Users
-                    .Where(x =>
-                        mappings.Select(y => y.UserId).Contains(x.Id))
-                    .ToList();
+                // Its faster to just clear all the role mappings and bulk insert again then it is to
+                // query which ones we need
 
-                foreach (var role in mappings.GroupBy(x => x.RoleId).ToList())
+                await _context.RoleUser
+                    .Where(x => roleSet.Contains(x.RoleId))
+                    .DeleteAsync();
+
+                var mappedEntities = mappings.Select(x => new RoleUser() {RoleId = x.RoleId, UserId = x.UserId});
+
+                await _context.BulkCopyAsync(new BulkCopyOptions()
                 {
-                    var mappedRole = roles.First(x => x.Id == role.Key);
-                    var mappedUsers = users.Where(x => role.Select(z => z.UserId).Contains(x.Id));
-
-                    mappedRole.Users.Clear();
-                    mappedRole.Users.AddRange(mappedUsers);
-                }
-
-                await _context.SaveChangesAsync();
+                    BulkCopyType = BulkCopyType.ProviderSpecific,
+                }, mappedEntities);
 
                 return QueryResult<ulong>.Success(request.GuildId);
             }

@@ -13,6 +13,7 @@ using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
 using FluentValidation.AspNetCore;
+using LinqToDB.EntityFrameworkCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -145,6 +146,10 @@ namespace ClemBot.Api.Core
 
             // Apply any new migrations
             context.Database.Migrate();
+
+            // Load linq2db for bulk copies
+            LinqToDBForEFTools.Initialize();
+
 
             // Reload enum types after a migration
             using var conn = (NpgsqlConnection)context.Database.GetDbConnection();

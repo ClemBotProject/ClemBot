@@ -514,6 +514,7 @@ namespace ClemBot.Api.Data.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
+
                 name: "Channels");
 
             migrationBuilder.DropTable(
