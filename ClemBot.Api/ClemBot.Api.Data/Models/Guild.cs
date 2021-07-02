@@ -12,6 +12,7 @@ namespace ClemBot.Api.Data.Models
         public string? WelcomeMessage { get; set; }
 
         public List<User> Users { get; set; } = new();
+        public List<GuildUser> GuildUsers { get; set; } = new();
 
         public List<Channel> Channels { get; set; } = new();
 

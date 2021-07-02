@@ -49,46 +49,46 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     .Include(y => y.Roles)
                     .ToListAsync();
 
-                    var guildEntity = guilds.FirstOrDefault(x => x.Id == request.GuildId);
+                var guildEntity = guilds.FirstOrDefault(x => x.Id == request.GuildId);
 
-                    if (guildEntity is null)
+                if (guildEntity is null)
+                {
+                    return QueryResult<ulong>.NotFound();
+                }
+                var rolesEntity = guildEntity.Roles ?? new List<Role>();
+
+                // Get all roles that are common to both enumerables and check for a name change
+                foreach (var roleId in rolesEntity
+                    .Select(x => x.Id)
+                    .Intersect(roles
+                        .Select(x => x.Id)))
+                {
+                    var role = rolesEntity.First(x => x.Id == roleId);
+                    role.Name = roles.First(x => x.Id == roleId).Name;
+                    role.Admin = roles.First(x => x.Id == roleId).Admin;
+                }
+
+                // Get all roles that have been deleted
+                foreach (var role in rolesEntity.Where(x => roles.All(y => y.Id != x.Id)).ToList())
+                {
+                    _context.Roles.Remove(role);
+                }
+
+                // get new roles
+                foreach (var role in roles.Where(x => rolesEntity.All(y => y.Id != x.Id)))
+                {
+                    var roleEntity = new Role
                     {
-                        return QueryResult<ulong>.NotFound();
-                    }
-                    var rolesEntity = guildEntity.Roles ?? new List<Role>();
+                        Id = role.Id,
+                        Name = role.Name,
+                        GuildId = request.GuildId,
+                        Admin = role.Admin,
+                        IsAssignable = false
+                    };
 
-                    // Get all roles that are common to both enumerables and check for a name change
-                    foreach (var roleId in rolesEntity
-                        .Select(x => x.Id)
-                        .Intersect(roles
-                            .Select(x => x.Id)))
-                    {
-                        var role = rolesEntity.First(x => x.Id == roleId);
-                        role.Name = roles.First(x => x.Id == roleId).Name;
-                        role.Admin = roles.First(x => x.Id == roleId).Admin;
-                    }
-
-                    // Get all roles that have been deleted
-                    foreach (var role in rolesEntity.Where(x => roles.All(y => y.Id != x.Id)).ToList())
-                    {
-                        _context.Roles.Remove(role);
-                    }
-
-                    // get new roles
-                    foreach (var role in roles.Where(x => rolesEntity.All(y => y.Id != x.Id)))
-                    {
-                        var roleEntity = new Role
-                        {
-                            Id = role.Id,
-                            Name = role.Name,
-                            GuildId = request.GuildId,
-                            Admin = role.Admin,
-                            IsAssignable = false
-                        };
-
-                        _context.Roles.Add(roleEntity);
-                        guildEntity.Roles?.Add(roleEntity);
-                    }
+                    _context.Roles.Add(roleEntity);
+                    guildEntity.Roles?.Add(roleEntity);
+                }
 
                 await _context.SaveChangesAsync();
 

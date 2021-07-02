@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,10 @@ using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using CsvHelper;
+using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.EntityFrameworkCore;
+using LinqToDB.Tools;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,48 +47,71 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
 
                 _logger.LogInformation("UpdateUsers CSV Deserialization succeeded");
 
-                var guilds = await _context.Guilds
+                var usersDb = (await _context.Users
+                    .Select(x => x.Id)
+                    .ToListAsyncEF())
+                    .ToImmutableHashSet();
+
+                var guildEntity = await _context.Guilds
                     .Include(y => y.Users)
-                    .ToListAsync();
-
-                var usersDb = await _context.Users.ToListAsync();
-
-                var guildEntity = guilds.FirstOrDefault(x => x.Id == request.GuildId);
+                    .FirstOrDefaultAsyncEF(x => x.Id == request.GuildId);
 
                 if (guildEntity is null)
                 {
                     return QueryResult<ulong>.NotFound();
                 }
 
+                List<User> newUsers = new();
+                List<GuildUser> newGuildUsers = new();
+
+                var guildUsersSet = guildEntity.Users.Select(x => x.Id).ToHashSet();
+
                 foreach (var user in users)
                 {
-                    _logger.LogInformation("Updating {user}", user);
-                    var dbUser = usersDb.FirstOrDefault(x => x.Id == user.UserId);
+                    _logger.LogTrace("Updating {user}", user);
 
-                    if (dbUser is null)
+                    if (!usersDb.Contains(user.UserId))
                     {
-                        _logger.LogInformation("Adding new {user}", user);
+                        _logger.LogTrace("Adding new {user}", user);
                         var userEntity = new User {Id = user.UserId, Name = user.Name};
-                        _context.Users.Add(userEntity);
 
-                        guildEntity.Users.Add(userEntity);
+                        newUsers.Add(userEntity);
+                        newGuildUsers.Add(new GuildUser(){GuildId = request.GuildId, UserId = user.UserId});
                     }
-                    else if (!guildEntity.Users.Contains(dbUser))
+                    else if (!guildUsersSet.Contains(user.UserId))
                     {
-                        _logger.LogInformation("Adding new user guild mapping {user}", user);
-                        guildEntity.Users.Add(dbUser);
+                        _logger.LogTrace("Adding new user guild mapping {user}", user);
+                        newGuildUsers.Add(new GuildUser(){GuildId = request.GuildId, UserId = user.UserId});
                     }
-                }
-
-                foreach (var user in guildEntity.Users
-                    .Where(x => users.All(y => y.UserId != x.Id)))
-                {
-                    _context.Users.Remove(user);
                 }
 
                 _logger.LogInformation("Saving UpdateUser Changes");
 
-                await _context.SaveChangesAsync();
+                /*
+                 * We need to bulk copy here so that we can handle high load guilds
+                 * without this our api will crash attempting to add all the users
+                 */
+
+                if (newUsers.Count > 0)
+                {
+                    await _context.BulkCopyAsync(new BulkCopyOptions()
+                    {
+                        BulkCopyType = BulkCopyType.ProviderSpecific,
+                    }, newUsers);
+                }
+
+                if (newGuildUsers.Count > 0)
+                {
+                    await _context.BulkCopyAsync(new BulkCopyOptions()
+                    {
+                        BulkCopyType = BulkCopyType.ProviderSpecific,
+                    }, newGuildUsers);
+                }
+
+                await _context.GuildUser
+                    .Where(x => x.GuildId == request.GuildId && !users.Select(y => y.UserId)
+                        .Contains(x.UserId))
+                    .DeleteAsync();
 
                 return QueryResult<ulong>.Success(request.GuildId);
             }

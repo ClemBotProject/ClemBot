@@ -16,6 +16,7 @@ namespace ClemBot.Api.Data.Models
         public Guild Guild { get; set; }
 
         public List<User> Users { get; set; }
+        public List<RoleUser> RoleUsers { get; set; }
 
         public List<ClaimsMapping> Claims { get; set; }
     }
