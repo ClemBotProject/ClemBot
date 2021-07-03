@@ -1,3 +1,6 @@
+import typing as t
+
+
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 
@@ -14,22 +17,48 @@ class MessageRoute(BaseRoute):
                              author_id: int,
                              channel_id: int,
                              **kwargs):
-        json = {
+
+        json = {'Messages': [{
             'Id': message_id,
             'Content': content,
             'GuildId': guild_id,
             'UserId': author_id,
             'ChannelId': channel_id
-        }
+        }]}
+
+        await self._client.post('messages', data=json, **kwargs)
+
+    async def batch_create_message(self, messages: t.Iterable, **kwargs):
+        messages = [{
+            'Id': m.id,
+            'Content': m.content,
+            'GuildId': m.guild,
+            'UserId': m.author,
+            'ChannelId': m.channel,
+            'Time': m.time.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        } for m in messages]
+
+        json = {'Messages': messages}
+
         await self._client.post('messages', data=json, **kwargs)
 
     async def edit_message(self, message_id: int, content: str):
-        json = {
+        json = {'Messages': [{
             'Id': message_id,
             'Content': content,
-        }
+        }]}
 
         await self._client.patch('messages', data=json)
+
+    async def batch_edit_message(self, messages: t.Iterable, **kwargs):
+        messages = [{
+            'Id': m.id,
+            'Content': m.content,
+            'Time': m.time.strftime('%Y-%m-%dT%H:%M:%S.%f')
+        } for m in messages]
+
+        json = {'Messages': messages}
+        await self._client.patch('messages', data=json, **kwargs)
 
     async def get_message(self, message_id: int):
         return await self._client.get(f'messages/{message_id}')

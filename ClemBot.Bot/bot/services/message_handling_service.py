@@ -1,3 +1,5 @@
+import dataclasses
+import datetime
 import json
 import logging
 import re
@@ -5,18 +7,73 @@ from typing import Iterable
 
 import discord
 
-import bot.bot_secrets as bot_secrets
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
+MESSAGE_BATCH_SIZE = 20
+
+
+@dataclasses.dataclass()
+class MessageDto:
+    id: int
+    content: str
+    guild: int
+    author: int
+    channel: int
+    time: datetime.datetime
+
+
+@dataclasses.dataclass()
+class MessageEditDto:
+    id: int
+    content: str
+    time: datetime.datetime
+
 
 class MessageHandlingService(BaseService):
 
     def __init__(self, *, bot):
         super().__init__(bot)
+        self.message_batch = {}
+        self.message_edit_batch = []
+
+    async def batch_send_message(self, message: discord.Message):
+        """
+        Batch the messages to send them all at once to
+        the api to avoid sending hundreds a second
+        """
+
+        if len(self.message_batch) > MESSAGE_BATCH_SIZE:
+            await self.bot.message_route.batch_create_message(list(self.message_batch.values()), raise_on_error=False)
+            self.message_batch.clear()
+
+        self.message_batch[message.id] = MessageDto(message.id,
+                                                    message.content,
+                                                    message.guild.id,
+                                                    message.author.id,
+                                                    message.channel.id,
+                                                    datetime.datetime.utcnow())
+
+    async def batch_send_message_edit(self, id: int, content: str):
+        """
+        Batch the message edits to send them all at once to
+        the api to avoid sending hundreds a second
+        """
+
+        if message := self.message_batch.get(id, None):
+            self.message_batch[message.id].content = content
+            return
+
+        if len(self.message_edit_batch) > MESSAGE_BATCH_SIZE:
+            await self.bot.message_route.batch_edit_message(self.message_edit_batch, raise_on_error=False)
+            self.message_edit_batch.clear()
+
+        self.message_edit_batch.append(MessageEditDto(id,
+                                                      content,
+                                                      datetime.datetime.utcnow()))
 
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
@@ -31,12 +88,7 @@ class MessageHandlingService(BaseService):
             log.warning('Invalid Message event received')
             return
 
-        #await self.bot.message_route.create_message(message.id,
-        #                                            message.content,
-        #                                            message.guild.id,
-        #                                            message.author.id,
-        #                                            message.channel.id,
-        #                                            raise_on_error=False)
+        await self.batch_send_message(message)
 
     @BaseService.Listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
@@ -54,7 +106,7 @@ class MessageHandlingService(BaseService):
         log.info(f'Message edited in #{before.channel.name} By: \
             {self.get_full_name(before.author)} \nBefore: {before.content} \nAfter: {after.content}')
 
-        #await self.bot.message_route.edit_message(after.id, after.content)
+        await self.batch_send_message_edit(after.id, after.content)
 
         embed = discord.Embed(title=f':repeat: **Message Edited in #{before.channel.name}**', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Message Link', value=f'[Click Here]({after.jump_url})')

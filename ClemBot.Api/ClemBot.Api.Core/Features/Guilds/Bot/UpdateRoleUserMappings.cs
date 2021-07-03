@@ -53,7 +53,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     .Where(x => roleSet.Contains(x.RoleId))
                     .DeleteAsync();
 
-                var mappedEntities = mappings.Select(x => new RoleUser() {RoleId = x.RoleId, UserId = x.UserId});
+                var mappedEntities = mappings.Select(x => new RoleUser() { RoleId = x.RoleId, UserId = x.UserId });
 
                 await _context.BulkCopyAsync(new BulkCopyOptions()
                 {
