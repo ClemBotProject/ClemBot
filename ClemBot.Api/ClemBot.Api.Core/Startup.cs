@@ -12,6 +12,7 @@ using ClemBot.Api.Core.Security.Policies.BotMaster;
 using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
+using ClemBot.Api.Services.Guilds.Models;
 using FluentValidation.AspNetCore;
 using LinqToDB.EntityFrameworkCore;
 using MediatR;
@@ -66,7 +67,7 @@ namespace ClemBot.Api.Core
             // Add JWT generator to DI
             services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
-            services.AddMediatR(typeof(Startup));
+            services.AddMediatR(typeof(Startup), typeof(GuildExistsRequest));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
             // Specify Swagger startup options
@@ -84,6 +85,9 @@ namespace ClemBot.Api.Core
                 });
                 o.CustomSchemaIds(type => type.ToString());
             });
+
+            // Add our caching dependency
+            services.AddLazyCache();
 
             // Grab connection string from config
             var connectionString = Configuration["ClemBotConnectionString"];

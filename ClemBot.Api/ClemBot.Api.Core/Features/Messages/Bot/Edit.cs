@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Messages.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,46 +14,49 @@ namespace ClemBot.Api.Core.Features.Messages.Bot
 {
     public class Edit
     {
-        public class Validator : AbstractValidator<Command>
-        {
-            public Validator()
-            {
-                RuleFor(p => p.Id).NotNull();
-                RuleFor(p => p.Content).NotNull();
-            }
-        }
-
-        public class Command : IRequest<Result<ulong, QueryStatus>>
+        public class MessageEditDto
         {
             public ulong Id { get; set; }
 
             public string Content { get; set; } = null!;
+
+            public string Time { get; set; } = null!;
         }
 
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+        public class Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
         {
-            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            public List<MessageEditDto> Messages { get; set; } = null!;
+        }
+
+        public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+        {
+            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var message = await _context.Messages
-                   .FirstOrDefaultAsync(g => g.Id == request.Id);
+                List<ulong> sentEditIds = new();
 
-                if (message is null)
+                foreach (var message in request.Messages)
                 {
-                    return QueryResult<ulong>.NotFound();
+                    if (!await _mediator.Send(new MessageExistsRequest { Id = message.Id }))
+                    {
+                        continue;
+                    }
+
+                    var time = DateTime.Parse(message.Time);
+
+                    _context.MessageContents.Add(new MessageContent()
+                    {
+                        MessageId = message.Id,
+                        Content = message.Content,
+                        Time = time
+                    });
+
+                    sentEditIds.Add(message.Id);
                 }
-
-                message.Contents.Add(new MessageContent()
-                {
-                    MessageId = message.Id,
-                    Content = request.Content,
-                    Time = DateTime.UtcNow
-                });
 
                 await _context.SaveChangesAsync();
 
-                return QueryResult<ulong>.Success(message.Id);
+                return QueryResult<IEnumerable<ulong>>.Success(sentEditIds);
             }
-
         }
     }
 }

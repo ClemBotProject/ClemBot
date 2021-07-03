@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.CustomPrefix;
+using ClemBot.Api.Services.CustomPrefix.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +31,7 @@ namespace ClemBot.Api.Core.Features.CustomPrefixes.Bot
             public string Prefix { get; set; } = null!;
         }
 
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+        public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, Result<ulong, QueryStatus>>
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -52,6 +54,9 @@ namespace ClemBot.Api.Core.Features.CustomPrefixes.Bot
                 guild.CustomPrefixes.Add(prefix);
 
                 await _context.SaveChangesAsync();
+
+                // Clear the prefixes from the cache we fetch new values on the next message
+                await _mediator.Send(new ClearCustomPrefixRequest { Id = request.GuildId });
 
                 return QueryResult<ulong>.Success(request.GuildId);
             }

@@ -73,15 +73,15 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     if (!usersDb.Contains(user.UserId))
                     {
                         _logger.LogTrace("Adding new {user}", user);
-                        var userEntity = new User {Id = user.UserId, Name = user.Name};
+                        var userEntity = new User { Id = user.UserId, Name = user.Name };
 
                         newUsers.Add(userEntity);
-                        newGuildUsers.Add(new GuildUser(){GuildId = request.GuildId, UserId = user.UserId});
+                        newGuildUsers.Add(new GuildUser() { GuildId = request.GuildId, UserId = user.UserId });
                     }
                     else if (!guildUsersSet.Contains(user.UserId))
                     {
                         _logger.LogTrace("Adding new user guild mapping {user}", user);
-                        newGuildUsers.Add(new GuildUser(){GuildId = request.GuildId, UserId = user.UserId});
+                        newGuildUsers.Add(new GuildUser() { GuildId = request.GuildId, UserId = user.UserId });
                     }
                 }
 

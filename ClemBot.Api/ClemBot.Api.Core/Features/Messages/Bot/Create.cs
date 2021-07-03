@@ -1,36 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Channels.Models;
+using ClemBot.Api.Services.Guilds.Models;
+using ClemBot.Api.Services.Users.Models;
 using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Messages.Bot
 {
     public class Create
     {
-        public class Validator : AbstractValidator<Command>
-        {
-            public Validator()
-            {
-                RuleFor(p => p.Id).NotNull();
-                RuleFor(p => p.Content).NotNull();
-                RuleFor(p => p.GuildId).NotNull();
-                RuleFor(p => p.ChannelId).NotNull();
-                RuleFor(p => p.UserId).NotNull();
-            }
-        }
-
-        public class Command : IRequest<Result<ulong, QueryStatus>>
+        public class MessageDto
         {
             public ulong Id { get; set; }
 
             public string Content { get; set; } = null!;
 
-            public DateTime Time { get; } = DateTime.UtcNow;
+            public string Time { get; set; } = null!;
 
             public ulong GuildId { get; set; }
 
@@ -39,44 +30,60 @@ namespace ClemBot.Api.Core.Features.Messages.Bot
             public ulong UserId { get; set; }
         }
 
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+        public class Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
         {
-            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            public List<MessageDto> Messages { get; set; } = null!;
+        }
+
+        public record Handler(ClemBotContext _context, IMediator _mediator)
+            : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+        {
+            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var message = new Message()
-                {
-                    Id = request.Id,
-                    GuildId = request.GuildId,
-                    UserId = request.UserId,
-                    ChannelId = request.ChannelId
-                };
+                List<ulong> createdMessageIds = new();
 
-                if (!await _context.Users.AnyAsync(x => x.Id == request.UserId))
+                foreach (var messageDto in request.Messages)
                 {
-                    return QueryResult<ulong>.NotFound(request.UserId);
+                    if (!await _mediator.Send(new UserExistsRequest { Id = messageDto.UserId }))
+                    {
+                        continue;
+                    }
+
+                    if (!await _mediator.Send(new GuildExistsRequest { Id = messageDto.GuildId }))
+                    {
+                        continue;
+                    }
+
+                    if (!await _mediator.Send(new ChannelExistsRequest { Id = messageDto.ChannelId }))
+                    {
+                        continue;
+                    }
+
+                    var message = new Message()
+                    {
+                        Id = messageDto.Id,
+                        GuildId = messageDto.GuildId,
+                        UserId = messageDto.UserId,
+                        ChannelId = messageDto.ChannelId
+                    };
+
+                    var time = DateTime.Parse(messageDto.Time);
+
+                    message.Contents.Add(new MessageContent()
+                    {
+                        MessageId = messageDto.Id,
+                        Time = time,
+                        Content = messageDto.Content
+                    });
+
+                    _context.Messages.Add(message);
+
+                    createdMessageIds.Add(messageDto.Id);
                 }
 
-                if (!await _context.Guilds.AnyAsync(x => x.Id == request.GuildId))
-                {
-                    return QueryResult<ulong>.NotFound(request.GuildId);
-                }
-
-                if (!await _context.Channels.AnyAsync(x => x.Id == request.ChannelId))
-                {
-                    return QueryResult<ulong>.NotFound(request.ChannelId);
-                }
-
-                message.Contents.Add(new MessageContent()
-                {
-                    MessageId = message.Id,
-                    Time = DateTime.UtcNow,
-                    Content = request.Content
-                });
-
-                _context.Messages.Add(message);
                 await _context.SaveChangesAsync();
 
-                return QueryResult<ulong>.Success(request.Id);
+                return QueryResult<IEnumerable<ulong>>.Success(createdMessageIds);
 
             }
         }
