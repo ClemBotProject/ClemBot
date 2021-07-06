@@ -39,22 +39,20 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-
                 _logger.LogInformation("Beginning UpdateRoles CSV Deserialization");
 
                 using var csvReader = new CsvReader(new StringReader(request.RoleCsv), CultureInfo.InvariantCulture);
                 var roles = csvReader.GetRecords<RoleDto>().ToList();
 
-                var guilds = await _context.Guilds
+                var guildEntity = await _context.Guilds
                     .Include(y => y.Roles)
-                    .ToListAsync();
-
-                var guildEntity = guilds.FirstOrDefault(x => x.Id == request.GuildId);
+                    .FirstOrDefaultAsync(x => x.Id == request.GuildId);
 
                 if (guildEntity is null)
                 {
                     return QueryResult<ulong>.NotFound();
                 }
+
                 var rolesEntity = guildEntity.Roles ?? new List<Role>();
 
                 // Get all roles that are common to both enumerables and check for a name change
