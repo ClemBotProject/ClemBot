@@ -25,7 +25,7 @@ class ChannelHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild: discord.Guild):
-        await self.bot.guild_route.update_guild_channels([guild])
+        await self.bot.guild_route.update_guild_channels(guild)
 
     @BaseService.Listener(Events.on_guild_channel_update)
     async def channel_update(self, before, after):
