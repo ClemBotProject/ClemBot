@@ -138,7 +138,7 @@ class MessageHandlingService(BaseService):
                 log.info(f'Uncached message edited in #{channel.name} By: \
                     {message["userId"]} \nBefore: {message["content"]} \nAfter: {payload.data["content"]}')
 
-                await self.bot.message_route.edit_message(message['id'], payload.data['content'])
+                await self.batch_send_message_edit(message['id'], payload.data['content'])
 
                 embed = discord.Embed(title=f':repeat: **Uncached message edited in #{channel.name}**',
                                       color=Colors.ClemsonOrange)
