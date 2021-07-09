@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using FluentValidation;
+using LinqToDB;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,27 +33,15 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var guild = await _context.Guilds
-                    .Include(y => y.Users)
-                    .Where(x => x.Id == request.GuildId)
-                    .FirstOrDefaultAsync();
+                await _context.RoleUser
+                    .Where(u => u.UserId == request.UserId && u.Role.GuildId == request.GuildId)
+                    .DeleteAsync();
 
-                var user = await _context.Users
-                    .Include(z => z.Roles)
-                    .Where(x => x.Id == request.UserId)
-                    .FirstOrDefaultAsync();
+                await _context.GuildUser
+                    .Where(u => u.UserId == request.UserId && u.GuildId == request.GuildId)
+                    .DeleteAsync();
 
-                if (!guild.Users.Contains(user))
-                {
-                    return QueryResult<ulong>.NotFound();
-                }
-
-                user.Roles.RemoveAll(x => x.GuildId == guild.Id);
-                guild.Users.Remove(user);
-
-                await _context.SaveChangesAsync();
-
-                return QueryResult<ulong>.Success(guild.Id);
+                return QueryResult<ulong>.Success(request.GuildId);
             }
         }
     }

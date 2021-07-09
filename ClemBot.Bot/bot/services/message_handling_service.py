@@ -13,7 +13,7 @@ from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
-MESSAGE_BATCH_SIZE = 20
+MESSAGE_BATCH_SIZE = 5
 
 
 @dataclasses.dataclass()
@@ -47,8 +47,14 @@ class MessageHandlingService(BaseService):
         """
 
         if len(self.message_batch) > MESSAGE_BATCH_SIZE:
-            await self.bot.message_route.batch_create_message(list(self.message_batch.values()), raise_on_error=False)
+
+            # Copy the list values and clear the batch list BEFORE
+            # we send them. This way we can accept new messages while
+            # the current batch is being sent
+            batch_values = list(self.message_batch.values())
             self.message_batch.clear()
+
+            await self.bot.message_route.batch_create_message(batch_values, raise_on_error=False)
 
         self.message_batch[message.id] = MessageDto(message.id,
                                                     message.content,
@@ -68,8 +74,14 @@ class MessageHandlingService(BaseService):
             return
 
         if len(self.message_edit_batch) > MESSAGE_BATCH_SIZE:
-            await self.bot.message_route.batch_edit_message(self.message_edit_batch, raise_on_error=False)
+
+            # Copy the list and clear the batch edit list BEFORE
+            # we send them. This way we can accept new message edits while
+            # the current batch is being sent
+            batch_values = list(self.message_edit_batch)
             self.message_edit_batch.clear()
+
+            await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
         self.message_edit_batch.append(MessageEditDto(id,
                                                       content,
