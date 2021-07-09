@@ -13,7 +13,7 @@ from bot.services.base_service import BaseService
 
 log = logging.getLogger(__name__)
 
-MESSAGE_BATCH_SIZE = 5
+MESSAGE_BATCH_SIZE = 20
 
 
 @dataclasses.dataclass()
