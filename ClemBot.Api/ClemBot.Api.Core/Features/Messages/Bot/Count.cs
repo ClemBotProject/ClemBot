@@ -31,16 +31,6 @@ namespace ClemBot.Api.Core.Features.Messages.Bot
             public async Task<Result<Model, QueryStatus>> Handle(Query request,
                 CancellationToken cancellationToken)
             {
-                // var messages = await _context.Messages
-                //     .Where(x => x.UserId == request.UserId)
-                //     .Include(y => y.Guild)
-                //     .FirstOrDefaultAsync();
-
-                // if (messages is null)
-                // {
-                //     return QueryResult<Model>.NotFound();
-                // }
-
                 var dayOffset = DateTime.Now.Subtract(new TimeSpan(days: request.Days, hours: 0, minutes: 0, seconds: 0));
                 var messages = await _context.MessageContents
                     .Include(z => z.Message)
