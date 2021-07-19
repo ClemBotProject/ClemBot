@@ -1,3 +1,4 @@
+from bot.api.message_route import MessageRoute
 import logging
 import discord
 import discord.ext.commands as commands
@@ -15,6 +16,9 @@ class InfoCog(commands.Cog):
     @ext.required_claims(Claims.moderation_infraction_view)
     @ext.ignore_claims_pre_invoke()
     async def info(self, ctx, user: discord.User = None):
+        #Default range for message count 30 days(~1 month)
+        DEFAULT_MESSAGE_RANGE = 30
+
         #If the command is invoked without a specified user, it will return info on the calling user
         if not user:
             user = ctx.author
@@ -54,9 +58,8 @@ class InfoCog(commands.Cog):
             if (ctx.command.claims_check(claims)) or (ctx.author.id == user.id):
                 #prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
                 guild_info = '» **Joined:** ' + member.joined_at.strftime('%b %d %Y %I:%M:%S %p') 
-            #will re-add message counts soon
-            # messages = await self.bot.message_route.get_message_count_range(ctx.guild.id, user.id)
-            # guild_info += f'\n» **Message count (last 30 days):** {await MessageRepository().get_user_message_count_range(member.id, ctx.guild.id, 30)}'
+            messages = (await self.bot.message_route.range_count_messages(user.id, ctx.guild.id, DEFAULT_MESSAGE_RANGE))['messageCount']
+            guild_info += f'\n» **Message count (last 30 days):** {messages}'
             guild_info += f'\n» **Roles:** '
             log.info(f'User has roles: {member.roles}')
             #skipping the first index because it is just @everyone

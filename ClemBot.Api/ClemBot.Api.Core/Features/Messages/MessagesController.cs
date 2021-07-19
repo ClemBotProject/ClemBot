@@ -49,5 +49,14 @@ namespace ClemBot.Api.Core.Features.Messages
                 { Status: QueryStatus.Success } result => Ok(result.Value),
                 _ => NoContent()
             };
+
+        [HttpGet("bot/[controller]/Count")]
+        [BotMasterAuthorize]
+        public async Task<IActionResult> Count(Bot.Count.Query query) =>
+            await _mediator.Send(query) switch
+            {
+                {Status: QueryStatus.Success} result => Ok(result.Value),
+                _ => NoContent()
+            };
     }
 }

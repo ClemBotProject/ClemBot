@@ -1,5 +1,7 @@
 import typing as t
 
+from discord import user
+
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
@@ -62,3 +64,11 @@ class MessageRoute(BaseRoute):
 
     async def get_message(self, message_id: int):
         return await self._client.get(f'messages/{message_id}')
+
+    async def range_count_messages(self, user_id: int, guild_id: int, days: int):
+        json = {
+            'UserId' : user_id,
+            'GuildId' : guild_id,
+            'Days' : days
+        }
+        return await self._client.get('messages/Count', data=json)
