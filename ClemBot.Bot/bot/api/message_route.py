@@ -71,4 +71,4 @@ class MessageRoute(BaseRoute):
             'GuildId' : guild_id,
             'Days' : days
         }
-        return await self._client.get('messages/Count', data=json)
+        return (await self._client.get('messages/Count', data=json))['messageCount']
