@@ -1,8 +1,5 @@
 import typing as t
 
-from discord import user
-
-
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 
