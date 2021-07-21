@@ -1,11 +1,11 @@
 name: ClemBot Prod Deployment
 
 on:
-  #push:
-    #branches: [ master ]
-    #paths: 
-      #- "ClemBot.Api/**"
-      #- "ClemBot.Bot/**"
+  push:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Api/**"
+      - "ClemBot.Bot/**"
   workflow_dispatch:
     inputs:
       name:
