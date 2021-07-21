@@ -94,8 +94,9 @@ jobs:
           
   deploy-clembot:
     runs-on: [self-hosted]
+    needs: ['build-push-clembot-bot', 'build-push-clembot-api']
     steps:
-      - uses: actions/checkout@V2
+      - uses: actions/checkout@v2
       - name: Copy Secrets
         run: |
           cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
