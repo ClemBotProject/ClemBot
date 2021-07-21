@@ -1,44 +1,51 @@
 name: ClemBot Prod Deployment
 
 on:
-  push:
-    branches: [ master ]
-    paths: 
-      - "ClemBot.Api/**"
-      - "ClemBot.Bot/**"
+  #push:
+    #branches: [ master ]
+    #paths: 
+      #- "ClemBot.Api/**"
+      #- "ClemBot.Bot/**"
   workflow_dispatch:
     inputs:
       name:
         description: 'Manual ClemBot workflow trigger'
         required: true
         default: 'Manual Deployment'
+env:
+  REGISTRY: ghcr.io
 
 jobs:
-    deploy:
-        name: Deploy
-        runs-on: [self-hosted]
-        steps:
-            - uses: actions/checkout@v2
-            - name: Copy Secrets
-              run: |
-                cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
-                cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
-            - name: Stop ClemBot Containers
-              run: |
-                docker stop $(docker ps -q)
-            - name: Build updated Docker Images
-              run: |
-                ls
-                docker-compose build
-            - name: Deploy updated images
-              run: |
-                docker-compose up -d
-            - name: Prune old images and containers
-              run: |
-                docker system prune -f
-            - name: Discord notification
-              env:
-                DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
-              uses: "Ilshidur/action-discord@0.3.0"
-              with:
-                args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.Api has been deployed.'
+  build-push-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name == 'push'
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract Docker metadata for main build
+        id: meta
+        uses: docker/metadata-action@v3.4.1
+        with:
+          images: ${{ env.REGISTRY }}/ClemBotProject/ClemBot
+          flavor: |
+            latest=${{ github.event_name == 'push' }}
+            
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.6.1
+        with:
+          context: ./ClemBot.Api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-to: type=gha, scope=${{github.repository}}
+          cache-from: type=gha, scope=${{github.repository}}
+            
+
