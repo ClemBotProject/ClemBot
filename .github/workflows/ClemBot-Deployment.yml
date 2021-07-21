@@ -103,6 +103,7 @@ jobs:
           cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
       - name: Deploy updated images
         run: |
+          docker-compose pull
           docker-compose up -d
       - name: Discord notification
         env:
