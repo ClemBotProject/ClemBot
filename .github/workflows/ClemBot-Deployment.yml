@@ -16,7 +16,7 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-push-images:
+  build-push-clembot-api:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -40,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3.4.1
         with:
-          images: ${{ env.REGISTRY }}/ClemBotProject/ClemBot
+          images: ${{ env.REGISTRY }}/ClemBotProject/ClemBot.Api
           flavor: |
             latest=${{ github.event_name == 'push' }}
             
