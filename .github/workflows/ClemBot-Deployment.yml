@@ -91,4 +91,22 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: type=gha, scope=${{github.repository}}
           cache-from: type=gha, scope=${{github.repository}}
+          
+  deploy-clembot:
+    runs-on: [self-hosted]
+    steps:
+      - uses: actions/checkout@V2
+      - name: Copy Secrets
+        run: |
+          cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
+          cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
+      - name: Deploy updated images
+        run: |
+          docker-compose up -d
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
+        uses: "Ilshidur/action-discord@0.3.0"
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.Api has been deployed.'
 
