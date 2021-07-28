@@ -32,5 +32,16 @@ services:
     volumes:
       - ~/Logs:/ClemBot.Bot/Logs
     
+  # Create the Site process to serve user requests
+  clembot.site:
+    image: ghcr.io/clembotproject/clembot.site:master
+    restart: always
+    depends_on: 
+      - clembot.api
+    networks: 
+      - ClemBotNet
+    env_file: 
+      - ClemBot.Site/ClemBot.Site_env.env
+
 networks:
   ClemBotNet:
