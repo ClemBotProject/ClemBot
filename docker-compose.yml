@@ -10,11 +10,10 @@ services:
       - PGID=1000
       - TZ=Europe/London
       - URL=clembot.io
-      - SUBDOMAINS=api
       - VALIDATION=http
       - EMAIL=jaymaddencox@gmail.com
       - ONLY_SUBDOMAINS=false
-      - STAGING=true
+      - STAGING=false
     volumes:
       - swag-config:/config
     ports:
