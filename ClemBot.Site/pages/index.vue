@@ -244,6 +244,14 @@ export default Vue.extend({
   width: 100%;
 }
 
+@media (max-width: 769px) {
+  #hero-columns {
+    padding-right: 0;
+  }
 
+  #splash-card {
+    margin: 1.5rem !important;
+  }
+}
 
 </style>
