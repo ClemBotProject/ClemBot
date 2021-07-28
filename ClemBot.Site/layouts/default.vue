@@ -75,6 +75,7 @@
 #main-logo {
   position: fixed;
   z-index: 200;
+  min-width: 5rem;
 }
 
 #splash-card {
