@@ -6,8 +6,6 @@ WORKDIR /usr/src/clembot.site
 # Install app dependencies
 COPY package*.json ./
 
-RUN npm ci -only=production
-
 COPY . .
 
 RUN npm install && npm run build
