@@ -1,10 +1,17 @@
 const isProd = () => process.env.PROD === '1'
+const prodHost = '0.0.0.0'
+const localHost = 'localhost'
 const prodUrl = 'http://clembot.site:80/api'
 const devUrl = 'http://localhost:5001/api'
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
+
+  server: {
+    port: 3000, // default: 3000
+    host: isProd() ? prodHost : localHost, // default: localhost
+  },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
