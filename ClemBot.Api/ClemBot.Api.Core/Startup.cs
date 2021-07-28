@@ -89,6 +89,13 @@ namespace ClemBot.Api.Core
             // Add our caching dependency
             services.AddLazyCache();
 
+            services.AddCors(options => {
+                options.AddDefaultPolicy(
+                    builder => {
+                        builder.WithOrigins("http://localhost:3000");
+                    });
+            });
+
             // Grab connection string from config
             var connectionString = Configuration["ClemBotConnectionString"];
 
@@ -142,6 +149,8 @@ namespace ClemBot.Api.Core
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();

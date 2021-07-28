@@ -3,12 +3,11 @@ services:
   # Create the api first
   clembot.api:
     restart: always
-    image: ghcr.io/clembotproject/clembot.api:master
+    build: ClemBot.Api/
     networks:
         - ClemBotNet
     env_file: 
         - ClemBot.Api/ClemBot.Api_env.env
-        
   # Create the python eval container for sandboxed python code execution
   snekbox:
     image: ghcr.io/python-discord/snekbox:latest
@@ -17,10 +16,9 @@ services:
     networks: 
       - ClemBotNet
     privileged: true
-    
   # Create the Bot process to server as the dapi frontend
   clembot.bot:
-    image: ghcr.io/clembotproject/clembot.bot:master
+    build: ClemBot.Bot/
     restart: always
     user: root
     depends_on: 
@@ -31,6 +29,16 @@ services:
       - ClemBot.Bot/ClemBot.Bot_env.env
     volumes:
       - ~/Logs:/ClemBot.Bot/Logs
+  # Create the Site process to serve users requests over https
+  clembot.site:
+    restart: always
+    build: ClemBot.Site/
+    networks:
+        - ClemBotNet
+	ports: 
+		- "3000:3000"
+    env_file: 
+        - ClemBot.Site/ClemBot.Site_env.env
     
 networks:
   ClemBotNet:

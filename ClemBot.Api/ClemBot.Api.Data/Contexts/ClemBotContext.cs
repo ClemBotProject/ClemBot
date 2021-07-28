@@ -23,6 +23,7 @@ namespace ClemBot.Api.Data.Contexts
         public DbSet<Channel> Channels { get; set; }
         public DbSet<ClaimsMapping> ClaimsMappings { get; set; }
         public DbSet<CustomPrefix> CustomPrefixs { get; set; }
+        public DbSet<CommandInvocation> CommandInvocations { get; set; }
         public DbSet<DesignatedChannelMapping> DesignatedChannelMappings { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<GuildUser> GuildUser { get; set; }
