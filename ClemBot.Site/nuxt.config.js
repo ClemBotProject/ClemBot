@@ -42,7 +42,6 @@ export default {
 
   env: {
     prod: process.env.PROD === '1',
-    baseUrl: process.env.BASE_URL,
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
