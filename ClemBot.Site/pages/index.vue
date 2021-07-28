@@ -2,7 +2,7 @@
   <div>
     <section id="splash-image" class="hero has-shadow is-fullheight">
       <div class="hero-body is-vcentered">
-        <div class="columns" id="hero-columns">
+        <div class="columns is-desktop" id="hero-columns">
           <div class="column is-two-fifths">
           <img
             id="main-logo"
@@ -244,7 +244,7 @@ export default Vue.extend({
   width: 100%;
 }
 
-@media (max-width: 769px) {
+@media (max-width: 1024px) {
   #hero-columns {
     padding-right: 0;
   }
