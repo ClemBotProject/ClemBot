@@ -1,4 +1,5 @@
-const isProd = () => process.env.PROD === '1'
+// eslint-disable-next-line eqeqeq
+const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
 const prodUrl = 'https://clembot.io/api'
