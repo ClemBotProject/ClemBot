@@ -34,7 +34,7 @@ export default {
   },
 
   axios: {
-    baseURL: runtimeUrl, // Used as fallback if no runtime config is provided
+    baseURL: 'fasd', // Used as fallback if no runtime config is provided
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
