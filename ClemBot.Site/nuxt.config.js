@@ -1,5 +1,6 @@
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
+console.log(process.env.PROD)
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
 const prodUrl = 'https://clembot.io/api'
