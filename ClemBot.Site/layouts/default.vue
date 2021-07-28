@@ -42,23 +42,25 @@
         </b-navbar-item>
       </template>
       <template #end>
-        <b-navbar-item
-          href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
-        >
-          <b-button icon-left="plus" class="is-primary">
-            <b>Invite to Server </b>
-          </b-button>
-        </b-navbar-item>
-        <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
-          <b-icon id="tray-icons" icon="discord"> </b-icon>
-        </b-navbar-item>
-        <b-navbar-item
-          id="tray-icons"
-          target="_blank"
-          href="https://github.com/ClemBotProject/ClemBot"
-        >
-          <b-icon icon="github"> </b-icon>
-        </b-navbar-item>
+        <div id="socials">
+          <b-navbar-item
+            href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
+          >
+            <b-button icon-left="plus" class="is-primary">
+              <b>Invite to Server </b>
+            </b-button>
+          </b-navbar-item>
+          <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
+            <b-icon id="tray-icons" icon="discord"> </b-icon>
+          </b-navbar-item>
+          <b-navbar-item
+            id="tray-icons"
+            target="_blank"
+            href="https://github.com/ClemBotProject/ClemBot"
+          >
+            <b-icon icon="github"> </b-icon>
+          </b-navbar-item>
+        </div>
       </template>
     </b-navbar>
     <section class="hero">
@@ -75,6 +77,8 @@
 #main-logo {
   position: fixed;
   z-index: 200;
+  min-width: 5rem;
+  max-width: 6rem;
 }
 
 #splash-card {
@@ -98,6 +102,12 @@
 #tray-icons :hover {
   transform: scale(1.1);
   color: white;
+}
+
+#socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #discord-login :hover + .animation-wrapper {

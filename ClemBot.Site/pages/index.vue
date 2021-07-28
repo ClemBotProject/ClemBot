@@ -1,8 +1,9 @@
 <template>
   <div>
     <section id="splash-image" class="hero has-shadow is-fullheight">
-      <div class="hero-body columns is-vcentered">
-        <div class="column is-two-fifths">
+      <div class="hero-body is-vcentered">
+        <div class="columns is-desktop" id="hero-columns">
+          <div class="column is-two-fifths">
           <img
             id="main-logo"
             class="mx-6 mt-6 is-justify-content-center is-align-content-center"
@@ -38,7 +39,7 @@
                       column
                     "
                   >
-                    <div class="columns">
+                    <div class="columns is-mobile">
                       <p class="title column has-text-centered mt-3">
                         Summon me to your Server!
                       </p>
@@ -98,6 +99,7 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
     </section>
     <section class="hero is-fullheight-with-navbar">
@@ -119,6 +121,7 @@
     </section>
   </div>
 </template>
+
 
 <script lang="ts">
 import Vue from 'vue'
@@ -236,4 +239,19 @@ export default Vue.extend({
   transition: none;
   transform: none;
 }
+
+#hero-columns {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  #hero-columns {
+    padding-right: 0;
+  }
+
+  #splash-card {
+    margin: 1.5rem !important;
+  }
+}
+
 </style>

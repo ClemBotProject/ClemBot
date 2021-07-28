@@ -1,5 +1,5 @@
 <template>
-  <section class="section is-medium">
+  <section class="section is-medium" id="wiki">
     <div class="columns">
       <div class="column is-2">
         <b-menu id="wiki-menu">
@@ -103,4 +103,9 @@ export default Vue.extend({
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   overflow-y: auto;
 }
+
+#wiki {
+  margin-top: 4rem;
+}
+
 </style>
