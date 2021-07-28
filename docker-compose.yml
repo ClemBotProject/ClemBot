@@ -68,6 +68,9 @@ services:
     env_file: 
       - ClemBot.Site/ClemBot.Site_env.env
 
+volumes:
+  swag-config:
+
 networks:
   clembot-network:
   nginx-proxy:
