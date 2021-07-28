@@ -1,10 +1,10 @@
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
-console.log(process.env.PROD)
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
 const prodUrl = 'https://clembot.io/api'
 const devUrl = 'http://localhost:5001/api'
+console.log(isProd() ? prodUrl : devUrl)
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
