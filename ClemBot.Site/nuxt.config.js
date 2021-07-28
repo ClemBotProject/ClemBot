@@ -3,7 +3,7 @@ const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
 const prodUrl = 'https://clembot.io/api'
-const devUrl = 'http://localhost:5001/api'
+const devUrl = 'http://localhost:5000/api'
 
 const runtimeUrl = isProd() ? prodUrl : devUrl
 
