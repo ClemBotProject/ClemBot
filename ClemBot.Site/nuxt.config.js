@@ -1,7 +1,7 @@
 const isProd = () => process.env.PROD === '1'
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
-const prodUrl = 'http://clembot.api:80/api'
+const prodUrl = 'https://clembot.io/api'
 const devUrl = 'http://localhost:5001/api'
 
 export default {
