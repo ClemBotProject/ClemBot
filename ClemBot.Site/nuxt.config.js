@@ -30,7 +30,7 @@ export default {
   },
 
   axios: {
-    baseURL: isProd() ? prodUrl : devUrl, // Used as fallback if no runtime config is provided
+    baseURL: isProd() ? devUrl : prodUrl, // Used as fallback if no runtime config is provided
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
