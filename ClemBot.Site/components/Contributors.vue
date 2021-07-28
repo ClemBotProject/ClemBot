@@ -7,7 +7,7 @@
       <div
         v-for="contributor in contributors"
         :key="contributor"
-        class="column is-1 is-child"
+        class="column is-1-tablet is-1-desktop is-2-mobile is-child"
       >
         <a :href="contributor.html_url">
           <b-image
