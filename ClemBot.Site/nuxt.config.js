@@ -1,5 +1,7 @@
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
+const prodHost = '0.0.0.0'
+const localHost = 'localhost'
 const prodUrl = 'https://clembot.io:443/api'
 const devUrl = 'http://localhost:5000/api'
 
@@ -14,6 +16,7 @@ export default {
 
   server: {
     port: 3000, // default: 3000
+    host: isProd() ? prodHost : localHost, // default: localhost
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -31,7 +34,7 @@ export default {
   },
 
   axios: {
-    baseURL: runtimeUrl, // Used as fallback if no runtime config is provided
+    baseURL: isProd() ? prodUrl : devUrl, // Used as fallback if no runtime config is provided
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
