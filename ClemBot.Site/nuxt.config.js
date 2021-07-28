@@ -1,8 +1,13 @@
-const isProd = () => process.env.PROD === '1'
+// eslint-disable-next-line eqeqeq
+const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
-const prodUrl = 'http://clembot.api:80/api'
+const prodUrl = 'https://clembot.io/api'
 const devUrl = 'http://localhost:5001/api'
+console.log(process.env)
+// eslint-disable-next-line eqeqeq
+console.log(process.env.PROD == '1')
+console.log(isProd() ? prodUrl : devUrl)
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
@@ -28,7 +33,7 @@ export default {
   },
 
   axios: {
-    baseURL: isProd() ? prodUrl : devUrl, // Used as fallback if no runtime config is provided
+    baseURL: isProd() ? devUrl : prodUrl, // Used as fallback if no runtime config is provided
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css

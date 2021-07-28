@@ -1,47 +1,75 @@
 version: "3.7"
 services:
-  # Create the api first
+  # Create the reverse proxy to route requests and handle ssl/tsl
+  nginx-proxy:
+    image: ghcr.io/linuxserver/swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - URL=clembot.io
+      - VALIDATION=http
+      - EMAIL=jaymaddencox@gmail.com
+      - ONLY_SUBDOMAINS=false
+      - STAGING=false
+    volumes:
+      - swag-config:/config
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - nginx-proxy
+  # Create the api
   clembot.api:
     restart: always
     image: ghcr.io/clembotproject/clembot.api:master
     networks:
-        - ClemBotNet
+        - clembot-network 
+        - nginx-proxy
     env_file: 
         - ClemBot.Api/ClemBot.Api_env.env
-        
   # Create the python eval container for sandboxed python code execution
   snekbox:
     image: ghcr.io/python-discord/snekbox:latest
     init: true
     ipc: none
+    depends_on: 
+      - nginx-proxy
     networks: 
-      - ClemBotNet
+      - clembot-network 
     privileged: true
-    
   # Create the Bot process to server as the dapi frontend
   clembot.bot:
     image: ghcr.io/clembotproject/clembot.bot:master
     restart: always
     user: root
     depends_on: 
+      - nginx-proxy
       - clembot.api
     networks: 
-      - ClemBotNet
+      - clembot-network 
     env_file: 
       - ClemBot.Bot/ClemBot.Bot_env.env
     volumes:
       - ~/Logs:/ClemBot.Bot/Logs
-    
   # Create the Site process to serve user requests
   clembot.site:
     image: ghcr.io/clembotproject/clembot.site:master
     restart: always
     depends_on: 
+      - nginx-proxy
       - clembot.api
     networks: 
-      - ClemBotNet
+      - clembot-network 
+      - nginx-proxy
     env_file: 
       - ClemBot.Site/ClemBot.Site_env.env
 
+volumes:
+  swag-config:
+
 networks:
-  ClemBotNet:
+  clembot-network:
+  nginx-proxy:
