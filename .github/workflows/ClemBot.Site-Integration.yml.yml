@@ -4,11 +4,11 @@ on:
   push:
     branches: [ master ]
     paths: 
-      - "ClemBot.Bot/**"
+      - "ClemBot.Site/**"
   pull_request:
     branches: [ master ]
     paths: 
-      - "ClemBot.Bot/**"
+      - "ClemBot.Site/**"
   workflow_dispatch:
 
 jobs:
