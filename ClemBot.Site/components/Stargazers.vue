@@ -53,7 +53,7 @@ export default Vue.extend({
 
   async fetch() {
     this.starGazers = await this.$api.$axios.$get<Array<StarGazer>>(
-      'https://api.github.com/repos/ClemBotProject/ClemBot/stargazers'
+      'https://api.github.com/repos/ClemBotProject/ClemBot/stargazers?per_page=100'
     )
   },
 })
