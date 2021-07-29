@@ -162,7 +162,7 @@ export default Vue.extend({
           {
             title: 'Custom Tags',
             description:
-              'Create custom tags and invoke them later to easily convey repeated information',
+              'Create custom tags and invoke them later to easily convey repeated information or just an inside joke',
             image: 'FeatureImages/TagInvoke.png',
           },
           {
