@@ -174,7 +174,7 @@ export default Vue.extend({
           {
             title: 'Custom Prefixes',
             description:
-              'Do you have many bots in your server? Clembots commands prefix is totally customizable!',
+              'Do you have a lot of bots in your server? Clembots commands prefix is totally customizable!',
             image: 'FeatureImages/CustomPrefix.png',
           },
         ],
