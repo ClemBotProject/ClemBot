@@ -26,9 +26,7 @@ class EmoteCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.gif?v=1') as resp:
                 test_gif = await resp.read()
-
-        async with aiohttp.ClientSession() as session2:
-            async with session2.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp2:
+            async with session.get(f'https://cdn.discordapp.com/emojis/{emote_id}.png?v=1') as resp2:
                 test_png = await resp2.read()
 
         try:
