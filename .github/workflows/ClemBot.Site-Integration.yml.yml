@@ -1,0 +1,27 @@
+name: ClemBot.Site Master integration
+
+on:
+  push:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Site/**"
+  pull_request:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Site/**"
+  workflow_dispatch:
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ClemBot.Site
+    steps:
+    - name: Lint with Prettier
+      uses: creyD/prettier_action@v3.3
+      with:
+        dry: true
+        only_changed: true
+

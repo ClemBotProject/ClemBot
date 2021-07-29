@@ -46,7 +46,9 @@ class ClemBot(commands.Bot):
         self.messenger: Messenger = messenger
         self.scheduler: Scheduler = scheduler
 
+        # Register our before and after invoke hooks
         self._before_invoke = self.command_claims_check
+        self._after_invoke = self.on_after_command_invoke
 
         # pylint: disable=undefined-variable
         self.guild_route: guild_route.GuildRoute = None
@@ -60,6 +62,7 @@ class ClemBot(commands.Bot):
         self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None
         self.moderation_route: moderation_route.ModerationRoute = None
         self.claim_route: claim_route.ClaimRoute = None
+        self.commands_route: commands_route.CommandsRoute = None
 
         self.load_cogs()
         self.active_services = {}
@@ -84,7 +87,7 @@ class ClemBot(commands.Bot):
         # startup service has active routes
         self.load_routes(self.api_client)
 
-        await self.change_presence(activity=discord.Game(name='Run !help'))
+        await self.change_presence(activity=discord.Game(name='https://clembot.io'))
 
         # Connect to the api Before the services are loaded so they can begin their startup routines
         # this will block until the api is connected to, only THEN will we run our service startups
@@ -140,40 +143,50 @@ class ClemBot(commands.Bot):
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
         command = ctx.command
-        author = ctx.author
-
-        if await self.is_owner(author):
-            # if the author owns the bot, authorize the command no matter what
-            return
-
-        if not isinstance(command, ext.ExtBase):
-            # If the command isn't an extension command let it through, we dont need to think about it
-            return
-
-        if author.guild_permissions.administrator:
-            # Admins have full bot access no matter what
-            return
-
-        if len(command.claims) == 0:
-            # command requires no claims nothing else to do
-            return
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
             return
+
+        if await self.claims_check(ctx):
+            return
+
+        claims_str = '\n'.join(command.claims)
+        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
+                                f'\n **Help:** For more information on how claims work please visit my website [Link!]'
+                                f'(https://clembot.io/wiki)\n'
+                                f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
+
+    async def claims_check(self, ctx: commands.Context):
+        """
+        Before during cog execution to check if a user has the correct claims for aspects of a command
+        """
+        command = ctx.command
+        author = ctx.author
+
+        if await self.is_owner(author):
+            # if the author owns the bot, authorize the command no matter what
+            return True
+
+        if not isinstance(command, ext.ExtBase):
+            # If the command isn't an extension command let it through, we dont need to think about it
+            return True
+
+        if author.guild_permissions.administrator:
+            # Admins have full bot access no matter what
+            return True
+
+        if len(command.claims) == 0:
+            # command requires no claims nothing else to do
+            return True
 
         # Hit the db to get a users current claims
         claims = await self.claim_route.get_claims_user(author)
 
         if claims and command.claims_check(claims):
             # Author has valid claims
-            return
-
-        claims_str = '\n'.join(command.claims)
-        raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
-                                f'\n **Help:** For more information on how claims work please see the wiki [Link!]('
-                                f'https://github.com/ClemsonCPSC-Discord/ClemBot/wiki/Authorization-Claims)\n'
-                                f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
+            return True
+        return False
 
     async def on_message(self, message) -> None:
         """
@@ -263,6 +276,9 @@ class ClemBot(commands.Bot):
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
+
+    async def on_after_command_invoke(self, ctx):
+        await self.publish_with_error(Events.on_after_command_invoke, ctx)
 
     async def on_command_error(self, ctx, error):
         """

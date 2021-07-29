@@ -23,7 +23,7 @@ class InviteCog(commands.Cog):
         embed.add_field(name='Link',
                         value='[Click me!](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1409412343&scope=bot)')
         embed.add_field(name='Resources',
-                        value='For information on advanced features\nplease see my wiki\n[Link!](https://github.com/ClemsonCPSC-Discord/ClemBot/wiki)')
+                        value='For information on advanced features\nplease see my wiki\n[Link!](https://clembot.io/wiki)')
         embed.set_thumbnail(url=self.bot.user.avatar_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
@@ -39,9 +39,10 @@ class InviteCog(commands.Cog):
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.description = f'{len(self.bot.guilds)} Guilds\n{len(self.bot.users)} Users'
         embed.title = f'{self.bot.user.name}#{self.bot.user.discriminator}'
-        embed.add_field(name='Owner', value=owner.mention)
+        embed.add_field(name='Owner', value=owner.mention, inline=False)
+        embed.add_field(name='Website', value='[Link!](https://clembot.io)')
         embed.add_field(name='Repository', value='[Link!](https://github.com/ClemBotProject/ClemBot)')
-        embed.add_field(name='Wiki', value='[Link!](https://github.com/ClemBotProject/ClemBot/wiki)')
+        embed.add_field(name='Wiki', value='[Link!](https://clembot.io/wiki)')
         embed.set_thumbnail(url=self.bot.user.avatar_url_as(static_format='png'))
         await ctx.send(embed=embed)
 

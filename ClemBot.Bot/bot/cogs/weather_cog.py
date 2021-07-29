@@ -196,9 +196,19 @@ class WeatherCog(commands.Cog):
             err_str = re.sub(self.weather_api_key, "CLASSIFIED", err_str)
             raise Exception(err_str).with_traceback(err.__traceback__)
 
+        geo_err = res_geo_json.get('error', {}).get('code', {})
+        geo_err_desc = res_geo_json.get('error', {}).get('description', {})
         city = res_geo_json.get('standard', {}).get('city', {})
         lon = res_geo_json.get('longt', {})
         lat = res_geo_json.get('latt', {})
+
+        if geo_err:
+            embed = discord.Embed(title='OpenWeatherMap Weather', color=Colors.Error)
+            ErrMsg = f'Error Code {geo_err}: {geo_err_desc}'
+            embed.add_field(name='Error with geocode API', value=ErrMsg, inline=False)
+            await ctx.send(embed=embed)
+            await wait_msg.delete()
+            return
 
         queryparams = {
             'lat': lat,
