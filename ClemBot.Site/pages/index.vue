@@ -144,37 +144,37 @@ export default Vue.extend({
           {
             title: 'Message Logging',
             description:
-              'Complete message edit and deletion logging to make moderating easy',
+              'Complete message edit and deletion logging to make moderating easy.',
             image: 'FeatureImages/MessageEdit.png',
           },
           {
             title: 'Moderation',
             description:
-              'Ban troublesome members, mute spammers and keep track of warnings to provide some accountability in your community',
+              'Ban troublesome members, mute spammers, and keep track of warnings to provide some accountability in your community.',
             image: 'FeatureImages/MemberMute.png',
           },
           {
             title: 'User Logging',
             description:
-              'Keep track of your servers joins and leaves with welcome messages and logging posts',
+              "Keep track of your servers' joins and leaves with welcome messages and logging posts.",
             image: 'FeatureImages/UserJoinEmbed.png',
           },
           {
             title: 'Custom Tags',
             description:
-              'Create custom tags and invoke them later to easily convey repeated information or just an inside joke',
+              'Create custom tags and invoke them later to easily convey repeated information or just an inside joke.',
             image: 'FeatureImages/TagInvoke.png',
           },
           {
             title: 'Assignable Roles',
             description:
-              'Set roles as assignable and allow your members to self assign what roles they want',
+              'Set roles as assignable, and allow your members to self assign what roles they want.',
             image: 'FeatureImages/AssignRoles.png',
           },
           {
             title: 'Custom Prefixes',
             description:
-              'Do you have a lot of bots in your server? Clembots commands prefix is totally customizable!',
+              "Do you have multiple bots in your server? Clembot's command prefix is completely customizable!",
             image: 'FeatureImages/CustomPrefix.png',
           },
         ],

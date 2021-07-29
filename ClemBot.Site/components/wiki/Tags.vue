@@ -5,12 +5,12 @@
       <h3 class="title is-light">Overview</h3>
       <p>
         Tags are custom commands that allow for users to create custom responses
-        to a given tag name. Simply add a tag and then invoke it with either
+        to a given tag name. Simply add a tag, and then invoke it with either
         command notation or inline notation and ClemBot will respond with that
         tags content in a given channel.
       </p>
       <p>
-        ClemBots Tags support the idea of ownership, if a user creates a tag,
+        ClemBot's tags support the idea of ownership. If a user creates a tag,
         that tag is owned by them until they either leave the server or transfer
         the tag to someone else. By owning the tag they are allowed to either
         edit or delete the tag. When a user leaves a server all their owned tags
@@ -19,8 +19,8 @@
       </p>
       <p>
         ClemBot also tracks what tags are popular and allows for you to access
-        that information, you can view the total number of uses of a tag as well
-        as its owner and creation date with the info command!
+        that information. You can view the total number of uses of a tag as well
+        as its owner and creation date with the info command.
       </p>
       <h2 class="title is-light">Use a tag</h2>
       <h4 class="title is-light">Command Notation</h4>
@@ -30,11 +30,11 @@
       <h4 class="title is-light">Inline Notation</h4>
       <p>
         Inline notation is handled by prefixing a word with '$' in a given
-        message. If ClemBot finds a matching tag it will respond with that tags
-        content.
+        message. If ClemBot finds a matching tag, it will respond with that
+        tag's content.
       </p>
       <blockquote class="has-background-grey-darker">
-        Hello there Discord, I am invoking $MyTag isnt that cool!
+        Hello there Discord, I am invoking $MyTag isn't that cool!
       </blockquote>
       <h2 class="title is-light">Commands</h2>
       <h4 class="title is-light">View all tags in the server</h4>
