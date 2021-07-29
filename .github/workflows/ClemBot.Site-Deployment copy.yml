@@ -67,7 +67,7 @@ jobs:
       - name: Deploy updated images
         run: |
           docker-compose pull clembot.site
-          docker-compose up clembot.site
+          docker-compose up clembot.site -d
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
