@@ -107,5 +107,4 @@ export default Vue.extend({
 #wiki {
   margin-top: 4rem;
 }
-
 </style>
