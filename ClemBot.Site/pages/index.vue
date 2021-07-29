@@ -150,7 +150,7 @@ export default Vue.extend({
           {
             title: 'Moderation',
             description:
-              'Ban Troublesome members, mute spammers and keep track of warnings to provide some accountability in your community',
+              'Ban troublesome members, mute spammers and keep track of warnings to provide some accountability in your community',
             image: 'FeatureImages/MemberMute.png',
           },
           {
