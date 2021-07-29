@@ -4,19 +4,19 @@
     <div class="content">
       <h3 class="title is-light">Overview</h3>
       <p>
-        By default ClemBot allows for anyone with the Admin permission in
-        Discord full access to ClemBots functionality. But if you want to grant
-        people without Admin permissions access to individual parts of the bot
-        (a team of moderators for example) you can do that through "Claims".
+        By default ClemBot allows for anyone with Admin permission in Discord
+        full access to ClemBot's functionality. If you want to grant people
+        without Admin permission access to individual parts of the Bot (a team
+        of moderators for example) you can do that through "Claims".
         <br />
         <br />
-        Claims are ClemBots way of providing servers incredibly granular and
+        Claims are ClemBot's way of providing servers' incredibly granular and
         precise control over <b>WHO</b> has access to different parts of
         ClemBot. Claims are added to roles within your server. Anyone who has a
         role that has associated claims is granted access to the functionality
-        of the bot that the claim correlates too. A role can have multiple
-        claims on it and a claim can be on multiple roles, how you set up your
-        server is up too you!
+        of the Bot that the claim correlates to. A role can have multiple claims
+        associated with it, and a claim can be associated with multiple roles.
+        You decide how to set up your server!
       </p>
       <h4 class="title is-light">Available Claims</h4>
       <b-table :data="availableClaims" :columns="columns"></b-table>

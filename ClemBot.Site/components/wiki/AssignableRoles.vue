@@ -5,10 +5,10 @@
       <h3 class="title is-light">Overview</h3>
       <p>
         Servers often have many roles that regular users can have, but might not
-        want to give all users access to all roles, but it can be annoying to
-        manually give people the roles they want. ClemBot provides a way to mark
-        roles as assignable so that normal users can add and remove that as they
-        please with a simpe command.
+        want to give all users access to all roles; however, it can be annoying
+        to manually give people the roles they want. ClemBot provides a way to
+        mark roles as assignable so that normal users can add and remove them as
+        they please with a simple command.
       </p>
       <h2 class="title is-light">Commands</h2>
       <h4 class="title is-light">View all assignable roles</h4>
