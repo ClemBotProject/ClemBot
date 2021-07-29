@@ -4,8 +4,6 @@
 
 # ClemBot 
 
-
-
 <p align="center">
   <br>
   <a href="https://discord.gg/QNRbC6k">
@@ -27,7 +25,10 @@
   </a>
 </p>
  
+ ## Website
+ https://clembot.io
  
+ ## Intro
 A Discord bot for server and community management with a focus on school/programming/fun related commands. 
    - <b>Moderation:</b>  Moderation and Moderation logging is made easy with ClemBot, Banning, Muting and Warning are all supported and easy to use
 
