@@ -87,7 +87,7 @@ class ClemBot(commands.Bot):
         # startup service has active routes
         self.load_routes(self.api_client)
 
-        await self.change_presence(activity=discord.Game(name='Run !help'))
+        await self.change_presence(activity=discord.Game(name='https://clembot.io'))
 
         # Connect to the api Before the services are loaded so they can begin their startup routines
         # this will block until the api is connected to, only THEN will we run our service startups
@@ -153,8 +153,8 @@ class ClemBot(commands.Bot):
 
         claims_str = '\n'.join(command.claims)
         raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
-                                f'\n **Help:** For more information on how claims work please see the wiki [Link!]('
-                                f'https://github.com/ClemsonCPSC-Discord/ClemBot/wiki/Authorization-Claims)\n'
+                                f'\n **Help:** For more information on how claims work please visit my website [Link!]'
+                                f'(https://clembot.io/wiki)\n'
                                 f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
 
     async def claims_check(self, ctx: commands.Context):
