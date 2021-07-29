@@ -7,5 +7,8 @@
     <section class="section is-small box has-shadow">
       <contributors />
     </section>
+    <section class="section is-small box has-shadow">
+      <stargazers />
+    </section>
   </div>
 </template>
