@@ -30,8 +30,4 @@
       <ProjectReference Include="..\ClemBot.Api.Services\ClemBot.Api.Services.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services" />
-    </ItemGroup>
-
 </Project>

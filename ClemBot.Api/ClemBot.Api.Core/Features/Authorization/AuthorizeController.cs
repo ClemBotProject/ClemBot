@@ -28,5 +28,23 @@ namespace ClemBot.Api.Core.Features.Authorization
                 { Status: AuthorizeStatus.Forbidden } => Forbid(),
                 _ => throw new InvalidOperationException()
             };
+
+        [HttpGet("[controller]/login")]
+        public async Task<IActionResult> Login([FromQuery] SiteLogin.Query query) =>
+            await _mediator.Send(query) switch
+            {
+                { Status: AuthorizeStatus.Success } result => Ok(result.Value),
+                { Status: AuthorizeStatus.Forbidden } => Forbid(),
+                _ => throw new InvalidOperationException()
+            };
+
+        [HttpGet("[controller]/User")]
+        public async Task<IActionResult> User([FromQuery] SiteLogin.Query query) =>
+            await _mediator.Send(query) switch
+            {
+                { Status: AuthorizeStatus.Success } result => Ok(result.Value),
+                { Status: AuthorizeStatus.Forbidden } => Forbid(),
+                _ => throw new InvalidOperationException()
+            };
     }
 }

@@ -11,11 +11,14 @@
     "lint": "npm run lint:js"
   },
   "dependencies": {
+    "@nuxtjs/auth-next": "^5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.9.1",
+    "discord-oauth2": "^2.7.1",
     "nuxt": "^2.15.3",
     "nuxt-buefy": "^0.4.4",
-    "sass": "^1.32.0"
+    "sass": "^1.32.0",
+    "vuex-module-decorators": "^1.0.1"
   },
   "devDependencies": {
     "@creativebulma/bulma-divider": "^1.1.0",

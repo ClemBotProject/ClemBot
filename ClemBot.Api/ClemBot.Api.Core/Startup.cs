@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Core.Security;
 using ClemBot.Api.Core.Security.JwtToken;
+using ClemBot.Api.Core.Security.OAuth;
 using ClemBot.Api.Core.Security.Policies;
 using ClemBot.Api.Core.Security.Policies.BotMaster;
 using ClemBot.Api.Core.Security.Policies.GuildSandbox;
@@ -66,6 +67,10 @@ namespace ClemBot.Api.Core
 
             // Add JWT generator to DI
             services.AddScoped<IJwtAuthManager, JwtAuthManager>();
+
+            // Add the discord oauth validatators
+            services.AddScoped<IDiscordAuthManager, DiscordAuthManager>();
+
 
             services.AddMediatR(typeof(Startup), typeof(GuildExistsRequest));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

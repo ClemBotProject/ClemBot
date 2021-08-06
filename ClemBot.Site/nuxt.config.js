@@ -37,6 +37,35 @@ export default {
     baseURL: isProd() ? prodUrl : devUrl, // Used as fallback if no runtime config is provided
   },
 
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: '/authorize/login',
+            method: 'post',
+            propertyName: 'token',
+          },
+          user: {
+            url: '/authorize/user',
+            method: 'get',
+            propertyName: 'user',
+          },
+          logout: false,
+        },
+        tokenRequired: true,
+        tokenType: 'Bearer',
+      },
+      discord: {
+        clientId: process.env.DISCORD_CLIENT_ID,
+        clientSecret: process.env.DISCORD_CLIENT_SECRET,
+        codeChallengeMethod: '',
+        scope: ['identify', 'guilds'],
+        grantType: 'authorization_code',
+      },
+    },
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['assets/css/main.scss'],
 
@@ -61,6 +90,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
 
     // https://go.nuxtjs.dev/buefy
     ['nuxt-buefy', { css: false }],

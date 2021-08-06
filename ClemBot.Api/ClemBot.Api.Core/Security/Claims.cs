@@ -5,5 +5,7 @@ namespace ClemBot.Api.Core.Security
         public static string BotApiKey => "BotClaim";
 
         public static string ContextGuildId => "ContextGuildId";
+
+        public static string DiscordBearer => "DiscordBearer";
     }
 }

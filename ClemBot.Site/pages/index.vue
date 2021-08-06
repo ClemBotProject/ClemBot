@@ -133,6 +133,7 @@ import FeatureCard from '~/components/FeatureCard.vue'
 
 export default Vue.extend({
   components: { FeatureCard },
+  middleware: 'homeAuthCheck',
   data() {
     return {
       guildsCount: 'Unknown',
