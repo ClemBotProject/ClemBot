@@ -5,6 +5,7 @@ from collections import deque
 import discord
 import discord.ext.commands as commands
 
+import bot.extensions as ext
 from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels
 
 log = logging.getLogger(__name__)
@@ -18,19 +19,19 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(hidden=True, invoke_without_command=True, case_insensitive=True)
+    @ext.group(hidden=True, case_insensitive=True)
     @commands.is_owner()
     async def owner(self, ctx):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @owner.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
         await server.leave()
 
-    @owner.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True)
     @commands.is_owner()
     async def reload(self, ctx, id: int):
         guild = self.bot.get_guild(id)
