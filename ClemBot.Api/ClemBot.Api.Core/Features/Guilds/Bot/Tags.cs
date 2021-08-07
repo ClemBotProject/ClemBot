@@ -39,6 +39,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
             {
                 var tags = await _context.Tags
                     .Where(x => x.GuildId == request.Id)
+                    .Include(y => y.TagUses)
                     .ToListAsync();
 
                 if (tags is null)
