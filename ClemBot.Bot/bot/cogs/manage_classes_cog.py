@@ -109,7 +109,6 @@ class ManageClassesCog(commands.Cog):
         if not class_repr:
             return
 
-        category = None
         try:
             # attempt to get the category to add the class too
             category = await commands.converter.CategoryChannelConverter().convert(ctx, class_repr.category)
@@ -133,6 +132,9 @@ class ManageClassesCog(commands.Cog):
 
         #create a class role and mark it as assignable
         role = await self.create_role(ctx, class_repr)
+
+        # Sleep here to make sure the role has been sent to the database and added
+        await asyncio.sleep(0.5)
 
         #sync perms with cleanup role
         await self.sync_perms(ctx, channel, role)
