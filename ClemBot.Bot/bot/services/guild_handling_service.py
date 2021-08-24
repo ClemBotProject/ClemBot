@@ -58,12 +58,14 @@ class GuildHandlingService(BaseService):
     async def on_guild_leave(self, guild) -> None:
         log.info(f'Bot removed from {guild.name}: {guild.id}')
 
-        await self.bot.guild_route.leave_guild(guild.id)
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
                                          OwnerDesignatedChannels.server_join_log,
                                          f'Bot removed from {guild.name}: {guild.id}'
                                          )
+        
+        await self.bot.guild_route.leave_guild(guild.id)
+
 
     async def load_service(self):
         pass
