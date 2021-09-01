@@ -86,8 +86,13 @@ class HelpCog(commands.Cog):
         """
         Recursively searches the command tree to find a given command, if none found then returns None
         """
+
         if isinstance(parent, commands.Bot):
             found = None
+
+            if found := parent.get_command(command_name.lower()):
+                return found
+
             for c in parent.commands:
                 if result := self.find_command(c, command_name):
                     found = result
