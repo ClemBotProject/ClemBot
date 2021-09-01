@@ -54,7 +54,7 @@ A Discord bot for server and community management with a focus on school/program
    
    - <b>Weather Forecasts:</b> Clembot supports weather forecasts from anywhere in the world, simply run `!weather <location>` to get a full 7 day forecast for your area
   
-   - <b>Translation:</b> Leveraging Azure translation services Clembot supports over 50 langauges world wide for instant translation!
+   - <b>Translation:</b> Leveraging Azure translation services Clembot supports over 50 languages world wide for instant translation!
      
    and so much more
    
