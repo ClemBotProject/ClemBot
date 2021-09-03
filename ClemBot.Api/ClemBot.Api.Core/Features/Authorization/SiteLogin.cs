@@ -56,10 +56,11 @@ namespace ClemBot.Api.Core.Features.Authorization
 
             public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var bar = await _context.Users.GetUserClaims(703008870338920470, 190858129188192257);
+                var bar = await _context.Users.GetUserClaimsAsync(703008870338920470, 190858129188192257);
+
                 _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-                _logger.LogInformation($"Site Login Request Initialized from Url: {origin.ToString()}");
-                if (!await _discordAuthManager.CheckToken(request.Bearer))
+                _logger.LogInformation($"Site Login Request Initialized from Url: {origin}");
+                if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
                 {
                     _logger.LogInformation("Site Login Request Denied: Invalid Token");
                     return AuthorizeResult<Model>.Forbidden();
@@ -67,10 +68,9 @@ namespace ClemBot.Api.Core.Features.Authorization
 
                 _logger.LogInformation("Site Login Request Accepted");
 
-
                 var claims = new[]
                 {
-                    new Claim(Claims.DiscordBearer, request.Bearer)
+                    new Claim(Claims.DiscordBearer, request.Bearer),
                 };
 
                 return AuthorizeResult<Model>.Success();

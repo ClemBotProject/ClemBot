@@ -29,8 +29,8 @@ namespace ClemBot.Api.Core.Features.Authorization
                 _ => throw new InvalidOperationException()
             };
 
-        [HttpGet("[controller]/login")]
-        public async Task<IActionResult> Login([FromQuery] SiteLogin.Query query) =>
+        [HttpPost("[controller]/login")]
+        public async Task<IActionResult> Login([FromBody] SiteLogin.Query query) =>
             await _mediator.Send(query) switch
             {
                 { Status: AuthorizeStatus.Success } result => Ok(result.Value),

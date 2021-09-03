@@ -97,9 +97,8 @@ namespace ClemBot.Api.Core
             services.AddCors(options => {
                 options.AddDefaultPolicy(
                     builder => {
-                        //builder.WithOrigins("http://localhost:3000");
                         builder.AllowAnyOrigin();
-                        builder.AllowAnyOrigin();
+                        builder.AllowAnyHeader();
                         builder.AllowAnyMethod();
                     });
             });
@@ -132,6 +131,9 @@ namespace ClemBot.Api.Core
             });
 
             services.AddAuthorization(options => {
+                options.AddPolicy(Policies.UserId, policy => {
+                    policy.RequireClaim(Claims.UserId);
+                });
                 options.AddPolicy(Policies.BotMaster, policy => {
                     policy.RequireClaim(Claims.BotApiKey);
                 });
@@ -154,7 +156,7 @@ namespace ClemBot.Api.Core
             }
             app.UseSerilogRequestLogging();
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 

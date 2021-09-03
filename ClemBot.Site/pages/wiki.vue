@@ -95,7 +95,7 @@ export default Vue.extend({
       window.scrollTo(0, 0)
     },
     foo() {
-      console.log(this.$auth.strategy.token.get())
+      console.log()
     },
   },
 })

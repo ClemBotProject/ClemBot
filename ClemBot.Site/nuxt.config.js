@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
@@ -17,6 +19,13 @@ export default {
   server: {
     port: 3000, // default: 3000
     host: isProd() ? prodHost : localHost, // default: localhost
+  },
+
+  publicRuntimeConfig: {
+    discordClientId: process.env.DISCORD_CLIENT_ID,
+  },
+  privateRuntimeConfig: {
+    discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -44,7 +53,7 @@ export default {
           login: {
             url: '/authorize/login',
             method: 'post',
-            propertyName: 'token',
+            propertyName: 'bearer',
           },
           user: {
             url: '/authorize/user',
@@ -71,6 +80,8 @@ export default {
 
   env: {
     prod: process.env.PROD === '1',
+    discordClientId: process.env.DISCORD_CLIENT_ID,
+    discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -85,6 +96,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
+    '@nuxtjs/dotenv',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules

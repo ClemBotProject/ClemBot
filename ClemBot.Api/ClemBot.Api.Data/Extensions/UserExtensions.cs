@@ -10,7 +10,10 @@ namespace ClemBot.Api.Data.Extensions
     public static class UserExtensions
     {
 
-        public static async Task<IEnumerable<BotAuthClaims>> GetUserClaims(this DbSet<User> users, ulong guildId, ulong userId) =>
+        public static async Task<IEnumerable<BotAuthClaims>> GetUserClaimsAsync(
+                this DbSet<User> users,
+                ulong guildId,
+                ulong userId) =>
             await users
                 .Where(x => x.Id == userId)
                 .Include(

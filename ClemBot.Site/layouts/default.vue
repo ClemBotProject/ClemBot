@@ -9,10 +9,7 @@
         width="7%"
       />
     </nuxt-link>
-    <b-navbar
-      id="splash-card"
-      class="is-transparent has-shadow is-fixed-top mb-4"
-    >
+    <b-navbar class="is-transparent has-shadow is-fixed-top mb-4">
       <template #start>
         <b-navbar-item
           id="nav"
@@ -44,12 +41,14 @@
       <template #end>
         <div id="socials">
           <b-navbar-item
+            v-if="!$auth.loggedIn"
             href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
           >
-            <b-button icon-left="plus" class="is-primary">
-              <b>Invite to Server </b>
+            <b-button icon-left="login" class="is-primary">
+              <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
+          <guild-dropdown v-else />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
           </b-navbar-item>
@@ -79,10 +78,6 @@
   z-index: 200;
   min-width: 5rem;
   max-width: 6rem;
-}
-
-#splash-card {
-  opacity: 0.95;
 }
 
 #discord-login {
