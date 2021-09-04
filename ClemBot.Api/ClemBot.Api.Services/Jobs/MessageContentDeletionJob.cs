@@ -29,6 +29,7 @@ namespace ClemBot.Api.Services.Jobs
         {
             _logger.LogInformation("Beginning Discord compliance Message Content Deletion");
 
+            _context.Database.SetCommandTimeout(9000);
             var result = await _context.Database.ExecuteSqlRawAsync(@$"
                 UPDATE ""MessageContents""
                 SET ""Content"" = 'Content Deleted'
