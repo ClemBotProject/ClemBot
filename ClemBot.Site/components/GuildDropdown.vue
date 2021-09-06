@@ -8,6 +8,7 @@
     <div
       v-for="guild in userGuilds
         .filter(
+          // https://discord.com/developers/docs/topics/permissions
           (g) => (g.permissions & 0x8) == 0x8 || (g.permissions & 0x02) == 0x02
         )
         .sort((a, b) => a.name.localeCompare(b.name))"
