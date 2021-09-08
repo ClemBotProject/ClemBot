@@ -34,7 +34,7 @@ class MuteCog(commands.Cog):
             embed = discord.Embed(color=Colors.Error)
             embed.title = f'Error: Invalid Permissions'
             embed.add_field(name='Reason', value='Cannot moderate someone with the same rank or higher')
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
@@ -47,7 +47,7 @@ class MuteCog(commands.Cog):
             if not choice:
                 embed = discord.Embed(color=Colors.Error)
                 embed.title = f'Error: Mute Role not found, Cancelling operation'
-                embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+                embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
                 return
 
             mute_role = await ctx.guild.create_role(name=Moderation.mute_role_name)
@@ -56,16 +56,20 @@ class MuteCog(commands.Cog):
             msg = await ctx.send('Configuring ClemBot Mute role (This might take a minute)')
 
             for channel in ctx.guild.channels:
-                await channel.set_permissions(mute_role,
-                                              speak=False,
-                                              connect=False,
-                                              stream=False,
-                                              send_messages=False,
-                                              send_messages_in_threads=False,
-                                              create_public_threads=False,
-                                              create_private_threads=False,
-                                              send_tts_messages=False,
-                                              add_reactions=False)
+                try:
+                    await channel.set_permissions(mute_role,
+                                                  speak=False,
+                                                  connect=False,
+                                                  stream=False,
+                                                  send_messages=False,
+                                                  send_messages_in_threads=False,
+                                                  create_public_threads=False,
+                                                  create_private_threads=False,
+                                                  send_tts_messages=False,
+                                                  add_reactions=False)
+                except:
+                    pass
+
             await msg.delete()
 
             embed = discord.Embed(color=Colors.ClemsonOrange)
@@ -82,8 +86,8 @@ class MuteCog(commands.Cog):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'{self.get_full_name(subject)} Muted :mute:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
-        embed.set_thumbnail(url=subject.avatar.url)
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_thumbnail(url=subject.display_avatar.url)
         embed.description = f'**{duration_str}** \n{reason}'
 
         await ctx.send(embed=embed)
@@ -91,12 +95,12 @@ class MuteCog(commands.Cog):
         # Send the mute in the mod channels
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Muted :mute:'
-        embed.set_author(name=f'{self.get_full_name(ctx.author)}\nId: {ctx.author.id}', icon_url=ctx.author.avatar.url)
+        embed.set_author(name=f'{self.get_full_name(ctx.author)}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
         embed.add_field(name='Duration :timer:', value=duration_str)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
-        embed.set_thumbnail(url=subject.avatar.url)
+        embed.set_thumbnail(url=subject.display_avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.moderation_log,
@@ -106,7 +110,7 @@ class MuteCog(commands.Cog):
         # Dm the user who was muted
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been muted  :mute:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
         embed.add_field(name='Duration :timer:', value=duration_str)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
@@ -136,7 +140,7 @@ class MuteCog(commands.Cog):
             embed = discord.Embed(color=Colors.Error)
             embed.title = f'Error: Mute role not found'
             embed.add_field(name='Reason', value='Run the mute command to initiate mute role activation')
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         mutes = await self.bot.moderation_route.get_guild_mutes_user(subject.guild.id, subject.id)
@@ -145,7 +149,7 @@ class MuteCog(commands.Cog):
         if not mutes:
             embed = discord.Embed(color=Colors.Error)
             embed.title = f'Error: This user has no active mutes'
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         for mute in mutes:
@@ -158,9 +162,9 @@ class MuteCog(commands.Cog):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'{self.get_full_name(subject)} Unmuted  :speaker:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
-        embed.set_thumbnail(url=subject.avatar.url)
+        embed.set_thumbnail(url=subject.display_avatar.url)
 
         await ctx.send(embed=embed)
 

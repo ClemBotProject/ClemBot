@@ -103,21 +103,21 @@ class ClemBot(commands.Bot):
     async def on_ready(self) -> None:
         embed = discord.Embed(title='Bot Started Up  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar.url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
     async def on_backend_connect(self):
         embed = discord.Embed(title='Bot Connected to ClemBot.Api  :rocket:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar.url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
     async def on_backend_disconnect(self):
         embed = discord.Embed(title='Bot Disconnected from ClemBot.Api  :warning:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar.url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
@@ -126,7 +126,7 @@ class ClemBot(commands.Bot):
             log.info('Sending shutdown embed')
             embed = discord.Embed(title='Bot Shutting down  :no_entry_sign:', color=Colors.ClemsonOrange)
             embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-            embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar.url)
+            embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
             await self.send_startup_log_embed(embed)
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
@@ -303,7 +303,7 @@ class ClemBot(commands.Bot):
 
         embed = discord.Embed(title=f'ERROR: {type(error).__name__}', color=Colors.Error)
         embed.add_field(name='Exception:', value=error)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.channel.send(embed=embed)
         await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         await self.global_error_handler(error)

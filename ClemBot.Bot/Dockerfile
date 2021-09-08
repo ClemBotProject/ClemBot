@@ -9,6 +9,9 @@ ENV PYTHONUNBUFFERED 1
 
 # Set up and activate virtual environment
 ENV VIRTUAL_ENV "/venv"
+
+RUN apt-get update && apt-get install -y git
+
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 

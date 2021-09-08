@@ -55,7 +55,7 @@ class HelpCog(commands.Cog):
         com_repr = '\n'.join(self.get_commands_repr(command.commands, f'{prefix}{command.qualified_name} '))
         embed.add_field(name='Subcommands', value=com_repr or 'No example provided', inline=False)
 
-        embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.avatar.url)
+        embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
         embed.add_field(name='Website', value=f'For more information on my commands please visit my website [clembot.io]({LINK_URL})',
                         inline=False)
 
@@ -78,7 +78,7 @@ class HelpCog(commands.Cog):
             inline=False)
         embed.add_field(name='Website', value=f'For more information on my commands please visit my website [clembot.io]({LINK_URL})',
                         inline=False)
-        embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.avatar.url)
+        embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -115,7 +115,7 @@ class HelpCog(commands.Cog):
                 description=f'for more info on a command run `{prefix}help <CommandName>`',
                 color=Colors.ClemsonOrange)
 
-            embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.avatar.url)
+            embed.set_author(name=f'{self.bot.user.name} - Help', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
             embed.add_field(name='Commands', value='\n'.join(command))
             embed.add_field(name='Website', value=f'For more information on my commands please visit my website [clembot.io]({LINK_URL})',
                             inline=False)
