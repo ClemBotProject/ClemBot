@@ -6,7 +6,7 @@ using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Channels.Bot
+namespace ClemBot.Api.Core.Features.Threads.Bot
 {
     public class Details
     {
@@ -29,7 +29,7 @@ namespace ClemBot.Api.Core.Features.Channels.Bot
             public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var channel = await _context.Channels
-                    .Where(x => x.Id == request.Id && !x.IsThread)
+                    .Where(x => x.Id == request.Id && x.IsThread)
                     .FirstOrDefaultAsync();
 
                 if (channel is null)

@@ -100,7 +100,7 @@ class SlotsCog(commands.Cog):
                                       color=Colors.ClemsonOrange,
                                       description=quote)
 
-            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.avatar_url)
+            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.avatar.url)
             slotembed.add_field(name=input, value=spinstatus, inline=False)
             return slotembed
 

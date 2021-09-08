@@ -11,6 +11,11 @@ namespace ClemBot.Api.Data.Models
         public ulong GuildId { get; set; }
         public Guild Guild { get; set; }
 
+        public ulong? ParentId { get; set; }
+        public Channel? Parent { get; set; }
+
+        public bool IsThread { get; private set; }
+
         public List<Message> Messages { get; set; } = new();
 
         public List<DesignatedChannelMapping> DesignatedChannels { get; set; } = new();

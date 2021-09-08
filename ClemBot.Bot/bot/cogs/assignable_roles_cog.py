@@ -182,7 +182,7 @@ class AssignableRolesCog(commands.Cog):
         embed = discord.Embed(title=f'Role Added  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_right:')
         embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=ctx.author.avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -192,7 +192,7 @@ class AssignableRolesCog(commands.Cog):
         embed = discord.Embed(title=f'Role Removed  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_left:')
         embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=ctx.author.avatar.url)
 
         await ctx.send(embed=embed)
 

@@ -46,7 +46,7 @@ class UserHandlingService(BaseService):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
-        embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=user.avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
@@ -58,7 +58,7 @@ class UserHandlingService(BaseService):
         embed = discord.Embed(title='Guild User Left', color=Colors.Error)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
-        embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=user.avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,

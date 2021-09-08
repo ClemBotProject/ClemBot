@@ -39,6 +39,14 @@ namespace ClemBot.Api.Core.Features.DesignatedChannels.Bot
                     Type = request.Designation
                 };
 
+                var channel = await _context.Channels
+                    .FirstOrDefaultAsync(x => x.Id == request.ChannelId && !x.IsThread);
+
+                if (channel is null)
+                {
+                    return QueryResult<ulong>.Invalid();
+                }
+
                 var dcMappings = await _context.DesignatedChannelMappings.FirstOrDefaultAsync(x =>
                         x.ChannelId == request.ChannelId && x.Type == request.Designation);
 

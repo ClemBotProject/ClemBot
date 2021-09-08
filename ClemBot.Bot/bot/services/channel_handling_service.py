@@ -28,8 +28,9 @@ class ChannelHandlingService(BaseService):
         await self.bot.guild_route.update_guild_channels(guild)
 
     @BaseService.Listener(Events.on_guild_channel_update)
-    async def channel_update(self, before, after):
-        await self.bot.channel_route.edit_channel(after.id, after.name, raise_on_error=True)
+    async def channel_update(self, before: discord.TextChannel, after: discord.TextChannel):
+        if before.name != after.name:
+            await self.bot.channel_route.edit_channel(after.id, after.name, raise_on_error=True)
 
     async def load_service(self):
         pass

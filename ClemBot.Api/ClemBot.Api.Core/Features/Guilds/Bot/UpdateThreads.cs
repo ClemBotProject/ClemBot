@@ -15,20 +15,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot
 {
-    public class UpdateChannels
+    public class UpdateThreads
     {
-        public class ChannelDto
+        public class ThreadDto
         {
-            public ulong ChannelId { get; set; }
+            public ulong ThreadId { get; set; }
 
             public string? Name { get; set; }
+
+            public ulong ParentId { get; set; }
         }
 
         public record Command : IRequest<Result<ulong, QueryStatus>>
         {
             public ulong GuildId { get; init; }
 
-            public string ChannelCsv { get; set; } = null!;
+            public string ThreadCsv { get; set; } = null!;
         }
 
         public record Handler(ClemBotContext _context)
@@ -36,8 +38,8 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
         {
             public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
             {
-                using var csvReader = new CsvReader(new StringReader(request.ChannelCsv), CultureInfo.InvariantCulture);
-                var channels = csvReader.GetRecords<ChannelDto>().ToList();
+                using var csvReader = new CsvReader(new StringReader(request.ThreadCsv), CultureInfo.InvariantCulture);
+                var threads = csvReader.GetRecords<ThreadDto>().ToList();
 
                 var guildEntities = await _context.Guilds
                     .Include(y => y.Channels)
@@ -50,43 +52,44 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot
                     return QueryResult<ulong>.NotFound();
                 }
 
-                var channelsEntity = guildEntity.Channels
-                    .Where(x => !x.IsThread)
+                var threadsEntity = guildEntity.Channels
+                    .Where(x => x.IsThread)
                     .ToList();
 
                 // Get all channels that are common to both enumerables and check for a name change
-                foreach (var channelId in channelsEntity
+                foreach (var channelId in threadsEntity
                     .Select(x => x.Id)
-                    .Intersect(channels
-                        .Select(x => x.ChannelId)))
+                    .Intersect(threads
+                        .Select(x => x.ThreadId)))
                 {
-                    var role = channelsEntity.First(x => x.Id == channelId);
-                    role.Name = channels.First(x => x.ChannelId == channelId).Name;
+                    var role = threadsEntity.First(x => x.Id == channelId);
+                    role.Name = threads.First(x => x.ThreadId == channelId).Name;
                 }
 
                 // Get all channels that have been deleted
-                foreach (var channel in channelsEntity
+                foreach (var channel in threadsEntity
                     .Where(x =>
-                        channels.All(y => y.ChannelId != x.Id))
+                        threads.All(y => y.ThreadId != x.Id))
                     .ToList())
                 {
                     _context.Channels.Remove(channel);
                 }
 
                 // get new channels
-                foreach (var channel in channels
+                foreach (var thread in threads
                     .Where(x =>
-                        channelsEntity.All(y => y.Id != x.ChannelId))
+                        threadsEntity.All(y => y.Id != x.ThreadId))
                     .ToList())
                 {
-                    var channelEntity = new Channel
+                    var threadEntity = new Channel
                     {
-                        Id = channel.ChannelId,
-                        Name = channel.Name,
-                        GuildId = request.GuildId
+                        Id = thread.ThreadId,
+                        Name = thread.Name,
+                        GuildId = request.GuildId,
+                        ParentId = thread.ParentId
                     };
-                    _context.Channels.Add(channelEntity);
-                    guildEntity?.Channels?.Add(channelEntity);
+                    _context.Channels.Add(threadEntity);
+                    guildEntity?.Channels?.Add(threadEntity);
                 }
 
 

@@ -58,6 +58,7 @@ namespace ClemBot.Api.Core.Features.DesignatedChannels
             {
                 { Status: QueryStatus.Success } result => Ok(result.Value),
                 { Status: QueryStatus.Conflict } => Conflict(),
+                { Status: QueryStatus.Invalid } => BadRequest("Can not register a thread"),
                 _ => throw new InvalidOperationException()
             };
     }

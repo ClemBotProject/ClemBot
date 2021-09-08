@@ -19,8 +19,8 @@ class GuildHandlingService(BaseService):
         log.info(f'Loading guild {guild.name}: {guild.id}')
 
         embed = discord.Embed(title=f'{self.bot.user.name} added to a new guild', color=Colors.ClemsonOrange)
-        embed.set_author(name=f'Owner: {guild.owner.name}#{guild.owner.discriminator}', icon_url=guild.owner.avatar_url)
-        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_author(name=f'Owner: {guild.owner.name}#{guild.owner.discriminator}', icon_url=guild.owner.avatar.url)
+        embed.set_thumbnail(url=guild.icon.url)
         embed.add_field(name='Name', value=guild.name)
         embed.add_field(name='Id', value=guild.id)
         embed.add_field(name='Creation Date', value=guild.created_at, inline=False)

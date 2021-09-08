@@ -24,7 +24,7 @@ class InviteCog(commands.Cog):
                         value='[Click me!](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1409412343&scope=bot)')
         embed.add_field(name='Resources',
                         value='For information on advanced features\nplease see my wiki\n[Link!](https://clembot.io/wiki)')
-        embed.set_thumbnail(url=self.bot.user.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.send(embed=embed)
 
     @ext.command()
@@ -43,7 +43,7 @@ class InviteCog(commands.Cog):
         embed.add_field(name='Website', value='[Link!](https://clembot.io)')
         embed.add_field(name='Repository', value='[Link!](https://github.com/ClemBotProject/ClemBot)')
         embed.add_field(name='Wiki', value='[Link!](https://clembot.io/wiki)')
-        embed.set_thumbnail(url=self.bot.user.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
         await ctx.send(embed=embed)
 
 

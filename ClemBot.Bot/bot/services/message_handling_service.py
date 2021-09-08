@@ -107,7 +107,7 @@ class MessageHandlingService(BaseService):
         embed = discord.Embed(title=f'Bot Direct Message',
                               color=Colors.ClemsonOrange,
                               description=f'{message.content}')
-        embed.set_footer(text=message.author, icon_url=message.author.avatar_url)
+        embed.set_footer(text=message.author, icon_url=message.author.avatar.url)
         log.info(f'Message from {message.author}: "{message.content}" Guild Unknown (DM)')
         await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
         await message.author.send(
@@ -132,7 +132,7 @@ class MessageHandlingService(BaseService):
         for i, val in enumerate(after_chunk):
             embed.add_field(name='**After**' if i == 0 else 'Cont...', value=f'```{val}```', inline=False)
 
-        embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url=before.author.avatar_url)
+        embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url=before.author.avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.message_log,
@@ -207,7 +207,7 @@ class MessageHandlingService(BaseService):
         for i, val in enumerate(message_chunk):
             embed.add_field(name='**Message**' if i == 0 else 'Cont...', value=f'```{val}```', inline=False)
 
-        embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url=message.author.avatar_url)
+        embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url=message.author.avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.message_log,
@@ -255,7 +255,7 @@ class MessageHandlingService(BaseService):
             return
 
         matches = result.groupdict()
-        avi = message.author.avatar_url_as(static_format='png')
+        avi = message.author.avatar.url_as(static_format='png')
 
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(matches['channel_id'])

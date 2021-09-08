@@ -26,7 +26,7 @@ class InfoCog(commands.Cog):
         log.info(f'User {ctx.author} has ran info command on user {user.name}')
 
         embed = discord.Embed(title = f'Guild Member Information', color=Colors.ClemsonOrange)
-        embed.set_author(name=str(user), icon_url=user.avatar_url)
+        embed.set_author(name=str(user), icon_url=user.avatar.url)
 
         user_info = f'» **Nickname:** {user.mention}'
         user_info += f'\n» **ID:** {user.id}'
@@ -37,7 +37,7 @@ class InfoCog(commands.Cog):
             user_info += '\n» **Created:** ' + user.created_at.strftime('%b %d %Y %I:%M:%S %p')
 
         embed.add_field(name='**User ID:**', value=user_info)
-        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_thumbnail(url=user.avatar.url)
 
         #since member objects include guild ID's and information, we try to get a member object for the target user
         member = ctx.guild.get_member(user.id)
@@ -71,7 +71,7 @@ class InfoCog(commands.Cog):
             guild_info += '\n» **Nitro boost date:** ' + (member.premium_since.strftime('%b %d %Y %I:%M:%S %p') if member.premium_since is not None else 'Not boosting')
             embed.add_field(name='**Guild Information:**', value=guild_info, inline=False)
 
-        embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar.url)
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
