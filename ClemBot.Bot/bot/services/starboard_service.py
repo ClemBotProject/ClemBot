@@ -73,7 +73,7 @@ class StarboardService(BaseService):
             description=f'_Posted in {message.channel.mention}_ by {message.author.mention}'
         )
 
-        embed.set_thumbnail(url=message.author.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=message.author.avatar.url)
         embed.set_footer(text=f'Sent on {message.created_at.strftime("%m/%d/%Y")}')
 
         if len(message.content) > 0:

@@ -42,7 +42,7 @@ class EmoteCog(commands.Cog):
         embed.set_thumbnail(url=emote.url)
 
         fullName = f'{ctx.author.name}#{ctx.author.discriminator}'
-        embed.set_footer(text=f'Created By: {fullName}', icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=f'Created By: {fullName}', icon_url=ctx.author.avatar.url)
         await ctx.send(embed=embed)
 
 

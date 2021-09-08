@@ -72,7 +72,7 @@ class ModerationService(BaseService):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been Unmuted'
-        embed.set_thumbnail(url=str(guild.icon_url))
+        embed.set_thumbnail(url=str(guild.icon.url))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {guild.name}'
 
@@ -89,9 +89,9 @@ class ModerationService(BaseService):
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Unmuted'
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
-        embed.set_author(name=self.get_full_name(author), icon_url=author.avatar_url)
+        embed.set_author(name=self.get_full_name(author), icon_url=author.avatar.url)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
-        embed.set_thumbnail(url=subject.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=subject.avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.moderation_log,
@@ -115,7 +115,7 @@ class ModerationService(BaseService):
             embed.title = 'Reapplied Mute'
             embed.add_field(name=self.get_full_name(user), value=f'Id: {user.id}')
             embed.add_field(name='Reason :page_facing_up:', value=f'```User left and rejoined```', inline=False)
-            embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
+            embed.set_thumbnail(url=user.avatar.url)
 
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                              DesignatedChannels.moderation_log,
@@ -144,7 +144,7 @@ class ModerationService(BaseService):
         log = (await guild.audit_logs(limit=1, action=discord.AuditLogAction.ban).flatten())[0]
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Banned'
-        embed.set_author(name=log.user, icon_url=log.user.avatar_url)
+        embed.set_author(name=log.user, icon_url=log.user.avatar.url)
 
         #Dont send anything if clembot did the banning, we handled that case elsewhere
         if log.user == self.bot.user:
@@ -152,7 +152,7 @@ class ModerationService(BaseService):
 
         embed.add_field(name='Name', value=user.name)
         embed.add_field(name='Reason', value=log.reason)
-        embed.set_thumbnail(url=user.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=user.avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.moderation_log,

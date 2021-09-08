@@ -127,6 +127,16 @@ namespace ClemBot.Api.Core.Features.Guilds
                 _ => throw new InvalidOperationException()
             };
 
+        [HttpPatch("bot/[controller]/Update/Threads")]
+        [BotMasterAuthorize]
+        public async Task<IActionResult> UpdateThreads(Bot.UpdateThreads.Command command) =>
+            await _mediator.Send(command) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
+
         [HttpPatch("bot/[controller]/Update/RoleUserMappings")]
         [BotMasterAuthorize]
         public async Task<IActionResult> UpdateChannels(Bot.UpdateRolesUserMappings.Command command) =>
@@ -160,6 +170,26 @@ namespace ClemBot.Api.Core.Features.Guilds
         [HttpGet("bot/[controller]/{Id}/CustomPrefixes")]
         [BotMasterAuthorize]
         public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.CustomPrefixes.Query query) =>
+            await _mediator.Send(query) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NoContent(),
+                _ => throw new InvalidOperationException()
+            };
+
+        [HttpGet("bot/[controller]/{Id}/Channels")]
+        [BotMasterAuthorize]
+        public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.Channels.Query query) =>
+            await _mediator.Send(query) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NoContent(),
+                _ => throw new InvalidOperationException()
+            };
+
+        [HttpGet("bot/[controller]/{Id}/Threads")]
+        [BotMasterAuthorize]
+        public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.Threads.Query query) =>
             await _mediator.Send(query) switch
             {
                 { Status: QueryStatus.Success } result => Ok(result.Value),
