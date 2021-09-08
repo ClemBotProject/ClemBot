@@ -56,16 +56,20 @@ class MuteCog(commands.Cog):
             msg = await ctx.send('Configuring ClemBot Mute role (This might take a minute)')
 
             for channel in ctx.guild.channels:
-                await channel.set_permissions(mute_role,
-                                              speak=False,
-                                              connect=False,
-                                              stream=False,
-                                              send_messages=False,
-                                              send_messages_in_threads=False,
-                                              create_public_threads=False,
-                                              create_private_threads=False,
-                                              send_tts_messages=False,
-                                              add_reactions=False)
+                try:
+                    await channel.set_permissions(mute_role,
+                                                  speak=False,
+                                                  connect=False,
+                                                  stream=False,
+                                                  send_messages=False,
+                                                  send_messages_in_threads=False,
+                                                  create_public_threads=False,
+                                                  create_private_threads=False,
+                                                  send_tts_messages=False,
+                                                  add_reactions=False)
+                except:
+                    pass
+
             await msg.delete()
 
             embed = discord.Embed(color=Colors.ClemsonOrange)
