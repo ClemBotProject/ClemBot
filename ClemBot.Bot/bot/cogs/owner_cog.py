@@ -221,7 +221,7 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def updatemute(self, ctx):
 
-        for guild in ctx.guilds:
+        for guild in self.bot.guilds:
             mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
 
             if not mute_role:
@@ -229,7 +229,7 @@ class OwnerCog(commands.Cog):
 
             await ctx.send(f'Updating guild {guild.name}')
 
-            for channel in guild:
+            for channel in guild.channels:
                 await channel.set_permissions(mute_role,
                                               speak=False,
                                               connect=False,
