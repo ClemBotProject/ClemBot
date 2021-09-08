@@ -39,7 +39,7 @@ class InfractionsCog(commands.Cog):
         if len(infractions) == 0:
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Current Active Infractions'
-            embed.set_author(name=self.get_full_name(user), icon_url=user.avatar.url)
+            embed.set_author(name=self.get_full_name(user), icon_url=user.display_avatar.url)
             embed.add_field(name='Infractions', value='No Active Infractions')
             return await ctx.send(embed=embed)
 
@@ -47,7 +47,7 @@ class InfractionsCog(commands.Cog):
         for chunk in chunked_infractions:
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Infractions'
-            embed.set_author(name=self.get_full_name(user), icon_url=user.avatar.url)
+            embed.set_author(name=self.get_full_name(user), icon_url=user.display_avatar.url)
 
             for infraction in chunk:
                 time = datetime.strptime(infraction.time, '%Y-%m-%dT%H:%M:%S.%f')
@@ -76,14 +76,14 @@ class InfractionsCog(commands.Cog):
         if not await self.bot.get_infraction(infraction_id):
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Infraction does not exist'
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         await self.bot.moderation_route.delete_infractions(infraction_id, raise_on_error=True)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'Infractions {infraction_id} deleted successfully  :white_check_mark:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.avatar.url)
+        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         return await ctx.send(embed=embed)
 
     def get_full_name(self, author) -> str:
