@@ -188,7 +188,7 @@ class TagCog(commands.Cog):
         unclaimed_tags = []
         for tag in guild_tags:
             if ctx.guild.get_member(tag.user_id) is None:
-                unclaimed_tags.append(tag.name)
+                unclaimed_tags.append(tag)
 
         author = ctx.author
         if len(unclaimed_tags) == 0:
