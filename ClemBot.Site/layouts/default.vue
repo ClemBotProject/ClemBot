@@ -44,7 +44,7 @@
       <template #end>
         <div id="socials">
           <b-navbar-item
-            href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
+            href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot"
           >
             <b-button icon-left="plus" class="is-primary">
               <b>Invite to Server </b>
