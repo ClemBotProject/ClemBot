@@ -23,7 +23,7 @@ class GuildInfoCog(commands.Cog):
         member_count = len([m for m in guild.members if not m.bot])
         bot_count = len([m for m in guild.members if m.bot])
         channel_count = len(guild.text_channels) + len(guild.voice_channels)  # excludes categories
-        formatted_roles = ' '.join(map(discord.Role.mention, guild.roles))
+        formatted_roles = ' '.join([r.mention for r in guild.roles])
         age = arrow.get(guild.created_at)
         display_age = f"{age.format('MMM D, YYYY')}, {age.humanize()}"
 
@@ -31,6 +31,9 @@ class GuildInfoCog(commands.Cog):
             ban_count = len(await asyncio.wait_for(guild.bans(), 1))
         except asyncio.TimeoutError:  # so many bans, eeee
             ban_count = 'unknown'
+        except Exception as e:
+            print("\n\n\n\n\n\n\nsus", str(e))
+
 
         base = '`»` **{}:** {}'
 
