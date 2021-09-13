@@ -31,9 +31,6 @@ class GuildInfoCog(commands.Cog):
             ban_count = len(await asyncio.wait_for(guild.bans(), 1))
         except asyncio.TimeoutError:  # so many bans, eeee
             ban_count = 'unknown'
-        except Exception as e:
-            print("\n\n\n\n\n\n\nsus", str(e))
-
 
         base = '`»` **{}:** {}'
 
