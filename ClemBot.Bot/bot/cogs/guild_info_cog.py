@@ -17,7 +17,7 @@ class GuildInfoCog(commands.Cog):
     async def guildinfo(self, ctx, guild: discord.Guild = None):
         guild = ctx.guild
 
-        embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information')
+        embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [`{guild.id}`]')
         embed.set_thumbnail(url=guild.icon_url)
         
         member_count = len([m for m in guild.members if not m.bot])
@@ -44,7 +44,7 @@ class GuildInfoCog(commands.Cog):
             base.format('Roles', formatted_roles),
         ])
 
-        embed.set_footer(text=guild.name, icon_url=guild.icon_url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.avatar_url)
 
         await ctx.send(embed=embed)
 
