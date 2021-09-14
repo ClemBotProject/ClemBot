@@ -32,7 +32,7 @@ class GuildInfoCog(commands.Cog):
         except asyncio.TimeoutError:  # so many bans, eeee
             ban_count = 'unknown'
 
-        base = '`»` **{}:** {}'
+        base = '» **{}:** {}'
 
         embed.description = '\n'.join([
             base.format('Created At', display_age),
