@@ -27,10 +27,6 @@ class GuildInfoCog(commands.Cog):
         age = arrow.get(guild.created_at)
         display_age = f"{age.format('MMM D, YYYY')}, {age.humanize()}"
 
-        # try:
-        #     ban_count = len(await asyncio.wait_for(guild.bans(), 1))
-        # except asyncio.TimeoutError:  # so many bans, eeee
-        #     ban_count = 'unknown'
 
         base = '» **{}:** {}'
 
@@ -39,7 +35,6 @@ class GuildInfoCog(commands.Cog):
             base.format('Owner', guild.owner.mention),
             base.format('Member Count', member_count),
             base.format('Bot Count', bot_count),
-            # base.format('Ban Count', ban_count),
             base.format('Channel Count', channel_count),
             base.format('Roles', formatted_roles),
         ])
