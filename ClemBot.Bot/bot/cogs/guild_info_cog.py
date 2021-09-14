@@ -14,7 +14,7 @@ class GuildInfoCog(commands.Cog):
     @ext.long_help('Shows information on the current Guild/Discord server.')
     @ext.short_help('Shows info on a Discord server.')
     @ext.example('guildinfo')
-    async def guildinfo(self, ctx, guild: discord.Guild = None):
+    async def guildinfo(self, ctx: commands.Context, guild: discord.Guild = None):
         guild = ctx.guild
 
         embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [{guild.id}]')
