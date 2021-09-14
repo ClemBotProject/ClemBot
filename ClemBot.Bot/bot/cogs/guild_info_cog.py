@@ -39,7 +39,6 @@ class GuildInfoCog(commands.Cog):
             base.format('Owner', guild.owner.mention),
             base.format('Member Count', member_count),
             base.format('Bot Count', bot_count),
-            # base.format('Ban Count', ban_count),
             base.format('Channel Count', channel_count),
             base.format('Roles', formatted_roles),
         ])
