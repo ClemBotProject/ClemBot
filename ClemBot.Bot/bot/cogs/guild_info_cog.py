@@ -19,7 +19,7 @@ class GuildInfoCog(commands.Cog):
         guild = ctx.guild
 
         embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [{guild.id}]')
-        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_thumbnail(url=guild.icon.url)
         
         member_count = len([m for m in guild.members if not m.bot])
         bot_count = len([m for m in guild.members if m.bot])
