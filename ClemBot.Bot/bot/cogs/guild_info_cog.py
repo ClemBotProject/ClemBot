@@ -11,7 +11,7 @@ class GuildInfoCog(commands.Cog):
         self.bot = bot
 
     @ext.command()
-    @ext.long_help('Shows information on the current guild/Discord server.')
+    @ext.long_help('Shows information on the current Guild/Discord server.')
     @ext.short_help('Shows info on a Discord server.')
     @ext.example('guildinfo')
     async def guildinfo(self, ctx, guild: discord.Guild = None):
