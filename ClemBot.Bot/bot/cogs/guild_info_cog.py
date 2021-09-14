@@ -27,7 +27,6 @@ class GuildInfoCog(commands.Cog):
         age = arrow.get(guild.created_at)
         display_age = f"{age.format('MMM D, YYYY')}, {age.humanize()}"
 
-
         base = '» **{}:** {}'
 
         embed.description = '\n'.join([
