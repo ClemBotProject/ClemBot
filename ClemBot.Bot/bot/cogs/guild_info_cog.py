@@ -17,7 +17,7 @@ class GuildInfoCog(commands.Cog):
     async def guildinfo(self, ctx, guild: discord.Guild = None):
         guild = ctx.guild
 
-        embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [`{guild.id}`]')
+        embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [{guild.id}]')
         embed.set_thumbnail(url=guild.icon_url)
         
         member_count = len([m for m in guild.members if not m.bot])
