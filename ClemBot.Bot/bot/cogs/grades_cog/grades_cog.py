@@ -108,7 +108,7 @@ class GradesCog(commands.Cog):
         embeds = []
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.description = description
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df)), inline=False)
@@ -122,7 +122,7 @@ class GradesCog(commands.Cog):
         for i, row in df.groupby(['Instructor']).mean().iterrows():
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.description = description
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
             C = f'{int(row.C.round(2) * 100)}%'
@@ -213,7 +213,7 @@ class GradesCog(commands.Cog):
         embeds = []
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df.groupby(['CourseId']))), inline=False)
         embed.add_field(name='Explanation', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
@@ -228,7 +228,7 @@ class GradesCog(commands.Cog):
 
         for i, row in df.groupby(['CourseId']).mean().iterrows():
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
             C = f'{int(row.C.round(2) * 100)}%'

@@ -13,6 +13,7 @@ using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Services.Guilds.Models;
+using ClemBot.Api.Services.Jobs;
 using FluentValidation.AspNetCore;
 using LinqToDB.EntityFrameworkCore;
 using MediatR;
@@ -30,12 +31,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Npgsql;
+using Quartz;
 using Serilog;
 
 namespace ClemBot.Api.Core
 {
     public class Startup
     {
+        private const int DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL = 24;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -88,6 +92,24 @@ namespace ClemBot.Api.Core
 
             // Add our caching dependency
             services.AddLazyCache();
+
+            // Set up quartz
+            services.AddQuartz(options => {
+                options.UseMicrosoftDependencyInjectionJobFactory();
+
+                options.ScheduleJob<MessageContentDeletionJob>(trigger => trigger
+                    .WithIdentity("MessageContentDeletion", "DiscordCompliance")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x
+                        .WithIntervalInHours(DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL)
+                        .RepeatForever())
+                    .WithDescription("Discord Compliance Message Content Deletion Job")
+                );
+            });
+
+            services.AddQuartzServer(options => {
+                options.WaitForJobsToComplete = true;
+            });
 
             services.AddCors(options => {
                 options.AddDefaultPolicy(
@@ -165,7 +187,6 @@ namespace ClemBot.Api.Core
 
             // Load linq2db for bulk copies
             LinqToDBForEFTools.Initialize();
-
 
             // Reload enum types after a migration
             using var conn = (NpgsqlConnection)context.Database.GetDbConnection();

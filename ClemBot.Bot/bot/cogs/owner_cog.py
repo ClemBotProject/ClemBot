@@ -6,7 +6,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels
+from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
 
 log = logging.getLogger(__name__)
 
@@ -37,12 +37,19 @@ class OwnerCog(commands.Cog):
         guild = self.bot.get_guild(id)
         await ctx.send(f'reloading {guild.name} users')
         await self.bot.guild_route.update_guild_users(guild)
+
         await ctx.send(f'reloading {guild.name} roles')
         await self.bot.guild_route.update_guild_roles(guild)
+
         await ctx.send(f'reloading {guild.name} role user mappings')
         await self.bot.guild_route.update_guild_role_user_mappings(guild)
+
         await ctx.send(f'reloading {guild.name} channels')
         await self.bot.guild_route.update_guild_channels(guild)
+
+        await ctx.send(f'reloading {guild.name} threads')
+        await self.bot.guild_route.update_guild_threads(guild)
+
         await ctx.send(f'{guild.name} reloaded')
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
@@ -210,6 +217,31 @@ class OwnerCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @owner.command()
+    @commands.is_owner()
+    async def updatemute(self, ctx):
+
+        for guild in self.bot.guilds:
+            mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
+
+            if not mute_role:
+                continue
+
+            await ctx.send(f'Updating guild {guild.name}')
+
+            for channel in guild.channels:
+                await channel.set_permissions(mute_role,
+                                              speak=False,
+                                              connect=False,
+                                              stream=False,
+                                              send_messages=False,
+                                              send_messages_in_threads=False,
+                                              create_public_threads=False,
+                                              create_private_threads=False,
+                                              send_tts_messages=False,
+                                              add_reactions=False)
+
+        await ctx.send('Done')
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))

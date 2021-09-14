@@ -118,3 +118,21 @@ class GuildRoute(BaseRoute):
         }
 
         await self._client.patch(f'guilds/update/channels', data=json)
+
+    async def update_guild_threads(self, guild: discord.Guild):
+
+        threads = [{
+            'ThreadId': c.id,
+            'Name': c.name,
+            'ParentId': c.parent_id
+        }
+            for c in guild.threads]
+
+        df: pd.DataFrame = pd.DataFrame.from_records(threads)
+
+        json = {
+            'GuildId': guild.id,
+            'ThreadCsv': df.to_csv(index=False)
+        }
+
+        await self._client.patch(f'guilds/update/threads', data=json)

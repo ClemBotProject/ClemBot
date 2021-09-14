@@ -63,6 +63,7 @@ class ClemBot(commands.Bot):
         self.moderation_route: moderation_route.ModerationRoute = None
         self.claim_route: claim_route.ClaimRoute = None
         self.commands_route: commands_route.CommandsRoute = None
+        self.thread_route: thread_route.ThreadsRoute = None
 
         self.load_cogs()
         self.active_services = {}
@@ -102,21 +103,21 @@ class ClemBot(commands.Bot):
     async def on_ready(self) -> None:
         embed = discord.Embed(title='Bot Started Up  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar_url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
     async def on_backend_connect(self):
         embed = discord.Embed(title='Bot Connected to ClemBot.Api  :rocket:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar_url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
     async def on_backend_disconnect(self):
         embed = discord.Embed(title='Bot Disconnected from ClemBot.Api  :warning:', color=Colors.ClemsonOrange)
         embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-        embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar_url)
+        embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
 
         await self.send_startup_log_embed(embed)
 
@@ -125,7 +126,7 @@ class ClemBot(commands.Bot):
             log.info('Sending shutdown embed')
             embed = discord.Embed(title='Bot Shutting down  :no_entry_sign:', color=Colors.ClemsonOrange)
             embed.description = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M")
-            embed.set_author(name=f'{self.user.name}', icon_url=self.user.avatar_url)
+            embed.set_author(name=f'{self.user.name}', icon_url=self.user.display_avatar.url)
             await self.send_startup_log_embed(embed)
         except Exception as e:
             log.error(f'Logout error embed failed with error {e}')
@@ -143,6 +144,10 @@ class ClemBot(commands.Bot):
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
         command = ctx.command
+
+        if not isinstance(command, ext.ExtBase):
+            # If the command isn't an extension command let it through, we dont need to think about it
+            return True
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
@@ -166,10 +171,6 @@ class ClemBot(commands.Bot):
 
         if await self.is_owner(author):
             # if the author owns the bot, authorize the command no matter what
-            return True
-
-        if not isinstance(command, ext.ExtBase):
-            # If the command isn't an extension command let it through, we dont need to think about it
             return True
 
         if author.guild_permissions.administrator:
@@ -225,6 +226,12 @@ class ClemBot(commands.Bot):
 
     async def on_guild_channel_update(self, before, after):
         await self.publish_with_error(Events.on_guild_channel_update, before, after)
+
+    async def on_thread_join(self, channel):
+        await self.publish_with_error(Events.on_guild_thread_join, channel)
+
+    async def on_thread_update(self, before, after):
+        await self.publish_with_error(Events.on_guild_thread_update, before, after)
 
     async def on_member_join(self, user):
         await self.publish_with_error(Events.on_user_joined, user)
@@ -296,7 +303,7 @@ class ClemBot(commands.Bot):
 
         embed = discord.Embed(title=f'ERROR: {type(error).__name__}', color=Colors.Error)
         embed.add_field(name='Exception:', value=error)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.channel.send(embed=embed)
         await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         await self.global_error_handler(error)

@@ -44,6 +44,10 @@ class StartupService(BaseService):
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_channels(guild)
 
+    async def load_threads(self):
+        for guild in self.bot.guilds:
+            await self.bot.guild_route.update_guild_threads(guild)
+
     @staticmethod
     def get_full_name(author) -> str:
         return f'{author.name}#{author.discriminator}'
@@ -82,5 +86,9 @@ class StartupService(BaseService):
         # Reset active channels, send all channels to the backend and delete any not present and add any that are new
         log.info('Resetting Guild Channels state')
         await self.load_channels()
+
+        # Reset active threads, send all channels to the backend and delete any not present and add any that are new
+        log.info('Resetting Guild Threads state')
+        await self.load_threads()
 
         self.bot.is_starting_up = False

@@ -61,7 +61,7 @@ A Discord bot for server and community management with a focus on school/program
    Clembot is in current active development so check back often to see whats new!!
 
 # Bot Invite
-To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1409412343&scope=bot)
+To invite Clembot to your server click this link: [Clembot Invite](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot)
 
 ## Community
 We are a community focused on learning and acceptance; anyone is welcome. If you have an idea or a feature you would like to contribute, feel free to open an issue and we as a community can begin discussion. 
@@ -95,5 +95,14 @@ ClemBot.Api.Data folder contains the Entity Framework Code first db models and c
 </br>
 ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in the `Features` folder
 
-![ClemBot Master Deployment](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20Deployment/badge.svg?branch=master)
-![ClemBot Master Integration](https://github.com/ClemsonCPSC-Discord/ClemBot/workflows/ClemBot%20Master%20integration/badge.svg?branch=master)
+## ClemBot Pipeline Status
+
+|Service|Pipeline|Status|
+|-------|--------|------|
+|Api|ClemBot.Api Master Integration|![ClemBot.Api Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Api-Integration.yml/badge.svg?branch=master)|
+|Api|ClemBot.Api Master Deployment|![ClemBot.Api Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Api-Deployment.yml/badge.svg?branch=master)|
+|Bot|ClemBot.Bot Master Integration|![ClemBot.Bot Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Bot-Integration.yml/badge.svg?branch=master)|
+|Bot|ClemBot.Bot Master Deployment|![ClemBot.Bot Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Bot-Deployment%20copy%202.yml/badge.svg?branch=master)|
+|Site|ClemBot.Site Master Integration|![ClemBot.Site Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Site-Integration.yml.yml/badge.svg?branch=master)|
+|Site|ClemBot.Site Master Deployment|![ClemBot.Site Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Site-Deployment%20copy.yml/badge.svg?branch=master)|
+

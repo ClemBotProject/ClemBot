@@ -147,7 +147,7 @@ class ManageClassesCog(commands.Cog):
         # check if the initial command contained a class abbv and number
         if not class_repr.abbv:
             embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color=Colors.ClemsonOrange)
-            avi = ctx.author.avatar_url_as(static_format='png')
+            avi = ctx.author.display_avatar.url
             embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
                              icon_url=avi)
             embed.add_field(name='**Current values**', value=class_repr)
@@ -173,7 +173,7 @@ class ManageClassesCog(commands.Cog):
         embed = discord.Embed(
             title=f'Class "{class_repr.abbv}-{class_repr.number}" set',
             color=Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format='png')
+        avi = ctx.author.display_avatar.url
         embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)
@@ -193,7 +193,7 @@ class ManageClassesCog(commands.Cog):
             return
 
         embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color=Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format='png')
+        avi = ctx.author.display_avatar.url
         embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)
@@ -217,7 +217,7 @@ class ManageClassesCog(commands.Cog):
         embed = discord.Embed(
             title=f'Class description: "{class_repr.description}" set',
             color=Colors.ClemsonOrange)
-        avi = ctx.author.avatar_url_as(static_format='png')
+        avi = ctx.author.display_avatar.url
         embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)

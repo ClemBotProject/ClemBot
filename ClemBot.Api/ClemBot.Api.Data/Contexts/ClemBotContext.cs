@@ -69,6 +69,10 @@ namespace ClemBot.Api.Data.Contexts
                         .WithMany(p => p.RoleUsers)
                         .HasForeignKey(pt => pt.RoleId));
 
+            modelBuilder.Entity<Channel>()
+                .Property(e => e.IsThread)
+                .HasComputedColumnSql(@"""Channels"".""ParentId"" IS NOT null", stored: true);
+
             modelBuilder.HasPostgresEnum<BotAuthClaims>();
             modelBuilder.HasPostgresEnum<DesignatedChannels>();
             modelBuilder.HasPostgresEnum<InfractionType>();

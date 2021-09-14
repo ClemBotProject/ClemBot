@@ -52,7 +52,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         embed = discord.Embed(title='Current Valid Claims',
                               color=Colors.ClemsonOrange,
                               description=f'For: {subject.mention}\n```\n{claims_str}```')
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         return embed
 
     @claims.command(aliases=['set'])
@@ -113,7 +113,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         claims_str = self.get_all_claims()
 
         embed = discord.Embed(title='Available Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
