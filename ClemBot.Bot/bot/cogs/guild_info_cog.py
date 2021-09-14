@@ -44,7 +44,7 @@ class GuildInfoCog(commands.Cog):
             base.format('Roles', formatted_roles),
         ])
 
-        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
