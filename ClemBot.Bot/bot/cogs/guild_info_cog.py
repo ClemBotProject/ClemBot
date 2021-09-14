@@ -5,6 +5,7 @@ from discord.ext import commands
 
 import bot.extensions as ext
 from bot.consts import Colors
+from bot.messaging.events import Events
 
 class GuildInfoCog(commands.Cog):
     def __init__(self, bot):
@@ -14,11 +15,11 @@ class GuildInfoCog(commands.Cog):
     @ext.long_help('Shows information on the current Guild/Discord server.')
     @ext.short_help('Shows info on a Discord server.')
     @ext.example('guildinfo')
-    async def guildinfo(self, ctx, guild: discord.Guild = None):
+    async def guildinfo(self, ctx: commands.Context, guild: discord.Guild = None):
         guild = ctx.guild
 
         embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{guild.name} Information [{guild.id}]')
-        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_thumbnail(url=guild.icon.url)
         
         member_count = len([m for m in guild.members if not m.bot])
         bot_count = len([m for m in guild.members if m.bot])
@@ -26,7 +27,6 @@ class GuildInfoCog(commands.Cog):
         formatted_roles = ' '.join(reversed([r.mention for r in guild.roles if r.id != guild.id]))
         age = arrow.get(guild.created_at)
         display_age = f"{age.format('MMM D, YYYY')}, {age.humanize()}"
-
 
         base = '» **{}:** {}'
 
@@ -41,7 +41,9 @@ class GuildInfoCog(commands.Cog):
 
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+
 
 
 def setup(bot):
