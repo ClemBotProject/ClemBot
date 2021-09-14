@@ -5,6 +5,7 @@ from discord.ext import commands
 
 import bot.extensions as ext
 from bot.consts import Colors
+from bot.messaging.events import Events
 
 class GuildInfoCog(commands.Cog):
     def __init__(self, bot):
@@ -40,7 +41,9 @@ class GuildInfoCog(commands.Cog):
 
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+
 
 
 def setup(bot):
