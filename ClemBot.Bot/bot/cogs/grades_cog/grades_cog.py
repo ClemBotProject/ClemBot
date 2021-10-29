@@ -317,7 +317,7 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title='All Known Professors', color=Colors.ClemsonOrange)
             embed.add_field(name='Listings:', value=f'```{content}```')
             embed.add_field(name='Info:',
-                            value=f'Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other manglaed names. This is just a byproduct of how the data is distributed by the university',
+                            value=f'Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
                             inline=False)
 
             embeds.append(embed)
