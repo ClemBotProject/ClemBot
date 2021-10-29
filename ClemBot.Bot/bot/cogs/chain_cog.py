@@ -118,7 +118,7 @@ class ChainCog(commands.Cog):
         if not checkfordecorator and not func.chainable_input and not func.chainable_output:
             return 1, command.split()[0] + ' Is not a chainable input command'
 
-        args = {'ctx': ctx}
+        args = {'context': ctx}
         temp = []
         for arg in func.params:
             if arg != 'self' and arg != 'ctx':
@@ -165,6 +165,8 @@ class ChainCog(commands.Cog):
                         args[temp[i]] = func.params[temp[i]].annotation(remainder[0])
                         remainder.pop(0)
                     except ValueError:
+                        pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
+                    except TypeError:
                         pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
                     except IndexError:
                         break  # We ran out of arguments so continuing with command execution
