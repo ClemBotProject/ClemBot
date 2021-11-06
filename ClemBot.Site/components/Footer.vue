@@ -26,6 +26,9 @@
       >
     </div>
     <div>
+      <nuxt-link :to="{ path: '/privacy' }">Privacy Policy</nuxt-link>
+    </div>
+    <div>
       <a
         href="https://github.com/ClemBotProject/ClemBot/blob/master/LICENSE"
         rel="noopener noreferrer"

@@ -43,6 +43,7 @@ class InviteCog(commands.Cog):
         embed.add_field(name='Website', value='[Link!](https://clembot.io)')
         embed.add_field(name='Repository', value='[Link!](https://github.com/ClemBotProject/ClemBot)')
         embed.add_field(name='Wiki', value='[Link!](https://clembot.io/wiki)')
+        embed.add_field(name='Privacy Policy', value='[Link!](https://clembot.io/privacy)')
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         await ctx.send(embed=embed)
 
