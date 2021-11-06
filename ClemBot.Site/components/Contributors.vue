@@ -63,10 +63,10 @@ export default Vue.extend({
   -moz-transition: all 0.1s ease-in-out;
   -o-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
-  -ms-transform: scale(1.25, 1.25);
+  -ms-transform: scale(1.08, 1.08);
   /* IE 9 */
-  -webkit-transform: scale(1.25, 1.25);
+  -webkit-transform: scale(1.08, 1.08);
   /* Safari */
-  transform: scale(1.25, 1.25);
+  transform: scale(1.08, 1.08);
 }
 </style>
