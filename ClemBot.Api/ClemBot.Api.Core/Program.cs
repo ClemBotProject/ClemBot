@@ -58,7 +58,7 @@ builder.Host.ConfigureAppConfiguration((_, config) => {
 });
 builder.Services.AddControllers()
     .AddFluentValidation(s => {
-        s.RegisterValidatorsFromAssemblyContaining<Startup>();
+        s.RegisterValidatorsFromAssemblyContaining<Program>();
     })
     .AddJsonOptions(options => {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -80,7 +80,7 @@ builder.Services.AddSingleton(jwtTokenConfig);
 // Add JWT generator to DI
 builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
-builder.Services.AddMediatR(typeof(Startup), typeof(GuildExistsRequest));
+builder.Services.AddMediatR(typeof(Program), typeof(GuildExistsRequest));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
 // Specify Swagger startup options
@@ -93,7 +93,8 @@ builder.Services.AddSwaggerGen(o => {
             Description = "ClemBot Backend API Implementation",
             License = new OpenApiLicense
             {
-                Name = "Use under MIT", Url = new Uri("https://opensource.org/licenses/MIT")
+                Name = "Use under MIT",
+                Url = new Uri("https://opensource.org/licenses/MIT")
             }
         });
     o.CustomSchemaIds(type => type.ToString());
@@ -122,11 +123,9 @@ builder.Services.AddQuartzServer(options => {
 
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(
-        builder => {
-            //builder.WithOrigins("http://localhost:3000");
-            builder.AllowAnyOrigin();
-            builder.AllowAnyOrigin();
-            builder.AllowAnyMethod();
+        policyBuilder => {
+            policyBuilder.AllowAnyOrigin();
+            policyBuilder.AllowAnyMethod();
         });
 });
 
