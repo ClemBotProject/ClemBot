@@ -17,12 +17,14 @@ class BanCog(commands.Cog):
 
     @ext.command()
     @ext.long_help(
-        'Bans a user from a server and tracks that ban as an infraction'
+        'Bans a user from a server and tracks that ban as an infraction, '
+        'Optionally allows to specify the number of days from which to purge the '
+        'banned users messages'
     )
     @ext.short_help('Bans a user')
-    @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll'))
+    @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll', 'ban @SomeOtherUser 3 Spamming messages'))
     @ext.required_claims(Claims.moderation_ban)
-    async def ban(self, ctx: commands.Context, subject: discord.Member, *, reason: str):
+    async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: int = 0, *, reason: str):
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
             embed.title = f'Error: Invalid Permissions'
@@ -53,7 +55,8 @@ class BanCog(commands.Cog):
                                          guild=ctx.guild,
                                          author=ctx.author,
                                          subject=subject,
-                                         reason=reason)
+                                         reason=reason,
+                                         purge_days=purge_days)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'{self.get_full_name(subject)} Banned  :hammer:'
@@ -69,6 +72,8 @@ class BanCog(commands.Cog):
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
+        if purge_days != 0:
+            embed.add_field(name='Messages Purged :no_entry_sign:', value=f'{purge_days} day{"s" if not purge_days == 1 else ""} of messages purged')
         embed.set_thumbnail(url=subject.display_avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
