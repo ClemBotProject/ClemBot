@@ -10,11 +10,11 @@ Make sure you can run these commands and install them if not present.
 * A python IDE/Text Editor: Anything will work but people generally use Visual Studio Code [Link](https://code.visualstudio.com/) or Jetbrains Pycharm [Link](https://www.jetbrains.com/pycharm/)
 
 ### ClemBot.Api
-* .Net 5 SDK [Link](https://dotnet.microsoft.com/download/dotnet/5.0)
+* .Net 6 SDK [Link](https://dotnet.microsoft.com/download/dotnet/6.0)
 * A C# IDE, Preferably [Visual Studio Community](https://visualstudio.microsoft.com/) (Windows only) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (Cross Platform, Free with a student email)
 
 ### Database
-* PostgresSQL [Link](https://www.postgresql.org/download/)
+* PostgresSQL 14 [Link](https://www.postgresql.org/download/)
 * PgAdmin4 [Link](https://www.pgadmin.org/download/)
 
 ## Get a Discord bot token and enable intents
@@ -78,6 +78,7 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 * `GeocodeKey`:(Optional) Geocode weather service api token
 * `AzureTranslateKey`:(Optional) Azure translation api token
 * `BotOnly`: (optional) If set to true, puts ClemBot.Bot into Bot only mode which deactivates the api and allows for limited functionality. Mainly used when a feature only requires discord and needs no persistence/database
+* `MessageApiBatchSize` (Optional: Defaults to 5) Sets the max cache size for clembots internal message catch before it is flushed to the api
 
 ## Setting up the ClemBot.Bot build environment
 Setup a virtual environment:  
