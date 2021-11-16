@@ -7,43 +7,42 @@ using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Guilds.Bot
+namespace ClemBot.Api.Core.Features.Guilds.Bot;
+
+public class Details
 {
-    public class Details
+    public class Query : IRequest<Result<Model, QueryStatus>>
     {
-        public class Query : IRequest<Result<Model, QueryStatus>>
+        public ulong Id { get; set; }
+    }
+
+    public class Model
+    {
+        public ulong Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? WelcomeMessage { get; set; }
+    }
+
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    {
+        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public ulong Id { get; set; }
-        }
+            var guild = await _context.Guilds
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-        public class Model
-        {
-            public ulong Id { get; set; }
-
-            public string? Name { get; set; }
-
-            public string? WelcomeMessage { get; set; }
-        }
-
-        public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
-        {
-            public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+            if (guild is null)
             {
-                var guild = await _context.Guilds
-                    .FirstOrDefaultAsync(x => x.Id == request.Id);
-
-                if (guild is null)
-                {
-                    return QueryResult<Model>.NotFound();
-                }
-
-                return QueryResult<Model>.Success(new Model
-                {
-                    Id = guild.Id,
-                    Name = guild.Name,
-                    WelcomeMessage = guild.WelcomeMessage,
-                });
+                return QueryResult<Model>.NotFound();
             }
+
+            return QueryResult<Model>.Success(new Model
+            {
+                Id = guild.Id,
+                Name = guild.Name,
+                WelcomeMessage = guild.WelcomeMessage,
+            });
         }
     }
 }

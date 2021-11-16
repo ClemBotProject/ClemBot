@@ -7,58 +7,58 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
-namespace ClemBot.Api.Core.Features.Infractions.Bot
+namespace ClemBot.Api.Core.Features.Infractions.Bot;
+
+public class Details
 {
-    public class Details
+    public class Query : IRequest<Result<Model, QueryStatus>>
     {
-        public class Query : IRequest<Result<Model, QueryStatus>>
+        public int Id { get; set; }
+    }
+
+    public class Model
+    {
+        public ulong GuildId { get; set; }
+
+        public ulong AuthorId { get; set; }
+
+        public ulong SubjectId { get; set; }
+
+        public InfractionType Type { get; set; }
+
+        public string? Reason { get; set; }
+
+        public LocalDateTime? Duration { get; set; }
+
+        public LocalDateTime Time { get; set; }
+
+        public bool? Active { get; set; }
+    }
+
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    {
+        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public int Id { get; set; }
-        }
+            var infraction = await _context.Infractions.FirstOrDefaultAsync(y => y.Id == request.Id);
 
-        public class Model
-        {
-            public ulong GuildId { get; set; }
-
-            public ulong AuthorId { get; set; }
-
-            public ulong SubjectId { get; set; }
-
-            public InfractionType Type { get; set; }
-
-            public string? Reason { get; set; }
-
-            public DateTime? Duration { get; set; }
-
-            public DateTime Time { get; set; }
-
-            public bool? Active { get; set; }
-        }
-
-        public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
-        {
-            public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+            if (infraction is null)
             {
-                var infraction = await _context.Infractions.FirstOrDefaultAsync(y => y.Id == request.Id);
-
-                if (infraction is null)
-                {
-                    return QueryResult<Model>.NotFound();
-                }
-
-                return QueryResult<Model>.Success(new Model()
-                {
-                    GuildId = infraction.GuildId,
-                    AuthorId = infraction.AuthorId,
-                    SubjectId = infraction.SubjectId,
-                    Reason = infraction.Reason,
-                    Duration = infraction.Duration,
-                    Time = infraction.Time,
-                    Type = infraction.Type,
-                    Active = infraction.IsActive
-                });
+                return QueryResult<Model>.NotFound();
             }
+
+            return QueryResult<Model>.Success(new Model()
+            {
+                GuildId = infraction.GuildId,
+                AuthorId = infraction.AuthorId,
+                SubjectId = infraction.SubjectId,
+                Reason = infraction.Reason,
+                Duration = infraction.Duration,
+                Time = infraction.Time,
+                Type = infraction.Type,
+                Active = infraction.IsActive
+            });
         }
     }
 }

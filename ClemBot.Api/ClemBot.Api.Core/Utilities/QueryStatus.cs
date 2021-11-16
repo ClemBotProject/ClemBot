@@ -1,10 +1,9 @@
-namespace ClemBot.Api.Core.Utilities
+namespace ClemBot.Api.Core.Utilities;
+
+public enum QueryStatus
 {
-    public enum QueryStatus
-    {
-        Success,
-        Invalid,
-        NotFound,
-        Conflict
-    }
+    Success,
+    Invalid,
+    NotFound,
+    Conflict
 }

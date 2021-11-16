@@ -1,9 +1,8 @@
 using MediatR;
 
-namespace ClemBot.Api.Services.Messages.Models
+namespace ClemBot.Api.Services.Messages.Models;
+
+public class MessageExistsRequest : IRequest<bool>
 {
-    public class MessageExistsRequest : IRequest<bool>
-    {
-        public ulong Id { get; init; }
-    }
+    public ulong Id { get; init; }
 }

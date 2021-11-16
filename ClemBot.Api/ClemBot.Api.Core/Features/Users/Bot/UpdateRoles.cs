@@ -8,48 +8,47 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Users.Bot
+namespace ClemBot.Api.Core.Features.Users.Bot;
+
+public class UpdateRoles
 {
-    public class UpdateRoles
+    public class Validator : AbstractValidator<Command>
     {
-        public class Validator : AbstractValidator<Command>
+        public Validator()
         {
-            public Validator()
-            {
-                RuleFor(p => p.Id).NotNull();
-            }
+            RuleFor(p => p.Id).NotNull();
         }
+    }
 
-        public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
+    public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
+    {
+        public ulong Id { get; set; }
+
+        public List<ulong> Roles { get; set; } = new();
+    }
+
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+    {
+        public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            public ulong Id { get; set; }
+            var roles = await _context.Roles
+                .Where(x => request.Roles.Contains(x.Id))
+                .ToListAsync();
 
-            public List<ulong> Roles { get; set; } = new();
-        }
+            var user = await _context.Users
+                .Include(y => y.Roles)
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
-        {
-            public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            if (roles is null || !roles.Any() || user is null)
             {
-                var roles = await _context.Roles
-                    .Where(x => request.Roles.Contains(x.Id))
-                    .ToListAsync();
-
-                var user = await _context.Users
-                    .Include(y => y.Roles)
-                    .FirstOrDefaultAsync(x => x.Id == request.Id);
-
-                if (roles is null || !roles.Any() || user is null)
-                {
-                    return QueryResult<IEnumerable<ulong>>.NotFound();
-                }
-
-                user.Roles.RemoveAll(x => x.GuildId == roles.First().GuildId);
-                user.Roles.AddRange(roles);
-                await _context.SaveChangesAsync();
-
-                return QueryResult<IEnumerable<ulong>>.Success(roles.Select(x => x.Id));
+                return QueryResult<IEnumerable<ulong>>.NotFound();
             }
+
+            user.Roles.RemoveAll(x => x.GuildId == roles.First().GuildId);
+            user.Roles.AddRange(roles);
+            await _context.SaveChangesAsync();
+
+            return QueryResult<IEnumerable<ulong>>.Success(roles.Select(x => x.Id));
         }
     }
 }

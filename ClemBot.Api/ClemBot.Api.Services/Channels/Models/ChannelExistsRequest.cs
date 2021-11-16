@@ -1,9 +1,8 @@
 using MediatR;
 
-namespace ClemBot.Api.Services.Channels.Models
+namespace ClemBot.Api.Services.Channels.Models;
+
+public class ChannelExistsRequest : IRequest<bool>
 {
-    public class ChannelExistsRequest : IRequest<bool>
-    {
-        public ulong Id { get; init; }
-    }
+    public ulong Id { get; init; }
 }

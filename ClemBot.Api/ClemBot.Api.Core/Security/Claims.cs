@@ -1,9 +1,8 @@
-namespace ClemBot.Api.Core.Security
-{
-    public static class Claims
-    {
-        public static string BotApiKey => "BotClaim";
+namespace ClemBot.Api.Core.Security;
 
-        public static string ContextGuildId => "ContextGuildId";
-    }
+public static class Claims
+{
+    public static string BotApiKey => "BotClaim";
+
+    public static string ContextGuildId => "ContextGuildId";
 }

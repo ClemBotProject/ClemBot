@@ -7,24 +7,23 @@ using LazyCache;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Services.GlobalStats
+namespace ClemBot.Api.Services.GlobalStats;
+
+public class GetGlobalUserStats : IRequestHandler<GlobalUserStatsRequest, int>
 {
-    public class GetGlobalUserStats : IRequestHandler<GlobalUserStatsRequest, int>
+    private readonly IAppCache _cache;
+
+    private readonly ClemBotContext _context;
+
+    public GetGlobalUserStats(IAppCache cache, ClemBotContext context)
     {
-        private readonly IAppCache _cache;
+        _cache = cache;
+        _context = context;
+    }
 
-        private readonly ClemBotContext _context;
+    public async Task<int> Handle(GlobalUserStatsRequest request, CancellationToken cancellationToken) =>
+        await _cache.GetOrAddAsync(GetCacheKey(),
+            () => _context.Users.CountAsync(), TimeSpan.FromHours(1));
 
-        public GetGlobalUserStats(IAppCache cache, ClemBotContext context)
-        {
-            _cache = cache;
-            _context = context;
-        }
-
-        public async Task<int> Handle(GlobalUserStatsRequest request, CancellationToken cancellationToken) =>
-            await _cache.GetOrAddAsync(GetCacheKey(),
-                () => _context.Users.CountAsync(), TimeSpan.FromHours(1));
-
-        private string GetCacheKey()
-            => $"{nameof(GetGlobalUserStats)}";    }
-}
+    private string GetCacheKey()
+        => $"{nameof(GetGlobalUserStats)}";    }

@@ -1,8 +1,7 @@
 using MediatR;
 
-namespace ClemBot.Api.Services.GlobalStats.Models
+namespace ClemBot.Api.Services.GlobalStats.Models;
+
+public class GlobalUserStatsRequest : IRequest<int>
 {
-    public class GlobalUserStatsRequest : IRequest<int>
-    {
-    }
 }
