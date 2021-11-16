@@ -8,46 +8,45 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Users.Bot
+namespace ClemBot.Api.Core.Features.Users.Bot;
+
+public class Create
 {
-    public class Create
+    public class Validator : AbstractValidator<Command>
     {
-        public class Validator : AbstractValidator<Command>
+        public Validator()
         {
-            public Validator()
-            {
-                RuleFor(p => p.Id).NotNull();
-                RuleFor(p => p.Name).NotNull();
-            }
+            RuleFor(p => p.Id).NotNull();
+            RuleFor(p => p.Name).NotNull();
         }
+    }
 
-        public class Command : IRequest<Result<ulong, QueryStatus>>
+    public class Command : IRequest<Result<ulong, QueryStatus>>
+    {
+        public ulong Id { get; set; }
+
+        public string Name { get; set; } = null!;
+    }
+
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    {
+        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            public ulong Id { get; set; }
-
-            public string Name { get; set; } = null!;
-        }
-
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
-        {
-            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            var user = new User()
             {
-                var user = new User()
-                {
-                    Id = request.Id,
-                    Name = request.Name,
-                };
+                Id = request.Id,
+                Name = request.Name,
+            };
 
-                if (await _context.Roles.Where(x => x.Id == user.Id).AnyAsync())
-                {
-                    return QueryResult<ulong>.Conflict();
-                }
-
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-
-                return QueryResult<ulong>.Success(user.Id);
+            if (await _context.Roles.Where(x => x.Id == user.Id).AnyAsync())
+            {
+                return QueryResult<ulong>.Conflict();
             }
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return QueryResult<ulong>.Success(user.Id);
         }
     }
 }

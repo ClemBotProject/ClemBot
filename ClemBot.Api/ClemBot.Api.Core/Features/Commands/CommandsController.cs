@@ -8,26 +8,25 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ClemBot.Api.Core.Features.Commands
+namespace ClemBot.Api.Core.Features.Commands;
+
+[ApiController]
+[Route("api")]
+public class CommandsController : ControllerBase
 {
-    [ApiController]
-    [Route("api")]
-    public class CommandsController : ControllerBase
+    private readonly IMediator _mediator;
+
+    public CommandsController(IMediator mediator)
     {
-        private readonly IMediator _mediator;
-
-        public CommandsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpPost("bot/[controller]")]
-        [BotMasterAuthorize]
-        public async Task<IActionResult> AddInvocation(AddInvocation.Command command) =>
-            await _mediator.Send(command) switch
-            {
-                { Status: QueryStatus.Success } result => Ok(result.Value),
-                _ => throw new InvalidOperationException()
-            };
+        _mediator = mediator;
     }
+
+    [HttpPost("bot/[controller]")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> AddInvocation(AddInvocation.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
 }

@@ -10,57 +10,56 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.ClaimMappings.Bot
+namespace ClemBot.Api.Core.Features.ClaimMappings.Bot;
+
+public class Delete
 {
-    public class Delete
+    public class Validator : AbstractValidator<Command>
     {
-        public class Validator : AbstractValidator<Command>
+        public Validator()
         {
-            public Validator()
-            {
-                RuleFor(p => p.Claim).NotNull();
-                RuleFor(p => p.RoleId).NotNull();
-            }
+            RuleFor(p => p.Claim).NotNull();
+            RuleFor(p => p.RoleId).NotNull();
         }
+    }
 
-        public class Command : IRequest<Result<ulong, QueryStatus>>
+    public class Command : IRequest<Result<ulong, QueryStatus>>
+    {
+        public BotAuthClaims Claim { get; set; }
+
+        public ulong RoleId { get; set; }
+    }
+
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    {
+        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            public BotAuthClaims Claim { get; set; }
-
-            public ulong RoleId { get; set; }
-        }
-
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
-        {
-            public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            var claimMapping = new ClaimsMapping
             {
-                var claimMapping = new ClaimsMapping
-                {
-                    Claim = request.Claim,
-                    RoleId = request.RoleId
-                };
+                Claim = request.Claim,
+                RoleId = request.RoleId
+            };
 
-                var role = await _context.Roles.FirstOrDefaultAsync(x => x.Id == request.RoleId);
+            var role = await _context.Roles.FirstOrDefaultAsync(x => x.Id == request.RoleId);
 
-                if (role is null)
-                {
-                    return QueryResult<ulong>.NotFound();
-                }
-
-                var dbClaim = await _context.ClaimsMappings
-                    .FirstOrDefaultAsync(x => x.RoleId == request.RoleId && x.Claim == request.Claim);
-
-                if (dbClaim is null)
-                {
-                    return QueryResult<ulong>.NotFound();
-                }
-
-                role.Claims.Remove(dbClaim);
-                await _context.SaveChangesAsync();
-
-                return QueryResult<ulong>.Success(request.RoleId);
-
+            if (role is null)
+            {
+                return QueryResult<ulong>.NotFound();
             }
+
+            var dbClaim = await _context.ClaimsMappings
+                .FirstOrDefaultAsync(x => x.RoleId == request.RoleId && x.Claim == request.Claim);
+
+            if (dbClaim is null)
+            {
+                return QueryResult<ulong>.NotFound();
+            }
+
+            role.Claims.Remove(dbClaim);
+            await _context.SaveChangesAsync();
+
+            return QueryResult<ulong>.Success(request.RoleId);
+
         }
     }
 }

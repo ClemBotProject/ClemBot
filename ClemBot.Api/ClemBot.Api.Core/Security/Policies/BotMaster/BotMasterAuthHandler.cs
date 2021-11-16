@@ -3,28 +3,27 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace ClemBot.Api.Core.Security.Policies.BotMaster
+namespace ClemBot.Api.Core.Security.Policies.BotMaster;
+
+public class BotMasterAuthHandler : AuthorizationHandler<BotMasterRequirement>
 {
-    public class BotMasterAuthHandler : AuthorizationHandler<BotMasterRequirement>
+    private readonly ILogger<BotMasterAuthHandler> _logger;
+    private readonly HttpContext? _requestContext;
+
+    public BotMasterAuthHandler(ILogger<BotMasterAuthHandler> logger, IHttpContextAccessor requestContext)
     {
-        private readonly ILogger<BotMasterAuthHandler> _logger;
-        private readonly HttpContext? _requestContext;
+        _logger = logger;
+        _requestContext = requestContext.HttpContext;
+    }
 
-        public BotMasterAuthHandler(ILogger<BotMasterAuthHandler> logger, IHttpContextAccessor requestContext)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        BotMasterRequirement requirement)
+    {
+        if (context.User.HasClaim(c => c.Type == Claims.BotApiKey))
         {
-            _logger = logger;
-            _requestContext = requestContext.HttpContext;
+            context.Succeed(requirement);
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            BotMasterRequirement requirement)
-        {
-            if (context.User.HasClaim(c => c.Type == Claims.BotApiKey))
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

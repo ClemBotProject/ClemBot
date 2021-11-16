@@ -7,25 +7,24 @@ using LazyCache;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Services.GlobalStats
+namespace ClemBot.Api.Services.GlobalStats;
+
+public class GetGlobalCommandStats : IRequestHandler<GlobalCommandStatsRequest, int>
 {
-    public class GetGlobalCommandStats : IRequestHandler<GlobalCommandStatsRequest, int>
+    private readonly IAppCache _cache;
+
+    private readonly ClemBotContext _context;
+
+    public GetGlobalCommandStats(IAppCache cache, ClemBotContext context)
     {
-        private readonly IAppCache _cache;
-
-        private readonly ClemBotContext _context;
-
-        public GetGlobalCommandStats(IAppCache cache, ClemBotContext context)
-        {
-            _cache = cache;
-            _context = context;
-        }
-
-        public async Task<int> Handle(GlobalCommandStatsRequest request, CancellationToken cancellationToken) =>
-            await _cache.GetOrAddAsync(GetCacheKey(),
-                () => _context.CommandInvocations.CountAsync(), TimeSpan.FromMinutes(30));
-
-        private string GetCacheKey()
-            => $"{nameof(GetGlobalCommandStats)}";
+        _cache = cache;
+        _context = context;
     }
+
+    public async Task<int> Handle(GlobalCommandStatsRequest request, CancellationToken cancellationToken) =>
+        await _cache.GetOrAddAsync(GetCacheKey(),
+            () => _context.CommandInvocations.CountAsync(), TimeSpan.FromMinutes(30));
+
+    private string GetCacheKey()
+        => $"{nameof(GetGlobalCommandStats)}";
 }

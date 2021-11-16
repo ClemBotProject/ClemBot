@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace ClemBot.Api.Core.Security.Policies.BotMaster
+namespace ClemBot.Api.Core.Security.Policies.BotMaster;
+
+public class BotMasterAuthorizeAttribute : AuthorizeAttribute
 {
-    public class BotMasterAuthorizeAttribute : AuthorizeAttribute
+    public BotMasterAuthorizeAttribute()
     {
-        public BotMasterAuthorizeAttribute()
-        {
-            Policy = Policies.BotMaster;
-        }
+        Policy = Policies.BotMaster;
     }
 }

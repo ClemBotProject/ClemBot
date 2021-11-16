@@ -7,36 +7,35 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Guilds.Bot
+namespace ClemBot.Api.Core.Features.Guilds.Bot;
+
+public class GetWelcomeMessage
 {
-    public class GetWelcomeMessage
+    public class Validator : AbstractValidator<Command>
     {
-        public class Validator : AbstractValidator<Command>
+        public Validator()
         {
-            public Validator()
-            {
-                RuleFor(p => p.Id).NotNull();
-            }
+            RuleFor(p => p.Id).NotNull();
         }
+    }
 
-        public record Command : IRequest<Result<string, QueryStatus>>
-        {
-            public ulong Id { get; set; }
-        }
+    public record Command : IRequest<Result<string, QueryStatus>>
+    {
+        public ulong Id { get; set; }
+    }
 
-        public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<string, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<string, QueryStatus>>
+    {
+        public async Task<Result<string, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            public async Task<Result<string, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+            var guild = await _context.Guilds.FirstOrDefaultAsync(x => x.Id == request.Id);
+
+            if (guild is null)
             {
-                var guild = await _context.Guilds.FirstOrDefaultAsync(x => x.Id == request.Id);
-
-                if (guild is null)
-                {
-                    return QueryResult<string>.NotFound();
-                }
-
-                return QueryResult<string>.Success(guild.WelcomeMessage);
+                return QueryResult<string>.NotFound();
             }
+
+            return QueryResult<string>.Success(guild.WelcomeMessage);
         }
     }
 }
