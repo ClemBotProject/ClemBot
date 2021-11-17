@@ -44,7 +44,7 @@ public class Add
                 return QueryResult<ulong>.NotFound();
             }
 
-            var prefix = new CustomPrefix()
+            var prefix = new CustomPrefix
             {
                 GuildId = request.GuildId,
                 Prefix = request.Prefix
