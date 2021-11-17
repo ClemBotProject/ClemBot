@@ -28,7 +28,7 @@ public class AddInvocation
     {
         public async Task<Result<int, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var invocationEntity = new CommandInvocation()
+            var invocationEntity = new CommandInvocation
             {
                 CommandName = request.CommandName,
                 Time = SystemClock.Instance.InZone(DateTimeZone.Utc).GetCurrentLocalDateTime(),

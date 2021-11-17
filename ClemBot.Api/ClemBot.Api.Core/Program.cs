@@ -35,7 +35,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .WriteTo.Console()
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
 const int DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL = 24;
 
@@ -46,7 +46,12 @@ var builder = WebApplication.CreateBuilder(args);
 // ******
 
 // ****** Configure the host ******
-builder.Host.UseSerilog();
+builder.Host.UseSerilog((builderContext, provider, config) => {
+    config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .WriteTo.Console();
+});
+
 builder.Host.ConfigureAppConfiguration((_, config) => {
     //Set our user secrets as optional so
     config.AddUserSecrets<ClemBotContext>(true);
