@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
@@ -77,12 +75,6 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['assets/css/main.scss'],
-
-  env: {
-    prod: process.env.PROD === '1',
-    discordClientId: process.env.DISCORD_CLIENT_ID,
-    discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
-  },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [

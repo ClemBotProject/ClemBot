@@ -1,6 +1,6 @@
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
 
-interface oauthGuild {
+interface OauthGuild {
   id: string
   name: string
   icon: string
@@ -14,11 +14,11 @@ interface oauthGuild {
   namespaced: true,
 })
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class oauthGuilds extends VuexModule {
-  guilds: Array<oauthGuild> = []
+class OauthUser extends VuexModule {
+  guilds: Array<OauthGuild> = []
 
   @Mutation
-  set(guilds: Array<oauthGuild>) {
+  set(guilds: Array<OauthGuild>) {
     this.guilds = guilds
   }
 

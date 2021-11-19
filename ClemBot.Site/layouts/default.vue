@@ -42,7 +42,8 @@
         <div id="socials">
           <b-navbar-item
             v-if="!$auth.loggedIn"
-            href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
+			tag="nuxt-link"
+			:to="{ path: '/login' }"
           >
             <b-button icon-left="login" class="is-primary">
               <b>Login With Discord</b>
