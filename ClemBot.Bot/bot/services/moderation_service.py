@@ -25,9 +25,9 @@ class ModerationService(BaseService):
                                                     raise_on_error=True)
 
     @BaseService.Listener(Events.on_bot_ban)
-    async def on_bot_ban(self, guild, author: discord.Member, subject: discord.Member, reason):
+    async def on_bot_ban(self, guild, author: discord.Member, purge_days: int, subject: discord.Member, reason):
 
-        await guild.ban(subject, reason=reason, delete_message_days=1)
+        await guild.ban(subject, reason=reason, delete_message_days=purge_days)
 
         await self.bot.moderation_route.insert_ban(guild_id=guild.id,
                                                    author_id=author.id,
@@ -78,7 +78,7 @@ class ModerationService(BaseService):
 
         try:
             await subject.send(embed=embed)
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = f'Dm unmute to {self.get_full_name(subject)} forbidden'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
