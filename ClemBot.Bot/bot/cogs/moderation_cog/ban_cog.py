@@ -32,6 +32,13 @@ class BanCog(commands.Cog):
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
+        if not 0 <= purge_days <= 7:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Error: Invalid Purge Dates'
+            embed.add_field(name='Reason', value='Message purge days must be between 0 and 7')
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+
         # Dm the user who was banned
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been banned from Guild {ctx.guild.name}  :hammer:'
