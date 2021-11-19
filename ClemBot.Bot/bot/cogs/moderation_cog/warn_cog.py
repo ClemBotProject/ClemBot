@@ -48,7 +48,7 @@ class WarnCog(commands.Cog):
 
         try:
             await subject.send(embed=embed)
-        except discord.Forbidden:
+        except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = f'Dm Warn to {self.get_full_name(subject)} forbidden'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
