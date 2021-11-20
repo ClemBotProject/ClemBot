@@ -9,28 +9,27 @@ using LazyCache;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Services.CustomPrefix
+namespace ClemBot.Api.Services.CustomPrefix;
+
+public class GetCustomPrefixHandler : IRequestHandler<GetCustomPrefixRequest, IEnumerable<string>>
 {
-    public class GetCustomPrefixHandler : IRequestHandler<GetCustomPrefixRequest, IEnumerable<string>>
+    private readonly IAppCache _cache;
+
+    private readonly ClemBotContext _context;
+
+    public GetCustomPrefixHandler(IAppCache cache, ClemBotContext context)
     {
-        private readonly IAppCache _cache;
-
-        private readonly ClemBotContext _context;
-
-        public GetCustomPrefixHandler(IAppCache cache, ClemBotContext context)
-        {
-            _cache = cache;
-            _context = context;
-        }
-
-        public async Task<IEnumerable<string>> Handle(GetCustomPrefixRequest request, CancellationToken cancellationToken) =>
-            await _cache.GetOrAddAsync(GetCacheKey(request.Id),
-                () => _context.CustomPrefixs
-                    .Where(x => x.Guild.Id == request.Id)
-                    .Select(y => y.Prefix)
-                    .ToListAsync());
-
-        private static string GetCacheKey(ulong id)
-            => $"{nameof(GetCustomPrefixRequest)}:{id}";
+        _cache = cache;
+        _context = context;
     }
+
+    public async Task<IEnumerable<string>> Handle(GetCustomPrefixRequest request, CancellationToken cancellationToken) =>
+        await _cache.GetOrAddAsync(GetCacheKey(request.Id),
+            () => _context.CustomPrefixs
+                .Where(x => x.Guild.Id == request.Id)
+                .Select(y => y.Prefix)
+                .ToListAsync());
+
+    private static string GetCacheKey(ulong id)
+        => $"{nameof(GetCustomPrefixRequest)}:{id}";
 }

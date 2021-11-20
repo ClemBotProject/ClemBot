@@ -10,36 +10,35 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ClemBot.Api.Core.Features.CustomPrefixes
+namespace ClemBot.Api.Core.Features.CustomPrefixes;
+
+[ApiController]
+[Route("api")]
+public class CustomPrefixesController : ControllerBase
 {
-    [ApiController]
-    [Route("api")]
-    public class CustomPrefixesController : ControllerBase
+    private readonly IMediator _mediator;
+
+    public CustomPrefixesController(IMediator mediator)
     {
-        private readonly IMediator _mediator;
-
-        public CustomPrefixesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpPost("bot/[controller]/Add")]
-        [BotMasterAuthorize]
-        public async Task<IActionResult> Add(Bot.Add.Command command) =>
-            await _mediator.Send(command) switch
-            {
-                { Status: QueryStatus.Success } result => Ok(result.Value),
-                _ => throw new InvalidOperationException()
-            };
-
-        [HttpDelete("bot/[controller]/Delete")]
-        [BotMasterAuthorize]
-        public async Task<IActionResult> Add(Bot.Delete.Command command) =>
-            await _mediator.Send(command) switch
-            {
-                { Status: QueryStatus.Success } result => Ok(result.Value),
-                _ => throw new InvalidOperationException()
-            };
-
+        _mediator = mediator;
     }
+
+    [HttpPost("bot/[controller]/Add")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Add(Bot.Add.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpDelete("bot/[controller]/Delete")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Add(Bot.Delete.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
+
 }

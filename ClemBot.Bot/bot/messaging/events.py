@@ -485,6 +485,27 @@ class EventsMeta(type):
         """
         return 'on_after_command_invoke'
 
+    @property
+    def on_guild_thread_join(self):
+        """
+        Published when a new thread channel is joined in a guild
+
+        Args:
+            thread (discord.Thread): The new thread
+        """
+        return 'on_guild_thread_join'
+
+    @property
+    def on_guild_thread_update(self):
+        """
+        Published when a text channel is edited
+
+        Args:
+            before (discord.Thread): The before of the thread
+            after (discord.Thread): The after of the thread
+        """
+        return 'on_guild_thread_update'
+
 
 class Events(metaclass=EventsMeta):
     pass

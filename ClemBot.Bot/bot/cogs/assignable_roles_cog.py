@@ -51,14 +51,15 @@ class AssignableRolesCog(commands.Cog):
 
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
 
-        str_role_list = [str(i).casefold() for i in assignable_roles]  # Case-fold to do case insensitive matching
+        str_role_list = [str(i['name']).casefold() for i in assignable_roles]  # Case-fold to do case insensitive matching
 
         # Compare input_role to role_list entries for matches
         matching_roles = []
 
         for j, val_j in enumerate(str_role_list):
             if str_input_role == val_j:
-                matching_roles.append(assignable_roles[j])  # matching_roles.append(j)
+                role = await commands.RoleConverter().convert(ctx, assignable_roles[j]['name'])
+                matching_roles.append(role)  # matching_roles.append(j)
 
         role_count = len(matching_roles)
 
@@ -67,8 +68,10 @@ class AssignableRolesCog(commands.Cog):
         elif role_count == 1:  # If only one match was found, assign the role
             await self.set_role(ctx, matching_roles[0])
         else:  # If multiple matches found, query user via emojis to select correct role
-            await self.send_matching_roles_list(ctx, f'Multiple roles found for @{input_role}',
-                                                matching_roles, role_count)
+            await self.send_matching_roles_list(ctx,
+                                                f'Multiple roles found for @{input_role}',
+                                                matching_roles,
+                                                role_count)
 
     async def send_matching_roles_list(self, ctx, title: str, matching_roles, role_count):
         names = ''
@@ -107,7 +110,7 @@ class AssignableRolesCog(commands.Cog):
 
                 Guide: https://medium.com/@codingpilot25/how-to-print-emojis-using-python-2e4f93443f7e
                 A list of emojis: https://www.unicode.org/emoji/charts/emoji-list.html
-                
+
                 Additional info: https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
 
                 Method 1:
@@ -179,7 +182,7 @@ class AssignableRolesCog(commands.Cog):
         embed = discord.Embed(title=f'Role Added  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_right:')
         embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -189,7 +192,7 @@ class AssignableRolesCog(commands.Cog):
         embed = discord.Embed(title=f'Role Removed  :white_check_mark:', color=Colors.ClemsonOrange)
         embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_left:')
         embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
-        embed.set_thumbnail(url=ctx.author.avatar_url_as(static_format='png'))
+        embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 

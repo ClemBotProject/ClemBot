@@ -6,50 +6,49 @@ using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Roles.Bot
+namespace ClemBot.Api.Core.Features.Roles.Bot;
+
+public class Details
 {
-    public class Details
+    public class Query : IRequest<Result<Model, QueryStatus>>
     {
-        public class Query : IRequest<Result<Model, QueryStatus>>
+        public ulong Id { get; init; }
+    }
+
+    public class Model
+    {
+        public ulong Id { get; init; }
+
+        public string? Name { get; init; }
+
+        public ulong GuildId { get; init; }
+
+        public bool Admin { get; init; }
+
+        public bool IsAssignable { get; init; }
+    }
+
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    {
+        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public ulong Id { get; init; }
-        }
+            var role = await _context.Roles
+                .Where(x => x.Id == request.Id)
+                .FirstAsync();
 
-        public class Model
-        {
-            public ulong Id { get; init; }
-
-            public string? Name { get; init; }
-
-            public ulong GuildId { get; init; }
-
-            public bool Admin { get; init; }
-
-            public bool IsAssignable { get; init; }
-        }
-
-        public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
-        {
-            public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+            if (role is null)
             {
-                var role = await _context.Roles
-                    .Where(x => x.Id == request.Id)
-                    .FirstAsync();
-
-                if (role is null)
-                {
-                    return QueryResult<Model>.NotFound();
-                }
-
-                return QueryResult<Model>.Success(new Model()
-                {
-                    Id = role.Id,
-                    Name = role.Name,
-                    GuildId = role.GuildId,
-                    IsAssignable = role.IsAssignable ?? false,
-                    Admin = role.Admin
-                });
+                return QueryResult<Model>.NotFound();
             }
+
+            return QueryResult<Model>.Success(new Model()
+            {
+                Id = role.Id,
+                Name = role.Name,
+                GuildId = role.GuildId,
+                IsAssignable = role.IsAssignable ?? false,
+                Admin = role.Admin
+            });
         }
     }
 }

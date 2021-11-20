@@ -12,8 +12,9 @@ log = logging.getLogger(__name__)
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
-TAG_CHUNK_SIZE = 15 * 3
+TAG_CHUNK_SIZE = 12
 MAX_NON_ADMIN_LINE_LENGTH = 10
+LINK_URL = 'https://clembot.io/wiki'
 
 
 class TagCog(commands.Cog):
@@ -30,7 +31,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Supports custom tag functionality')
     @ext.example(('tag', 'tag mytag'))
-    async def tag(self, ctx, tag_name: Optional[str] = None):
+    async def tag(self, ctx: commands.Context, tag_name: Optional[str] = None):
         # check if a tag name was given
         if tag_name:
             tag_name = tag_name.lower()
@@ -41,26 +42,29 @@ class TagCog(commands.Cog):
 
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
 
+        tags.sort(key=lambda x: x.use_count, reverse=True)
+
         # check for if no tags exist in this server
         if not tags:
             embed = discord.Embed(title=f'Available Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Available:', value='There are no currently available tags.')
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             msg = await ctx.send(embed=embed)
             await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
             return
 
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
-        pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
+        # pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
+
+        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags')
 
         # send the pages to the paginator service
-        await self.bot.messenger.publish(Events.on_set_pageable_text,
-                                         embed_name='Available Tags',
-                                         field_title='Available:',
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=pages,
                                          author=ctx.author,
-                                         channel=ctx.channel)
+                                         channel=ctx.channel,
+                                         timeout=360)
 
     @tag.command(aliases=['create', 'make'])
     @ext.required_claims(Claims.tag_add)
@@ -86,8 +90,7 @@ class TagCog(commands.Cog):
         await self.bot.tag_route.create_tag(name, formatted_content, ctx.guild.id, ctx.author.id, raise_on_error=True)
         embed = discord.Embed(title=":white_check_mark: Tag Added", color=Colors.ClemsonOrange)
         embed.add_field(name="Name", value=name, inline=True)
-        embed.add_field(name="Content", value=content, inline=True)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['remove', 'destroy'])
@@ -127,12 +130,11 @@ class TagCog(commands.Cog):
         embed = discord.Embed(title=':information_source: Tag Information', color=Colors.ClemsonOrange,
                               description=description)
         embed.add_field(name='Name', value=tag.name)
-        embed.add_field(name='Content', value=tag.content, inline=False)
         if owner:
             embed.add_field(name='Owner', value=owner.mention)
         embed.add_field(name='Uses', value=f'{tag.use_count}')
         embed.add_field(name='Creation Date', value=tag.creation_date)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command()
@@ -153,8 +155,7 @@ class TagCog(commands.Cog):
         await self.bot.tag_route.edit_tag_content(ctx.guild.id, tag.name, formatted_content, raise_on_error=True)
         embed = discord.Embed(title=':white_check_mark: Tag Edited', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=tag.name, inline=False)
-        embed.add_field(name='Content', value=tag.content)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command()
@@ -175,7 +176,7 @@ class TagCog(commands.Cog):
         embed = discord.Embed(title=f':white_check_mark: Tag Claimed', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=tag.name, inline=True)
         embed.add_field(name='Owner', value=author.mention, inline=True)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['unowned'])
@@ -187,24 +188,22 @@ class TagCog(commands.Cog):
         unclaimed_tags = []
         for tag in guild_tags:
             if ctx.guild.get_member(tag.user_id) is None:
-                unclaimed_tags.append(tag.name)
+                unclaimed_tags.append(tag)
 
         author = ctx.author
         if len(unclaimed_tags) == 0:
             embed = discord.Embed(title='Unclaimed Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Unclaimed:', value='There are currently no unclaimed tags.')
-            embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+            embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
             msg = await ctx.send(embed=embed)
             await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
             return
 
         # chunk the unclaimed tags into pages
-        pages = self.chunked_pages(unclaimed_tags, TAG_CHUNK_SIZE)
+        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags')
 
         # send the pages to the paginator service
-        await self.bot.messenger.publish(Events.on_set_pageable_text,
-                                         embed_name='Unclaimed Tags',
-                                         field_title='Unclaimed:',
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=pages,
                                          author=ctx.author,
                                          channel=ctx.channel)
@@ -242,7 +241,7 @@ class TagCog(commands.Cog):
         embed.add_field(name='From', value=f'{author.mention} :arrow_right:')
         embed.add_field(name='To', value=user.mention)
         embed.add_field(name='Name', value=tag.name, inline=False)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.avatar_url)
+        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     async def _delete_tag(self, name, ctx):
@@ -250,8 +249,7 @@ class TagCog(commands.Cog):
         dictionary = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
         embed = discord.Embed(title=':white_check_mark: Tag Deleted', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=dictionary['name'], inline=False)
-        embed.add_field(name='Content', value=dictionary['content'], inline=False)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     async def _check_tag_exists(self, ctx, name: str) -> Optional[Tag]:
@@ -284,7 +282,7 @@ class TagCog(commands.Cog):
     async def _error_embed(self, ctx, desc: str):
         """Short-hand for sending an error message w/ consistent formatting."""
         embed = discord.Embed(title='Error', color=Colors.Error, description=desc)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
 
@@ -296,23 +294,17 @@ class TagCog(commands.Cog):
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
-    def chunked_pages(self, tags_list: list, n: int):
+    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str):
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
         for chunk in self.chunk_list(tags_list, n):
-            content = ''
-            for col in self.chunk_list(chunk, 3):
-                # the columns wont have the perfect number of elements every time, we need to append spaces if
-                # the list entries is less then the number of columns
-                while len(col) < 3:
-                    col.append(' ')
+            embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
+            embed.set_footer(text=f'Use tags with "{prefix} name", or inline with "$name"')
+            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            for tag in chunk:
+                embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
+            pages.append(embed)
 
-                # Concatenate the formatted column string to the page content string
-                content += "{: <20} {: <20} {: <20}\n".format(*col)
-
-            # Append the content string to the list of pages to send to the paginator
-            # Marked as a code block to ensure a monospaced font and even columns
-            pages.append(f'```{content}```')
         return pages
 
 

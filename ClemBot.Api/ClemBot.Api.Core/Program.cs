@@ -1,59 +1,233 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using System.Text.Json.Serialization;
+using ClemBot.Api.Core;
+using ClemBot.Api.Core.Behaviors;
+using ClemBot.Api.Core.Security;
+using ClemBot.Api.Core.Security.JwtToken;
+using ClemBot.Api.Core.Security.Policies;
+using ClemBot.Api.Core.Security.Policies.BotMaster;
+using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
-using Microsoft.AspNetCore.Hosting;
+using ClemBot.Api.Services.Guilds.Models;
+using ClemBot.Api.Services.Jobs;
+using FluentValidation.AspNetCore;
+using LazyCache;
+using LinqToDB.EntityFrameworkCore;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
+using Npgsql;
+using Quartz;
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 
-namespace ClemBot.Api.Core
-{
-    public class Program
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+const int DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL = 24;
+
+
+// ****** Creating the WebHostBuilder ******
+Log.Information("Starting ClemBot.Api web host");
+var builder = WebApplication.CreateBuilder(args);
+// ******
+
+// ****** Configure the host ******
+builder.Host.UseSerilog((builderContext, provider, config) => {
+    config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .WriteTo.Console();
+});
+
+builder.Host.ConfigureAppConfiguration((_, config) => {
+    //Set our user secrets as optional so
+    config.AddUserSecrets<ClemBotContext>(true);
+    config.AddEnvironmentVariables();
+    if (args.Length == 0)
     {
-        public static int Main(string[] args)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .CreateLogger();
-
-            try
-            {
-                Log.Information("Starting ClemBot.Api web host");
-                CreateHostBuilder(args).Build().Run();
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "ClemBot.Api terminated unexpectedly");
-                return 1;
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args)
-            => Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .ConfigureAppConfiguration((_, config) => {
-                    config.AddUserSecrets<ClemBotContext>();
-                    config.AddEnvironmentVariables();
-
-                    if (args.Length == 0)
-                    {
-                        config.AddCommandLine(args);
-                    }
-                })
-                .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>();
-                });
+        config.AddCommandLine(args);
     }
+});
+builder.Services.AddControllers()
+    .AddFluentValidation(s => {
+        s.RegisterValidatorsFromAssemblyContaining<Program>();
+    })
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+    });
+// ******
+
+// ****** Configure Services ******
+
+// Get Bots api key to check requests for from config
+var apiKey = builder.Configuration["BotApiKey"];
+builder.Services.AddSingleton(new ApiKey {Key = apiKey});
+
+// Generate JWT token with random access key
+var jwtTokenConfig = builder.Configuration.GetSection("JwtTokenConfig").Get<JwtTokenConfig>();
+jwtTokenConfig.Secret = Guid.NewGuid().ToString();
+builder.Services.AddSingleton(jwtTokenConfig);
+
+// Add JWT generator to DI
+builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
+
+builder.Services.AddMediatR(typeof(Program), typeof(GuildExistsRequest));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+// Specify Swagger startup options
+builder.Services.AddSwaggerGen(o => {
+    o.SwaggerDoc("v1",
+        new OpenApiInfo
+        {
+            Title = "ClemBot.Api",
+            Version = "1.0.0",
+            Description = "ClemBot Backend API Implementation",
+            License = new OpenApiLicense
+            {
+                Name = "Use under MIT",
+                Url = new Uri("https://opensource.org/licenses/MIT")
+            }
+        });
+    o.CustomSchemaIds(type => type.ToString());
+});
+
+// Add our caching dependency
+builder.Services.AddLazyCache();
+
+// Set up quartz
+builder.Services.AddQuartz(options => {
+    options.UseMicrosoftDependencyInjectionJobFactory();
+
+    options.ScheduleJob<MessageContentDeletionJob>(trigger => trigger
+        .WithIdentity("MessageContentDeletion", "DiscordCompliance")
+        .StartNow()
+        .WithSimpleSchedule(x => x
+            .WithIntervalInHours(DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL)
+            .RepeatForever())
+        .WithDescription("Discord Compliance Message Content Deletion Job")
+    );
+});
+
+builder.Services.AddQuartzServer(options => {
+    options.WaitForJobsToComplete = true;
+});
+
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(
+        policyBuilder => {
+            policyBuilder.AllowAnyOrigin();
+            policyBuilder.AllowAnyMethod();
+        });
+});
+
+// Grab connection string from config
+var connectionString = builder.Configuration["ClemBotConnectionString"];
+
+// Set the db context for DI injection
+builder.Services.AddDbContext<ClemBotContext>(options =>
+    options.UseNpgsql(connectionString, optionsBuilder => optionsBuilder.UseNodaTime()));
+
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+
+// Initialize the Authentication middleware
+builder.Services.AddAuthentication(options => {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(x => {
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
+            ValidAudience = jwtTokenConfig.Audience,
+            ValidateAudience = true
+        };
+    });
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy(Policies.BotMaster, policy => {
+        policy.RequireClaim(Claims.BotApiKey);
+    });
+});
+// Add authorization policy providers
+builder.Services.AddScoped<IAuthorizationHandler, BotMasterAuthHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, GuildSandboxAuthHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, GuildSandboxPolicyProvider>();
+// ******
+
+
+// ****** Build and configure the WebApplication ******
+var app = builder.Build();
+
+
+// ****** Create the EF Context scope and inject ClemBotContext
+using var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<ClemBotContext>();
+// ******
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClemBot.Api 1.0.0"));
 }
+
+app.UseSerilogRequestLogging();
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints => endpoints.MapControllers());
+
+// Apply any new migrations
+context.Database.Migrate();
+
+// Load linq2db for bulk copies
+LinqToDBForEFTools.Initialize();
+
+// Reload enum types after a migration
+using var conn = (NpgsqlConnection)context.Database.GetDbConnection();
+conn.Open();
+conn.ReloadTypes();
+// ******
+
+
+// ****** Run the API ******
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "ClemBot.Api terminated unexpectedly");
+    return 1;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
+
+return 0;

@@ -1,4 +1,6 @@
-namespace ClemBot.Api.Core.Security.Policies
+namespace ClemBot.Api.Core.Security.Policies;
+
+public static class Policies
 {
     public static class Policies
     {

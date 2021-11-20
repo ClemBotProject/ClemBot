@@ -1,6 +1,7 @@
 aiohttp==3.7.4
 aiosqlite==0.12.0
 appdirs==1.4.3
+arrow==1.1.1
 astroid==2.3.3
 async-timeout==3.0.1
 asynctest==0.13.0
@@ -11,11 +12,12 @@ beautifulsoup4==4.9.3
 CacheControl==0.12.6
 certifi==2020.6.20
 chardet==3.0.4
+charset-normalizer==2.0.7
 colorama==0.4.3
 contextlib2==0.6.0
 dataclasses-json==0.5.3
 dateutils==0.6.8
-discord.py==1.6.0
+discord.py @ git+https://github.com/Rapptz/discord.py@45d498c1b76deaf3b394d17ccf56112fa691d160
 distlib==0.3.1
 distro==1.4.0
 entrypoints==0.3
@@ -44,10 +46,10 @@ mypy==0.770
 mypy-extensions==0.4.3
 numpy==1.20.2
 packaging==20.4
-pandas==1.2.3
+pandas==1.3.4
 pbr==5.4.5
 pep517==0.8.2
-Pillow==8.2.0
+Pillow==8.3.2
 pluggy==0.13.1
 progress==1.5
 py==1.10.0

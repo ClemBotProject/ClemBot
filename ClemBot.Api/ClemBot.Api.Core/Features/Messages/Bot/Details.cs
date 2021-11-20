@@ -7,51 +7,50 @@ using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Messages.Bot
+namespace ClemBot.Api.Core.Features.Messages.Bot;
+
+public class Details
 {
-    public class Details
+    public class Query : IRequest<Result<Model, QueryStatus>>
     {
-        public class Query : IRequest<Result<Model, QueryStatus>>
+        public ulong Id { get; set; }
+    }
+
+    public class Model
+    {
+        public ulong Id { get; set; }
+
+        public string Content { get; set; } = null!;
+
+        public ulong GuildId { get; set; }
+
+        public ulong ChannelId { get; set; }
+
+        public ulong UserId { get; set; }
+    }
+
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    {
+        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public ulong Id { get; set; }
-        }
+            var message = await _context.Messages
+                .Where(x => x.Id == request.Id)
+                .Include(y => y.Contents)
+                .FirstOrDefaultAsync();
 
-        public class Model
-        {
-            public ulong Id { get; set; }
-
-            public string Content { get; set; } = null!;
-
-            public ulong GuildId { get; set; }
-
-            public ulong ChannelId { get; set; }
-
-            public ulong UserId { get; set; }
-        }
-
-        public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
-        {
-            public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+            if (message is null)
             {
-                var message = await _context.Messages
-                    .Where(x => x.Id == request.Id)
-                    .Include(y => y.Contents)
-                    .FirstOrDefaultAsync();
-
-                if (message is null)
-                {
-                    return QueryResult<Model>.NotFound();
-                }
-
-                return QueryResult<Model>.Success(new Model()
-                {
-                    Id = message.Id,
-                    Content = message.Contents.Last().Content,
-                    ChannelId = message.ChannelId,
-                    GuildId = message.GuildId,
-                    UserId = message.UserId
-                });
+                return QueryResult<Model>.NotFound();
             }
+
+            return QueryResult<Model>.Success(new Model()
+            {
+                Id = message.Id,
+                Content = message.Contents.Last().Content,
+                ChannelId = message.ChannelId,
+                GuildId = message.GuildId,
+                UserId = message.UserId
+            });
         }
     }
 }

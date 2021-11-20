@@ -5,7 +5,8 @@ from collections import deque
 import discord
 import discord.ext.commands as commands
 
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels
+import bot.extensions as ext
+from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
 
 log = logging.getLogger(__name__)
 
@@ -18,30 +19,37 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(hidden=True, invoke_without_command=True, case_insensitive=True)
+    @ext.group(hidden=True, case_insensitive=True)
     @commands.is_owner()
     async def owner(self, ctx):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @owner.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
         await server.leave()
 
-    @owner.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True)
     @commands.is_owner()
     async def reload(self, ctx, id: int):
         guild = self.bot.get_guild(id)
         await ctx.send(f'reloading {guild.name} users')
         await self.bot.guild_route.update_guild_users(guild)
+
         await ctx.send(f'reloading {guild.name} roles')
         await self.bot.guild_route.update_guild_roles(guild)
+
         await ctx.send(f'reloading {guild.name} role user mappings')
         await self.bot.guild_route.update_guild_role_user_mappings(guild)
+
         await ctx.send(f'reloading {guild.name} channels')
         await self.bot.guild_route.update_guild_channels(guild)
+
+        await ctx.send(f'reloading {guild.name} threads')
+        await self.bot.guild_route.update_guild_threads(guild)
+
         await ctx.send(f'{guild.name} reloaded')
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
@@ -209,6 +217,31 @@ class OwnerCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @owner.command()
+    @commands.is_owner()
+    async def updatemute(self, ctx):
+
+        for guild in self.bot.guilds:
+            mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
+
+            if not mute_role:
+                continue
+
+            await ctx.send(f'Updating guild {guild.name}')
+
+            for channel in guild.channels:
+                await channel.set_permissions(mute_role,
+                                              speak=False,
+                                              connect=False,
+                                              stream=False,
+                                              send_messages=False,
+                                              send_messages_in_threads=False,
+                                              create_public_threads=False,
+                                              create_private_threads=False,
+                                              send_tts_messages=False,
+                                              add_reactions=False)
+
+        await ctx.send('Done')
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))

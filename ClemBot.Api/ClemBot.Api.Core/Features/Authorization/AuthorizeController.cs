@@ -6,16 +6,23 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ClemBot.Api.Core.Features.Authorization
-{
-    [ApiController]
-    [Route("api")]
-    [AllowAnonymous]
-    public class AuthorizeController : ControllerBase
-    {
-        private readonly IMediator _mediator;
+namespace ClemBot.Api.Core.Features.Authorization;
 
-        public AuthorizeController(IMediator mediator)
+[ApiController]
+[Route("api")]
+[AllowAnonymous]
+public class AuthorizeController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public AuthorizeController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    [HttpGet("bot/[controller]")]
+    public async Task<IActionResult> Authorize([FromQuery] BotAuthorize.Query query) =>
+        await _mediator.Send(query) switch
         {
             _mediator = mediator;
         }

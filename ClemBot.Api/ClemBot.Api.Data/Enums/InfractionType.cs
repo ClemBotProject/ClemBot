@@ -1,9 +1,8 @@
-namespace ClemBot.Api.Data.Enums
+namespace ClemBot.Api.Data.Enums;
+
+public enum InfractionType
 {
-    public enum InfractionType
-    {
-        Ban,
-        Mute,
-        Warn
-    }
+    Ban,
+    Mute,
+    Warn
 }

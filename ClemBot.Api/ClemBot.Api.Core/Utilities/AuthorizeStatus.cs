@@ -1,8 +1,7 @@
-namespace ClemBot.Api.Core.Utilities
+namespace ClemBot.Api.Core.Utilities;
+
+public enum AuthorizeStatus
 {
-    public enum AuthorizeStatus
-    {
-        Success,
-        Forbidden
-    }
+    Success,
+    Forbidden
 }

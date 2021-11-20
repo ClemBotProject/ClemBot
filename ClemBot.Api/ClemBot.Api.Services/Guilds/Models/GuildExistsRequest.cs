@@ -1,9 +1,8 @@
 using MediatR;
 
-namespace ClemBot.Api.Services.Guilds.Models
+namespace ClemBot.Api.Services.Guilds.Models;
+
+public class GuildExistsRequest : IRequest<bool>
 {
-    public class GuildExistsRequest : IRequest<bool>
-    {
-        public ulong Id { get; init; }
-    }
+    public ulong Id { get; init; }
 }

@@ -30,7 +30,7 @@
               <div class="tile is-vertical is-6">
                 <div id="nav-tile" class="tile is-parent">
                   <a
-                    href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=1543630070&scope=bot"
+                    href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot"
                   >
                     <article
                       id="nav-child"

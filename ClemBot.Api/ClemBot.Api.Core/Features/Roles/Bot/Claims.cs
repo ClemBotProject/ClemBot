@@ -10,37 +10,36 @@ using ClemBot.Api.Data.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Roles.Bot
+namespace ClemBot.Api.Core.Features.Roles.Bot;
+
+public class Claims
 {
-    public class Claims
+    public class Query : IRequest<Result<IEnumerable<BotAuthClaims>, QueryStatus>>
     {
-        public class Query : IRequest<Result<IEnumerable<BotAuthClaims>, QueryStatus>>
-        {
-            public ulong Id { get; init; }
-        }
+        public ulong Id { get; init; }
+    }
 
-        public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<IEnumerable<BotAuthClaims>, QueryStatus>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<IEnumerable<BotAuthClaims>, QueryStatus>>
+    {
+        public async Task<Result<IEnumerable<BotAuthClaims>, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public async Task<Result<IEnumerable<BotAuthClaims>, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+            var role = await _context.Roles
+                .Where(x => x.Id == request.Id)
+                .Include(y => y.Claims)
+                .FirstOrDefaultAsync();
+
+            if (role is null)
             {
-                var role = await _context.Roles
-                    .Where(x => x.Id == request.Id)
-                    .Include(y => y.Claims)
-                    .FirstOrDefaultAsync();
-
-                if (role is null)
-                {
-                    return QueryResult<IEnumerable<BotAuthClaims>>.NotFound();
-                }
-
-                // Role is admin and has full claim permissions no matter what
-                if (role.Admin)
-                {
-                    return QueryResult<IEnumerable<BotAuthClaims>>.Success(Enum.GetValues<BotAuthClaims>());
-                }
-
-                return QueryResult<IEnumerable<BotAuthClaims>>.Success(role.Claims.Select(x => x.Claim));
+                return QueryResult<IEnumerable<BotAuthClaims>>.NotFound();
             }
+
+            // Role is admin and has full claim permissions no matter what
+            if (role.Admin)
+            {
+                return QueryResult<IEnumerable<BotAuthClaims>>.Success(Enum.GetValues<BotAuthClaims>());
+            }
+
+            return QueryResult<IEnumerable<BotAuthClaims>>.Success(role.Claims.Select(x => x.Claim));
         }
     }
 }

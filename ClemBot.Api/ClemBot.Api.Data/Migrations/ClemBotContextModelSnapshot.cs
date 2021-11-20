@@ -32,12 +32,22 @@ namespace ClemBot.Api.Data.Migrations
                     b.Property<decimal>("GuildId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<bool>("IsThread")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("boolean")
+                        .HasComputedColumnSql("\"Channels\".\"ParentId\" IS NOT null", true);
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<decimal?>("ParentId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Channels");
                 });
@@ -411,7 +421,13 @@ namespace ClemBot.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ClemBot.Api.Data.Models.Channel", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
                     b.Navigation("Guild");
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.ClaimsMapping", b =>

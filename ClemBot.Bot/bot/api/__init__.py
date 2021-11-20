@@ -10,5 +10,6 @@ __all__ = ['guild_route',
            'custom_prefix_route',
            'moderation_route',
            'claim_route',
-           'commands_route'
+           'commands_route',
+           'thread_route'
            ]
