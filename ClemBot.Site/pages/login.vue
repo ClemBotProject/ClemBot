@@ -6,6 +6,6 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  middleware: 'homeAuthCheck',
+  middleware: 'LoginAuthFlow',
 })
 </script>

@@ -3,7 +3,7 @@ const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
 const localHost = 'localhost'
 const prodUrl = 'https://clembot.io:443/api'
-const devUrl = 'http://localhost:5000/api'
+const devUrl = 'https://localhost:5001/api'
 
 const runtimeUrl = isProd() ? prodUrl : devUrl
 
@@ -78,7 +78,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '@/plugins/api.ts', // our plugin
+    '@/plugins/Api.ts', // our plugin
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

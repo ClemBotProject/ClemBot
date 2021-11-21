@@ -9,72 +9,74 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
-namespace ClemBot.Api.Core.Features.Authorization
+namespace ClemBot.Api.Core.Features.Authorization;
+
+public class SiteLogin
 {
-    public class SiteLogin
+    public class Query : IRequest<Result<Model, AuthorizeStatus>>
     {
-        public class Query : IRequest<Result<Model, AuthorizeStatus>>
+        public string Bearer { get; set; } = null!;
+    }
+
+    public class Model
+    {
+        public string Token { get; set; } = null!;
+    }
+
+    public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
+    {
+        private readonly ClemBotContext _context;
+
+        private readonly ILogger _logger;
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly IJwtAuthManager _jwtAuthManager;
+
+        private readonly JwtTokenConfig _jwtTokenConfig;
+
+        private readonly IDiscordAuthManager _discordAuthManager;
+
+        public Handler(ClemBotContext context,
+            ILogger logger,
+            IHttpContextAccessor httpContextAccessor,
+            IJwtAuthManager jwtAuthManager,
+            JwtTokenConfig jwtTokenConfig,
+            IDiscordAuthManager discordAuthManager)
         {
-            public string Bearer { get; set; } = null!;
+            _context = context;
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            _jwtAuthManager = jwtAuthManager;
+            _jwtTokenConfig = jwtTokenConfig;
+            _discordAuthManager = discordAuthManager;
         }
 
-        public class Model
+        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
-            public string Token { get; set; } = null!;
-        }
+            var bar = await _context.Users.GetUserGuildClaimsAsync(703008870338920470, 190858129188192257);
 
-        public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
-        {
-            private readonly ClemBotContext _context;
-
-            private readonly ILogger<BotAuthorize> _logger;
-
-            private readonly IHttpContextAccessor _httpContextAccessor;
-
-            private readonly IJwtAuthManager _jwtAuthManager;
-
-            private readonly JwtTokenConfig _jwtTokenConfig;
-
-            private readonly IDiscordAuthManager _discordAuthManager;
-
-            public Handler(ClemBotContext context,
-                ILogger<BotAuthorize> logger,
-                IHttpContextAccessor httpContextAccessor,
-                IJwtAuthManager jwtAuthManager,
-                JwtTokenConfig jwtTokenConfig,
-                IDiscordAuthManager discordAuthManager)
+            _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
+            _logger.Information("Site Login Request Initialized from Url: {Origin}", origin);
+            if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
             {
-                _context = context;
-                _logger = logger;
-                _httpContextAccessor = httpContextAccessor;
-                _jwtAuthManager = jwtAuthManager;
-                _jwtTokenConfig = jwtTokenConfig;
-                _discordAuthManager = discordAuthManager;
+                _logger.Warning("Site Login Request Denied: Invalid Token");
+                return AuthorizeResult<Model>.Forbidden();
             }
 
-            public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
+            _logger.Information("Site Login Request Accepted");
+
+            var claims = new[]
             {
-                var bar = await _context.Users.GetUserClaimsAsync(703008870338920470, 190858129188192257);
+                new Claim(Claims.DiscordBearer, request.Bearer)
+            };
 
-                _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-                _logger.LogInformation($"Site Login Request Initialized from Url: {origin}");
-                if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
-                {
-                    _logger.LogInformation("Site Login Request Denied: Invalid Token");
-                    return AuthorizeResult<Model>.Forbidden();
-                }
+            _logger.Information("Generating JWT Access Token");
+            var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);
+            _logger.Information("JWT Access Token Successfully Generated");
 
-                _logger.LogInformation("Site Login Request Accepted");
-
-                var claims = new[]
-                {
-                    new Claim(Claims.DiscordBearer, request.Bearer),
-                };
-
-                return AuthorizeResult<Model>.Success();
-            }
+            return AuthorizeResult<Model>.Success(new Model {Token = token});
         }
     }
 }

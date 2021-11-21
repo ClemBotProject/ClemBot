@@ -90,7 +90,6 @@ export default Vue.extend({
   },
   methods: {
     changeWikiPage(path: string) {
-      this.$auth.loginWith('discord')
       this.activeItem = () => import(`~/components/${path}.vue`)
       window.scrollTo(0, 0)
     },

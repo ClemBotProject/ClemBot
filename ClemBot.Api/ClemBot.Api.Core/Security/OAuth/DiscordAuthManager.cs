@@ -11,7 +11,9 @@ namespace ClemBot.Api.Core.Security.OAuth
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        private const string DISCORD_USER_URL = @"https://discord.com/oauth2/@me";
+        private const string DISCORD_USER_URL = @"https://discord.com/api/oauth2/@me";
+
+        private const string DISCORD_USER_GUILDS_URL = @"https://discord.com/api/users/@me/guilds";
 
         public DiscordAuthManager(IHttpClientFactory httpClientFactory)
         {
@@ -35,6 +37,17 @@ namespace ClemBot.Api.Core.Security.OAuth
             var resp = await client.GetAsync(DISCORD_USER_URL);
 
             return await resp.Content.ReadFromJsonAsync<DiscordOAuthModel>();
+        }
+
+        public async Task<List<Guild>?> GetDiscordUserGuildsAsync(string bearer)
+        {
+            using var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+
+            var resp = await client.GetAsync(DISCORD_USER_GUILDS_URL);
+
+            return await resp.Content.ReadFromJsonAsync<List<Guild>>();
+
         }
     }
 }

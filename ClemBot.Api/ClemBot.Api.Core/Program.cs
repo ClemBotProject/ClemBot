@@ -5,6 +5,7 @@ using ClemBot.Api.Core;
 using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Core.Security;
 using ClemBot.Api.Core.Security.JwtToken;
+using ClemBot.Api.Core.Security.OAuth;
 using ClemBot.Api.Core.Security.Policies;
 using ClemBot.Api.Core.Security.Policies.BotMaster;
 using ClemBot.Api.Core.Security.Policies.GuildSandbox;
@@ -82,8 +83,12 @@ var jwtTokenConfig = builder.Configuration.GetSection("JwtTokenConfig").Get<JwtT
 jwtTokenConfig.Secret = Guid.NewGuid().ToString();
 builder.Services.AddSingleton(jwtTokenConfig);
 
+// *** Add Security Services to container ***
 // Add JWT generator to DI
 builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
+
+// Add the discord oauth service
+builder.Services.AddScoped<IDiscordAuthManager, DiscordAuthManager>();
 
 builder.Services.AddMediatR(typeof(Program), typeof(GuildExistsRequest));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
@@ -130,6 +135,7 @@ builder.Services.AddCors(options => {
     options.AddDefaultPolicy(
         policyBuilder => {
             policyBuilder.AllowAnyOrigin();
+            policyBuilder.AllowAnyHeader();
             policyBuilder.AllowAnyMethod();
         });
 });

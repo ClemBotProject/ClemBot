@@ -2,79 +2,112 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Features.Roles.Bot;
+using ClemBot.Api.Core.Security;
 using ClemBot.Api.Core.Security.JwtToken;
 using ClemBot.Api.Core.Security.OAuth;
+using ClemBot.Api.Core.Security.OAuth.OAuthUser;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Data.Extensions;
+using LinqToDB;
+using LinqToDB.Mapping;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
-namespace ClemBot.Api.Core.Features.Authorization
+namespace ClemBot.Api.Core.Features.Authorization;
+
+public class GetSiteUser
 {
-    public class GetSiteUser
+    public class Query : IRequest<Result<Model, AuthorizeStatus>>
     {
-        public class Query : IRequest<Result<Model, AuthorizeStatus>>
+    }
+
+    public class SiteUser
+    {
+        public DiscordOAuthModel User { get; set; } = null!;
+
+        public List<Guild> Guilds { get; set; } = null!;
+    }
+
+    public class Model
+    {
+        public SiteUser User { get; set; } = null!;
+    }
+
+    public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
+    {
+        private readonly ClemBotContext _context;
+
+        private readonly ILogger _logger;
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly IDiscordAuthManager _discordAuthManager;
+
+        public Handler(ClemBotContext context,
+            ILogger logger,
+            IHttpContextAccessor httpContextAccessor,
+            IDiscordAuthManager discordAuthManager)
         {
+            _context = context;
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            _discordAuthManager = discordAuthManager;
         }
 
-        public class Model
+        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
+            var bar = await _context.Users.GetUserGuildClaimsAsync(703008870338920470, 190858129188192257);
 
-        }
+            _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
+            _logger.Information("Site User Request Initialized from Url: {Origin}", origin);
 
-        public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
-        {
-            private readonly ClemBotContext _context;
+            var token = _httpContextAccessor.HttpContext.User.FindFirst(Claims.DiscordBearer)?.Value;
 
-            private readonly ILogger<BotAuthorize> _logger;
-
-            private readonly IHttpContextAccessor _httpContextAccessor;
-
-            private readonly IJwtAuthManager _jwtAuthManager;
-
-            private readonly JwtTokenConfig _jwtTokenConfig;
-
-            private readonly IDiscordAuthManager _discordAuthManager;
-
-            public Handler(ClemBotContext context,
-                ILogger<BotAuthorize> logger,
-                IHttpContextAccessor httpContextAccessor,
-                IJwtAuthManager jwtAuthManager,
-                JwtTokenConfig jwtTokenConfig,
-                IDiscordAuthManager discordAuthManager)
+            if (token is null)
             {
-                _context = context;
-                _logger = logger;
-                _httpContextAccessor = httpContextAccessor;
-                _jwtAuthManager = jwtAuthManager;
-                _jwtTokenConfig = jwtTokenConfig;
-                _discordAuthManager = discordAuthManager;
+                _logger.Warning("Api User Request Denied: No Bearer Token Found");
+                return AuthorizeResult<Model>.Forbidden();
             }
 
-            public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
+            var discordUser = await _discordAuthManager.GetDiscordUserAsync(token);
+            if (discordUser is null)
             {
-                var bar = await _context.Users.GetUserClaimsAsync(703008870338920470, 190858129188192257);
-
-                _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-                _logger.LogInformation($"Site Login Request Initialized from Url: {origin}");
-                if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
-                {
-                    _logger.LogInformation("Site Login Request Denied: Invalid Token");
-                    return AuthorizeResult<Model>.Forbidden();
-                }
-
-                _logger.LogInformation("Site Login Request Accepted");
-
-                var claims = new[]
-                {
-                    new Claim(Claims.DiscordBearer, request.Bearer),
-                };
-
-                return AuthorizeResult<Model>.Success();
+                _logger.Warning("Api User Request Denied: Invalid Discord Token");
+                return AuthorizeResult<Model>.Forbidden();
             }
+
+            var userGuilds = await _discordAuthManager.GetDiscordUserGuildsAsync(token);
+            if (userGuilds is null)
+            {
+                _logger.Warning("Api User Guilds Request Denied: Invalid Discord Token");
+                return AuthorizeResult<Model>.Forbidden();
+            }
+
+            var userClaims = await _context.Users.GetUserClaimsAsync(ulong.Parse(discordUser.User.Id));
+
+            foreach (var guild in userGuilds)
+            {
+                guild.IsAdded = _context.Guilds.FirstOrDefault(x => x.Id == ulong.Parse(guild.Id)) is not null;
+
+               if (userClaims.TryGetValue(ulong.Parse(guild.Id), out var claims))
+               {
+                   guild.Claims = claims.Select(x => x.ToString()).ToList();
+               }
+
+               // Check if the user has admin in the guild
+               // This means they automatically have all the claims
+               if ((guild.Permissions & 0x8) == 0x8)
+               {
+                   guild.Claims = Enum.GetNames(typeof(BotAuthClaims)).ToList();
+               }
+            }
+
+            var siteUser = new SiteUser {User = discordUser, Guilds = userGuilds};
+
+            _logger.Information("Site Login Request Accepted");
+            return AuthorizeResult<Model>.Success(new Model {User = siteUser});
         }
     }
 }

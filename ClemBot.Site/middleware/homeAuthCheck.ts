@@ -6,16 +6,14 @@ const HomeAuthCheck: Middleware = async ({ app: { $auth } }) => {
   }
 
   if ($auth.loggedIn && $auth.strategy.name === 'local') {
-    debugger
+    //debugger
   }
 
   if ($auth.loggedIn && $auth.strategy.name === 'discord') {
-    /*
     await $auth.loginWith('local', {
       // @ts-ignore
-      data: { bearer: $auth.strategy.token.get() },
+      data: { bearer: $auth.strategy.token.get().split(' ')[1] },
     })
-    */
   }
 }
 

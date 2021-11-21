@@ -1,5 +1,5 @@
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import Public from './routes/public'
+import Public from './routes/Public'
 
 export default class ApiClient {
   $axios: NuxtAxiosInstance

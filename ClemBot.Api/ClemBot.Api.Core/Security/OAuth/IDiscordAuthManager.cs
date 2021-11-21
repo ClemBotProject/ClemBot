@@ -7,5 +7,6 @@ namespace ClemBot.Api.Core.Security.OAuth
     {
         Task<bool> CheckTokenIsUserAsync(string bearer);
         Task<DiscordOAuthModel?> GetDiscordUserAsync(string bearer);
+        Task<List<Guild>?> GetDiscordUserGuildsAsync(string bearer);
     }
 }

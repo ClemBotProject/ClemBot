@@ -128,12 +128,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { chunkArray } from '~/services/utilities'
+import { chunkArray } from '~/services/Utilities'
 import FeatureCard from '~/components/FeatureCard.vue'
 
 export default Vue.extend({
   components: { FeatureCard },
-  middleware: 'homeAuthCheck',
+  middleware: 'HomeAuthCheck',
   data() {
     return {
       guildsCount: 'Unknown',

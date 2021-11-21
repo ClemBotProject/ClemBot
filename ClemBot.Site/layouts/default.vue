@@ -40,16 +40,12 @@
       </template>
       <template #end>
         <div id="socials">
-          <b-navbar-item
-            v-if="!$auth.loggedIn"
-			tag="nuxt-link"
-			:to="{ path: '/login' }"
-          >
-            <b-button icon-left="login" class="is-primary">
+          <b-navbar-item v-if="!$auth.loggedIn">
+            <b-button @click="login" icon-left="login" class="is-primary">
               <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
-          <guild-dropdown v-else />
+          <GuildDropdown v-else />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
           </b-navbar-item>
@@ -69,6 +65,19 @@
     <Footer />
   </div>
 </template>
+
+<script>
+import Vue from 'vue'
+
+export default Vue.extend({
+  methods: {
+    async login() {
+      await this.$auth.loginWith('discord')
+    },
+  },
+})
+</script>
+
 <style scoped lang="scss">
 .section {
   height: 20%;

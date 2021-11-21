@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ClemBot.Api.Core.Utilities;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +6,6 @@ namespace ClemBot.Api.Core.Features.Authorization;
 
 [ApiController]
 [Route("api")]
-[AllowAnonymous]
 public class AuthorizeController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -20,38 +15,32 @@ public class AuthorizeController : ControllerBase
         _mediator = mediator;
     }
 
+    [AllowAnonymous]
     [HttpGet("bot/[controller]")]
     public async Task<IActionResult> Authorize([FromQuery] BotAuthorize.Query query) =>
         await _mediator.Send(query) switch
         {
-            _mediator = mediator;
-        }
+            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
+            {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            _ => throw new InvalidOperationException()
+        };
 
-        [HttpGet("bot/[controller]")]
-        public async Task<IActionResult> Authorize([FromQuery] BotAuthorize.Query query) =>
-            await _mediator.Send(query) switch
-            {
-                { Status: AuthorizeStatus.Success } result => Ok(result.Value),
-                { Status: AuthorizeStatus.Forbidden } => Forbid(),
-                _ => throw new InvalidOperationException()
-            };
+    [AllowAnonymous]
+    [HttpPost("[controller]/login")]
+    public async Task<IActionResult> Login([FromBody] SiteLogin.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
+            {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            _ => throw new InvalidOperationException()
+        };
 
-        [HttpPost("[controller]/login")]
-        public async Task<IActionResult> Login([FromBody] SiteLogin.Query query) =>
-            await _mediator.Send(query) switch
-            {
-                { Status: AuthorizeStatus.Success } result => Ok(result.Value),
-                { Status: AuthorizeStatus.Forbidden } => Forbid(),
-                _ => throw new InvalidOperationException()
-            };
-
-        [HttpGet("[controller]/User")]
-        public async Task<IActionResult> User([FromQuery] SiteLogin.Query query) =>
-            await _mediator.Send(query) switch
-            {
-                { Status: AuthorizeStatus.Success } result => Ok(result.Value),
-                { Status: AuthorizeStatus.Forbidden } => Forbid(),
-                _ => throw new InvalidOperationException()
-            };
-    }
+    [HttpGet("[controller]/User")]
+    public async Task<IActionResult> GetUser() =>
+        await _mediator.Send(new GetSiteUser.Query()) switch
+        {
+            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
+            {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            _ => throw new InvalidOperationException()
+        };
 }
