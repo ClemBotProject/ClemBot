@@ -46,6 +46,7 @@
             </b-button>
           </b-navbar-item>
           <GuildDropdown v-else />
+          <UserDisplay v-if="$auth.loggedIn" class="ml-2" />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
           </b-navbar-item>
