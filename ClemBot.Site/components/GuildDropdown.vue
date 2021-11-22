@@ -46,27 +46,31 @@
       @mouseenter="guild.isHovered = true"
       @mouseleave="guild.isHovered = false"
     >
-      <b-dropdown-item class="py-1">
-        <div class="columns is-vcentered">
-          <div class="column is-3">
-            <b-image
-              v-if="!guild.isHovered"
-              class="is-32x32"
-              rounded
-              :src="`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`"
-            >
-            </b-image>
-            <b-icon
-              class="pl-2 py-1 my-1"
-              v-else-if="guild.isHovered && guild.isAdded"
-              icon="wrench"
-            />
-            <b-icon class="pl-2 py-1 my-1" v-else icon="plus" />
+      <b-dropdown-item class="py-1" has-link>
+        <a
+          :href="`https://discord.com/api/oauth2/authorize?client_id=${$config.discordClientId}&permissions=${$config.oauthPermissions}&scope=bot&guild_id=${guild.id}`"
+        >
+          <div class="columns is-vcentered" target="_blank">
+            <div class="column is-3">
+              <b-image
+                v-if="!guild.isHovered"
+                class="is-32x32"
+                rounded
+                :src="`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`"
+              >
+              </b-image>
+              <b-icon
+                class="pl-2 py-1 my-1"
+                v-else-if="guild.isHovered && guild.isAdded"
+                icon="wrench"
+              />
+              <b-icon class="pl-2 py-1 my-1" v-else icon="plus" />
+            </div>
+            <div class="column has-text-justified is-three-quarters">
+              <b> {{ guild.name }} </b>
+            </div>
           </div>
-          <div class="column has-text-justified is-three-quarters">
-            <b> {{ guild.name }} </b>
-          </div>
-        </div>
+        </a>
       </b-dropdown-item>
     </div>
   </b-dropdown>
@@ -111,11 +115,5 @@ export default Vue.extend({
       this.userGuildsAdd = userGuilds.filter((x) => !x.isAdded)
     }
   },
-
-  methods: {
-    onGuildAddClick() {
-      let link = `https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot&guild_id=386585461285715968`
-    }
-  }
 })
 </script>

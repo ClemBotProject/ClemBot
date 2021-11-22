@@ -36,6 +36,7 @@ public static class UserExtensions
             .SelectMany(
                 b => b.Roles.SelectMany(
                     c => c.Claims))
+            .AsNoTracking()
             .ToListAsync();
 
             return user

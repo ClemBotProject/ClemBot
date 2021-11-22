@@ -21,6 +21,7 @@ export default {
 
   publicRuntimeConfig: {
     discordClientId: process.env.DISCORD_CLIENT_ID,
+    oauthPermissions: process.env.OAUTH_PERMISSIONS
   },
   privateRuntimeConfig: {
     discordClientSecret: process.env.DISCORD_CLIENT_SECRET,

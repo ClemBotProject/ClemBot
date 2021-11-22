@@ -10,6 +10,7 @@ using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Data.Extensions;
+using ClemBot.Api.Services.Guilds.Models;
 using LinqToDB;
 using LinqToDB.Mapping;
 using MediatR;
@@ -45,21 +46,23 @@ public class GetSiteUser
 
         private readonly IDiscordAuthManager _discordAuthManager;
 
+        private readonly IMediator _mediator;
+
         public Handler(ClemBotContext context,
             ILogger logger,
             IHttpContextAccessor httpContextAccessor,
-            IDiscordAuthManager discordAuthManager)
+            IDiscordAuthManager discordAuthManager,
+            IMediator _mediator)
         {
             _context = context;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _discordAuthManager = discordAuthManager;
+            this._mediator = _mediator;
         }
 
-        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationTokeln)
         {
-            var bar = await _context.Users.GetUserGuildClaimsAsync(703008870338920470, 190858129188192257);
-
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.Information("Site User Request Initialized from Url: {Origin}", origin);
 
@@ -89,7 +92,7 @@ public class GetSiteUser
 
             foreach (var guild in userGuilds)
             {
-                guild.IsAdded = _context.Guilds.FirstOrDefault(x => x.Id == ulong.Parse(guild.Id)) is not null;
+                guild.IsAdded = await _mediator.Send(new GuildExistsRequest{Id = ulong.Parse(guild.Id)});
 
                if (userClaims.TryGetValue(ulong.Parse(guild.Id), out var claims))
                {

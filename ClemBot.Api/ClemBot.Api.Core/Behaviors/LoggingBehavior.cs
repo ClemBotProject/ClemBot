@@ -1,16 +1,11 @@
-using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace ClemBot.Api.Core.Behaviors;
 
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
-    private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
+    private readonly ILogger _logger;
 
-    public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+    public LoggingBehavior(ILogger logger)
     {
         _logger = logger;
     }
@@ -19,9 +14,9 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
-        _logger.LogInformation("{request} Request Data: {@Data}", request, request);
+        _logger.Information("{Request} Request Data: {@Data}", request, request);
         var response = await next();
-        _logger.LogInformation("Response Data: {@Body}", response);
+        _logger.Information("Response Data: {@Body}", response);
 
         return response;
     }
