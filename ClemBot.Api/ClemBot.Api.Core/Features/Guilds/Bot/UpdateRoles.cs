@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ClemBot.Api.Core.Features.Authorization;
 using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Core.Utilities;
 using ClemBot.Api.Data.Contexts;
@@ -33,12 +34,12 @@ public class UpdateRoles
         public string RoleCsv { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context, ILogger _logger)
+    public record Handler(ClemBotContext _context, ILogger<Handler> _logger)
         : IRequestHandler<Command, Result<ulong, QueryStatus>>
     {
         public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
         {
-            _logger.Information("Beginning UpdateRoles CSV Deserialization");
+            _logger.LogInformation("Beginning UpdateRoles CSV Deserialization");
 
             using var csvReader = new CsvReader(new StringReader(request.RoleCsv), CultureInfo.InvariantCulture);
             var roles = csvReader.GetRecords<RoleDto>().ToList();

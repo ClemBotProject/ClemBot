@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.JwtToken;
 using ClemBot.Api.Core.Security.OAuth;
 using ClemBot.Api.Core.Security.OAuth.OAuthUser;
 using ClemBot.Api.Core.Utilities;
@@ -11,9 +6,6 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Data.Extensions;
 using ClemBot.Api.Services.Guilds.Models;
-using LinqToDB;
-using LinqToDB.Mapping;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace ClemBot.Api.Core.Features.Authorization;
@@ -40,7 +32,7 @@ public class GetSiteUser
     {
         private readonly ClemBotContext _context;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<Handler> _logger;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -49,42 +41,42 @@ public class GetSiteUser
         private readonly IMediator _mediator;
 
         public Handler(ClemBotContext context,
-            ILogger logger,
+            ILogger<Handler> logger,
             IHttpContextAccessor httpContextAccessor,
             IDiscordAuthManager discordAuthManager,
-            IMediator _mediator)
+            IMediator mediator)
         {
             _context = context;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _discordAuthManager = discordAuthManager;
-            this._mediator = _mediator;
+            _mediator = mediator;
         }
 
         public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationTokeln)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-            _logger.Information("Site User Request Initialized from Url: {Origin}", origin);
+            _logger.LogInformation("Site User Request Initialized from Url: {Origin}", origin);
 
             var token = _httpContextAccessor.HttpContext.User.FindFirst(Claims.DiscordBearer)?.Value;
 
             if (token is null)
             {
-                _logger.Warning("Api User Request Denied: No Bearer Token Found");
+                _logger.LogWarning("Api User Request Denied: No Bearer Token Found");
                 return AuthorizeResult<Model>.Forbidden();
             }
 
             var discordUser = await _discordAuthManager.GetDiscordUserAsync(token);
             if (discordUser is null)
             {
-                _logger.Warning("Api User Request Denied: Invalid Discord Token");
+                _logger.LogWarning("Api User Request Denied: Invalid Discord Token");
                 return AuthorizeResult<Model>.Forbidden();
             }
 
             var userGuilds = await _discordAuthManager.GetDiscordUserGuildsAsync(token);
             if (userGuilds is null)
             {
-                _logger.Warning("Api User Guilds Request Denied: Invalid Discord Token");
+                _logger.LogWarning("Api User Guilds Request Denied: Invalid Discord Token");
                 return AuthorizeResult<Model>.Forbidden();
             }
 
@@ -109,7 +101,7 @@ public class GetSiteUser
 
             var siteUser = new SiteUser {User = discordUser, Guilds = userGuilds};
 
-            _logger.Information("Site Login Request Accepted");
+            _logger.LogInformation("Site Login Request Accepted");
             return AuthorizeResult<Model>.Success(new Model {User = siteUser});
         }
     }

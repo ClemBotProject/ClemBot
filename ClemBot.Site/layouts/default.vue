@@ -4,7 +4,7 @@
       <img
         id="main-logo"
         class="mx-3 mt-3"
-        src="ClemBotLogo.svg"
+        src="/ClemBotLogo.svg"
         alt="ClemBot"
         width="7%"
       />
@@ -45,7 +45,7 @@
               <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
-          <GuildDropdown v-else />
+          <GuildDropdown v-else keep-alive />
           <UserDisplay v-if="$auth.loggedIn" class="ml-3 mr-1" />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
@@ -61,7 +61,8 @@
       </template>
     </b-navbar>
     <section class="hero">
-      <nuxt />
+      <nuxt v-if="!$slots.default" />
+      <slot />
     </section>
     <Footer />
   </div>

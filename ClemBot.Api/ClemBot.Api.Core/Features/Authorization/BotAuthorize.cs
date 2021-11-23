@@ -39,7 +39,7 @@ public class BotAuthorize
 
         private readonly ClemBotContext _context;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<Handler> _logger;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -50,7 +50,7 @@ public class BotAuthorize
         private readonly ApiKey _apiKey;
 
         public Handler(ClemBotContext context,
-            ILogger logger,
+            ILogger<Handler> logger,
             IHttpContextAccessor httpContextAccessor,
             IJwtAuthManager jwtAuthManager,
             JwtTokenConfig jwtTokenConfig,
@@ -68,24 +68,24 @@ public class BotAuthorize
             CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-            _logger.Information("Bot Authorize Request Initialized from Url: {Origin}", origin.ToString());
+            _logger.LogInformation("Bot Authorize Request Initialized from Url: {Origin}", origin.ToString());
             if (request.Key != _apiKey.Key)
             {
-                _logger.Information("Bot Authorize Request Denied: Invalid Key");
+                _logger.LogInformation("Bot Authorize Request Denied: Invalid Key");
                 return Task.FromResult(AuthorizeResult<Model>.Forbidden());
             }
 
-            _logger.Information("Bot Authorize Request Accepted");
+            _logger.LogInformation("Bot Authorize Request Accepted");
 
-            _logger.Information("Generating Claim: {BotApiKey}", Claims.BotApiKey);
+            _logger.LogInformation("Generating Claim: {BotApiKey}", Claims.BotApiKey);
             var claims = new[]
             {
                 new Claim(Claims.BotApiKey, request.Key)
             };
 
-            _logger.Information("Generating JWT Access Token");
+            _logger.LogInformation("Generating JWT Access Token");
             var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);
-            _logger.Information("JWT Access Token Successfully Generated");
+            _logger.LogInformation("JWT Access Token Successfully Generated");
 
             return Task.FromResult(AuthorizeResult<Model>.Success(new Model() { Token = token }));
         }

@@ -43,6 +43,9 @@ class ClemBot(commands.Bot):
                                     disconnect_callback=self.on_backend_disconnect,
                                     bot_only=bot_secrets.secrets.bot_only)
 
+        {
+            foo =3
+        }
         self.messenger: Messenger = messenger
         self.scheduler: Scheduler = scheduler
 

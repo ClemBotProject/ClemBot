@@ -28,7 +28,7 @@ public class SiteLogin
     {
         private readonly ClemBotContext _context;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<Handler> _logger;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -39,7 +39,7 @@ public class SiteLogin
         private readonly IDiscordAuthManager _discordAuthManager;
 
         public Handler(ClemBotContext context,
-            ILogger logger,
+            ILogger<Handler> logger,
             IHttpContextAccessor httpContextAccessor,
             IJwtAuthManager jwtAuthManager,
             JwtTokenConfig jwtTokenConfig,
@@ -56,23 +56,23 @@ public class SiteLogin
         public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-            _logger.Information("Site Login Request Initialized from Url: {Origin}", origin);
+            _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", origin);
             if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
             {
-                _logger.Warning("Site Login Request Denied: Invalid Token");
+                _logger.LogWarning("Site Login Request Denied: Invalid Token");
                 return AuthorizeResult<Model>.Forbidden();
             }
 
-            _logger.Information("Site Login Request Accepted");
+            _logger.LogInformation("Site Login Request Accepted");
 
             var claims = new[]
             {
                 new Claim(Claims.DiscordBearer, request.Bearer)
             };
 
-            _logger.Information("Generating JWT Access Token");
+            _logger.LogInformation("Generating JWT Access Token");
             var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);
-            _logger.Information("JWT Access Token Successfully Generated");
+            _logger.LogInformation("JWT Access Token Successfully Generated");
 
             return AuthorizeResult<Model>.Success(new Model {Token = token});
         }

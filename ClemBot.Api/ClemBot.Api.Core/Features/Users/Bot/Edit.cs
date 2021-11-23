@@ -20,7 +20,6 @@ public class Edit
     }
 
     public class Command : IRequest<Result<ulong, QueryStatus>>
-
     {
         public ulong Id { get; set; }
 

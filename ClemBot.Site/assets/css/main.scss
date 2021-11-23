@@ -44,6 +44,8 @@ $dropdown-disabled-opacity: 1;
 $dropdown-item-hover-color: $white;
 $dropdown-content-background-color: $grey-darker;
 $dropdown-item-hover-background-color: $grey-dark;
+$dropdown-item-active-color: $grey-dark;
+$dropdown-item-active-background-color: $grey-dark;
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(
