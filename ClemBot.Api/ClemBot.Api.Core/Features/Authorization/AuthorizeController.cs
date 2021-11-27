@@ -1,4 +1,4 @@
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

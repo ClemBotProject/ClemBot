@@ -1,9 +1,9 @@
-using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.OAuth;
-using ClemBot.Api.Core.Security.OAuth.OAuthUser;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common;
+using ClemBot.Api.Common.Enums;
+using ClemBot.Api.Common.Security.OAuth;
+using ClemBot.Api.Common.Security.OAuth.OAuthUser;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Data.Extensions;
 using ClemBot.Api.Services.Guilds.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Authorization;
 
 public class GetSiteUser
 {
-    public class Query : IRequest<Result<Model, AuthorizeStatus>>
+    public class Query : IRequest<IAuthorizeResult<Model>>
     {
     }
 
@@ -28,7 +28,7 @@ public class GetSiteUser
         public SiteUser User { get; set; } = null!;
     }
 
-    public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
+    public class Handler : IRequestHandler<Query, IAuthorizeResult<Model>>
     {
         private readonly ClemBotContext _context;
 
@@ -53,7 +53,7 @@ public class GetSiteUser
             _mediator = mediator;
         }
 
-        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationTokeln)
+        public async Task<IAuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationTokeln)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.LogInformation("Site User Request Initialized from Url: {Origin}", origin);

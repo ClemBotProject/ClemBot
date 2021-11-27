@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ClemBot.Api.Data.Enums;
+using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Data.Models;
 using Microsoft.EntityFrameworkCore;
 

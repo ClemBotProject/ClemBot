@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using MediatR;
@@ -35,7 +35,7 @@ public class Edit
         public int UseCount { get; set; }
     }
 
-    public class Command : IRequest<Result<TagDto, QueryStatus>>
+    public class Command : IRequest<IQueryResult<TagDto>>
     {
         public ulong GuildId { get; set; }
 
@@ -46,9 +46,9 @@ public class Edit
         public ulong? UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<TagDto, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<TagDto>>
     {
-        public async Task<Result<TagDto, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = await _context.Tags
                 .FirstOrDefaultAsync(g => g.GuildId == request.GuildId && g.Name == request.Name);

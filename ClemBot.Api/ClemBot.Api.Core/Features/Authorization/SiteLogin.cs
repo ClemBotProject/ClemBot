@@ -1,10 +1,12 @@
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.JwtToken;
-using ClemBot.Api.Core.Security.OAuth;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common;
+using ClemBot.Api.Common.Security.JwtToken;
+using ClemBot.Api.Common.Security.OAuth;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Extensions;
 using MediatR;
@@ -14,7 +16,7 @@ namespace ClemBot.Api.Core.Features.Authorization;
 
 public class SiteLogin
 {
-    public class Query : IRequest<Result<Model, AuthorizeStatus>>
+    public class Query : IRequest<IAuthorizeResult<Model>>
     {
         public string Bearer { get; set; } = null!;
     }
@@ -24,7 +26,7 @@ public class SiteLogin
         public string Token { get; set; } = null!;
     }
 
-    public class Handler : IRequestHandler<Query, Result<Model, AuthorizeStatus>>
+    public class Handler : IRequestHandler<Query, IAuthorizeResult<Model>>
     {
         private readonly ClemBotContext _context;
 
@@ -53,7 +55,7 @@ public class SiteLogin
             _discordAuthManager = discordAuthManager;
         }
 
-        public async Task<Result<Model, AuthorizeStatus>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<IAuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", origin);
@@ -65,10 +67,14 @@ public class SiteLogin
 
             _logger.LogInformation("Site Login Request Accepted");
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(Claims.DiscordBearer, request.Bearer)
+                new(Claims.DiscordBearer, request.Bearer)
             };
+
+            var userGuilds = await _discordAuthManager.GetDiscordUserGuildsAsync(request.Bearer);
+            var guildIds = JsonSerializer.Serialize(userGuilds?.Select(x => x.Id).ToList());
+            claims.Add(new Claim(Claims.ContextGuildId, guildIds));
 
             _logger.LogInformation("Generating JWT Access Token");
             var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);

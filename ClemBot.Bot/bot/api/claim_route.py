@@ -16,7 +16,7 @@ class ClaimRoute(BaseRoute):
             'Claim': claim
         }
 
-        await self._client.post('claimmappings', data=json, **kwargs)
+        await self._client.post('bot/claimmappings', data=json, **kwargs)
 
     async def remove_claim_mapping(self, claim: Claims, role_id: int, **kwargs):
         json = {
@@ -24,15 +24,15 @@ class ClaimRoute(BaseRoute):
             'Claim': claim
         }
 
-        await self._client.delete('claimmappings', data=json, **kwargs)
+        await self._client.delete('bot/claimmappings', data=json, **kwargs)
 
     async def get_claims_role(self, role_id):
-        return await self._client.get(f'roles/{role_id}/claimmappings')
+        return await self._client.get(f'bot/roles/{role_id}/claimmappings')
 
     async def get_claims_user(self, user: discord.Member):
         claims = set()
         for role in user.roles:
-            resp = await self._client.get(f'roles/{role.id}/claimmappings')
+            resp = await self._client.get(f'bot/roles/{role.id}/claimmappings')
 
             if not resp:
                 continue

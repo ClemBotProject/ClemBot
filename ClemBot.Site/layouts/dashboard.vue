@@ -1,8 +1,71 @@
 <template>
-  <default-layout>
-    <h1>Surrounding layout</h1>
-    <nuxt />
-  </default-layout>
+  <div class="sidebar-page">
+    <section class="sidebar-layout">
+      <b-sidebar :fullheight="true" position="static" open type="is-dark" />
+      <b-sidebar :fullheight="true" open type="is-dark">
+        <nuxt-link :to="{ path: '/' }">
+          <img class="px-6 py-3" src="/ClemBotLogo.svg" alt="ClemBot" />
+        </nuxt-link>
+        <div class="box mx-3 my-3 has-background-darkest">
+          <b-menu class="is-custom-mobile mx-4">
+            <div class="is-vcentered"></div>
+            <b-menu-list label="Dashboard">
+              <b-menu-item icon="cog" label="Guild"></b-menu-item>
+              <b-menu-item icon="book" label="Tags"></b-menu-item>
+              <b-menu-item
+                active
+                expanded
+                icon="settings"
+                label="Administrator"
+              >
+                <b-menu-item icon="account" label="Users"></b-menu-item>
+                <b-menu-item
+                  icon="cellphone-link"
+                  label="Devices"
+                ></b-menu-item>
+                <b-menu-item
+                  icon="cash-multiple"
+                  label="Payments"
+                  disabled
+                ></b-menu-item>
+              </b-menu-item>
+              <b-menu-item icon="account" label="My Account">
+                <b-menu-item
+                  icon="account-box"
+                  label="Account data"
+                ></b-menu-item>
+                <b-menu-item
+                  icon="home-account"
+                  label="Addresses"
+                ></b-menu-item>
+              </b-menu-item>
+            </b-menu-list>
+          </b-menu>
+        </div>
+      </b-sidebar>
+      <div class="p-1">
+        <nuxt />
+      </div>
+    </section>
+    <b-navbar transparent class="is-fixed-top mb-4">
+      <template #end>
+        <div id="socials" class="box mx-3 my-3 has-background-dark has-shadow">
+          <GuildDropdown side="is-right" />
+          <UserDisplay v-if="$auth.loggedIn" class="ml-3 mr-1" />
+          <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
+            <b-icon id="tray-icons" icon="discord"> </b-icon>
+          </b-navbar-item>
+          <b-navbar-item
+            id="tray-icons"
+            target="_blank"
+            href="https://github.com/ClemBotProject/ClemBot"
+          >
+            <b-icon icon="github"> </b-icon>
+          </b-navbar-item>
+        </div>
+      </template>
+    </b-navbar>
+  </div>
 </template>
 
 <script>
@@ -16,57 +79,100 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped lang="scss">
-.section {
-  height: 20%;
-}
-
-#main-logo {
-  position: fixed;
-  z-index: 200;
-  min-width: 5rem;
-  max-width: 6rem;
-}
-
-#discord-login {
-  background: #5865f2;
-  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-  text-decoration: none;
-}
-
-#nav {
-  left: 38%;
-}
-
-#tray-icons {
-  transition: all 1.2s ease-in-out;
-}
-
-#tray-icons :hover {
-  transform: scale(1.1);
-  color: white;
-}
-
+<style lang="scss">
 #socials {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#discord-login :hover + .animation-wrapper {
-  animation-name: ckw;
-  animation-duration: 1.5s;
-  /* Things added */
-  animation-iteration-count: infinite;
-  display: inline-block;
-  /* <--- */
+nav.navbar.is-fixed-top {
+  background: transparent;
 }
-@keyframes ckw {
-  0% {
-    transform: rotate(0deg);
+
+.p-1 {
+  padding: 1em;
+}
+.sidebar-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  // min-height: 100vh;
+  .sidebar-layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 100%;
+    // min-height: 100vh;
   }
-  100% {
-    transform: rotate(360deg);
+}
+@media screen and (max-width: 1023px) {
+  .b-sidebar {
+    .sidebar-content {
+      &.is-mini-mobile {
+        &:not(.is-mini-expand),
+        &.is-mini-expand:not(:hover):not(.is-mini-delayed) {
+          .menu-list {
+            li {
+              a {
+                span:nth-child(2) {
+                  display: none;
+                }
+              }
+              ul {
+                padding-left: 0;
+                li {
+                  a {
+                    display: inline-block;
+                  }
+                }
+              }
+            }
+          }
+          .menu-label:not(:last-child) {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (min-width: 1024px) {
+  .b-sidebar {
+    .sidebar-content {
+      &.is-mini {
+        &:not(.is-mini-expand),
+        &.is-mini-expand:not(:hover):not(.is-mini-delayed) {
+          .menu-list {
+            li {
+              a {
+                span:nth-child(2) {
+                  display: none;
+                }
+              }
+              ul {
+                padding-left: 0;
+                li {
+                  a {
+                    display: inline-block;
+                  }
+                }
+              }
+            }
+          }
+          .menu-label:not(:last-child) {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+.is-mini-expand {
+  .menu-list a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

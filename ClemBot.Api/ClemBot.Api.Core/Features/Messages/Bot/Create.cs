@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Channels.Models;
@@ -32,15 +32,15 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
+    public class Command : IRequest<IQueryResult<IEnumerable<ulong>>>
     {
         public List<MessageDto> Messages { get; set; } = null!;
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+        : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
     {
-        public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             List<ulong> createdMessageIds = new();
 

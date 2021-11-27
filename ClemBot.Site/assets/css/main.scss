@@ -47,6 +47,10 @@ $dropdown-item-hover-background-color: $grey-dark;
 $dropdown-item-active-color: $grey-dark;
 $dropdown-item-active-background-color: $grey-dark;
 
+
+$sidebar-background: $info;
+$sidebar-widt: 3000px;
+
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(
   (

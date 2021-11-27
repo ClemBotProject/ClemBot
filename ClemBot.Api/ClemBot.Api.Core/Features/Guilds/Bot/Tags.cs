@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Tags
 {
-    public class Query : IRequest<Result<IEnumerable<Model>, QueryStatus>>
+    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
     {
         public ulong Id { get; init; }
     }
@@ -32,9 +32,9 @@ public class Tags
     }
 
     public record QueryHandler(ClemBotContext _context)
-        : IRequestHandler<Query, Result<IEnumerable<Model>, QueryStatus>>
+        : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
     {
-        public async Task<Result<IEnumerable<Model>, QueryStatus>> Handle(Query request,
+        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var tags = await _context.Tags

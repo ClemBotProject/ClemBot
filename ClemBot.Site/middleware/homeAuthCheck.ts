@@ -1,12 +1,12 @@
 import { Middleware } from '@nuxt/types'
 
-const HomeAuthCheck: Middleware = async ({ app: { $auth } }) => {
+const HomeAuthCheck: Middleware = async ({ app: { $auth, $axios } }) => {
   if (!$auth.loggedIn) {
     return
   }
 
   if ($auth.loggedIn && $auth.strategy.name === 'local') {
-    //debugger
+
   }
 
   if ($auth.loggedIn && $auth.strategy.name === 'discord') {

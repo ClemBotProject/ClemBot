@@ -1,7 +1,7 @@
 <template>
   <b-dropdown
     v-model="activeGuild"
-    class="is-right"
+    :class="side"
     mobile-modal
     scrollable
     max-height="400"
@@ -21,7 +21,7 @@
         icon-right="menu-down"
       >
         <div class="columns is-vcentered">
-          <div class="column is-3">
+          <div v-if="showicon" class="column is-3">
             <b-image
               class="is-32x32"
               rounded
@@ -43,9 +43,9 @@
       @mouseleave="guild.isHovered = false"
     >
       <b-dropdown-item :value="guild" class="py-1">
-        <nuxt-link :to="{ path: `/dashboard/${guild.id}/home` }">
+        <nuxt-link :to="{ path: `/dashboard/${guild.id}/guild` }">
           <div class="columns is-vcentered">
-            <div class="column is-3">
+            <div  class="column is-3">
               <b-image
                 v-if="!guild.isHovered"
                 class="is-32x32"
@@ -109,6 +109,13 @@ import Vue from 'vue'
 import { Guild } from 'services/Models/Guild'
 
 export default Vue.extend({
+  props: {
+    side: String,
+    showicon: {
+       type: Boolean,
+        default: true
+      }
+    },
   data() {
     const userGuildsConfig: Array<Guild> = []
     const userGuildsAdd: Array<Guild> = []
@@ -119,7 +126,7 @@ export default Vue.extend({
       activeGuild,
     }
   },
-  mounted() {
+  mounted( ) {
     if (this.$auth.loggedIn && this.$auth.strategy.name === 'local') {
       let userGuilds = (this.$auth.user?.guilds as Array<Guild>)
         .filter(
@@ -130,7 +137,6 @@ export default Vue.extend({
         .map((g) => ({ ...g, isHovered: false } as Guild))
 
       userGuilds.forEach((x) => this.$set(x, 'isHovered', false))
-
 
       this.userGuildsConfig = userGuilds.filter((x) => x.isAdded)
       this.userGuildsAdd = userGuilds.filter((x) => !x.isAdded)

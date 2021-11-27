@@ -83,7 +83,11 @@ export default {
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
+  components:  [
+    '~/components',
+    { path: '~/components/support', extensions: ['vue'] },
+    { path: '~/components/dashboard', extensions: ['vue'] }
+  ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [

@@ -14,7 +14,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
-        _logger.LogInformation("{Request} Request Data: {@Data}", request, request);
+        _logger.LogInformation("{Request} Request Data: {@Data}", request.GetType(), request);
         var response = await next();
         _logger.LogInformation("Response Data: {@Body}", response);
 

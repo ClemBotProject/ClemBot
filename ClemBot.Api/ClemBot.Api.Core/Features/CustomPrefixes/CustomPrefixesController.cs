@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ClemBot.Api.Common.Enums;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Roles.Bot;
-using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.Policies;
-using ClemBot.Api.Core.Security.Policies.BotMaster;
-using ClemBot.Api.Core.Utilities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +24,8 @@ public class CustomPrefixesController : ControllerBase
     }
 
     [HttpPost("bot/[controller]/Add")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> Add(Bot.Add.Command command) =>
+    [GuildSandboxAuthorize(BotAuthClaims.custom_prefix_set)]
+    public async Task<IActionResult> Add(Set.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
@@ -34,7 +34,7 @@ public class CustomPrefixesController : ControllerBase
 
     [HttpDelete("bot/[controller]/Delete")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Add(Bot.Delete.Command command) =>
+    public async Task<IActionResult> Delete(Bot.Delete.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),

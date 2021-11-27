@@ -45,7 +45,7 @@
               <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
-          <GuildDropdown v-else keep-alive />
+          <GuildDropdown v-else side="is-right"/>
           <UserDisplay v-if="$auth.loggedIn" class="ml-3 mr-1" />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>

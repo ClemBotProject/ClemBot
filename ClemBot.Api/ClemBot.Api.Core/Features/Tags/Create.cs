@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
@@ -37,7 +37,7 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Command : IRequest<Result<TagDto, QueryStatus>>
+    public class Command : IRequest<IQueryResult<TagDto>>
     {
         public string Name { get; set; } = null!;
 
@@ -50,9 +50,9 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<TagDto, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<TagDto>>
     {
-        public async Task<Result<TagDto, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = new Tag()
             {

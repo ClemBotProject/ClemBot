@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ namespace ClemBot.Api.Core.Features.Threads.Bot;
 
 public class Details
 {
-    public class Query : IRequest<Result<Model, QueryStatus>>
+    public class Query : IRequest<IQueryResult<Model>>
     {
         public ulong Id { get; init; }
     }
@@ -24,9 +24,9 @@ public class Details
         public ulong GuildId { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
     {
-        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var channel = await _context.Channels
                 .Where(x => x.Id == request.Id && x.IsThread)

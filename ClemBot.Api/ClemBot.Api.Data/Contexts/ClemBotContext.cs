@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using ClemBot.Api.Data.Enums;
+using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;

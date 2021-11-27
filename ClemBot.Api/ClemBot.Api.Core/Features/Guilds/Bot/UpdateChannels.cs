@@ -4,8 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Security.Policies.GuildSandbox;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using CsvHelper;
@@ -24,7 +23,7 @@ public class UpdateChannels
         public string? Name { get; set; }
     }
 
-    public record Command : IRequest<Result<ulong, QueryStatus>>
+    public record Command : IRequest<IQueryResult<ulong>>
     {
         public ulong GuildId { get; init; }
 
@@ -32,9 +31,9 @@ public class UpdateChannels
     }
 
     public record Handler(ClemBotContext _context)
-        : IRequestHandler<Command, Result<ulong, QueryStatus>>
+        : IRequestHandler<Command, IQueryResult<ulong>>
     {
-        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             using var csvReader = new CsvReader(new StringReader(request.ChannelCsv), CultureInfo.InvariantCulture);
             var channels = csvReader.GetRecords<ChannelDto>().ToList();
