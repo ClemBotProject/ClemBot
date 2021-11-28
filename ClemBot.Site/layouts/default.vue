@@ -74,7 +74,6 @@ import Vue from 'vue'
 export default Vue.extend({
   methods: {
     async login() {
-      debugger
       await this.$auth.loginWith('discord')
     },
   },

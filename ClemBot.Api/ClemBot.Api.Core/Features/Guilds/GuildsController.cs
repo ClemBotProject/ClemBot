@@ -217,23 +217,25 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpPost("bot/[controller]/{Id}/SetWelcomeMessage")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> SetWelcomeMessage(ulong Id, [FromBody] Bot.SetWelcomeMessage.Command command) =>
+    [HttpPost("[controller]/{Id}/SetWelcomeMessage")]
+    [GuildSandboxAuthorize(BotAuthClaims.welcome_message_modify)]
+    public async Task<IActionResult> SetWelcomeMessage(ulong Id, [FromBody] SetWelcomeMessage.Command command) =>
         await _mediator.Send(command with { Id = Id }) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{Id}/GetWelcomeMessage")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> GetWelcomeMessage([FromRoute] Bot.GetWelcomeMessage.Command command) =>
+    [HttpGet("[controller]/{Id}/GetWelcomeMessage")]
+    [GuildSandboxAuthorize(BotAuthClaims.welcome_message_view)]
+    public async Task<IActionResult> GetWelcomeMessage([FromRoute] GetWelcomeMessage.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NotFound(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 

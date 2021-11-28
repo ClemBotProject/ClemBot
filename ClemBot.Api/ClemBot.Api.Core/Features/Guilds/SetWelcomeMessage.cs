@@ -1,13 +1,8 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClemBot.Api.Core.Features.Guilds.Bot;
+namespace ClemBot.Api.Core.Features.Guilds;
 
 public class SetWelcomeMessage
 {

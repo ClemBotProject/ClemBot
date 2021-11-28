@@ -20,7 +20,7 @@ export default class CustomPrefix {
   }
 
   async setCustomPrefix(id: string, prefix: string): Promise<boolean> {
-    await this.$axios.$post<Prefix>('customprefixes/add', {
+    await this.$axios.$post<number>('customprefixes/add', {
       guildId: id,
       prefix: prefix,
     })

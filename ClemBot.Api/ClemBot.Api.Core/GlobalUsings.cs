@@ -1,4 +1,5 @@
 global using Microsoft.Extensions.Logging;
+global using ClemBot.Api.Common.Utilities;
 global using System.Collections.Generic;
 global using ClemBot.Api.Common.Enums;
 global using System.Threading.Tasks;
