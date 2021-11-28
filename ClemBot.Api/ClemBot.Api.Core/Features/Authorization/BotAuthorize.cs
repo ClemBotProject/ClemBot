@@ -28,7 +28,7 @@ public class BotAuthorize
 
     public record Query : IRequest<IAuthorizeResult<Model>>
     {
-        public string Key => null!;
+        public string Key { get; set; } = null!;
     }
 
     public record Model : IResponseModel

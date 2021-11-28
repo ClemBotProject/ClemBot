@@ -12,7 +12,11 @@
         </template>
         <b-input id="form" class="has-text-white" v-model="name"></b-input>
       </b-field>
-      <div v-if="name != ''" @click="customPrefixSaveClick" class="card-content">
+      <div
+        v-if="name != ''"
+        @click="customPrefixSaveClick"
+        class="card-content"
+      >
         <b-button>Save</b-button>
       </div>
     </div>
@@ -43,13 +47,15 @@ export default Vue.extend({
     this.guildPrefix = await this.$api.customPrefix.getCustomPrefix(guildId)
   },
 
-  methods:{
-      async customPrefixSaveClick(){
-          await this.$api.customPrefix.setCustomPrefix(this.guildId, this.name)
-          this.guildPrefix = this.name
-          this.name = ''
-      }
-  }
+  methods: {
+    async customPrefixSaveClick() {
+      await this.$api.customPrefix.setCustomPrefix(this.guildId, this.name)
+      this.guildPrefix = await this.$api.customPrefix.getCustomPrefix(
+        this.guildId
+      )
+      this.name = ''
+    },
+  },
 })
 </script>
 
