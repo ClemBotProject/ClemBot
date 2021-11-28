@@ -47,7 +47,7 @@
         <nuxt />
       </div>
     </section>
-    <b-navbar transparent class="is-fixed-top mb-4">
+    <b-navbar id="dashboard-navbar" transparent class="is-fixed-top mb-4">
       <template #end>
         <div id="socials" class="box mx-3 my-3 has-background-dark has-shadow">
           <GuildDropdown side="is-right" />
@@ -86,7 +86,7 @@ export default Vue.extend({
   justify-content: center;
 }
 
-nav.navbar.is-fixed-top {
+#dashboard-navbar {
   background: transparent;
 }
 

@@ -7,6 +7,7 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Extensions;
 using ClemBot.Api.Services.Guilds.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Authorization;
 
@@ -80,10 +81,15 @@ public class GetSiteUser
                 return AuthorizeResult<Model>.Forbidden();
             }
 
+            var addedGuilds = await _context.GuildUser
+                .Where(x => x.UserId == ulong.Parse(discordUser.User.Id))
+                .Select(y => y.GuildId.ToString())
+                .ToListAsync();
+
             var userClaims = await _context.Users.GetUserClaimsAsync(ulong.Parse(discordUser.User.Id));
             foreach (var guild in userGuilds)
             {
-                guild.IsAdded = await _mediator.Send(new GuildExistsRequest{Id = ulong.Parse(guild.Id)});
+                guild.IsAdded = addedGuilds.Contains(guild.Id);
 
                if (userClaims.TryGetValue(ulong.Parse(guild.Id), out var claims))
                {

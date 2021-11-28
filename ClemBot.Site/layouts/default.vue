@@ -9,7 +9,7 @@
         width="7%"
       />
     </nuxt-link>
-    <b-navbar class="is-transparent has-shadow is-fixed-top mb-4">
+    <b-navbar id="splash-card" transparent shadow class="is-fixed-top mb-4">
       <template #start>
         <b-navbar-item
           id="nav"
@@ -45,7 +45,7 @@
               <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
-          <GuildDropdown v-else side="is-right"/>
+          <GuildDropdown v-else side="is-right" />
           <UserDisplay v-if="$auth.loggedIn" class="ml-3 mr-1" />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
@@ -74,6 +74,7 @@ import Vue from 'vue'
 export default Vue.extend({
   methods: {
     async login() {
+      debugger
       await this.$auth.loginWith('discord')
     },
   },
@@ -100,6 +101,10 @@ export default Vue.extend({
 
 #nav {
   left: 38%;
+}
+
+#splash-card {
+  opacity: 0.95;
 }
 
 #tray-icons {

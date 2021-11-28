@@ -25,6 +25,7 @@ public static class UserExtensions
             await users.Where(x => x.Id == userId && x.Roles.Any(z => z.GuildId == guildId && z.Admin)).AnyAsync()
                ? Enum.GetValues(typeof(BotAuthClaims)).Cast<BotAuthClaims>()
                : await users
+                   .AsNoTracking()
                    .Where(x => x.Id == userId)
                    .SelectMany(
                        b => b.Roles.SelectMany(
@@ -45,10 +46,11 @@ public static class UserExtensions
                 b => b.Roles.SelectMany(
                     c => c.Claims))
             .AsNoTracking()
+            .Select(x => new { x.Id, x.Claim, x.Role.GuildId})
             .ToListAsync();
 
             return user
-                .GroupBy(v => v.Role.GuildId)
+                .GroupBy(v => v.GuildId)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.Claim));
     }
 }
