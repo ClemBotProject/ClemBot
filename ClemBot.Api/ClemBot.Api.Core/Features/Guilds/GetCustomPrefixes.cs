@@ -9,7 +9,7 @@ namespace ClemBot.Api.Core.Features.Guilds;
 
 public class GetCustomPrefixes
 {
-    public class Query : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public class Query : IGuildSandboxModel, IRequest<IQueryResult<IResponseModel>>
     {
         public ulong GuildId { get; init; }
     }
@@ -20,14 +20,14 @@ public class GetCustomPrefixes
     }
 
     public record QueryHandler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Query, IQueryResult<Model>>
+        : IRequestHandler<Query, IQueryResult<IResponseModel>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request,
+        public async Task<IQueryResult<IResponseModel>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var prefixes = await _mediator.Send(new GetCustomPrefixRequest { Id = request.GuildId });
 
-            return QueryResult<Model>.Success(new Model{Prefixes = prefixes});
+            return QueryResult<IResponseModel>.Success(new Model{Prefixes = prefixes});
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using ClemBot.Api.Common.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ public class AuthorizeController : ControllerBase
         {
             {Status: AuthorizeStatus.Success} result => Ok(result.Value),
             {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            {Status: AuthorizeStatus.Failure} => Problem(),
             _ => throw new InvalidOperationException()
         };
 }

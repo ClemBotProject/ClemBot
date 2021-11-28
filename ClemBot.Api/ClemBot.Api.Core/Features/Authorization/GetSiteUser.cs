@@ -81,7 +81,6 @@ public class GetSiteUser
             }
 
             var userClaims = await _context.Users.GetUserClaimsAsync(ulong.Parse(discordUser.User.Id));
-
             foreach (var guild in userGuilds)
             {
                 guild.IsAdded = await _mediator.Send(new GuildExistsRequest{Id = ulong.Parse(guild.Id)});

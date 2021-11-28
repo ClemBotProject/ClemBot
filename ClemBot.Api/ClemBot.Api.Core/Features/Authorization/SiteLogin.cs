@@ -59,22 +59,20 @@ public class SiteLogin
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", origin);
-            if (!await _discordAuthManager.CheckTokenIsUserAsync(request.Bearer))
+
+            var discordUser = await _discordAuthManager.GetDiscordUserAsync(request.Bearer);
+            if (discordUser is null)
             {
                 _logger.LogWarning("Site Login Request Denied: Invalid Token");
                 return AuthorizeResult<Model>.Forbidden();
             }
 
             _logger.LogInformation("Site Login Request Accepted");
-
             var claims = new List<Claim>
             {
-                new(Claims.DiscordBearer, request.Bearer)
+                new(Claims.DiscordBearer, request.Bearer),
+                new(Claims.DiscordUserId, discordUser.User.Id)
             };
-
-            var userGuilds = await _discordAuthManager.GetDiscordUserGuildsAsync(request.Bearer);
-            var guildIds = JsonSerializer.Serialize(userGuilds?.Select(x => x.Id).ToList());
-            claims.Add(new Claim(Claims.ContextGuildId, guildIds));
 
             _logger.LogInformation("Generating JWT Access Token");
             var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);

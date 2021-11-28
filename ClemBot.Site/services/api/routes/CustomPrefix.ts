@@ -14,8 +14,16 @@ export default class CustomPrefix {
 
   async getCustomPrefix(id: string): Promise<string> {
     const prefixes = await this.$axios.$get<Prefix>(
-      `guilds/customprefixes?guildId=${id}`
+      `guilds/${id}/customprefixes`
     )
     return prefixes.prefixes[0]
+  }
+
+  async setCustomPrefix(id: string, prefix: string): Promise<boolean> {
+    await this.$axios.$post<Prefix>('customprefixes/add', {
+      guildId: id,
+      prefix: prefix,
+    })
+    return true
   }
 }

@@ -6,7 +6,7 @@ namespace ClemBot.Api.Common.Utilities;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="U"></typeparam>
-public readonly struct Result<T, U> : IResult<T, U>
+public class Result<T, U> : IResult<T, U>
 {
     public T? Value { get; }
 

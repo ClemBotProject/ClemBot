@@ -173,6 +173,7 @@ public class GuildsController : ControllerBase
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 

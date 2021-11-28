@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,20 +10,27 @@ namespace ClemBot.Api.Data.Extensions;
 
 public static class UserExtensions
 {
+    /// <summary>
+    /// Extension Method to return the claims a user has in a given guild.
+    /// Will return all claims if that user is an admin in the guild.
+    /// </summary>
+    /// <param name="users"></param>
+    /// <param name="guildId"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public static async Task<IEnumerable<BotAuthClaims>> GetUserGuildClaimsAsync(
         this DbSet<User> users,
         ulong guildId,
         ulong userId) =>
-        await users
-            .Where(x => x.Id == userId)
-            .Include(
-                y => y.Roles.Where(z => z.GuildId == guildId))
-            .ThenInclude(a => a.Claims)
-            .SelectMany(
-                b => b.Roles.SelectMany(
-                    c => c.Claims.Select(
-                        d => d.Claim)))
-            .ToListAsync();
+            await users.Where(x => x.Id == userId && x.Roles.Any(z => z.GuildId == guildId && z.Admin)).AnyAsync()
+               ? Enum.GetValues(typeof(BotAuthClaims)).Cast<BotAuthClaims>()
+               : await users
+                   .Where(x => x.Id == userId)
+                   .SelectMany(
+                       b => b.Roles.SelectMany(
+                           c => c.Claims.Select(
+                               d => d.Claim)))
+                   .ToListAsync();
 
     public static async Task<Dictionary<ulong, IEnumerable<BotAuthClaims>>> GetUserClaimsAsync(
         this DbSet<User> users,

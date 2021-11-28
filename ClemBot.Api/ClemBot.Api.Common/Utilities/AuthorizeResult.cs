@@ -29,4 +29,7 @@ public class AuthorizeResult<T> : IAuthorizeResult<T>
     public static IAuthorizeResult<T> Forbidden()
         => new AuthorizeResult<T>(AuthorizeStatus.Forbidden);
 
+    public static IAuthorizeResult<T> Failure()
+        => new AuthorizeResult<T>(AuthorizeStatus.Failure);
+
 }

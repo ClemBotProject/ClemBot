@@ -23,12 +23,13 @@ public class CustomPrefixesController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("bot/[controller]/Add")]
+    [HttpPost("[controller]/Add")]
     [GuildSandboxAuthorize(BotAuthClaims.custom_prefix_set)]
     public async Task<IActionResult> Add(Set.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
