@@ -37,7 +37,7 @@ class InviteCog(commands.Cog):
         owner = self.bot.get_user(self.bot.owner_id)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.description = f'{len(self.bot.guilds)} Guilds\n{len(self.bot.users)} Users'
+        embed.description = f'{len(self.bot.guilds)} Guilds\n{sum([g.member_count for g in self.bot.guilds])} Users'
         embed.title = f'{self.bot.user.name}#{self.bot.user.discriminator}'
         embed.add_field(name='Owner', value=owner.mention, inline=False)
         embed.add_field(name='Website', value='[Link!](https://clembot.io)')
