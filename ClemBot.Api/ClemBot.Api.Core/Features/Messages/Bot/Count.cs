@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using NodaTime.Extensions;
 
 namespace ClemBot.Api.Core.Features.Messages.Bot;
 
@@ -33,7 +34,7 @@ public class Count
         {
             var dayOffset = DateTime.Now.Subtract(new TimeSpan(days: request.Days, hours: 0, minutes: 0, seconds: 0));
             var messages = await _context.MessageContents
-                .Where(y => y.Time.ToDateTimeUnspecified() > dayOffset && y.Message.UserId == request.UserId && y.Message.GuildId == request.GuildId)
+                .Where(y => y.Time > dayOffset.ToLocalDateTime() && y.Message.UserId == request.UserId && y.Message.GuildId == request.GuildId)
                 .GroupBy(x => x.MessageId)
                 .CountAsync();
 
