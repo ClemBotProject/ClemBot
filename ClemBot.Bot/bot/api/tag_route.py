@@ -49,10 +49,10 @@ class TagRoute(BaseRoute):
             'GuildId': guild_id,
             'Name': name,
         }
-        tag_dict = await self._client.get('bot/tags', data=json)
+        tag_dict = await self._client.get('tags', data=json)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict)
+        return Tag.from_dict(tag_dict['tags'])
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
         json = {

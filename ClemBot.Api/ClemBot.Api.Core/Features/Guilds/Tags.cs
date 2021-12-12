@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ClemBot.Api.Common;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
@@ -11,12 +13,12 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Tags
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
+    public class Query : IGuildSandboxModel, IRequest<IQueryResult<IResponseModel>>
     {
-        public ulong Id { get; init; }
+        public ulong GuildId { get; init; }
     }
 
-    public class Model
+    public class Tag
     {
         public string Name { get; init; } = null!;
 
@@ -31,24 +33,29 @@ public class Tags
         public int UseCount { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context)
-        : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
+    public class Model : IResponseModel
     {
-        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
+        public IEnumerable<Tag> Tags { get; init; } = null!;
+    }
+
+    public record QueryHandler(ClemBotContext _context)
+        : IRequestHandler<Query, IQueryResult<IResponseModel>>
+    {
+        public async Task<IQueryResult<IResponseModel>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var tags = await _context.Tags
-                .Where(x => x.GuildId == request.Id)
+                .Where(x => x.GuildId == request.GuildId)
                 .Include(y => y.TagUses)
                 .ToListAsync();
 
             if (tags is null)
             {
-                return QueryResult<IEnumerable<Model>>.NotFound();
+                return QueryResult<IResponseModel>.NotFound();
             }
 
-            return QueryResult<IEnumerable<Model>>.Success(tags
-                .Select(tag => new Model
+            return QueryResult<IResponseModel>.Success(new Model{ Tags = tags
+                .Select(tag => new Tag
                 {
                     Name = tag.Name,
                     Content = tag.Content,
@@ -56,7 +63,8 @@ public class Tags
                     UserId = tag.UserId,
                     GuildId = tag.GuildId,
                     UseCount = tag.TagUses.Count
-                }));
+                })
+            });
         }
     }
 }

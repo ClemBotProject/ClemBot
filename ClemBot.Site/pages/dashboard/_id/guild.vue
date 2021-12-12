@@ -1,12 +1,11 @@
 <template>
   <div>
     <section class="hero">
-      <div class="hero-body">
-</div>
+      <div class="hero-body"></div>
     </section>
     <div class="tile is-ancestor mx-3">
-      <div class="tile is-5">
-        <div class="card has-background-dark">
+      <div class="tile is-3">
+        <div class="box has-background-dark">
           <div class="card-header">
             <p class="card-header-title has-text-white">Prefix</p>
           </div>
@@ -35,14 +34,16 @@
           </div>
         </div>
       </div>
-      <div class="tile">
-        <div class="card has-background-dark mx-3">
+      <div class="tile is-parent">
+        <div class="tile is-child box has-background-dark mx-3">
           <div class="card-header">
             <p class="card-header-title has-text-white">Welcome Message</p>
           </div>
-          <p class="card-header-title has-text-white">
-            <span class="tag is-black">{{ this.guildWelcomeMessage }}</span>
-          </p>
+          <div class="box has-background-black">
+            <div class="content is-black my-2">
+              {{ this.guildWelcomeMessage }}
+            </div>
+          </div>
           <b-field class="mx-3 mb-3 has-text-white">
             <template #label>
               <span class="has-text-white">Set</span>
@@ -75,10 +76,10 @@
 import Vue from 'vue'
 import AssignableRoles from '~/components/wiki/AssignableRoles.vue'
 import dashboard from '~/layouts/dashboard.vue'
-import { chunkArray } from '~/services/Utilities'
 
 export default Vue.extend({
   components: { dashboard, AssignableRoles },
+  layout: 'dashboard',
   data() {
     let guildId: string = ''
     let guildPrefix: string = ''
@@ -94,7 +95,6 @@ export default Vue.extend({
       inputWelcomeMessage,
     }
   },
-  layout: 'dashboard',
 
   mounted() {
     this.guildId = this.$route.params.id

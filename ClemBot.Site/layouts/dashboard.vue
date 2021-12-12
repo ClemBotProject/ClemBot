@@ -10,40 +10,23 @@
           <b-menu class="is-custom-mobile mx-4">
             <div class="is-vcentered"></div>
             <b-menu-list label="Dashboard">
-              <b-menu-item icon="cog" label="Guild"></b-menu-item>
-              <b-menu-item icon="book" label="Tags"></b-menu-item>
               <b-menu-item
-                active
-                expanded
-                icon="settings"
-                label="Administrator"
-              >
-                <b-menu-item icon="account" label="Users"></b-menu-item>
-                <b-menu-item
-                  icon="cellphone-link"
-                  label="Devices"
-                ></b-menu-item>
-                <b-menu-item
-                  icon="cash-multiple"
-                  label="Payments"
-                  disabled
-                ></b-menu-item>
-              </b-menu-item>
-              <b-menu-item icon="account" label="My Account">
-                <b-menu-item
-                  icon="account-box"
-                  label="Account data"
-                ></b-menu-item>
-                <b-menu-item
-                  icon="home-account"
-                  label="Addresses"
-                ></b-menu-item>
-              </b-menu-item>
+                icon="cog"
+                label="Guild"
+                tag="nuxt-link"
+                to="guild"
+              ></b-menu-item>
+              <b-menu-item
+                icon="book"
+                label="Tags"
+                tag="nuxt-link"
+                to="tags"
+              ></b-menu-item>
             </b-menu-list>
           </b-menu>
         </div>
       </b-sidebar>
-      <div class="p-1">
+      <div class="column">
         <nuxt />
       </div>
     </section>

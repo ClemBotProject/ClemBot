@@ -13,7 +13,7 @@ export default class CustomPrefix {
   }
 
   async getWelcomeMessage(id: string): Promise<string> {
-    let foo = await (await this.$axios.$get<WelcomeMessage>(`guilds/${id}/getWelcomeMessage`))
+    let foo = await this.$axios.$get<WelcomeMessage>(`guilds/${id}/getWelcomeMessage`)
     return foo.message
   }
 
