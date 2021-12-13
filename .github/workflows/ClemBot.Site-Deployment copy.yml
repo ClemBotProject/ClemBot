@@ -49,6 +49,11 @@ jobs:
           context: ./ClemBot.Site
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            DISCORD_CLIENT_ID=${{env.DISCORD_CLIENT_ID}}
+            DISCORD_CLIENT_SECRET=${{env.DISCORD_CLIENT_SECRET}}
+            OAUTH_PERMISSIONS=${{env.OAUTH_PERMISSIONS}}
+            PROD=1
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: type=gha, scope=${{github.repository}}
           cache-from: type=gha, scope=${{github.repository}}
