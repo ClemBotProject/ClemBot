@@ -66,7 +66,7 @@ export default {
         tokenType: 'Bearer',
       },
       discord: {
-        clientId: /*process.env.DISCORD_CLIENT_ID*/710672266245177365,
+        clientId: /*process.env.DISCORD_CLIENT_ID*/'710672266245177365',
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
         codeChallengeMethod: '',
         scope: ['identify', 'guilds'],
