@@ -12,7 +12,7 @@ console.log(process.env.DISCORD_CLIENT_ID)
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  ssr: false,
+  //ssr: false,
 
   server: {
     port: 3000, // default: 3000
@@ -66,7 +66,7 @@ export default {
         tokenType: 'Bearer',
       },
       discord: {
-        clientId: /*process.env.DISCORD_CLIENT_ID*/'710672266245177365',
+        clientId: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
         codeChallengeMethod: '',
         scope: ['identify', 'guilds'],
@@ -80,6 +80,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/Axios',
     '@/plugins/Api.ts', // our plugin
   ],
 
