@@ -1,0 +1,42 @@
+name: ClemBot.Site Prod Deployment
+
+on:
+  push:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Site/**"
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Manual ClemBot.Site workflow trigger'
+        required: true
+        default: 'Manual Deployment'
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+    deploy:
+        name: Deploy
+        runs-on: [self-hosted]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Copy Secrets
+              run: |
+                cp ~/ClemBot/ClemBot.Api/ClemBot.Api_env.env ClemBot.Api_env.env
+                cp ~/clembot/clembot.bot/clembot.bot_env.env clembot.bot_env.env
+                cp ~/ClemBot/ClemBot.Site/ClemBot.Site_env.env ClemBot.Site_env.env
+            - name: Build updated Docker Images
+              run: |
+                docker-compose build clembot.site
+            - name: Deploy updated images
+              run: |
+                docker-compose up -d clembot.site
+            - name: Prune old images and containers
+              run: |
+                docker system prune -f
+            - name: Discord notification
+              env:
+                DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
+              uses: "Ilshidur/action-discord@0.3.0"
+              with:
+                args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.Site has been deployed.'
