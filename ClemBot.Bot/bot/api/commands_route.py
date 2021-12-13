@@ -23,4 +23,4 @@ class CommandsRoute(BaseRoute):
             'UserId': user_id
         }
 
-        return await self._client.post('commands', data=json, **kwargs)
+        return await self._client.post('bot/commands', data=json, **kwargs)

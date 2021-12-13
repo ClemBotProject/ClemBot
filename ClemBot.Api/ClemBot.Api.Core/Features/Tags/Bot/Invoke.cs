@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
@@ -27,7 +27,7 @@ public class Invoke
         public string? Name { get; init; }
     }
 
-    public class Command : IRequest<Result<Model, QueryStatus>>
+    public class Command : IRequest<IQueryResult<Model>>
     {
         public string Name { get; set; } = null!;
 
@@ -38,9 +38,9 @@ public class Invoke
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<Model, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
     {
-        public async Task<Result<Model, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = await _context.Tags
                 .FirstOrDefaultAsync(g => g.GuildId == request.GuildId && g.Name == request.Name);

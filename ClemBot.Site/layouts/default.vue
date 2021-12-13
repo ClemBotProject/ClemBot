@@ -4,15 +4,12 @@
       <img
         id="main-logo"
         class="mx-3 mt-3"
-        src="ClemBotLogo.svg"
+        src="/ClemBotLogo.svg"
         alt="ClemBot"
         width="7%"
       />
     </nuxt-link>
-    <b-navbar
-      id="splash-card"
-      class="is-transparent has-shadow is-fixed-top mb-4"
-    >
+    <b-navbar id="splash-card" transparent shadow class="is-fixed-top mb-4">
       <template #start>
         <b-navbar-item
           id="nav"
@@ -43,13 +40,13 @@
       </template>
       <template #end>
         <div id="socials">
-          <b-navbar-item
-            href="https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot"
-          >
-            <b-button icon-left="plus" class="is-primary">
-              <b>Invite to Server </b>
+          <b-navbar-item v-if="!$auth.loggedIn">
+            <b-button @click="login" icon-left="login" class="is-primary">
+              <b>Login With Discord</b>
             </b-button>
           </b-navbar-item>
+          <GuildDropdown v-else side="is-right" />
+          <UserDisplay v-if="$auth.loggedIn" class="ml-3 mr-1" />
           <b-navbar-item target="_blank" href="https://discord.gg/mhrVuyh">
             <b-icon id="tray-icons" icon="discord"> </b-icon>
           </b-navbar-item>
@@ -64,11 +61,25 @@
       </template>
     </b-navbar>
     <section class="hero">
-      <nuxt />
+      <nuxt v-if="!$slots.default" />
+      <slot />
     </section>
     <Footer />
   </div>
 </template>
+
+<script>
+import Vue from 'vue'
+
+export default Vue.extend({
+  methods: {
+    async login() {
+      await this.$auth.loginWith('discord')
+    },
+  },
+})
+</script>
+
 <style scoped lang="scss">
 .section {
   height: 20%;
@@ -81,10 +92,6 @@
   max-width: 6rem;
 }
 
-#splash-card {
-  opacity: 0.95;
-}
-
 #discord-login {
   background: #5865f2;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
@@ -93,6 +100,10 @@
 
 #nav {
   left: 38%;
+}
+
+#splash-card {
+  opacity: 0.95;
 }
 
 #tray-icons {

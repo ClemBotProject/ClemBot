@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
@@ -20,16 +20,16 @@ public class Delete
         }
     }
 
-    public class Command : IRequest<Result<ulong, QueryStatus>>
+    public class Command : IRequest<IQueryResult<ulong>>
     {
         public ulong ChannelId { get; set; }
 
-        public Data.Enums.DesignatedChannels Designation { get; set; }
+        public Common.Enums.DesignatedChannels Designation { get; set; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
     {
-        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
 
             var dcMappings = await _context.DesignatedChannelMappings

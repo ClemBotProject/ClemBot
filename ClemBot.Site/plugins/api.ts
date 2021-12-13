@@ -1,6 +1,6 @@
 import { Context, Plugin } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
-import ApiClient from '~/services/api/apiClient'
+import ApiClient from '~/services/api/ApiClient'
 
 declare module '@nuxt/types' {
   interface Context {

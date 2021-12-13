@@ -1,19 +1,19 @@
 using System.Threading.Tasks;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Quartz;
-using Serilog;
 
 namespace ClemBot.Api.Services.Jobs;
 
 public class MessageContentDeletionJob : IJob
 {
     private readonly ClemBotContext _context;
-    private readonly ILogger _logger;
+    private readonly ILogger<MessageContentDeletionJob> _logger;
 
     private const int MESSAGE_RETENTION_TIME = 30;
 
-    public MessageContentDeletionJob(ClemBotContext context, ILogger logger)
+    public MessageContentDeletionJob(ClemBotContext context, ILogger<MessageContentDeletionJob> logger)
     {
         _context = context;
         _logger = logger;
@@ -25,7 +25,7 @@ public class MessageContentDeletionJob : IJob
     /// <param name="context"></param>
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.Information("Beginning Discord compliance Message Content Deletion");
+        _logger.LogInformation("Beginning Discord compliance Message Content Deletion");
 
         _context.Database.SetCommandTimeout(9000);
         var result = await _context.Database.ExecuteSqlRawAsync(@$"
@@ -34,6 +34,6 @@ public class MessageContentDeletionJob : IJob
                 WHERE ""MessageContents"".""Time""::date <= (NOW()::date -{MESSAGE_RETENTION_TIME}) at time zone 'utc'
                 ");
 
-        _logger.Information("Discord compliance Message Content Deletion complete: {Result} row(s) effected", result);
+        _logger.LogInformation("Discord compliance Message Content Deletion complete: {Result} row(s) effected", result);
     }
 }

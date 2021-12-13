@@ -129,7 +129,7 @@ class ApiClient:
         auth_args = {
             'method': HttpRequestType.get,
             'ssl': False,
-            'url': self._build_url('authorize'),
+            'url': self._build_url('bot/authorize'),
             'headers': {'Accept': '*/*'},
             'params': {'key': bot_secrets.secrets.api_key}
         }
@@ -165,7 +165,7 @@ class ApiClient:
         log.info('Initialized JWT BEARER token Auth Headers')
         return True
 
-    async def _request(self, http_type: str, endpoint: str, raise_on_error, body=None):
+    async def _request(self, http_type: str, endpoint: str, raise_on_error, params=None, body=None):
 
         log.info(f'HTTP {http_type} Request initializing to route: {endpoint}')
 
@@ -175,6 +175,7 @@ class ApiClient:
             'url': self._build_url(endpoint),
             'raise_for_status': raise_on_error,
             'headers': self.headers,
+            'params': params
         }
 
         if body:
@@ -192,6 +193,7 @@ class ApiClient:
 
         raise_on_error = kwargs.get('raise_on_error', False),
         body = kwargs.get('data', None)
+        params = kwargs.get('params', None)
 
         # If we are in bot_only mode stop the request and report that
         if self.bot_only:
@@ -205,7 +207,8 @@ class ApiClient:
             resp = await self._request(http_type,
                                        endpoint,
                                        raise_on_error=raise_on_error,
-                                       body=body)
+                                       body=body,
+                                       params=params)
 
         # The request errored out and had raise_for_status enabled
         except aiohttp.ClientResponseError as e:

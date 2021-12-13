@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Enums;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Data.Enums;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
 using MediatR;
@@ -34,7 +34,7 @@ public class Create
         public InfractionType Type { get; set; }
     }
 
-    public class Command : IRequest<Result<InfractionDto, QueryStatus>>
+    public class Command : IRequest<IQueryResult<InfractionDto>>
     {
         public ulong GuildId { get; set; }
 
@@ -51,9 +51,9 @@ public class Create
         public bool? Active { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<InfractionDto, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<InfractionDto>>
     {
-        public async Task<Result<InfractionDto, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<InfractionDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             var infraction = new Infraction()
             {

@@ -66,7 +66,7 @@
             <b-menu-item
               label="Welcome Messages"
               class="pb-1"
-              @click="changeWikiPage('wiki/WelcomeMessage')"
+              @click="foo()"
             ></b-menu-item>
           </b-menu-list>
         </b-menu>
@@ -92,6 +92,9 @@ export default Vue.extend({
     changeWikiPage(path: string) {
       this.activeItem = () => import(`~/components/${path}.vue`)
       window.scrollTo(0, 0)
+    },
+    foo() {
+      console.log()
     },
   },
 })

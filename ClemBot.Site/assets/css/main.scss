@@ -19,11 +19,16 @@ $info: #00cbff;
 $text: #e2e2e2;
 $link-hover: $text;
 
+$input-color: $text;
+
 $navbar-item-img-max-height: 70;
 $navbar-padding-horizontal: 10;
 $navbar-box-shadow-color: $text;
 
 $footer-padding: 1;
+
+$table-cell-heading-color: $scheme-main;
+$table-row-hover-background-color: $dark;
 
 $menu-item-hover-color: $text;
 $menu-item-radius: 3;
@@ -39,6 +44,17 @@ $content-heading-color: $text;
 $table-color: $text;
 $table-head-cell-color: $primary;
 $table-head-background-color: $white;
+
+$dropdown-disabled-opacity: 1;
+$dropdown-item-hover-color: $white;
+$dropdown-content-background-color: $grey-darker;
+$dropdown-item-hover-background-color: $grey-dark;
+$dropdown-item-active-color: $grey-dark;
+$dropdown-item-active-background-color: $grey-dark;
+
+
+$sidebar-background: $info;
+$sidebar-widt: 3000px;
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(

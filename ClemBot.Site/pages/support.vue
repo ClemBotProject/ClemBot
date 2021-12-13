@@ -12,3 +12,14 @@
     </section>
   </div>
 </template>
+
+<script lang="ts">
+import Vue from 'vue'
+import SponsorButton from '~/components/support/SponsorButton.vue'
+import Stargazers from '~/components/support/Stargazers.vue'
+import Contributors from '~/components/support/Contributors.vue'
+
+export default Vue.extend({
+ 
+})
+</script>

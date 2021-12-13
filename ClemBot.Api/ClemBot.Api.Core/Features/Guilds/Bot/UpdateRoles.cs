@@ -4,15 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Security.Policies.GuildSandbox;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
+using ClemBot.Api.Core.Features.Authorization;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using CsvHelper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
@@ -27,17 +26,17 @@ public class UpdateRoles
         public bool Admin { get; set; }
     }
 
-    public record Command : IRequest<Result<ulong, QueryStatus>>
+    public record Command : IRequest<IQueryResult<ulong>>
     {
         public ulong GuildId { get; init; }
 
         public string RoleCsv { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context, ILogger<UpdateRoles> _logger)
-        : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    public record Handler(ClemBotContext _context, ILogger<Handler> _logger)
+        : IRequestHandler<Command, IQueryResult<ulong>>
     {
-        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Beginning UpdateRoles CSV Deserialization");
 

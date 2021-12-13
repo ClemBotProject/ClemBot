@@ -5,9 +5,10 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-      <UserSecretsId>95286ed9-8628-45df-b16a-e46644da6b69</UserSecretsId>
-      <LangVersion>10</LangVersion>
-  </PropertyGroup>
+        <UserSecretsId>95286ed9-8628-45df-b16a-e46644da6b69</UserSecretsId>
+        <LangVersion>preview</LangVersion>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CsvHelper" Version="27.1.1" />
@@ -33,6 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ClemBot.Api.Common\ClemBot.Api.Common.csproj" />
       <ProjectReference Include="..\ClemBot.Api.Data\ClemBot.Api.Data.csproj" />
       <ProjectReference Include="..\ClemBot.Api.Services\ClemBot.Api.Services.csproj" />
     </ItemGroup>

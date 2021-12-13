@@ -1,5 +1,5 @@
 using System;
-using ClemBot.Api.Data.Enums;
+using ClemBot.Api.Common.Enums;
 using NodaTime;
 
 namespace ClemBot.Api.Data.Models;
