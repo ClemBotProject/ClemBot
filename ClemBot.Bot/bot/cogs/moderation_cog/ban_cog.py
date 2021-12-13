@@ -1,4 +1,5 @@
 import logging
+import typing as t
 
 import discord
 import discord.ext.commands as commands
@@ -24,7 +25,7 @@ class BanCog(commands.Cog):
     @ext.short_help('Bans a user')
     @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll', 'ban @SomeOtherUser 3 Spamming messages'))
     @ext.required_claims(Claims.moderation_ban)
-    async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: int = 0, *, reason: str):
+    async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: t.Optional[int] = 0, *, reason: str):
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
             embed.title = f'Error: Invalid Permissions'
