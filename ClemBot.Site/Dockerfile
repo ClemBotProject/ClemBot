@@ -6,7 +6,7 @@ WORKDIR /usr/src/clembot.site
 ENV PROD=1
 
 # Install app dependencies
-COPY ClemBot.Bot_env.env .env
+COPY ClemBot.Site_env.env .env
 COPY package*.json ./
 
 COPY . .
