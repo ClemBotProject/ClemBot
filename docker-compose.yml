@@ -56,7 +56,7 @@ services:
       - ~/Logs:/ClemBot.Bot/Logs
   # Create the Site process to serve user requests
   clembot.site:
-    build: ClemBot.Site/
+    image: ghcr.io/clembotproject/clembot.site:master
     restart: always
     depends_on: 
       - nginx-proxy
