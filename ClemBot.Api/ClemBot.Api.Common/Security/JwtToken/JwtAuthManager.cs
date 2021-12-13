@@ -17,12 +17,12 @@ public class JwtAuthManager : IJwtAuthManager
     }
 
     /// <inheritdoc cref="IJwtAuthManager.GenerateToken"/>
-    public string GenerateToken(IEnumerable<Claim> claims, DateTime now)
+    public string GenerateToken(IEnumerable<Claim> claims, DateTime expires)
     {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(1),
+            Expires = expires,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(_secret),
                 SecurityAlgorithms.HmacSha256Signature),

@@ -63,6 +63,7 @@ export default Vue.extend({
   components: {
     DefaultLayout,
   },
+  middleware: 'DashboardAuthCheck',
 })
 </script>
 

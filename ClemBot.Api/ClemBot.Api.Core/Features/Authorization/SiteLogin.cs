@@ -75,7 +75,7 @@ public class SiteLogin
             };
 
             _logger.LogInformation("Generating JWT Access Token");
-            var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);
+            var token = _jwtAuthManager.GenerateToken(claims, DateTime.UtcNow.AddHours(4));
             _logger.LogInformation("JWT Access Token Successfully Generated");
 
             return AuthorizeResult<Model>.Success(new Model {Token = token});

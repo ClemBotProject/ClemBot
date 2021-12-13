@@ -64,7 +64,7 @@ public class BotAuthorize
             };
 
             _logger.LogInformation("Generating JWT Access Token");
-            var token = _jwtAuthManager.GenerateToken(claims, DateTime.Now);
+            var token = _jwtAuthManager.GenerateToken(claims, DateTime.UtcNow.AddDays(1));
             _logger.LogInformation("JWT Access Token Successfully Generated");
 
             return Task.FromResult(AuthorizeResult<Model>.Success(new Model() { Token = token }));
