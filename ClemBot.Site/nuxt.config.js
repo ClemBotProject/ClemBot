@@ -8,7 +8,7 @@ const devUrl = 'https://localhost:5001/api'
 const runtimeUrl = isProd() ? prodUrl : devUrl
 
 // eslint-disable-next-line no-console
-console.log(process.env.TESTOUTPUT)
+console.log(process.env.DISCORD_CLIENT_ID)
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
