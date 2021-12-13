@@ -69,6 +69,12 @@ public class GuildSandboxAuthorizeService : IGuildSandboxAuthorizeService
            return false;
         }
 
+        if (model is IGuildUserSandboxModel userModel && userId != userModel.UserId)
+        {
+            _logger.LogError("Invalid request: {User} is does not match requested user {ReqUser}", userId, allowedClaims);
+            return false;
+        }
+
         if (!userGuilds.Contains(model.GuildId))
         {
             _logger.LogError("Invalid request: {User} is not a member in {Guild}", userId, allowedClaims);

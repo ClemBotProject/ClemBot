@@ -1,18 +1,22 @@
 <template>
   <div>
-    <section class="hero">
-      <div class="hero-body"></div>
-    </section>
-    <div class="tile is-ancestor mx-3">
+    <b-message
+      class="mb-3"
+      size="is-primary"
+      type="is-primary-light"
+      :closable="false"
+      title="Guild Options"
+    />
+    <div class="tile is-ancestor mx-3 my-2">
       <div class="tile is-3">
         <div class="box has-background-dark">
           <div class="card-header">
-            <p class="card-header-title has-text-white">Prefix</p>
+            <p class="card-header-title has-text-white">Command Prefix</p>
           </div>
           <p class="card-header-title has-text-white">
             <span class="tag is-black is-medium">{{ this.guildPrefix }}</span>
           </p>
-          <b-field class="mx-4 mb-3 has-text-white">
+          <b-field v-if="canSetPrefix" class="mx-4 mb-3 has-text-white">
             <template #label>
               <span class="has-text-white">Set</span>
             </template>
@@ -34,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div class="tile is-parent">
+      <div v-if="canSeeWelcomeMessage" class="tile is-parent">
         <div class="tile is-child box has-background-dark mx-3">
           <div class="card-header">
             <p class="card-header-title has-text-white">Welcome Message</p>
@@ -44,7 +48,7 @@
               {{ this.guildWelcomeMessage }}
             </div>
           </div>
-          <b-field class="mx-3 mb-3 has-text-white">
+          <b-field v-if="canSetWelcomeMessage" class="mx-3 mb-3 has-text-white">
             <template #label>
               <span class="has-text-white">Set</span>
             </template>
@@ -76,6 +80,7 @@
 import Vue from 'vue'
 import AssignableRoles from '~/components/wiki/AssignableRoles.vue'
 import dashboard from '~/layouts/dashboard.vue'
+import { BotAuthClaims } from '~/services/Claims'
 
 export default Vue.extend({
   components: { dashboard, AssignableRoles },
@@ -94,6 +99,19 @@ export default Vue.extend({
       guildWelcomeMessage,
       inputWelcomeMessage,
     }
+  },
+
+  computed: {
+    canSeeWelcomeMessage: function (): boolean {
+      return this.hasClaim(BotAuthClaims.welcomeMessageView)
+    },
+
+    canSetWelcomeMessage: function (): boolean {
+      return this.hasClaim(BotAuthClaims.welcomeMessageModify)
+    },
+    canSetPrefix: function (): boolean {
+      return this.hasClaim(BotAuthClaims.customPrefixSet)
+    },
   },
 
   mounted() {
@@ -131,6 +149,15 @@ export default Vue.extend({
       this.guildWelcomeMessage =
         await this.$api.welcomeMessage.getWelcomeMessage(this.guildId)
       this.inputWelcomeMessage = ''
+    },
+    hasClaim(claim: BotAuthClaims): boolean {
+      // @ts-ignore
+      let guildId: string = this.$route.params.id
+      // @ts-ignore
+      let activeGuild = this.$auth.user?.guilds.filter(
+        (x: { id: string }) => x.id == guildId
+      )[0]
+      return activeGuild.claims.find((x: string) => x === claim)
     },
   },
 })

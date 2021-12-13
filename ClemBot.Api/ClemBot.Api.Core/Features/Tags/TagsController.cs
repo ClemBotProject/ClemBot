@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Tags;
 using MediatR;
@@ -20,13 +21,14 @@ public class TagsController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("bot/[controller]")]
-    [BotMasterAuthorize]
+    [HttpPost("[controller]")]
+    [GuildSandboxAuthorize(BotAuthClaims.tag_add)]
     public async Task<IActionResult> Create(Create.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.Conflict } => Conflict(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 

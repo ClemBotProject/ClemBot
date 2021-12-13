@@ -27,6 +27,9 @@
         </div>
       </b-sidebar>
       <div class="column">
+        <section class="hero">
+          <div class="hero-body"></div>
+        </section>
         <nuxt />
       </div>
     </section>
@@ -54,6 +57,7 @@
 <script>
 import Vue from 'vue'
 import DefaultLayout from '~/layouts/default.vue'
+import { titleCase } from '@/services/Utilities'
 
 export default Vue.extend({
   components: {

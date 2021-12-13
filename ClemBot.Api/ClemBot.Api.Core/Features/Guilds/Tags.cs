@@ -6,6 +6,7 @@ using ClemBot.Api.Common;
 using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
+using LinqToDB.Tools;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,8 @@ public class Tags
 
         public ulong UserId { get; init; }
 
+        public string UserName { get; init; } = null!;
+
         public int UseCount { get; init; }
     }
 
@@ -47,6 +50,7 @@ public class Tags
             var tags = await _context.Tags
                 .Where(x => x.GuildId == request.GuildId)
                 .Include(y => y.TagUses)
+                .Include(z => z.User)
                 .ToListAsync();
 
             if (tags is null)
@@ -61,6 +65,7 @@ public class Tags
                     Content = tag.Content,
                     CreationDate = tag.Time.ToDateTimeUnspecified().ToLongDateString(),
                     UserId = tag.UserId,
+                    UserName = tag.User.Name,
                     GuildId = tag.GuildId,
                     UseCount = tag.TagUses.Count
                 })

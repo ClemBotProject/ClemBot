@@ -17,7 +17,7 @@ class TagRoute(BaseRoute):
             'GuildId': guild_id,
             'UserId': user_id,
         }
-        tag_dict = await self._client.post('bot/tags', data=json, **kwargs)
+        tag_dict = await self._client.post('tags', data=json, **kwargs)
         if not tag_dict:
             return None
         return Tag.from_dict(tag_dict)
@@ -49,10 +49,10 @@ class TagRoute(BaseRoute):
             'GuildId': guild_id,
             'Name': name,
         }
-        tag_dict = await self._client.get('tags', data=json)
+        tag_dict = await self._client.get('bot/tags', data=json)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict['tags'])
+        return Tag.from_dict(tag_dict)
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
         json = {
@@ -93,9 +93,9 @@ class TagRoute(BaseRoute):
         return await self._client.post('bot/tags/invoke', data=json)
 
     async def get_guilds_tags(self, guild_id: int) -> t.Iterator[Tag]:
-        resp = await self._client.get(f'bot/guilds/{guild_id}/tags')
+        resp = await self._client.get(f'guilds/{guild_id}/tags')
 
         if not resp:
             return []
 
-        return [Tag.from_dict(i) for i in resp]
+        return [Tag.from_dict(i) for i in resp['tags']]

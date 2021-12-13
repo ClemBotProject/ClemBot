@@ -1,11 +1,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ClemBot.Api.Common;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Extensions;
 
@@ -17,14 +20,14 @@ public class Create
     {
         public Validator()
         {
-            RuleFor(p => p.Name).NotNull();
+            RuleFor(p => p.Name).NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
             RuleFor(p => p.Content).NotNull();
             RuleFor(p => p.GuildId).NotNull();
             RuleFor(p => p.UserId).NotNull();
         }
     }
 
-    public class TagDto
+    public class TagDto : IResponseModel
     {
         public string Name { get; set; } = null!;
 
@@ -37,24 +40,29 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Command : IRequest<IQueryResult<TagDto>>
+    public class Command : IGuildUserSandboxModel, IRequest<IQueryResult<IResponseModel>>
     {
         public string Name { get; set; } = null!;
 
         public string Content { get; set; } = null!;
 
-        public LocalDateTime Time { get; }
+        public LocalDateTime? Time { get; }
 
-        public ulong GuildId { get; set; }
+        public ulong GuildId { get; init; }
 
-        public ulong UserId { get; set; }
+        public ulong UserId { get; init; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<TagDto>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IResponseModel>>
     {
-        public async Task<IQueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<IResponseModel>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var tag = new Tag()
+            if (await _context.Tags.FirstOrDefaultAsync(x => x.Guild.Id == request.GuildId && x.Name == request.Name) is not null)
+            {
+               return QueryResult<IResponseModel>.Conflict();
+            }
+
+            var tag = new Tag
             {
                 Name = request.Name,
                 Content = request.Content,
@@ -66,7 +74,7 @@ public class Create
             _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
-            return QueryResult<TagDto>.Success(new TagDto()
+            return QueryResult<IResponseModel>.Success(new TagDto
             {
                 Name = tag.Name,
                 Content = tag.Content,

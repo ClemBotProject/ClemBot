@@ -4,6 +4,8 @@ export interface Tag {
     name: string
     content: string
     creationDate: string
+    userId: string
+    userName: string
     useCount: string
 }
 
@@ -21,5 +23,14 @@ export default class Tags{
   async getGuildTags(id: string): Promise<Array<Tag>> {
     let resp = await this.$axios.$get<Model>(`guilds/${id}/tags`)
     return resp.tags
+  }
+
+  async createTag(name: string, content: string, guildId: string, userId: string){
+      let resp = await this.$axios.$post<Tag>('tags', {
+          name,
+          content,
+          guildId,
+          userId
+      })
   }
 }
