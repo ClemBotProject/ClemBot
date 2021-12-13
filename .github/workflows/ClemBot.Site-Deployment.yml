@@ -71,7 +71,7 @@ jobs:
           cp ~/ClemBot.Site_env.env ./ClemBot.Site/ClemBot.Site_env.env
       - name: Deploy updated images
         run: |
-          echo ${{ secrets.CLEMBOT_SITE_GHCR_CD_TOKEN }} | docker login ghcr.io -u ${{ secrets.USERNAME }} --password-stdin
+          echo ${{ secrets.SITE_GHCR_PAT }} | docker login ghcr.io -u ${{ secrets.USERNAME }} --password-stdin
           docker-compose pull clembot.site
           docker-compose up -d clembot.site
       - name: Discord notification
