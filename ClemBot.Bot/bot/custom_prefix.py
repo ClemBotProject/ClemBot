@@ -26,7 +26,7 @@ class CustomPrefix:
             # noinspection PyBroadException
             try:
                 # Try to grab the prefixes from the db, raise an error on failure
-                # so we know to fallback to the default prefix
+                # and bailout, we cant respond to anything at the moment
                 prefixes = await bot.custom_prefix_route.get_custom_prefixes(message.guild.id, raise_on_error=True)
             except Exception as e:
                 log.error(f'Custom prefix request failed with error: {e}')

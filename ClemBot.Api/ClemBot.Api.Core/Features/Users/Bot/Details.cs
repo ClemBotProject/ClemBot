@@ -1,4 +1,4 @@
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot;
 
 public class Details
 {
-    public class Query : IRequest<Result<Model, QueryStatus>>
+    public class Query : IRequest<IQueryResult<Model>>
     {
         public ulong Id { get; set; }
     }
@@ -21,9 +21,9 @@ public class Details
         public List<ulong> Guilds { get; set; } = new();
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, Result<Model, QueryStatus>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
     {
-        public async Task<Result<Model, QueryStatus>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .Where(x => x.Id == request.Id)

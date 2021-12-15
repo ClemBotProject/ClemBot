@@ -13,17 +13,17 @@ class GuildRoute(BaseRoute):
         super().__init__(api_client)
 
     async def add_guild(self, guild_id: int, name: str):
-        if await self._client.get(f'guilds/{guild_id}'):
+        if await self._client.get(f'bot/guilds/{guild_id}'):
             return
 
         json = {
             'Id': guild_id,
             'Name': name
         }
-        await self._client.post('guilds', data=json)
+        await self._client.post('bot/guilds', data=json)
 
     async def get_all_guilds_ids(self):
-        guilds = await self._client.get('guilds')
+        guilds = await self._client.get('bot/guilds')
 
         if not guilds:
             return
@@ -31,13 +31,13 @@ class GuildRoute(BaseRoute):
         return [g['id'] for g in guilds]
 
     async def leave_guild(self, guild_id: int):
-        return await self._client.delete(f'guilds/{guild_id}')
+        return await self._client.delete(f'bot/guilds/{guild_id}')
 
     async def get_guild(self, guild_id: int):
-        return await self._client.get(f'guilds/{guild_id}')
+        return await self._client.get(f'bot/guilds/{guild_id}')
 
     async def get_guild_user_ids(self, guild_id: int):
-        guild = await self._client.get(f'guilds/{guild_id}')
+        guild = await self._client.get(f'bot/guilds/{guild_id}')
 
         if not guild:
             return
@@ -50,7 +50,7 @@ class GuildRoute(BaseRoute):
             'Name': name,
         }
 
-        await self._client.patch('guilds', data=json)
+        await self._client.patch('bot/guilds', data=json)
 
     async def update_guild_users(self, guild: discord.Guild):
 
@@ -67,7 +67,7 @@ class GuildRoute(BaseRoute):
             'UserCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'guilds/update/users', data=json)
+        await self._client.patch(f'bot/guilds/update/users', data=json)
 
     async def update_guild_roles(self, guild: discord.Guild):
         roles = [{
@@ -84,7 +84,7 @@ class GuildRoute(BaseRoute):
             'RoleCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'guilds/update/roles', data=json)
+        await self._client.patch(f'bot/guilds/update/roles', data=json)
 
     async def update_guild_role_user_mappings(self, guild: discord.Guild):
 
@@ -100,7 +100,7 @@ class GuildRoute(BaseRoute):
             'RoleMappingCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'guilds/update/RoleUserMappings', data=json)
+        await self._client.patch(f'bot/guilds/update/RoleUserMappings', data=json)
 
     async def update_guild_channels(self, guild: discord.Guild):
 
@@ -117,7 +117,7 @@ class GuildRoute(BaseRoute):
             'ChannelCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'guilds/update/channels', data=json)
+        await self._client.patch(f'bot/guilds/update/channels', data=json)
 
     async def update_guild_threads(self, guild: discord.Guild):
 
@@ -135,4 +135,4 @@ class GuildRoute(BaseRoute):
             'ThreadCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'guilds/update/threads', data=json)
+        await self._client.patch(f'bot/guilds/update/threads', data=json)

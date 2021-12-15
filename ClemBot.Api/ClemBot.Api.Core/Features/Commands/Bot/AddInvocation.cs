@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using MediatR;
@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Commands.Bot;
 
 public class AddInvocation
 {
-    public class Command : IRequest<Result<int, QueryStatus>>
+    public class Command : IRequest<IQueryResult<int>>
     {
         public string CommandName { get; set; } = null!;
 
@@ -24,9 +24,9 @@ public class AddInvocation
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Command, Result<int, QueryStatus>>
+        : IRequestHandler<Command, IQueryResult<int>>
     {
-        public async Task<Result<int, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<int>> Handle(Command request, CancellationToken cancellationToken)
         {
             var invocationEntity = new CommandInvocation
             {

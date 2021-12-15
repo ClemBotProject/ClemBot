@@ -21,10 +21,10 @@ class ThreadRoute(BaseRoute):
             'GuildId': guild_id,
             'ParentId': parent_id
         }
-        await self._client.post('threads', data=json, **kwargs)
+        await self._client.post('bot/threads', data=json, **kwargs)
 
     async def get_thread(self, thread_id: int):
-        return await self._client.get(f'threads/{thread_id}')
+        return await self._client.get(f'bot/threads/{thread_id}')
 
     async def edit_thread(self, thread_id: int, name: str, **kwargs):
         json = {
@@ -32,10 +32,10 @@ class ThreadRoute(BaseRoute):
             'Name': name,
         }
 
-        return await self._client.patch('threads', data=json, **kwargs)
+        return await self._client.patch('bot/threads', data=json, **kwargs)
 
     async def remove_thread(self, thread_id: int, **kwargs):
-        return await self._client.delete(f'threads/{thread_id}', **kwargs)
+        return await self._client.delete(f'bot/threads/{thread_id}', **kwargs)
 
     async def get_guilds_threads(self, guild_id: int) -> t.Optional[t.List[int]]:
-        return await self._client.get(f'guilds/{guild_id}/threads')
+        return await self._client.get(f'bot/guilds/{guild_id}/threads')

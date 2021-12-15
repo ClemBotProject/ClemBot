@@ -16,7 +16,7 @@ class DesignatedChannelRoute(BaseRoute):
             'Designation': designation
         }
 
-        return await self._client.post('designatedchannels', data=json, **kwargs)
+        return await self._client.post('bot/designatedchannels', data=json, **kwargs)
 
     async def delete_channel(self,
                              channel_id: int,
@@ -27,7 +27,7 @@ class DesignatedChannelRoute(BaseRoute):
             'Designation': designation
         }
 
-        return await self._client.delete('designatedchannels', data=json, **kwargs)
+        return await self._client.delete('bot/designatedchannels', data=json, **kwargs)
 
     async def get_guild_designated_channel_ids(self,
                                                guild_id: int,
@@ -36,7 +36,7 @@ class DesignatedChannelRoute(BaseRoute):
             'GuildId': guild_id,
             'Designation': designation
         }
-        resp = await self._client.get('designatedchannels/details', data=json)
+        resp = await self._client.get('bot/designatedchannels/details', data=json)
 
         if not resp:
             return []
@@ -44,7 +44,7 @@ class DesignatedChannelRoute(BaseRoute):
         return resp['mappings']
 
     async def get_guild_all_designated_channels(self, guild_id: int):
-        resp = await self._client.get(f'guilds/{guild_id}/designatedchannels')
+        resp = await self._client.get(f'bot/guilds/{guild_id}/designatedchannels')
 
         if not resp:
             return {}
@@ -52,4 +52,4 @@ class DesignatedChannelRoute(BaseRoute):
         return {i['designation']: i['channelIds'] for i in resp}
 
     async def get_global_designations(self, designation: str):
-        return await self._client.get(f'designatedchannels/{designation}/index')
+        return await self._client.get(f'bot/designatedchannels/{designation}/index')

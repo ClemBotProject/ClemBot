@@ -25,7 +25,7 @@
   </a>
 </p>
  
- ## Website
+ ## Website and Configuration Dashboard
  https://clembot.io
  
  ## Intro
@@ -102,7 +102,7 @@ ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in t
 |Api|ClemBot.Api Master Integration|![ClemBot.Api Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Api-Integration.yml/badge.svg?branch=master)|
 |Api|ClemBot.Api Master Deployment|![ClemBot.Api Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Api-Deployment.yml/badge.svg?branch=master)|
 |Bot|ClemBot.Bot Master Integration|![ClemBot.Bot Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Bot-Integration.yml/badge.svg?branch=master)|
-|Bot|ClemBot.Bot Master Deployment|![ClemBot.Bot Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Bot-Deployment%20copy%202.yml/badge.svg?branch=master)|
+|Bot|ClemBot.Bot Master Deployment|![ClemBot.Bot Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Bot-Deployment.yml/badge.svg?branch=master)|
 |Site|ClemBot.Site Master Integration|![ClemBot.Site Master Integration](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Site-Integration.yml.yml/badge.svg?branch=master)|
-|Site|ClemBot.Site Master Deployment|![ClemBot.Site Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Site-Deployment%20copy.yml/badge.svg?branch=master)|
+|Site|ClemBot.Site Master Deployment|![ClemBot.Site Master Deployment](https://github.com/ClemBotProject/ClemBot/actions/workflows/ClemBot.Site-Deployment.yml/badge.svg?branch=master)|
 

@@ -1,0 +1,82 @@
+name: ClemBot.Site Prod Deployment
+
+on:
+  push:
+    branches: [ master ]
+    paths: 
+      - "ClemBot.Site/**"
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Manual ClemBot.Site workflow trigger'
+        required: true
+        default: 'Manual Deployment'
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-push-clembot-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.5.1
+        with:
+          version: latest
+          install: true  
+
+      - name: Extract Docker metadata for main build
+        id: meta
+        uses: docker/metadata-action@v3.4.1
+        with:
+          images: ${{ env.REGISTRY }}/ClemBotProject/ClemBot.Site
+          flavor: |
+            latest=${{ github.event_name == 'push' }}
+            
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.6.1
+        with:
+          context: ./ClemBot.Site
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            DISCORD_CLIENT_ID_ARG=${{ secrets.DISCORD_CLIENT_ID }}
+            DISCORD_CLIENT_SECRET_ARG=${{ secrets.DISCORD_CLIENT_SECRET }}
+            OAUTH_PERMISSIONS_ARG=${{ secrets.OAUTH_PERMISSIONS }}
+            PROD=1
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-to: type=gha, scope=${{github.repository}}
+          cache-from: type=gha, scope=${{github.repository}}
+
+
+  deploy-clembot-bot:
+    runs-on: [self-hosted]
+    needs: ['build-push-clembot-site']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Copy Secrets
+        run: |
+          cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
+          cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
+          cp ~/ClemBot.Site_env.env ./ClemBot.Site/ClemBot.Site_env.env
+      - name: Deploy updated images
+        run: |
+          echo ${{ secrets.SITE_GHCR_PAT }} | docker login ghcr.io -u ${{ secrets.USERNAME }} --password-stdin
+          docker-compose pull clembot.site
+          docker-compose up -d clembot.site
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
+        uses: "Ilshidur/action-discord@0.3.0"
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.site has been deployed.'

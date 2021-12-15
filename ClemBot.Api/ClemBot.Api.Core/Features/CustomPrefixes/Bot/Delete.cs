@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.CustomPrefix.Models;
 using FluentValidation;
@@ -21,16 +21,16 @@ public class Delete
         }
     }
 
-    public class Command : IRequest<Result<ulong, QueryStatus>>
+    public class Command : IRequest<IQueryResult<ulong>>
     {
         public ulong GuildId { get; set; }
 
         public string Prefix { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, IQueryResult<ulong>>
     {
-        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
                 .Include(x => x.CustomPrefixes)

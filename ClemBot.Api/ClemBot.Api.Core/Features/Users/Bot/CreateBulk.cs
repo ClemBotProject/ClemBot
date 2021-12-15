@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
@@ -20,14 +20,14 @@ public class CreateBulk
         public string Name { get; set; } = null!;
     }
 
-    public class Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
+    public class Command : IRequest<IQueryResult<IEnumerable<ulong>>>
     {
         public List<UserDto> Users { get; set; } = new();
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
     {
-        public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             var dbUsers = await _context.Users.ToListAsync();
 

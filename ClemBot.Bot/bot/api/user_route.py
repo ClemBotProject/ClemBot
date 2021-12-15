@@ -15,7 +15,7 @@ class UserRoute(BaseRoute):
             'Id': user_id,
             'Name': name,
         }
-        await self._client.post('users', data=json, **kwargs)
+        await self._client.post('bot/users', data=json, **kwargs)
 
     async def create_user_bulk(self, users: t.Iterable[discord.User], **kwargs):
         users = [{
@@ -28,27 +28,27 @@ class UserRoute(BaseRoute):
             'Users': users
         }
 
-        await self._client.post('users/createbulk', data=json, **kwargs)
+        await self._client.post('bot/users/createbulk', data=json, **kwargs)
 
     async def get_user(self, user_id: int):
-        return await self._client.get(f'users/{user_id}')
+        return await self._client.get(f'bot/users/{user_id}')
 
     async def add_user_guild(self, user_id: int, guild_id: int, **kwargs):
         json = {
             'GuildId': guild_id,
             'UserId': user_id,
         }
-        await self._client.post('guilds/adduser', data=json, **kwargs)
+        await self._client.post('bot/guilds/adduser', data=json, **kwargs)
 
     async def remove_user_guild(self, user_id: int, guild_id: int, **kwargs):
         json = {
             'GuildId': guild_id,
             'UserId': user_id,
         }
-        await self._client.delete('guilds/removeuser', data=json, **kwargs)
+        await self._client.delete('bot/guilds/removeuser', data=json, **kwargs)
 
     async def get_user_guilds_ids(self, user_id: int):
-        user = await self._client.get(f'users/{user_id}')
+        user = await self._client.get(f'bot/users/{user_id}')
 
         if not user:
             return
@@ -61,7 +61,7 @@ class UserRoute(BaseRoute):
             'Name': name,
         }
 
-        await self._client.patch('users/edit', data=json)
+        await self._client.patch('bot/users/edit', data=json)
 
     async def get_users_ids(self) -> t.Optional[t.List[int]]:
         users = await self._client.get(f'users')
@@ -76,4 +76,4 @@ class UserRoute(BaseRoute):
             'Roles': roles
         }
 
-        await self._client.post(f'users/{user_id}/updateroles', data=json)
+        await self._client.post(f'bot/users/{user_id}/updateroles', data=json)

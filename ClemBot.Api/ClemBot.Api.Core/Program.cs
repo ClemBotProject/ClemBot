@@ -1,23 +1,24 @@
-using System;
 using System.Text;
 using System.Text.Json.Serialization;
-using ClemBot.Api.Core;
+using ClemBot.Api.Common;
+using ClemBot.Api.Common.Security;
+using ClemBot.Api.Common.Security.JwtToken;
+using ClemBot.Api.Common.Security.OAuth;
+using ClemBot.Api.Common.Security.Policies;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Behaviors;
-using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.JwtToken;
-using ClemBot.Api.Core.Security.Policies;
-using ClemBot.Api.Core.Security.Policies.BotMaster;
-using ClemBot.Api.Core.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Services.Authorization;
 using ClemBot.Api.Services.Guilds.Models;
 using ClemBot.Api.Services.Jobs;
 using FluentValidation.AspNetCore;
-using LazyCache;
 using LinqToDB.EntityFrameworkCore;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,11 +83,17 @@ var jwtTokenConfig = builder.Configuration.GetSection("JwtTokenConfig").Get<JwtT
 jwtTokenConfig.Secret = Guid.NewGuid().ToString();
 builder.Services.AddSingleton(jwtTokenConfig);
 
+// *** Add Security Services to container ***
 // Add JWT generator to DI
 builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
+// Add the discord oauth service
+builder.Services.AddScoped<IDiscordAuthManager, DiscordAuthManager>();
+
+// Configure Mediatr and the pipelines
 builder.Services.AddMediatR(typeof(Program), typeof(GuildExistsRequest));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(GuildSandboxAuthorizeBehavior<,>));
 
 // Specify Swagger startup options
 builder.Services.AddSwaggerGen(o => {
@@ -130,6 +137,7 @@ builder.Services.AddCors(options => {
     options.AddDefaultPolicy(
         policyBuilder => {
             policyBuilder.AllowAnyOrigin();
+            policyBuilder.AllowAnyHeader();
             policyBuilder.AllowAnyMethod();
         });
 });
@@ -168,8 +176,13 @@ builder.Services.AddAuthorization(options => {
 });
 // Add authorization policy providers
 builder.Services.AddScoped<IAuthorizationHandler, BotMasterAuthHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, GuildSandboxAuthHandler>();
+//builder.Services.AddScoped<IAuthorizationHandler, GuildSandboxAuthHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, GuildSandboxPolicyProvider>();
+
+// Register services
+builder.Services.AddScoped<IGuildSandboxAuthorizeService, GuildSandboxAuthorizeService>();
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
 // ******
 
 

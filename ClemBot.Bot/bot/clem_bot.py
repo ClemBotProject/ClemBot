@@ -88,8 +88,6 @@ class ClemBot(commands.Bot):
         # startup service has active routes
         self.load_routes(self.api_client)
 
-        await self.change_presence(activity=discord.Game(name='https://clembot.io'))
-
         # Connect to the api Before the services are loaded so they can begin their startup routines
         # this will block until the api is connected to, only THEN will we run our service startups
         # until this is connected no commands will be processed because there is no message_handling_service
