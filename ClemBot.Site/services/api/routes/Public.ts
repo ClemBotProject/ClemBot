@@ -13,8 +13,15 @@ export default class Public {
     this.$axios = axios
   }
 
-  async getGlobalStats(): Promise<GlobalStats> {
-    const stats = await this.$axios.$get<GlobalStats>('public/globalstats')
-    return stats
+  async getGlobalStats(): Promise<GlobalStats | null> {
+    let stats;
+    try {
+      stats = await this.$axios.$get<GlobalStats>('public/globalstats')
+    }
+    catch(e) {
+      console.log(e)
+    }
+    
+    return stats ?? null
   }
 }

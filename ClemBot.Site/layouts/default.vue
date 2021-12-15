@@ -15,7 +15,7 @@
           id="nav"
           class="is-spaced is-tab"
           tag="nuxt-link"
-          :to="{ path: '/wiki' }"
+          :to="{ path: '/wiki/intro' }"
         >
           <b-icon icon="script" class="mr-1" size="is-small" /><b> Wiki </b>
         </b-navbar-item>
