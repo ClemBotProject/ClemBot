@@ -25,7 +25,7 @@ class MessageRoute(BaseRoute):
             'ChannelId': channel_id
         }]}
 
-        await self._client.post('messages', data=json, **kwargs)
+        await self._client.post('bot/messages', data=json, **kwargs)
 
     async def batch_create_message(self, messages: t.Iterable, **kwargs):
         messages = [{
@@ -39,7 +39,7 @@ class MessageRoute(BaseRoute):
 
         json = {'Messages': messages}
 
-        await self._client.post('messages', data=json, **kwargs)
+        await self._client.post('bot/messages', data=json, **kwargs)
 
     async def edit_message(self, message_id: int, content: str):
         json = {'Messages': [{
@@ -47,7 +47,7 @@ class MessageRoute(BaseRoute):
             'Content': content,
         }]}
 
-        await self._client.patch('messages', data=json)
+        await self._client.patch('bot/messages', data=json)
 
     async def batch_edit_message(self, messages: t.Iterable, **kwargs):
         messages = [{
@@ -57,10 +57,10 @@ class MessageRoute(BaseRoute):
         } for m in messages]
 
         json = {'Messages': messages}
-        await self._client.patch('messages', data=json, **kwargs)
+        await self._client.patch('bot/messages', data=json, **kwargs)
 
     async def get_message(self, message_id: int):
-        return await self._client.get(f'messages/{message_id}')
+        return await self._client.get(f'bot/messages/{message_id}')
 
     async def range_count_messages(self, user_id: int, guild_id: int, days: int):
         json = {
@@ -68,7 +68,7 @@ class MessageRoute(BaseRoute):
             'GuildId' : guild_id,
             'Days' : days
         }
-        resp = await self._client.get('messages/Count', data=json)
+        resp = await self._client.get('bot/essages/Count', data=json)
         
         if not resp:
         	return 0

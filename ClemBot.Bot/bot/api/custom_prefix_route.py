@@ -19,7 +19,8 @@ class CustomPrefixRoute(BaseRoute):
             'GuildId': guild_id,
             'Prefix': prefix
         }
-        return await self._client.delete('customprefixes/remove', data=json)
+        return await self._client.delete('bot/customprefixes/remove', data=json)
 
     async def get_custom_prefixes(self, guild_id: int, **kwargs):
-        return await self._client.get(f'guilds/{guild_id}/customprefixes', **kwargs)
+        resp = await self._client.get(f'guilds/{guild_id}/customprefixes', **kwargs)
+        return resp['prefixes']

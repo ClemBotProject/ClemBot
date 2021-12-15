@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using MediatR;
@@ -20,16 +20,16 @@ public class UpdateRoles
         }
     }
 
-    public record Command : IRequest<Result<IEnumerable<ulong>, QueryStatus>>
+    public record Command : IRequest<IQueryResult<IEnumerable<ulong>>>
     {
         public ulong Id { get; set; }
 
         public List<ulong> Roles { get; set; } = new();
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<IEnumerable<ulong>, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
     {
-        public async Task<Result<IEnumerable<ulong>, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             var roles = await _context.Roles
                 .Where(x => request.Roles.Contains(x.Id))

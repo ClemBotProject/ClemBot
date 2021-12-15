@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Commands.Bot;
 using ClemBot.Api.Core.Features.Public;
-using ClemBot.Api.Core.Security.Policies.BotMaster;
-using ClemBot.Api.Core.Utilities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

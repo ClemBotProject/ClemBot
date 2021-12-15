@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using MediatR;
@@ -19,16 +19,16 @@ public class Edit
         }
     }
 
-    public class Command : IRequest<Result<ulong, QueryStatus>>
+    public class Command : IRequest<IQueryResult<ulong>>
     {
         public ulong Id { get; set; }
 
         public string Name { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, Result<ulong, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
     {
-        public async Task<Result<ulong, QueryStatus>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
                 .FirstOrDefaultAsync(g => g.Id == request.Id);

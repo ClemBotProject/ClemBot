@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ClemBot.Api.Core.Utilities;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot;
 
 public class Index
 {
-    public class Query : IRequest<Result<IEnumerable<Model>, QueryStatus>>
+    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
     {
     }
 
@@ -22,9 +22,9 @@ public class Index
         public string Name { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, Result<IEnumerable<Model>, QueryStatus>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
     {
-        public async Task<Result<IEnumerable<Model>, QueryStatus>> Handle(Query request,
+        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var users = await _context.Users.ToListAsync();

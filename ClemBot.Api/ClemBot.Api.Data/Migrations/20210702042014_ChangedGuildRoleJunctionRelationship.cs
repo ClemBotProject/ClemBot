@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore.Migrations;
+using ClemBot.Api.Common.Enums;
 
 namespace ClemBot.Api.Data.Migrations
 {

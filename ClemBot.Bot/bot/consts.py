@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 
 class Urls:
-    base_api_url = 'api/bot/'
+    base_api_url = 'api/'
 
 
 class Colors:

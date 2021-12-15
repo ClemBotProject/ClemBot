@@ -128,11 +128,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { chunkArray } from '~/services/utilities'
+import { chunkArray } from '~/services/Utilities'
 import FeatureCard from '~/components/FeatureCard.vue'
 
 export default Vue.extend({
   components: { FeatureCard },
+  middleware: 'HomeAuthCheck',
   data() {
     return {
       guildsCount: 'Unknown',
@@ -185,6 +186,11 @@ export default Vue.extend({
 
   async fetch() {
     const stats = await this.$api.public.getGlobalStats()
+
+    if (stats === null) {
+      console.log('Getting public guild stats failed')
+      return
+    }
 
     this.guildsCount = stats.guilds ?? 'many'
     this.usersCount = stats.users ?? 'all the'

@@ -1,0 +1,9 @@
+<template>
+  <div>
+    <b-image
+      class="is-32x32"
+      rounded
+      :src="`https://cdn.discordapp.com/avatars/${this.$auth.user.user.user.id}/${this.$auth.user.user.user.avatar}.png?size=128`"
+    />
+  </div>
+</template>

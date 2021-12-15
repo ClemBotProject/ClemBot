@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClemBot.Api.Common.Enums;
+using ClemBot.Api.Common.Security.Policies;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Security.Policies.GuildSandbox;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Guilds;
-using ClemBot.Api.Core.Security;
-using ClemBot.Api.Core.Security.Policies;
-using ClemBot.Api.Core.Security.Policies.BotMaster;
-using ClemBot.Api.Core.Security.Policies.GuildSandbox;
-using ClemBot.Api.Core.Utilities;
-using ClemBot.Api.Data.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -157,29 +156,31 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{Id}/Tags")]
-    [BotMasterAuthorize]
+    [HttpGet("[controller]/{GuildId}/Tags")]
+    [GuildSandboxAuthorize]
     public async Task<IActionResult> Tags([FromRoute] Bot.Tags.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{Id}/CustomPrefixes")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.CustomPrefixes.Query query) =>
+    [HttpGet("[controller]/{GuildId}/CustomPrefixes")]
+    [GuildSandboxAuthorize]
+    public async Task<IActionResult> CustomPrefixes([FromRoute] GetCustomPrefixes.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
     [HttpGet("bot/[controller]/{Id}/Channels")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.Channels.Query query) =>
+    public async Task<IActionResult> Channels([FromRoute] Bot.Channels.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
@@ -189,7 +190,7 @@ public class GuildsController : ControllerBase
 
     [HttpGet("bot/[controller]/{Id}/Threads")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> CustomPrefixes([FromRoute] Bot.Threads.Query query) =>
+    public async Task<IActionResult> Threads([FromRoute] Bot.Threads.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
@@ -217,23 +218,25 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpPost("bot/[controller]/{Id}/SetWelcomeMessage")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> SetWelcomeMessage(ulong Id, [FromBody] Bot.SetWelcomeMessage.Command command) =>
+    [HttpPost("[controller]/{Id}/SetWelcomeMessage")]
+    [GuildSandboxAuthorize(BotAuthClaims.welcome_message_modify)]
+    public async Task<IActionResult> SetWelcomeMessage(ulong Id, [FromBody] SetWelcomeMessage.Command command) =>
         await _mediator.Send(command with { Id = Id }) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{Id}/GetWelcomeMessage")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> GetWelcomeMessage([FromRoute] Bot.GetWelcomeMessage.Command command) =>
+    [HttpGet("[controller]/{Id}/GetWelcomeMessage")]
+    [GuildSandboxAuthorize(BotAuthClaims.welcome_message_view)]
+    public async Task<IActionResult> GetWelcomeMessage([FromRoute] GetWelcomeMessage.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NotFound(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 

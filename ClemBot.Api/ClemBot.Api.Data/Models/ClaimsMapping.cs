@@ -1,4 +1,4 @@
-using ClemBot.Api.Data.Enums;
+using ClemBot.Api.Common.Enums;
 
 namespace ClemBot.Api.Data.Models;
 

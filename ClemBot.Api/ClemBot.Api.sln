@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClemBot.Api.Data", "ClemBot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClemBot.Api.Services", "ClemBot.Api.Services\ClemBot.Api.Services.csproj", "{1673A4E8-4BE2-4255-968A-D562D51FAE95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClemBot.Api.Common", "ClemBot.Api.Common\ClemBot.Api.Common.csproj", "{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{1673A4E8-4BE2-4255-968A-D562D51FAE95}.Release|x64.Build.0 = Release|Any CPU
 		{1673A4E8-4BE2-4255-968A-D562D51FAE95}.Release|x86.ActiveCfg = Release|Any CPU
 		{1673A4E8-4BE2-4255-968A-D562D51FAE95}.Release|x86.Build.0 = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|x64.Build.0 = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Debug|x86.Build.0 = Debug|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|x64.ActiveCfg = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|x64.Build.0 = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|x86.ActiveCfg = Release|Any CPU
+		{F84B8C5F-E9CC-4705-87B1-D428F205AFAE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

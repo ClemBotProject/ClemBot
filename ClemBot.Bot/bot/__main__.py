@@ -78,6 +78,7 @@ def main():
         messenger=messenger,
         scheduler=scheduler,
         command_prefix=custom_prefix.get_prefix,  # noqa: E126
+        activity=discord.Game(name='https://clembot.io'),
         help_command=None,
         case_insensitive=True,
         max_messages=50000,
