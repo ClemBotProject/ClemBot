@@ -40,7 +40,7 @@
                 tag="router-link"
                 :to="{ path: '/wiki/moderation/warn' }"
                 class="pb-1"
-                label="overview"
+                label="Warn"
               ></b-menu-item>
               <b-menu-item
                 tag="router-link"
