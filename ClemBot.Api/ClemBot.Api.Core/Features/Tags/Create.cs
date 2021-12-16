@@ -40,7 +40,7 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Command : IGuildUserSandboxModel, IRequest<IQueryResult<IResponseModel>>
+    public class Command : IGuildUserSandboxModel, IRequest<IQueryResult<TagDto>>
     {
         public string Name { get; set; } = null!;
 
@@ -53,13 +53,13 @@ public class Create
         public ulong UserId { get; init; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IResponseModel>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<TagDto>>
     {
-        public async Task<IQueryResult<IResponseModel>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             if (await _context.Tags.FirstOrDefaultAsync(x => x.Guild.Id == request.GuildId && x.Name == request.Name) is not null)
             {
-               return QueryResult<IResponseModel>.Conflict();
+               return QueryResult<TagDto>.Conflict();
             }
 
             var tag = new Tag
@@ -74,7 +74,7 @@ public class Create
             _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
-            return QueryResult<IResponseModel>.Success(new TagDto
+            return QueryResult<TagDto>.Success(new TagDto
             {
                 Name = tag.Name,
                 Content = tag.Content,

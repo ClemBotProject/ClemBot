@@ -119,13 +119,25 @@ export default Vue.extend({
 
   async fetch() {
     let guildId = this.$route.params.id
-    this.guildPrefix =
-      (await this.$api.customPrefix.getCustomPrefix(guildId)) ??
-      this.$config.defaultPrefix
+    try {
+      this.guildPrefix =
+        (await this.$api.customPrefix.getCustomPrefix(guildId)) ??
+        this.$config.defaultPrefix
+    } 
+    catch(e) {
+      console.log(e)
+      this.guildPrefix = 'Retrieving Guild Prefix failed'
+    }
 
-    this.guildWelcomeMessage =
-      (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
-      'No Welcome Message set'
+    try {
+      this.guildWelcomeMessage =
+        (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
+        'No Welcome Message set'
+    }
+    catch(e) {
+      console.log(e)
+      this.guildWelcomeMessage = 'Retrieving Guild Welcome message failed'
+    }
   },
 
   methods: {
