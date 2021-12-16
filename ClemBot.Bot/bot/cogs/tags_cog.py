@@ -135,7 +135,8 @@ class TagCog(commands.Cog):
         embed.add_field(name='Uses', value=f'{tag.use_count}')
         embed.add_field(name='Creation Date', value=tag.creation_date)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
     @tag.command()
     @ext.required_claims(Claims.tag_add)
