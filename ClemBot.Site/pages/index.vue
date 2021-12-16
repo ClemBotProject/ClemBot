@@ -187,6 +187,11 @@ export default Vue.extend({
   async fetch() {
     const stats = await this.$api.public.getGlobalStats()
 
+    if (stats === null) {
+      console.log('Getting public guild stats failed')
+      return
+    }
+
     this.guildsCount = stats.guilds ?? 'many'
     this.usersCount = stats.users ?? 'all the'
     this.commandsCount = stats.commands ?? 'tons of'

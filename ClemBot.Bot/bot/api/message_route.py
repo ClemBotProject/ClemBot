@@ -68,7 +68,7 @@ class MessageRoute(BaseRoute):
             'GuildId' : guild_id,
             'Days' : days
         }
-        resp = await self._client.get('bot/essages/Count', data=json)
+        resp = await self._client.get('bot/messages/Count', data=json)
         
         if not resp:
         	return 0

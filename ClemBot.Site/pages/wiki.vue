@@ -5,19 +5,22 @@
         <b-menu id="wiki-menu">
           <b-menu-list label="ClemBot Wiki">
             <b-menu-item
+              tag="router-link"
+              :to="{ path: '/wiki/intro' }"
               label="Intro"
               class="pb-1"
-              @click="changeWikiPage('wiki/Intro')"
             ></b-menu-item>
             <b-menu-item
+              tag="router-link"
+              :to="{ path: '/wiki/customprefix' }"
+              class="pb-1"
               label="Custom Prefix"
-              class="pb-1"
-              @click="changeWikiPage('wiki/CustomPrefix')"
             ></b-menu-item>
             <b-menu-item
-              label="Claims"
+              tag="router-link"
+              :to="{ path: '/wiki/claims' }"
               class="pb-1"
-              @click="changeWikiPage('wiki/Claims')"
+              label="Claims"
             ></b-menu-item>
             <b-menu-item :active="moderationActive" expanded>
               <template #label="props">
@@ -28,51 +31,59 @@
                 ></b-icon>
               </template>
               <b-menu-item
+                tag="router-link"
+                :to="{ path: '/wiki/moderation/overview' }"
                 class="pb-1"
                 label="Overview"
-                @click="changeWikiPage('wiki/moderation/Overview')"
               ></b-menu-item>
               <b-menu-item
+                tag="router-link"
+                :to="{ path: '/wiki/moderation/warn' }"
                 class="pb-1"
                 label="Warn"
-                @click="changeWikiPage('wiki/moderation/Warn')"
               ></b-menu-item>
               <b-menu-item
+                tag="router-link"
+                :to="{ path: '/wiki/moderation/mute' }"
                 class="pb-1"
                 label="Mute"
-                @click="changeWikiPage('wiki/moderation/Mute')"
               ></b-menu-item>
               <b-menu-item
+                tag="router-link"
+                :to="{ path: '/wiki/moderation/ban' }"
                 class="pb-1"
                 label="Ban"
-                @click="changeWikiPage('wiki/moderation/Ban')"
               ></b-menu-item>
             </b-menu-item>
             <b-menu-item
+              tag="router-link"
+              :to="{ path: '/wiki/designatedchannels' }"
+              class="pb-1"
               label="Designated Channels"
-              class="pb-1"
-              @click="changeWikiPage('wiki/DesignatedChannels')"
             ></b-menu-item>
             <b-menu-item
+              tag="router-link"
+              :to="{ path: '/wiki/assignableroles' }"
+              class="pb-1"
               label="Assignable Roles"
-              class="pb-1"
-              @click="changeWikiPage('wiki/AssignableRoles')"
             ></b-menu-item>
             <b-menu-item
+              tag="router-link"
+              :to="{ path: '/wiki/tags' }"
+              class="pb-1"
               label="Tags"
-              class="pb-1"
-              @click="changeWikiPage('wiki/Tags')"
             ></b-menu-item>
             <b-menu-item
-              label="Welcome Messages"
+              tag="router-link"
+              :to="{ path: '/wiki/welcomemessage' }"
               class="pb-1"
-              @click="foo()"
+              label="Welcome Message"
             ></b-menu-item>
           </b-menu-list>
         </b-menu>
       </div>
       <div id="wiki-component" class="column has-background-black-ter">
-        <component :is="activeItem"></component>
+        <nuxt-child />
       </div>
     </div>
   </section>
@@ -85,17 +96,7 @@ export default Vue.extend({
   data() {
     return {
       moderationActive: true,
-      activeItem: () => import('~/components/wiki/Intro.vue'),
     }
-  },
-  methods: {
-    changeWikiPage(path: string) {
-      this.activeItem = () => import(`~/components/${path}.vue`)
-      window.scrollTo(0, 0)
-    },
-    foo() {
-      console.log()
-    },
   },
 })
 </script>

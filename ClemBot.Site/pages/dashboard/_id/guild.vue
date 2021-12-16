@@ -78,12 +78,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import AssignableRoles from '~/components/wiki/AssignableRoles.vue'
 import dashboard from '~/layouts/dashboard.vue'
 import { BotAuthClaims } from '~/services/Claims'
 
 export default Vue.extend({
-  components: { dashboard, AssignableRoles },
+  components: { dashboard },
   layout: 'dashboard',
   data() {
     let guildId: string = ''

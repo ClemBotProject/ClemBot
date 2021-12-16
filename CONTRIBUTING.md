@@ -94,7 +94,7 @@ Then allow pip to get the latest libraries:
 
 You can then test-run the bot with the command:  
 `python3 -m bot`  windows: `py -m bot`
-when you are in the root directory `ClemBot/`
+when you are in the directory `ClemBot/ClemBot.Bot`
 
 The bot should show up in the test server and respond to commands (test with `<your_prefix>hello`)
 
