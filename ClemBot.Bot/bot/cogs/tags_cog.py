@@ -66,6 +66,39 @@ class TagCog(commands.Cog):
                                          channel=ctx.channel,
                                          timeout=360)
 
+
+    @tag.command(aliases=['claimed'])
+    @ext.long_help(
+        'Lists all tags owned by a given user or the called user if no user is provided.'
+    )
+    @ext.short_help('Lists owned tags')
+    @ext.example(['tag owned', 'tag owned @user'])
+    # returns a list of all tags owned by the calling user or given user returned in pages
+    async def owned(self, ctx: commands.Context, user: Optional[discord.Member] = None):
+        if not user:
+            user = ctx.author
+        tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
+
+        ownedTags = []
+        for tag in tags:
+            if tag.user_id == user.id:
+                ownedTags.append(tag)
+        
+        if not ownedTags:
+            # await self._error_embed(ctx, f'{user.display_name} has no tags.')
+            embed = discord.Embed(title=f'{user.display_name}\'s Tags', color=Colors.ClemsonOrange)
+            embed.add_field(name='Tags', value='User does not own any tags', inline=True)
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            await ctx.send(embed=embed)
+            return
+
+        pages = self.chunked_tags_with_content(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, f'{user.display_name}\'s Tags')
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
+                                         pages=pages,
+                                         author=ctx.author,
+                                         channel=ctx.channel,
+                                         timeout=360)
+
     @tag.command(aliases=['create', 'make'])
     @ext.required_claims(Claims.tag_add)
     @ext.long_help(
@@ -304,6 +337,26 @@ class TagCog(commands.Cog):
             embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
             for tag in chunk:
                 embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
+            pages.append(embed)
+
+        return pages
+
+    def chunked_tags_with_content(self, tags_list: list, n: int, prefix: str, title: str):
+        """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
+        pages = []
+        for chunk in self.chunk_list(tags_list, n):
+            embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
+            embed.set_footer(text=f'Use tags with "{prefix} name", or inline with "$name"')
+            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            for tag in chunk:
+                embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
+            pages.append(embed)
+        for tag in tags_list:
+            embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{tag.name}')
+            # embed.set_footer(text=f'Use tags with "{prefix} name", or inline with "$name"')
+            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            embed.add_field(name='Content', value=tag.content)
+            embed.add_field(name='Uses', value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
             pages.append(embed)
 
         return pages
