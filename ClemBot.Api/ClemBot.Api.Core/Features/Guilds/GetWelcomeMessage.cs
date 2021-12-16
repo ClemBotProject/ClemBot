@@ -1,6 +1,4 @@
 using ClemBot.Api.Common;
-using ClemBot.Api.Common.Utilities;
-using ClemBot.Api.Core.Features.Authorization;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +11,13 @@ public class GetWelcomeMessage
     {
         public Validator()
         {
-            RuleFor(p => p.Id).NotNull();
+            RuleFor(p => p.GuildId).NotNull();
         }
     }
 
-    public record Command : IRequest<IQueryResult<IResponseModel>>
+    public record Command : IGuildSandboxModel, IRequest<IQueryResult<Model>>
     {
-        public ulong Id { get; set; }
+        public ulong GuildId { get; init; }
     }
 
     public record Model : IResponseModel
@@ -27,20 +25,20 @@ public class GetWelcomeMessage
        public string? Message { get; init; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IResponseModel>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
     {
-        public async Task<IQueryResult<IResponseModel>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
                 .Select(x => new{ x.Id, x.WelcomeMessage })
-                .FirstOrDefaultAsync(x => x.Id == request.Id);
+                .FirstOrDefaultAsync(x => x.Id == request.GuildId);
 
             if (guild is null)
             {
-                return QueryResult<IResponseModel>.NotFound();
+                return QueryResult<Model>.NotFound();
             }
 
-            return QueryResult<IResponseModel>.Success(new Model{ Message = guild.WelcomeMessage });
+            return QueryResult<Model>.Success(new Model{ Message = guild.WelcomeMessage });
         }
     }
 }

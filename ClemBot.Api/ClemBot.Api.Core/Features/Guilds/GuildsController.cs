@@ -221,7 +221,7 @@ public class GuildsController : ControllerBase
     [HttpPost("[controller]/{Id}/SetWelcomeMessage")]
     [GuildSandboxAuthorize(BotAuthClaims.welcome_message_modify)]
     public async Task<IActionResult> SetWelcomeMessage(ulong Id, [FromBody] SetWelcomeMessage.Command command) =>
-        await _mediator.Send(command with { Id = Id }) switch
+        await _mediator.Send(command with { GuildId = Id }) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NoContent(),
@@ -229,7 +229,7 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("[controller]/{Id}/GetWelcomeMessage")]
+    [HttpGet("[controller]/{GuildId}/GetWelcomeMessage")]
     [GuildSandboxAuthorize(BotAuthClaims.welcome_message_view)]
     public async Task<IActionResult> GetWelcomeMessage([FromRoute] GetWelcomeMessage.Command command) =>
         await _mediator.Send(command) switch
