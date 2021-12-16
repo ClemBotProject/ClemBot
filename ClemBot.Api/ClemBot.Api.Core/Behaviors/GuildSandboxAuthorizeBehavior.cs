@@ -30,7 +30,9 @@ public class GuildSandboxAuthorizeBehavior<TRequest, TResponse> :
     {
         if (!await _authorizeService.AuthorizeUser(request))
         {
-            return (TResponse)QueryResult<IResponseModel>.Forbidden();
+            var genericResultType = typeof(TResponse).GetGenericArguments().First();
+            var resultType = typeof(QueryResult<>).MakeGenericType(genericResultType);
+            return (TResponse) Activator.CreateInstance(resultType, QueryStatus.Forbidden)!;
         }
 
         return await next();

@@ -5,7 +5,7 @@ public class QueryResult<T> : IQueryResult<T>
     public T? Value { get; }
     public QueryStatus Status { get; }
 
-    private QueryResult(QueryStatus status)
+    public QueryResult(QueryStatus status)
     {
         Status = status;
     }

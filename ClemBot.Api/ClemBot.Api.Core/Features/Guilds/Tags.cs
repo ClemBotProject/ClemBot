@@ -14,7 +14,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Tags
 {
-    public class Query : IGuildSandboxModel, IRequest<IQueryResult<IResponseModel>>
+    public class Query : IGuildSandboxModel, IRequest<IQueryResult<Model>>
     {
         public ulong GuildId { get; init; }
     }
@@ -42,9 +42,9 @@ public class Tags
     }
 
     public record QueryHandler(ClemBotContext _context)
-        : IRequestHandler<Query, IQueryResult<IResponseModel>>
+        : IRequestHandler<Query, IQueryResult<Model>>
     {
-        public async Task<IQueryResult<IResponseModel>> Handle(Query request,
+        public async Task<IQueryResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var tags = await _context.Tags
@@ -55,10 +55,10 @@ public class Tags
 
             if (tags is null)
             {
-                return QueryResult<IResponseModel>.NotFound();
+                return QueryResult<Model>.NotFound();
             }
 
-            return QueryResult<IResponseModel>.Success(new Model{ Tags = tags
+            return QueryResult<Model>.Success(new Model{ Tags = tags
                 .Select(tag => new Tag
                 {
                     Name = tag.Name,
