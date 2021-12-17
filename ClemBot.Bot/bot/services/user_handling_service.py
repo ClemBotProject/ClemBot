@@ -39,8 +39,15 @@ class UserHandlingService(BaseService):
         await self.notify_user_remove(user)
 
     @BaseService.Listener(Events.on_member_update)
-    async def on_member_update(self, _, after):
-        await self.bot.user_route.update_roles(after.id, [r.id for r in after.roles])
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        # only update roles if they have changed
+        if not await self.bot.user_route.get_user(before.id):
+            # Possibly add them to the db if they dont exist
+            # For future enhancement
+            return
+
+        if set(r.id for r in before.roles) != set(r.id for r in after.roles):
+            await self.bot.user_route.update_roles(after.id, [r.id for r in after.roles])
 
     async def notify_user_join(self, user: discord.Member):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
