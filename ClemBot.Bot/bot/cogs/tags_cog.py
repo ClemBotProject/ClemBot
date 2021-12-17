@@ -203,7 +203,8 @@ class TagCog(commands.Cog):
             return
 
         # chunk the unclaimed tags into pages
-        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags')
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags', tags_url)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
