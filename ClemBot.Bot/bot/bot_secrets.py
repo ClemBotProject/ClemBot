@@ -27,6 +27,7 @@ class BotSecrets:
         self._bot_only = None
         self._startup_log_channel_ids = None
         self._error_log_channel_ids = None
+        self._site_url = None
 
     @property
     def client_token(self) -> str:
@@ -245,6 +246,18 @@ class BotSecrets:
             raise ConfigAccessError(f'api_key has already been initialized')
         self._api_key = value
 
+    @property
+    def site_url(self) -> str:
+        if not self._site_url:
+            raise ConfigAccessError(f'site_url has not been initialized')
+        return self._site_url
+
+    @site_url.setter
+    def site_url(self, value: str) -> None:
+        if self._site_url:
+            raise ConfigAccessError(f'site_url has already been initialized')
+        self._site_url = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
 
@@ -264,6 +277,7 @@ class BotSecrets:
         self.azure_translate_key = secrets['AzureTranslateKey']
         self.api_url = secrets['ApiUrl']
         self.api_key = secrets['ApiKey']
+        self.site_url = secrets['SiteUrl']
 
         log.info('Bot Secrets Loaded')
 
@@ -285,6 +299,7 @@ class BotSecrets:
         self.azure_translate_key = os.environ.get('AZURE_TRANSLATE_KEY')
         self.api_url = os.environ.get('API_URL')
         self.api_key = os.environ.get('API_KEY')
+        self.site_url = os.environ.get('SITE_URL')
 
         log.info('Production keys loaded')
 
