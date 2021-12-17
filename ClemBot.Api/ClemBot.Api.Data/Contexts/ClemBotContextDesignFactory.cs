@@ -13,7 +13,8 @@ public class ClemBotContextDesignFactory : IDesignTimeDbContextFactory<ClemBotCo
             .Build();
 
         var builder = new DbContextOptionsBuilder<ClemBotContext>();
-        builder.UseNpgsql(configuration["ClemBotConnectionString"]);
+        builder.UseNpgsql(configuration["ClemBotConnectionString"],
+            o => o.UseNodaTime());
 
         return new ClemBotContext(builder.Options);
     }
