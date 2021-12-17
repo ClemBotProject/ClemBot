@@ -187,7 +187,7 @@ class OwnerCog(commands.Cog):
         code = code.replace('`', '')
         code = code.replace('\n', '\n\t')
         t = [None]
-        exec_globals = {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 't': t}
+        exec_globals = {'asyncio': asyncio, 'bot': self.bot, 'code': code, 'ctx': ctx, 'loop': asyncio.get_running_loop(), 't': t, 'discord': discord}
         code = 'async def foobar():\n\t' + code + '\nt[0] = loop.create_task(foobar())'
         exec(code, exec_globals)
         await asyncio.gather(t[0])
