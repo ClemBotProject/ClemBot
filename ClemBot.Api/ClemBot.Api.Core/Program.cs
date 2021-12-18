@@ -47,12 +47,6 @@ var builder = WebApplication.CreateBuilder(args);
 // ******
 
 // ****** Configure the host ******
-builder.Host.UseSerilog((builderContext, provider, config) => {
-    config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-        .Enrich.FromLogContext()
-        .WriteTo.Console();
-});
-
 builder.Host.ConfigureAppConfiguration((_, config) => {
     //Set our user secrets as optional so
     config.AddUserSecrets<ClemBotContext>(true);
@@ -62,6 +56,23 @@ builder.Host.ConfigureAppConfiguration((_, config) => {
         config.AddCommandLine(args);
     }
 });
+
+builder.Host.UseSerilog((context, provider, config) => {
+    if (context.HostingEnvironment.IsProduction())
+    {
+        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.Seq(context.Configuration["SeqUrl"])
+            .WriteTo.Console();
+    }
+    else
+    {
+        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.Console();
+    }
+});
+
 builder.Services.AddControllers()
     .AddFluentValidation(s => {
         s.RegisterValidatorsFromAssemblyContaining<Program>();

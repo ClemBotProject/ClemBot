@@ -30,6 +30,15 @@ services:
         - nginx-proxy
     env_file: 
         - ClemBot.Api/ClemBot.Api_env.env
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: Y
+    restart: unless-stopped
+    volumes:
+      - seq-data:/data
   # Create the python eval container for sandboxed python code execution
   snekbox:
     image: ghcr.io/python-discord/snekbox:latest
@@ -69,6 +78,7 @@ services:
 
 volumes:
   swag-config:
+  seq-data:
 
 networks:
   clembot-network:
