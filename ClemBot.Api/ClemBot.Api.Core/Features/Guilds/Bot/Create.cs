@@ -26,6 +26,8 @@ public class Create
         public ulong Id { get; set; }
 
         public string Name { get; set; } = null!;
+
+        public ulong OwnerId { get; set; }
     }
 
     public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Guild>>
@@ -35,7 +37,8 @@ public class Create
             var guild = new Guild
             {
                 Id = request.Id,
-                Name = request.Name
+                Name = request.Name,
+                OwnerId = request.OwnerId
             };
 
             if (await _context.Guilds.Where(x => x.Id == guild.Id).AnyAsync())
