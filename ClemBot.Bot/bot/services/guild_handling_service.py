@@ -43,7 +43,7 @@ class GuildHandlingService(BaseService):
                                          f'{guild.name}: {guild.id} initialization successful'
                                          )
 
-    @BaseService.Listener(Events.on_guild_role_update)
+    @BaseService.Listener(Events.on_guild_update)
     async def on_guild_edit(self, before: discord.Guild, after: discord.Guild):
         if before.name != after.name or before.owner.id != after.owner.id:
             await self.bot.guild_route.edit_guild(after.id, after.name, after.owner.id)
