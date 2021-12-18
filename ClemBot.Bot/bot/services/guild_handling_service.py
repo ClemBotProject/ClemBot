@@ -20,7 +20,7 @@ class GuildHandlingService(BaseService):
 
         await self._send_guild_joined_embed(guild)
 
-        await self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner_id)
+        await self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)
         log.info(f'Finished Loading guild {guild.name}: {guild.id}')
 
         await self.bot.guild_route.update_guild_users(guild)
@@ -43,9 +43,10 @@ class GuildHandlingService(BaseService):
                                          f'{guild.name}: {guild.id} initialization successful'
                                          )
 
-
-    async def on_guild_edit(self, guild):
-        pass
+    @BaseService.Listener(Events.on_guild_role_update)
+    async def on_guild_edit(self, before: discord.Guild, after: discord.Guild):
+        if before.name != after.name or before.owner.id != after.owner.id:
+            await self.bot.guild_route.edit_guild(after.id, after.name, after.owner.id)
 
     @BaseService.Listener(Events.on_guild_leave)
     async def on_guild_leave(self, guild) -> None:
