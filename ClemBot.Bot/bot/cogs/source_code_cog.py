@@ -37,7 +37,7 @@ class SourceCodeCog(commands.Cog):
         # Hold tight
 
         # Get the Current working directory
-        root = os.getcwd()
+        root = os.getcwd().replace('\\','/')
 
         # Split on the path delimiters, on linux its '/'
         root_list = root.split('/')
@@ -53,7 +53,7 @@ class SourceCodeCog(commands.Cog):
 
         # Walk this new path and ignore all folders in the ignore list and all invalid file types
         for root, dirs, files in os.walk(root, topdown=True):
-
+            root= root.replace('\\','/')
             # Remove hidden directories from dirs to prevent them from being traversed into further
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             if not any(folder in f'{root}/' for folder in self.ignored):
@@ -64,7 +64,7 @@ class SourceCodeCog(commands.Cog):
                     if f.split('.')[-1] not in self.allowed_file_types:
                         continue
 
-                    path = os.path.join(root, f)
+                    path = os.path.join(root, f).replace('\\','/')
                     self.bot_files[f] = FilePaths(path, path.split(f'/{root_dir}/')[1])
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=['src'])
