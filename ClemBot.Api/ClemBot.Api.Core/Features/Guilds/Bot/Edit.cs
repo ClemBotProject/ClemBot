@@ -24,6 +24,8 @@ public class Edit
         public ulong Id { get; set; }
 
         public string Name { get; set; } = null!;
+
+        public ulong OwnerId { get; set; }
     }
 
     public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
@@ -39,6 +41,7 @@ public class Edit
             }
 
             guild.Name = request.Name;
+            guild.OwnerId = request.OwnerId;
             await _context.SaveChangesAsync();
 
             return QueryResult<ulong>.Success(guild.Id);

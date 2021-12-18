@@ -95,13 +95,6 @@ public class GetSiteUser
                {
                    guild.Claims = claims.Select(x => x.ToString()).ToList();
                }
-
-               // Check if the user has admin in the guild
-               // This means they automatically have all the claims
-               if ((guild.Permissions & 0x8) == 0x8)
-               {
-                   guild.Claims = Enum.GetNames(typeof(BotAuthClaims)).ToList();
-               }
             }
 
             var siteUser = new SiteUser {User = discordUser, Guilds = userGuilds};

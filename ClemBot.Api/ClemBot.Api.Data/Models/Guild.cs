@@ -11,6 +11,8 @@ public class Guild
 
     public string? WelcomeMessage { get; set; }
 
+    public ulong OwnerId { get; set; }
+
     public List<User> Users { get; set; } = new();
     public List<GuildUser> GuildUsers { get; set; } = new();
 
