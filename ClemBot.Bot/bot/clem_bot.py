@@ -204,6 +204,9 @@ class ClemBot(commands.Bot):
     async def on_guild_join(self, guild):
         await self.publish_with_error(Events.on_guild_joined, guild)
 
+    async def on_guild_update(self, before, after):
+        await self.publish_with_error(Events.on_guild_update, before, after)
+
     async def on_guild_remove(self, guild):
         await self.publish_with_error(Events.on_guild_leave, guild)
 
