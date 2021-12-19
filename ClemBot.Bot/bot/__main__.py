@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 import discord
+import seqlog
 
 import bot.bot_secrets as bot_secrets
 from bot.api.api_client import ApiClient
@@ -20,6 +21,17 @@ def setup_logger() -> None:
 
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                         level=logging.INFO, handlers=handlers)
+
+    if url := os.environ.get('SEQ_URL'):
+        seqlog.log_to_seq(
+            # Initialize the seq logging url before the secrets are loaded
+            # this is ok because seq logging only happens in prod
+            server_url=url,
+            level=logging.INFO,
+            batch_size=5,
+            auto_flush_timeout=10,  # seconds
+            override_root_logger=True,
+        )
 
 
 def main():
