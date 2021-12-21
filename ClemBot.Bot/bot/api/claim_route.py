@@ -30,17 +30,8 @@ class ClaimRoute(BaseRoute):
         return await self._client.get(f'bot/roles/{role_id}/claimmappings')
 
     async def get_claims_user(self, user: discord.Member):
-        claims = set()
-        for role in user.roles:
-            resp = await self._client.get(f'bot/roles/{role.id}/claimmappings')
-
-            if not resp:
-                continue
-
-            for claim in resp:
-                claims.add(claim)
-
-        return claims
+        resp = await self._client.get(f'bot/users/{user.id}/{user.guild.id}/claims')
+        return resp
 
     async def check_claim_role(self, claim: Claims, role: discord.Role) -> bool:
         return claim.name in await self.get_claims_role(role.id)

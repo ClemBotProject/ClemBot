@@ -11,6 +11,8 @@ public class Guild
 
     public string? WelcomeMessage { get; set; }
 
+    public ulong OwnerId { get; set; }
+
     public List<User> Users { get; set; } = new();
     public List<GuildUser> GuildUsers { get; set; } = new();
 
@@ -27,4 +29,6 @@ public class Guild
     public List<Reminder> Reminders { get; set; } = new();
 
     public List<CustomPrefix> CustomPrefixes { get; set; } = new();
+
+    public List<GuildSetting> GuildSettings { get; set; } = new();
 }

@@ -10,7 +10,7 @@
     <div class="tile is-ancestor mx-3 my-2">
       <div class="tile is-3">
         <div class="box has-background-dark">
-          <div class="card-header">
+          <div class="card-header my-2">
             <p class="card-header-title has-text-white">Command Prefix</p>
           </div>
           <p class="card-header-title has-text-white">
@@ -40,7 +40,7 @@
       </div>
       <div v-if="canSeeWelcomeMessage" class="tile is-parent">
         <div class="tile is-child box has-background-dark mx-3">
-          <div class="card-header">
+          <div class="card-header my-2">
             <p class="card-header-title has-text-white">Welcome Message</p>
           </div>
           <div class="box has-background-black">
@@ -72,6 +72,27 @@
           </div>
         </div>
       </div>
+      <div v-if="canSeeGuildConfig" class="tile is-parent">
+        <div class="tile is-child box has-background-dark mx-3">
+          <div class="card-header my-2">
+            <p class="card-header-title has-text-white">Guild Config</p>
+          </div>
+          <div class="box has-background-black">
+            <div class="content is-black my-2">
+              <b-field>
+                <b-switch
+                  :disabled="!canSeeGuildConfig"
+                  v-model="canEmbedLinks"
+                  @input="embedMessageSwitch"
+                  type="is-success"
+                >
+                  Allow message link embeds</b-switch
+                >
+              </b-field>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -90,6 +111,7 @@ export default Vue.extend({
     let inputPrefix: string = ''
     let guildWelcomeMessage: string = ''
     let inputWelcomeMessage: string = ''
+    let canEmbedLinks: boolean = false
 
     return {
       inputPrefix,
@@ -97,6 +119,7 @@ export default Vue.extend({
       guildPrefix,
       guildWelcomeMessage,
       inputWelcomeMessage,
+      canEmbedLinks,
     }
   },
 
@@ -108,8 +131,17 @@ export default Vue.extend({
     canSetWelcomeMessage: function (): boolean {
       return this.hasClaim(BotAuthClaims.welcomeMessageModify)
     },
+
     canSetPrefix: function (): boolean {
       return this.hasClaim(BotAuthClaims.customPrefixSet)
+    },
+
+    canSeeGuildConfig: function (): boolean {
+      return this.hasClaim(BotAuthClaims.guildSettingsView)
+    },
+
+    canEditGuildConfig: function (): boolean {
+      return this.hasClaim(BotAuthClaims.guildSettingsEdit)
     },
   },
 
@@ -123,20 +155,29 @@ export default Vue.extend({
       this.guildPrefix =
         (await this.$api.customPrefix.getCustomPrefix(guildId)) ??
         this.$config.defaultPrefix
-    } 
-    catch(e) {
+    } catch (e) {
       console.log(e)
       this.guildPrefix = 'Retrieving Guild Prefix failed'
     }
 
     try {
-      this.guildWelcomeMessage =
-        (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
-        'No Welcome Message set'
-    }
-    catch(e) {
+      if (this.canSeeWelcomeMessage){
+        this.guildWelcomeMessage =
+          (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
+          'No Welcome Message set'
+      }
+    } catch (e) {
       console.log(e)
       this.guildWelcomeMessage = 'Retrieving Guild Welcome message failed'
+    }
+
+    try {
+      if (this.canSeeGuildConfig){
+        this.canEmbedLinks =
+          (await this.$api.guildSettings.getCanEmbedLink(guildId)) ?? false
+      }
+    } catch (e) {
+      console.log(e)
     }
   },
 
@@ -161,6 +202,12 @@ export default Vue.extend({
         await this.$api.welcomeMessage.getWelcomeMessage(this.guildId)
       this.inputWelcomeMessage = ''
     },
+
+    async embedMessageSwitch() {
+      await this.$api.guildSettings.setCanEmbedLink(this.guildId, this.canEmbedLinks)
+      this.canEmbedLinks = await this.$api.guildSettings.getCanEmbedLink(this.guildId)
+    },
+
     hasClaim(claim: BotAuthClaims): boolean {
       // @ts-ignore
       let guildId: string = this.$route.params.id

@@ -157,7 +157,7 @@ class ClemBot(commands.Bot):
         claims_str = '\n'.join(command.claims)
         raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
                                 f'\n **Help:** For more information on how claims work please visit my website [Link!]'
-                                f'(https://clembot.io/wiki)\n'
+                                f'({bot_secrets.secrets.site_url}wiki/claims)\n'
                                 f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
 
     async def claims_check(self, ctx: commands.Context):
@@ -203,6 +203,9 @@ class ClemBot(commands.Bot):
 
     async def on_guild_join(self, guild):
         await self.publish_with_error(Events.on_guild_joined, guild)
+
+    async def on_guild_update(self, before, after):
+        await self.publish_with_error(Events.on_guild_update, before, after)
 
     async def on_guild_remove(self, guild):
         await self.publish_with_error(Events.on_guild_leave, guild)

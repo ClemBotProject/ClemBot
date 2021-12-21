@@ -4,6 +4,8 @@ import bot.extensions as ext
 import discord.ext.commands as commands
 
 from typing import Optional
+
+from bot import bot_secrets
 from bot.models import Tag
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
@@ -56,8 +58,8 @@ class TagCog(commands.Cog):
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         # pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
-
-        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags')
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags', tags_url)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
@@ -201,7 +203,8 @@ class TagCog(commands.Cog):
             return
 
         # chunk the unclaimed tags into pages
-        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags')
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags', tags_url)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
@@ -295,12 +298,13 @@ class TagCog(commands.Cog):
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
-    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str):
+    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str, url: str):
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
         for chunk in self.chunk_list(tags_list, n):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
-            embed.set_footer(text=f'Use tags with "{prefix} name", or inline with "$name"')
+            embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
+            embed.description = f'To view all tags please visit: [site]({url})'
             embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
             for tag in chunk:
                 embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')

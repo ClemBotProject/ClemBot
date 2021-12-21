@@ -12,6 +12,7 @@ using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Authorization;
 using ClemBot.Api.Services.Guilds.Models;
+using ClemBot.Api.Services.GuildSettings;
 using ClemBot.Api.Services.Jobs;
 using FluentValidation.AspNetCore;
 using LinqToDB.EntityFrameworkCore;
@@ -47,12 +48,6 @@ var builder = WebApplication.CreateBuilder(args);
 // ******
 
 // ****** Configure the host ******
-builder.Host.UseSerilog((builderContext, provider, config) => {
-    config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-        .Enrich.FromLogContext()
-        .WriteTo.Console();
-});
-
 builder.Host.ConfigureAppConfiguration((_, config) => {
     //Set our user secrets as optional so
     config.AddUserSecrets<ClemBotContext>(true);
@@ -62,6 +57,23 @@ builder.Host.ConfigureAppConfiguration((_, config) => {
         config.AddCommandLine(args);
     }
 });
+
+builder.Host.UseSerilog((context, provider, config) => {
+    if (context.HostingEnvironment.IsProduction())
+    {
+        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.Seq(context.Configuration["SeqUrl"])
+            .WriteTo.Console();
+    }
+    else
+    {
+        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.Console();
+    }
+});
+
 builder.Services.AddControllers()
     .AddFluentValidation(s => {
         s.RegisterValidatorsFromAssemblyContaining<Program>();
@@ -184,7 +196,8 @@ builder.Services.AddAuthentication(options => {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
             ValidAudience = jwtTokenConfig.Audience,
-            ValidateAudience = true
+            ValidateAudience = true,
+            ValidateLifetime = true
         };
     });
 
@@ -195,11 +208,11 @@ builder.Services.AddAuthorization(options => {
 });
 // Add authorization policy providers
 builder.Services.AddScoped<IAuthorizationHandler, BotMasterAuthHandler>();
-//builder.Services.AddScoped<IAuthorizationHandler, GuildSandboxAuthHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, GuildSandboxPolicyProvider>();
 
 // Register services
 builder.Services.AddScoped<IGuildSandboxAuthorizeService, GuildSandboxAuthorizeService>();
+builder.Services.AddScoped<IGuildSettingsService, GuildSettingsService>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 // ******

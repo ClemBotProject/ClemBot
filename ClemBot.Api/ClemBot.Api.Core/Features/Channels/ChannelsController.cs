@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Channels.Bot;
 using MediatR;
@@ -22,6 +23,7 @@ public class ChannelsController : ControllerBase
     }
 
     [HttpGet("bot/[controller]")]
+    [BotMasterAuthorize]
     public async Task<IActionResult> Index() =>
         await _mediator.Send(new Index.Query()) switch
         {
@@ -30,6 +32,7 @@ public class ChannelsController : ControllerBase
         };
 
     [HttpGet("bot/[controller]/{Id}")]
+    [BotMasterAuthorize]
     public async Task<IActionResult> Details([FromRoute] Details.Query query) =>
         await _mediator.Send(query) switch
         {
@@ -38,6 +41,7 @@ public class ChannelsController : ControllerBase
         };
 
     [HttpDelete("bot/[controller]/{Id}")]
+    [BotMasterAuthorize]
     public async Task<IActionResult> Delete([FromRoute] Delete.Query query) =>
         await _mediator.Send(query) switch
         {
@@ -47,6 +51,7 @@ public class ChannelsController : ControllerBase
         };
 
     [HttpPost("bot/[controller]")]
+    [BotMasterAuthorize]
     public async Task<IActionResult> Create(Create.Command command) =>
         await _mediator.Send(command) switch
         {
@@ -56,6 +61,7 @@ public class ChannelsController : ControllerBase
         };
 
     [HttpPatch("bot/[controller]")]
+    [BotMasterAuthorize]
     public async Task<IActionResult> Edit(Edit.Command command) =>
         await _mediator.Send(command) switch
         {
