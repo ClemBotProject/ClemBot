@@ -226,9 +226,10 @@ class ApiClient:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
-        # Check if the response returned an HTTP 401 Unauthorized with raise_for_status set to False
-        # We still need to handle that case and put the client in reconnect mode
-        if resp.status == HTTPStatus.UNAUTHORIZED:
+        # Check if the response returned an HTTP 401 Unauthorized or 403 Forbidden
+        # with raise_for_status set to False We still need to handle that case
+        # and put the client in reconnect mode
+        if resp.status == HTTPStatus.UNAUTHORIZED or resp.status == HTTPStatus.FORBIDDEN:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
