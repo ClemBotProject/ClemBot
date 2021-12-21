@@ -22,7 +22,7 @@ GEOMETRY_OPTIONS = {'margin': '0in'}
 DOCUMENT_OPTIONS = 'preview, fleqn, border=5pt, varwidth=false'
 # Temporary file save location - change if needed!
 ASSETS_FOLDER = 'bot/cogs/latex_cog/assets/'
-FILE_EXTENSIONS = ['.png', '.tex', '.pdf', '.fdb_latexmk', '.div', '.aux', '.log']
+FILE_EXTENSIONS = ['.png', '.tex', '.pdf', '.aux', '.log']
 
 
 def gen_tex_images(file_name: str, doc: pylatex.Document):
@@ -40,8 +40,8 @@ def _cleanup_files(file_name: str):
     for extension in FILE_EXTENSIONS:
         try:
             os.remove(file_name + extension)
-        except:
-            pass
+        except OSError:
+            log.error(f'Failed to delete ${file_name + extension}')
 
 
 class LatexCog(commands.Cog):
