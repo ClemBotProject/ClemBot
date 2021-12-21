@@ -12,6 +12,7 @@ using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Authorization;
 using ClemBot.Api.Services.Guilds.Models;
+using ClemBot.Api.Services.GuildSettings;
 using ClemBot.Api.Services.Jobs;
 using FluentValidation.AspNetCore;
 using LinqToDB.EntityFrameworkCore;
@@ -206,11 +207,11 @@ builder.Services.AddAuthorization(options => {
 });
 // Add authorization policy providers
 builder.Services.AddScoped<IAuthorizationHandler, BotMasterAuthHandler>();
-//builder.Services.AddScoped<IAuthorizationHandler, GuildSandboxAuthHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, GuildSandboxPolicyProvider>();
 
 // Register services
 builder.Services.AddScoped<IGuildSandboxAuthorizeService, GuildSandboxAuthorizeService>();
+builder.Services.AddScoped<IGuildSettingsService, GuildSettingsService>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 // ******
