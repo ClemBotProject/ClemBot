@@ -1,4 +1,3 @@
-import { github } from '@nuxtjs/auth-next'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 interface Prefix {
