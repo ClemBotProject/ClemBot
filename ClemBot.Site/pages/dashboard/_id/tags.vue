@@ -15,7 +15,7 @@
     >
       Create Tag
     </b-button>
-    <div v-if="canAddTag" class="box has-background-dark">
+    <div v-if="addTag" class="box has-background-dark">
       <div class="columns">
         <div class="column is-3">
           <b-field>
