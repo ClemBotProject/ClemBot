@@ -161,17 +161,21 @@ export default Vue.extend({
     }
 
     try {
-      this.guildWelcomeMessage =
-        (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
-        'No Welcome Message set'
+      if (this.canSeeWelcomeMessage){
+        this.guildWelcomeMessage =
+          (await this.$api.welcomeMessage.getWelcomeMessage(guildId)) ??
+          'No Welcome Message set'
+      }
     } catch (e) {
       console.log(e)
       this.guildWelcomeMessage = 'Retrieving Guild Welcome message failed'
     }
 
     try {
-      this.canEmbedLinks =
-        (await this.$api.guildSettings.getCanEmbedLink(guildId)) ?? false
+      if (this.canSeeGuildConfig){
+        this.canEmbedLinks =
+          (await this.$api.guildSettings.getCanEmbedLink(guildId)) ?? false
+      }
     } catch (e) {
       console.log(e)
     }
