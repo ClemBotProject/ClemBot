@@ -74,6 +74,7 @@ class RandomCog(commands.Cog):
 
         if rolls > DICE_LIMIT or limit > DICE_LIMIT:
             embed = discord.Embed(title='Error:', description=f'Values exceed the limit of {DICE_LIMIT}', color=Colors.Error)
+            await ctx.send(embed=embed)
             return
 
         result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
