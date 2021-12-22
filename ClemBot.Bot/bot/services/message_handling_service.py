@@ -249,14 +249,15 @@ class MessageHandlingService(BaseService):
         Args:
             message (discord.Message): the original message containing the link
         """
-        if not await self.bot.guild_route.get_can_embed_link(message.guild.id):
-            return
 
         pattern = r'^http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})\n*$'  # noqa: E501
 
         result = re.search(pattern, message.content)
 
         if not result:
+            return
+
+        if not await self.bot.guild_route.get_can_embed_link(message.guild.id):
             return
 
         matches = result.groupdict()
