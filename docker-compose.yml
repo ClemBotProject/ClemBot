@@ -12,7 +12,7 @@ services:
       - URL=clembot.io
       - VALIDATION=http
       - EMAIL=jaymaddencox@gmail.com
-      - ONLY_SUBDOMAINS=false
+      - SUBDOMAINS=www,logs
       - STAGING=false
     volumes:
       - swag-config:/config
@@ -26,31 +26,46 @@ services:
     restart: always
     image: ghcr.io/clembotproject/clembot.api:master
     networks:
-        - clembot-network 
+        - clembot-network
         - nginx-proxy
-    env_file: 
+    env_file:
         - ClemBot.Api/ClemBot.Api_env.env
+  seq:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: Y
+      SEQ_FIRSTRUN_ADMINUSERNAME: ${SEQ_FIRSTRUN_ADMINUSERNAME}
+      SEQ_FIRSTRUN_ADMINPASSWORDHASH: ${SEQ_FIRSTRUN_ADMINPASSWORDHASH}
+    restart: unless-stopped
+    depends_on:
+      - nginx-proxy
+      - clembot.api
+    networks:
+      - clembot-network
+      - nginx-proxy
+    volumes:
+      - seq-data:/data
   # Create the python eval container for sandboxed python code execution
   snekbox:
     image: ghcr.io/python-discord/snekbox:latest
     init: true
     ipc: none
-    depends_on: 
+    depends_on:
       - nginx-proxy
-    networks: 
-      - clembot-network 
+    networks:
+      - clembot-network
     privileged: true
   # Create the Bot process to server as the dapi frontend
   clembot.bot:
     image: ghcr.io/clembotproject/clembot.bot:master
     restart: always
     user: root
-    depends_on: 
+    depends_on:
       - nginx-proxy
       - clembot.api
-    networks: 
-      - clembot-network 
-    env_file: 
+    networks:
+      - clembot-network
+    env_file:
       - ClemBot.Bot/ClemBot.Bot_env.env
     volumes:
       - ~/Logs:/ClemBot.Bot/Logs
@@ -58,17 +73,18 @@ services:
   clembot.site:
     image: ghcr.io/clembotproject/clembot.site:master
     restart: always
-    depends_on: 
+    depends_on:
       - nginx-proxy
       - clembot.api
-    networks: 
-      - clembot-network 
+    networks:
+      - clembot-network
       - nginx-proxy
-    env_file: 
+    env_file:
       - ClemBot.Site/ClemBot.Site_env.env
 
 volumes:
   swag-config:
+  seq-data:
 
 networks:
   clembot-network:

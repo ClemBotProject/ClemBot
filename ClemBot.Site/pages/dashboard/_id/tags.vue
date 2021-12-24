@@ -96,14 +96,18 @@ export default Vue.extend({
 
   async fetch() {
     let guildId = this.$route.params.id
-    this.tags = (await this.$api.tags.getGuildTags(guildId)) ?? []
+    try {
+      this.tags = (await this.$api.tags.getGuildTags(guildId)) ?? []
+    }
+    catch(e){
+      this.tags = []
+    }
   },
 
   methods: {
     async createTag() {
       // @ts-ignore
       let userId = this.$auth.user?.user.user.id
-      debugger
       let guildId: string = this.$route.params.id
       try {
         await this.$api.tags.createTag(

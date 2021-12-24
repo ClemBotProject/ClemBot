@@ -78,6 +78,16 @@ public class UsersController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpGet("bot/[controller]/{UserId}/{GuildId}/claims")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Claims([FromRoute] Bot.GetGuildClaims.Query command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpPost("bot/[controller]/{Id}/updateroles")]
     [BotMasterAuthorize]
     public async Task<IActionResult> UpdateRoles(ulong Id, Bot.UpdateRoles.Command command) =>

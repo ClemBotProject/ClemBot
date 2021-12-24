@@ -212,9 +212,10 @@ class ApiClient:
 
         # The request errored out and had raise_for_status enabled
         except aiohttp.ClientResponseError as e:
-            # Check if the error was an HTTP 401 Unauthorized, this means we need to try
-            # and reconnect to the api before we raise the error further
-            if e.status == HTTPStatus.UNAUTHORIZED:
+            # Check if the error was an HTTP 401 Unauthorized or HTTP 403 Forbidden,
+            # this means we need to try and reconnect to the api
+            # before we raise the error further
+            if e.status == HTTPStatus.UNAUTHORIZED or e.status == HTTPStatus.FORBIDDEN:
                 asyncio.create_task(self._disconnected())
             # Rethrow the error so it can be reported by the handlers
             raise e
@@ -225,9 +226,10 @@ class ApiClient:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
-        # Check if the response returned an HTTP 401 Unauthorized with raise_for_status set to False
-        # We still need to handle that case and put the client in reconnect mode
-        if resp.status == HTTPStatus.UNAUTHORIZED:
+        # Check if the response returned an HTTP 401 Unauthorized or 403 Forbidden
+        # with raise_for_status set to False We still need to handle that case
+        # and put the client in reconnect mode
+        if resp.status == HTTPStatus.UNAUTHORIZED or resp.status == HTTPStatus.FORBIDDEN:
             asyncio.create_task(self._disconnected())
             raise ConnectionError('Request to ClemBot.Api failed')
 
