@@ -351,5 +351,6 @@ class TagCog(commands.Cog):
 
         return pages
 
+
 def setup(bot):
     bot.add_cog(TagCog(bot))
