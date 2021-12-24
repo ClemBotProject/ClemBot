@@ -18,6 +18,7 @@ from bot.utils.converters import Duration
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
 
+DICE_LIMIT = 20
 
 class RandomCog(commands.Cog):
 
@@ -69,6 +70,11 @@ class RandomCog(commands.Cog):
             rolls, limit = map(int, dice.split('d'))
         except Exception:
             await ctx.send('Entry has to be in a XdY format! See the help command for an example.')
+            return
+
+        if rolls > DICE_LIMIT or limit > DICE_LIMIT:
+            embed = discord.Embed(title='Error:', description=f'Values exceed the limit of {DICE_LIMIT}', color=Colors.Error)
+            await ctx.send(embed=embed)
             return
 
         result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))

@@ -31,9 +31,11 @@ public static class UserExtensions
                    .AsNoTracking()
                    .Where(x => x.Id == userId)
                    .SelectMany(
-                       b => b.Roles.SelectMany(
-                           c => c.Claims.Select(
-                               d => d.Claim)))
+                       b => b.Roles
+                           .Where(e => e.GuildId == guildId)
+                           .SelectMany(
+                               c => c.Claims.Select(
+                                   d => d.Claim)))
                    .ToListAsync();
 
     /// <summary>

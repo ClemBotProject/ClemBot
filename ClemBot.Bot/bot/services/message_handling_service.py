@@ -91,7 +91,10 @@ class MessageHandlingService(BaseService):
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
         log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
-        # await self.handle_message_links(message)
+
+        # Check if the message is a discord message link and check if this server has
+        # Enabled embed message links
+        await self.handle_message_links(message)
 
         # Primary entry point for handling commands
         await self.bot.process_commands(message)
@@ -254,9 +257,11 @@ class MessageHandlingService(BaseService):
         if not result:
             return
 
-        matches = result.groupdict()
-        avi = message.author.display_avatar.url_as(static_format='png')
+        if not await self.bot.guild_route.get_can_embed_link(message.guild.id):
+            return
 
+        matches = result.groupdict()
+        avi = message.author.display_avatar.url
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(matches['channel_id'])
         link_message = await link_channel.fetch_message(matches['message_id'])

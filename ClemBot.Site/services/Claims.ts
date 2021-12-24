@@ -19,5 +19,8 @@ export enum BotAuthClaims
     moderationMute = "moderation_mute",
     moderationPurge = "moderation_purge",
     moderationInfractionView = "moderation_infraction_view",
-    dashboardEdit = "dashboard_edit"
+    dashboardView = "dashboard_view",
+    dashboardEdit = "dashboard_edit",
+    guildSettingsView = "guild_settings_view",
+    guildSettingsEdit = "guild_settings_edit"
 }
