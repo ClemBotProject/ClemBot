@@ -4,6 +4,8 @@ import bot.extensions as ext
 import discord.ext.commands as commands
 
 from typing import Optional
+
+from bot import bot_secrets
 from bot.models import Tag
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
@@ -56,10 +58,49 @@ class TagCog(commands.Cog):
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         # pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
-
-        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags')
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags', tags_url)
 
         # send the pages to the paginator service
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
+                                         pages=pages,
+                                         author=ctx.author,
+                                         channel=ctx.channel,
+                                         timeout=360)
+
+
+    @tag.command(aliases=['claimed'])
+    @ext.long_help(
+        'Lists all tags owned by a given user or the called user if no user is provided.'
+    )
+    @ext.short_help('Lists owned tags')
+    @ext.example(['tag owned', 'tag owned @user'])
+    # returns a list of all tags owned by the calling user or given user returned in pages
+    async def owned(self, ctx: commands.Context, user: Optional[discord.Member] = None):
+        if not user:
+            user = ctx.author
+        tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
+
+        ownedTags = []
+        for tag in tags:
+            if tag.user_id == user.id:
+                ownedTags.append(tag)
+        
+        if not ownedTags:
+            embed = discord.Embed(title=f'{user.display_name}\'s Tags', color=Colors.ClemsonOrange)
+            embed.add_field(name='Tags', value='User does not own any tags', inline=True)
+            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            await ctx.send(embed=embed)
+            return
+
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags', tags_url)
+        for tag in ownedTags:
+            embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{tag.name}')
+            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            embed.add_field(name='Content', value=tag.content)
+            embed.add_field(name='Uses', value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
+            pages.append(embed)
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=pages,
                                          author=ctx.author,
@@ -135,7 +176,8 @@ class TagCog(commands.Cog):
         embed.add_field(name='Uses', value=f'{tag.use_count}')
         embed.add_field(name='Creation Date', value=tag.creation_date)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
     @tag.command()
     @ext.required_claims(Claims.tag_add)
@@ -200,7 +242,8 @@ class TagCog(commands.Cog):
             return
 
         # chunk the unclaimed tags into pages
-        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags')
+        tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
+        pages = self.chunked_tags(unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, 'Unclaimed Tags', tags_url)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
@@ -294,12 +337,13 @@ class TagCog(commands.Cog):
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
 
-    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str):
+    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str, url: str):
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
         for chunk in self.chunk_list(tags_list, n):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
-            embed.set_footer(text=f'Use tags with "{prefix} name", or inline with "$name"')
+            embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
+            embed.description = f'To view all tags please visit: [site]({url})'
             embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
             for tag in chunk:
                 embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')

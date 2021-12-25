@@ -5,6 +5,7 @@ import pandas as pd
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.consts import GuildSettings
 
 
 class GuildRoute(BaseRoute):
@@ -12,13 +13,14 @@ class GuildRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def add_guild(self, guild_id: int, name: str):
+    async def add_guild(self, guild_id: int, name: str, owner_id):
         if await self._client.get(f'bot/guilds/{guild_id}'):
             return
 
         json = {
             'Id': guild_id,
-            'Name': name
+            'Name': name,
+            'OwnerId': owner_id
         }
         await self._client.post('bot/guilds', data=json)
 
@@ -44,10 +46,11 @@ class GuildRoute(BaseRoute):
 
         return guild['users']
 
-    async def edit_guild(self, guild_id: int, name: str):
+    async def edit_guild(self, guild_id: int, name: str, owner_id: int):
         json = {
             'Id': guild_id,
             'Name': name,
+            'OwnerId': owner_id
         }
 
         await self._client.patch('bot/guilds', data=json)
@@ -136,3 +139,8 @@ class GuildRoute(BaseRoute):
         }
 
         await self._client.patch(f'bot/guilds/update/threads', data=json)
+
+    async def get_can_embed_link(self, guild_id: int):
+        resp = await self._client.get(f'guildsettings/{guild_id}/{GuildSettings.allow_embed_links.name}')
+        return resp['value']
+

@@ -38,6 +38,10 @@ class OwnerDesignatedChannels(DesignatedChannelBase):
         return member in OwnerDesignatedChannels.__members__
 
 
+class GuildSettings(Enum):
+    allow_embed_links = auto()
+
+
 class Claims(Enum):
     """Represents all possible authorization claims that server roles can have"""
 
@@ -60,6 +64,10 @@ class Claims(Enum):
     moderation_mute = auto()
     moderation_purge = auto()
     moderation_infraction_view = auto()
+    dashboard_view = auto()
+    dashboard_edit = auto()
+    guild_settings_view = auto()
+    guild_settings_edit = auto()
 
     @staticmethod
     def get_claims_str():
