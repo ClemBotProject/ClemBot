@@ -40,7 +40,12 @@ class TagCog(commands.Cog):
             if not (tag := await self._check_tag_exists(ctx, tag_name)):
                 return
             await self.bot.tag_route.add_tag_use(ctx.guild.id, tag_name, ctx.channel.id, ctx.author.id)
-            return await ctx.send(tag.content)
+
+            msg = await ctx.send(tag.content)
+            return await self.bot.messenger.publish(Events.on_set_deletable,
+                                                    msg=msg,
+                                                    author=ctx.author,
+                                                    timeout=60)
 
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
 
@@ -68,7 +73,6 @@ class TagCog(commands.Cog):
                                          channel=ctx.channel,
                                          timeout=360)
 
-
     @tag.command(aliases=['claimed'])
     @ext.long_help(
         'Lists all tags owned by a given user or the called user if no user is provided.'
@@ -85,7 +89,7 @@ class TagCog(commands.Cog):
         for tag in tags:
             if tag.user_id == user.id:
                 ownedTags.append(tag)
-        
+
         if not ownedTags:
             embed = discord.Embed(title=f'{user.display_name}\'s Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Tags', value='User does not own any tags', inline=True)
