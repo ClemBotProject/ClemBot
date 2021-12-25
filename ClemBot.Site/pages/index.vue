@@ -77,7 +77,7 @@
                 </div>
               </div>
               <div id="nav-tile" class="tile is-parent is-vertical">
-                <nuxt-link :to="{ path: '/wiki' }">
+                <nuxt-link :to="{ path: '/wiki/intro' }">
                   <article
                     id="nav-child"
                     class="tile is-child notification is-primary"
