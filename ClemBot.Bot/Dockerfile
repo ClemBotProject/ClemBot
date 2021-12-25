@@ -12,8 +12,6 @@ ENV VIRTUAL_ENV "/venv"
 
 RUN apt-get update && apt-get install -y git
 
-RUN apt-get install texlive-latex-base
-
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 
