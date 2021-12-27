@@ -43,6 +43,10 @@ class ClemBot(commands.Bot):
                                     disconnect_callback=self.on_backend_disconnect,
                                     bot_only=bot_secrets.secrets.bot_only)
 
+        # Bool to indicate if the bot is still in its startup procedure, if it is then
+        # Dont forward events until its done
+        self.is_starting_up = True
+
         self.messenger: Messenger = messenger
         self.scheduler: Scheduler = scheduler
 
@@ -67,10 +71,6 @@ class ClemBot(commands.Bot):
 
         self.load_cogs()
         self.active_services = {}
-
-        # Bool to indicate if the bot is still in its startup procedure, if it is then
-        # Dont forward events until its done
-        self.is_starting_up = True
 
         # Create a task to handle service and api startup
         self.loop.create_task(self.bot_startup())
