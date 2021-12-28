@@ -100,7 +100,6 @@ class MessageHandlingService(BaseService):
         await self.bot.process_commands(message)
 
         if not message.content:
-            log.warning('Invalid Message event received')
             return
 
         await self.batch_send_message(message)
@@ -142,6 +141,7 @@ class MessageHandlingService(BaseService):
                                          after.guild.id,
                                          embed)
 
+    # noinspection PyArgumentList
     @BaseService.Listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
 
@@ -178,7 +178,7 @@ class MessageHandlingService(BaseService):
                     log.info(f'Uncached message edited in #{channel.name} By: \
                         {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["Content"]}')
                 except KeyError:
-                    log.error(json.dumps(payload.data))
+                    log.info('Uncached invalid message event received: {data}', data=json.dumps(payload.data))
 
                 embed = discord.Embed(title=f':repeat: **Uncached message edited in #{channel.name}**',
                                       color=Colors.ClemsonOrange)

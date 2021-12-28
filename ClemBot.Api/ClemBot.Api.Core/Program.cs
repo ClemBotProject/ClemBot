@@ -63,7 +63,7 @@ builder.Host.UseSerilog((context, provider, config) => {
     {
         config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
-            .WriteTo.Seq(context.Configuration["SeqUrl"])
+            .WriteTo.Seq(context.Configuration["SeqUrl"], apiKey: context.Configuration["SeqApiKey"])
             .WriteTo.Console();
     }
     else

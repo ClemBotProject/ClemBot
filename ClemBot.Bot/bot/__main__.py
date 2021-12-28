@@ -23,10 +23,16 @@ def setup_logger() -> None:
                         level=logging.INFO, handlers=handlers)
 
     if url := os.environ.get('SEQ_URL'):
+        key = os.environ.get('SEQ_BOT_KEY')
+
+        if not key:
+            raise Exception('SEQ_BOT_KEY not found but SEQ_URL was specified')
+
         seqlog.log_to_seq(
             # Initialize the seq logging url before the secrets are loaded
             # this is ok because seq logging only happens in prod
             server_url=url,
+            api_key=key,
             level=logging.INFO,
             batch_size=5,
             auto_flush_timeout=10,  # seconds
@@ -55,13 +61,14 @@ def main():
             with open("BotSecrets.json") as f:
                 bot_secrets.secrets.load_development_secrets(f.read())
         except FileNotFoundError as e:
-            bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
+            bot_log.fatal(f'{e}: The bot could not find your BotSecrets Json File')
             sys.exit(0)
         except KeyError as e:
-            bot_log.error(f'{e} is not a valid key in BotSecrets')
+            bot_log.fatal(f'{e} is not a valid key in BotSecrets')
             sys.exit(0)
         except Exception as e:
-            bot_log.error(e)
+            bot_log.fatal(e)
+            sys.exit(0)
 
     # get the default prefix for the bot instance
     prefix = bot_secrets.secrets.bot_prefix
