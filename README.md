@@ -94,6 +94,8 @@ The Api utilizes the following technologies
 ClemBot.Api.Data folder contains the Entity Framework Code first db models and contexts
 </br>
 ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in the `Features` folder
+</br>
+ClemBot.Api.Services containes the caching and authorization services that perform more complex tasks
 
 ## ClemBot Pipeline Status
 
