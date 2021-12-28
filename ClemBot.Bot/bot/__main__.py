@@ -30,7 +30,7 @@ def setup_logger() -> None:
             level=logging.INFO,
             batch_size=5,
             auto_flush_timeout=10,  # seconds
-            override_root_logger=True,
+            override_root_logger=False,
         )
     else:
         handlers = [logging.StreamHandler(sys.stdout)]
