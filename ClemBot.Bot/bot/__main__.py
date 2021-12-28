@@ -16,12 +16,6 @@ from bot.utils.scheduler import Scheduler
 
 
 def setup_logger() -> None:
-    handlers = []
-    handlers.append(logging.StreamHandler(sys.stdout))
-
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                        level=logging.INFO, handlers=handlers)
-
     if url := os.environ.get('SEQ_URL'):
         key = os.environ.get('SEQ_BOT_KEY')
 
@@ -38,6 +32,10 @@ def setup_logger() -> None:
             auto_flush_timeout=10,  # seconds
             override_root_logger=True,
         )
+    else:
+        handlers = [logging.StreamHandler(sys.stdout)]
+        logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                            level=logging.INFO, handlers=handlers)
 
 
 def main():
