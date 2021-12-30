@@ -4,6 +4,7 @@ import discord
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -15,12 +16,18 @@ class ChannelHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_channel_create)
     async def channel_create(self, channel):
-        log.info(f'New channel created {channel.name}:{channel.id} in guild: {channel.guild.name}:{channel.guild.id}')
+        log.info('Channel created {channel} in guild: {guild}',
+                 channel=serializers.log_channel(channel),
+                 guild=serializers.log_guild(channel.guild))
+
         await self.bot.channel_route.create_channel(channel.id, channel.name, channel.guild.id, raise_on_error=True)
 
     @BaseService.Listener(Events.on_guild_channel_delete)
     async def channel_delete(self, channel):
-        log.info(f'Channel deleted {channel.name}:{channel.id} in guild: {channel.guild.name}:{channel.guild.id}')
+        log.info('Channel deleted {channel} in guild: {guild}',
+                 channel=serializers.log_channel(channel),
+                 guild=serializers.log_guild(channel.guild))
+
         await self.bot.channel_route.remove_channel(channel.id, raise_on_error=True)
 
     @BaseService.Listener(Events.on_new_guild_initialized)

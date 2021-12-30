@@ -5,6 +5,7 @@ import discord
 from bot.consts import Colors, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ class GuildHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_leave)
     async def on_guild_leave(self, guild) -> None:
-        log.info('Bot removed from {guild_name}: {guild_id}', guild_name=guild.name, guild_id=guild.id)
+        log.info('Bot removed from {guild}', guild=serializers.log_guild(guild))
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
                                          OwnerDesignatedChannels.server_join_log,
