@@ -7,6 +7,7 @@ from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, Moderation, Infractions
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -130,9 +131,10 @@ class ModerationService(BaseService):
         if not mute_role:
             return
 
-        log.info('Setting mute role perms for channel: {channel} in guild {guild_id} ',
-                 channel=channel.name,
-                 guild_id=channel.guild.id)
+        log.info('Setting mute role perms for channel: {channel} in guild {guild} ',
+                 channel=serializers.log_channel(channel),
+                 guild_id=serializers.log_guild(channel.guild))
+
         await channel.set_permissions(mute_role,
                                       speak=False,
                                       connect=False,

@@ -5,6 +5,7 @@ import discord
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -35,10 +36,10 @@ class TagService(BaseService):
 
             await self.bot.tag_route.add_tag_use(message.guild.id, match, message.channel.id, message.author.id)
 
-            log.info('Tag "{match}" invoked in guild: {guild_id} by: {author_id}',
+            log.info('Tag "{match}" invoked in guild: {guild} by: {author}',
                      match=match,
-                     guild_id=message.guild.id,
-                     author_id=message.author.id)
+                     guild=serializers.log_guild(message.author.guild),
+                     author=serializers.log_member(message.author))
 
         if not tag_found:
             return

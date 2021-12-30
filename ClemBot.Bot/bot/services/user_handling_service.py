@@ -7,6 +7,7 @@ import discord
 from bot.consts import Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -18,11 +19,9 @@ class UserHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_user_joined)
     async def on_user_joined(self, user: discord.Member) -> None:
-        log.info('"{user_name}:{user_id}" has joined guild "{guild_name}:{guild_id}"',
-                 user_name=user.name,
-                 user_id=user.id,
-                 guild_name=user.guild.name,
-                 guild_id=user.guild.id)
+        log.info('"{member}" has joined guild "{guild}"',
+                 member=serializers.log_member(user),
+                 guild=serializers.log_guild(user.guild))
 
         db_user = await self.bot.user_route.get_user(user.id)
         if not db_user:
@@ -36,11 +35,9 @@ class UserHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_user_removed)
     async def on_user_removed(self, user) -> None:
-        log.info('"{user_name}:{user_id}" has left guild "{guild_name}:{guild_id}"',
-                 user_name=user.name,
-                 user_id=user.id,
-                 guild_name=user.guild.name,
-                 guild_id=user.guild.id)
+        log.info('"{user}" has left guild "{guild}"',
+                 user=serializers.log_user(user),
+                 guild=serializers.log_guild(user.guild))
 
         await self.bot.user_route.remove_user_guild(user.id, user.guild.id)
 
