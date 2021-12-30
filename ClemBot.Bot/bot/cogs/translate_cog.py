@@ -120,8 +120,6 @@ class TranslateCog(commands.Cog):
 
         text = ' '.join(input[2:])
 
-        log.info(f'Input Lang Code: {input_lang}')
-        log.info(f'Output Lang Code: {output_lang}')
         params = {
             'api-version': '3.0',
             'from': input_lang,
@@ -179,8 +177,6 @@ class TranslateCog(commands.Cog):
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
 
-        log.info(response[0]['detectedLanguage'])
-        log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)

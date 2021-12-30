@@ -99,7 +99,7 @@ class ApiClient:
         await self._internal_connect()
 
     async def _internal_connect(self):
-        log.info(f'Connecting to ClemBot.Api at URL: {bot_secrets.secrets.api_url}')
+        log.info('Connecting to ClemBot.Api at URL: {url}', url=bot_secrets.secrets.api_url)
 
         # Check if we have an active session, this means we are trying to reconnect
         # if we are, do nothing
@@ -166,7 +166,7 @@ class ApiClient:
 
     async def _request(self, http_type: str, endpoint: str, raise_on_error, params=None, body=None):
 
-        log.info(f'HTTP {http_type} Request initializing to route: {endpoint}')
+        log.info('HTTP {http_type} Request initializing to route: {endpoint}', http_type=http_type, endpoint=endpoint)
 
         req_args = {
             'method': http_type,
@@ -183,7 +183,8 @@ class ApiClient:
         async with self.session.request(**req_args) as resp:
             if resp.status == HTTPStatus.OK:
                 data = await resp.json()
-                log.info('Request at endpoint "{endpoint}" with request data:{body}  Succeeded with response data:{data}',
+                log.info('{type} Request at endpoint "{endpoint}" with request data:{body}  Succeeded with response data:{data}',
+                         type=http_type,
                          endpoint=endpoint,
                          body=body,
                          data=data)
