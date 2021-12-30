@@ -162,8 +162,7 @@ class MessageHandlingService(BaseService):
 
         try:
             if message is not None:
-                log.info('Uncached message edited in #{channel} By: {author} \nBefore: {before} \nAfter: {after}',
-                         channel=serializers.log_channel(message.channel),
+                log.info('Uncached message edited By: {author} \nBefore: {before} \nAfter: {after}',
                          author=message['userId'],
                          before=message['content'],
                          after=payload.data['content'])
