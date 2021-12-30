@@ -27,7 +27,7 @@ class EventsMeta(type):
         Args:
             message (Message) – The deleted message.
         """
-        return '_on_guild_message_received'
+        return 'on_guild_message_received'
 
     @property
     def on_dm_message_received(self):
@@ -37,7 +37,7 @@ class EventsMeta(type):
         Args:
             message (Message) – The deleted message.
         """
-        return '_on_dm_message_received'
+        return 'on_dm_message_received'
 
     @property
     def on_raw_message_edit(self):
@@ -48,7 +48,7 @@ class EventsMeta(type):
 
             payload (Edit Object) – The edit payload with the id of the edited message
         """
-        return '_on_raw_message_edit'
+        return 'on_raw_message_edit'
 
     @property
     def on_message_edit(self):
@@ -60,7 +60,7 @@ class EventsMeta(type):
             before (Message) – The previous version of the message.
             after (Message) – The current version of the message.
         """
-        return '_on_message_edit'
+        return 'on_message_edit'
 
     @property
     def on_raw_message_delete(self):
@@ -71,7 +71,7 @@ class EventsMeta(type):
 
             payload (Edit Object) – The delete payload with the id of the edited message
         """
-        return '_on_raw_message_delete'
+        return 'on_raw_message_delete'
 
     @property
     def on_message_delete(self):
@@ -82,7 +82,7 @@ class EventsMeta(type):
 
             message (Message) – The message that was deleted
         """
-        return '_on_message_delete'
+        return 'on_message_delete'
 
     def on_reaction_add(self):
         """
@@ -94,7 +94,7 @@ class EventsMeta(type):
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who added the reaction.
         """
-        return '_on_reaction_add'
+        return 'on_reaction_add'
 
     _on_raw_reaction_add = 'on_raw_reaction_add'
 
@@ -107,7 +107,7 @@ class EventsMeta(type):
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return '_on_raw_reaction_add'
+        return 'on_raw_reaction_add'
 
     @property
     def on_reaction_remove(self):
@@ -120,7 +120,7 @@ class EventsMeta(type):
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who removed the reaction.
         """
-        return '_on_reaction_remove'
+        return 'on_reaction_remove'
 
     @property
     def on_raw_reaction_remove(self):
@@ -131,7 +131,7 @@ class EventsMeta(type):
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return '_on_raw_reaction_remove'
+        return 'on_raw_reaction_remove'
 
     @property
     def on_guild_joined(self):
@@ -142,7 +142,7 @@ class EventsMeta(type):
 
             guild (Guild) – The guild that was joined.    
         """
-        return '_on_guild_joined'
+        return 'on_guild_joined'
 
     @property
     def on_guild_update(self):
@@ -154,7 +154,7 @@ class EventsMeta(type):
             before (Guild) – The guild object that was before.
             after (Guild) - The Guild object after
         """
-        return '_on_guild_update'
+        return 'on_guild_update'
 
     @property
     def on_guild_leave(self):
@@ -165,7 +165,7 @@ class EventsMeta(type):
 
             guild (Guild) – The guild that was left.    
         """
-        return '_on_guild_leave'
+        return 'on_guild_leave'
 
     @property
     def on_new_guild_initialized(self):
@@ -178,7 +178,7 @@ class EventsMeta(type):
 
             guild (Guild) – The guild that was joined.    
         """
-        return '_on_new_guild_initialized'
+        return 'on_new_guild_initialized'
 
     @property
     def on_guild_role_create(self):
@@ -189,7 +189,7 @@ class EventsMeta(type):
 
             role (Role) – The role that was created or deleted.
         """
-        return '_on_guild_role_create'
+        return 'on_guild_role_create'
 
     @property
     def on_guild_role_update(self):
@@ -201,7 +201,7 @@ class EventsMeta(type):
             before (Role) – The updated role’s old info.
             after (Role) – The updated role’s updated info.
         """
-        return '_on_guild_role_update'
+        return 'on_guild_role_update'
 
     @property
     def on_guild_role_delete(self):
@@ -212,7 +212,7 @@ class EventsMeta(type):
 
             role (Role) – The role that was created or deleted.
         """
-        return '_on_guild_role_delete'
+        return 'on_guild_role_delete'
 
     @property
     def on_user_joined(self):
@@ -223,7 +223,7 @@ class EventsMeta(type):
 
             user (User) – The user who joined or left.
         """
-        return '_on_user_joined'
+        return 'on_user_joined'
 
     @property
     def on_user_removed(self):
@@ -234,7 +234,7 @@ class EventsMeta(type):
 
             user (User) – The user who was removed or left.
         """
-        return '_on_user_removed'
+        return 'on_user_removed'
 
     @property
     def on_user_update(self):
@@ -246,7 +246,7 @@ class EventsMeta(type):
             before (User) – The updated user’s old info. 
             after (User) – The updated user’s updated info.
         """
-        return '_on_user_update'
+        return 'on_user_update'
 
     @property
     def on_add_designated_channel(self):
@@ -257,7 +257,7 @@ class EventsMeta(type):
 
             channel (Channel) the channel object that was added
         """
-        return '_on_add_designated_channel'
+        return 'on_add_designated_channel'
 
     @property
     def on_send_in_designated_channel(self):
@@ -297,7 +297,7 @@ class EventsMeta(type):
             channel_type (str) The designated channel to broadcast the message to
             message (union[embed, str]) the message to be sent to the channels
         """
-        return '_on_broadcast_designated_channel'
+        return 'on_broadcast_designated_channel'
 
     @property
     def on_set_custom_prefix(self):
@@ -341,7 +341,7 @@ class EventsMeta(type):
             author (discord.Member) member who called the bot 
             roles (str) Stores the roles needed to delete the message
         """
-        return '_on_set_deletable'
+        return 'on_set_deletable'
 
     @property
     def on_guild_channel_create(self):

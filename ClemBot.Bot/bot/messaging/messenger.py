@@ -22,7 +22,7 @@ class Messenger:
         Args:
             event (str): The event invoke the listeners on
         """
-        log.info('Received published event: {event}', event=event)
+        log.info('Received published event: {event}', event=str(event))
         event = event
         print(event)
         if event in self._events.keys():
@@ -30,12 +30,12 @@ class Messenger:
             for i, sub in enumerate(listeners):
                 if sub._alive:
                     log.info('Invoking listener: {sub} on event {event} in Messenger: {name}',
-                             sub=sub,
-                             event=event,
+                             sub=str(sub),
+                             event=str(event),
                              name=self.name)
                     await sub()(*args, **kwargs)
                 else:
-                    log.info('Deleting dead reference in Event: {event} function: {sub}', event=event, sub=sub)
+                    log.info('Deleting dead reference in Event: {event} function: {sub}', event=str(event), sub=str(sub))
                     del listeners[i]
 
     def subscribe(self, event: str, callback: t.Awaitable) -> None:
@@ -47,12 +47,12 @@ class Messenger:
         if event in self._events.keys():
             self._events[event].append(weak_ref)
         else:
-            log.info('Registering new event: {event} to Messenger: {name}', event=event, name=self.name)
+            log.info('Registering new event: {event} to Messenger: {name}', event=str(event), name=self.name)
             self._events[event] = [weak_ref]
 
         log.info('Registering listener {callback} to event: {event} in Messenger: {name}',
-                 callback=weak_ref.__callback__,
-                 event=event,
+                 callback=str(weak_ref.__callback__),
+                 event=str(event),
                  name=self.name)
 
     def _get_weak_ref(self, obj):
