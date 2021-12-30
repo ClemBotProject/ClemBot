@@ -51,7 +51,7 @@ class Messenger:
             self._events[event] = [weak_ref]
 
         log.info('Registering listener {callback} to event: {event} in Messenger: {name}',
-                 callback=callback,
+                 callback=weak_ref.__callback__,
                  event=event,
                  name=self.name)
 
