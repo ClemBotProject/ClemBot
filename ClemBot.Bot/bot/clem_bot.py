@@ -22,6 +22,7 @@ from bot.errors import ClaimsAccessError, BotOnlyRequestError
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -97,7 +98,7 @@ class ClemBot(commands.Bot):
             await self.api_client.connect()
 
         await self.load_services()
-        log.info(f'Logged on as {self.user}')
+        log.info('Logged on as {user}', user=serializers.log_user(self.user))
 
     async def on_ready(self) -> None:
         embed = discord.Embed(title='Bot Started Up  :white_check_mark:', color=Colors.ClemsonOrange)

@@ -4,6 +4,7 @@ import discord
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -23,12 +24,19 @@ class RoleHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_role_delete)
     async def on_role_delete(self, role):
-        log.info('Role: {role_id} deleted in guild: {role_guild}', role_id=role.id, role_guild=role.guild.id)
+        log.info('Role: {role} deleted in guild: {guild}',
+                 role=serializers.log_role(role),
+                 guild=serializers.log_guild(role.guild))
+
         await self.bot.role_route.remove_role(role.id, raise_on_error=True)
 
     @BaseService.Listener(Events.on_guild_role_update)
     async def on_role_update(self, before, after: discord.Role):
-        log.info('Role: {after} updated in guild: {role_guild}', after=after.id, role_guild=after.guild.id)
+        log.info('Role:{before} {after} updated in guild: {guild}',
+                 before=serializers.log_role(before),
+                 after=serializers.log_role(after),
+                 guild=serializers.log_guild(after.guild))
+
         await self.bot.role_route.edit_role(after.id, after.name, after.permissions.administrator, raise_on_error=True)
 
     async def load_service(self):
