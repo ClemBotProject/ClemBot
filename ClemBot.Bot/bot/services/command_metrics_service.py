@@ -1,11 +1,7 @@
-import asyncio
 import logging
-import typing as t
 
-import discord
 from discord.ext import commands
 
-from bot.consts import Claims
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
