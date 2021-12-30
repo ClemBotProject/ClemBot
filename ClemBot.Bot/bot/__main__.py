@@ -1,53 +1,18 @@
-import logging
 import os
+import logging
 import sys
-from datetime import datetime
-from pathlib import Path
 
 import discord
-import seqlog
 
 import bot.bot_secrets as bot_secrets
-from bot.api.api_client import ApiClient
 from bot.clem_bot import ClemBot
 from bot.custom_prefix import CustomPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 
 
-def setup_logger() -> None:
-    if url := os.environ.get('SEQ_URL'):
-        key = os.environ.get('SEQ_BOT_KEY')
-
-        if not key:
-            raise Exception('SEQ_BOT_KEY not found but SEQ_URL was specified')
-
-        seqlog.log_to_seq(
-            # Initialize the seq logging url before the secrets are loaded
-            # this is ok because seq logging only happens in prod
-            server_url=url,
-            api_key=key,
-            level=logging.INFO,
-            batch_size=5,
-            auto_flush_timeout=10,  # seconds
-            override_root_logger=False,
-        )
-    else:
-        handlers = [logging.StreamHandler(sys.stdout)]
-        logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                            level=logging.INFO, handlers=handlers)
-
-
 def main():
-    if not os.path.exists('Logs'):
-        os.makedirs('Logs')
-    # creates the logger for the Bot Itself
-    setup_logger()
-    bot_log = logging.getLogger('bot')
-    bot_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H.%M.%S")}_bot.log')
-    bot_file_handle = logging.FileHandler(filename=bot_log_name, encoding='utf-8', mode='w')
-    bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-    bot_log.addHandler(bot_file_handle)
+    bot_log = logging.getLogger()
 
     # check if this is a prod or a dev instance
     if bool(os.environ.get('PROD')):

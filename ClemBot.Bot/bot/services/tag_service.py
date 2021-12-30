@@ -31,12 +31,14 @@ class TagService(BaseService):
 
             tag_found = True
 
-            # tags_content.append(await repo.get_tag_content(match, message.guild.id))
             tags_content.append(tag.content)
 
             await self.bot.tag_route.add_tag_use(message.guild.id, match, message.channel.id, message.author.id)
 
-            log.info(f'Tag "{match}" invoked in guild: {message.guild.id} by: {message.author.id}')
+            log.info('Tag "{match}" invoked in guild: {guild_id} by: {author_id}',
+                     match=match,
+                     guild_id=message.guild.id,
+                     author_id=message.author.id)
 
         if not tag_found:
             return

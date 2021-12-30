@@ -8,6 +8,7 @@ from types import ModuleType
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 
 from bot.api import *
 import bot.api as api
@@ -265,14 +266,14 @@ class ClemBot(commands.Bot):
             await self.publish_with_error(Events.on_reaction_add, reaction, user)
 
     async def on_raw_reaction_add(self, reaction) -> None:
-        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+        pass
 
     async def on_reaction_remove(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
         if user.id != self.user.id:
             await self.publish_with_error(Events.on_reaction_remove, reaction, user)
 
     async def on_raw_reaction_remove(self, reaction) -> None:
-        log.info(f'Reaction by {reaction.member.display_name} on message:{reaction.message_id}')
+        pass
 
     async def on_member_update(self, before, after):
         await self.publish_with_error(Events.on_member_update, before, after)
@@ -325,6 +326,9 @@ class ClemBot(commands.Bot):
         if isinstance(e, BotOnlyRequestError):
             log.info(f'Ignoring ClemBot.Api request error in bot_only mode')
             return
+        elif isinstance(e, CommandNotFound):
+            log.info('Invalid command attempted: {command}', command=e.args)
+            return
 
         # log the exception first thing so we can be sure we got it
         log.exception(e)
@@ -362,7 +366,7 @@ class ClemBot(commands.Bot):
     """
 
     async def activate_service(self, service):
-        log.info(f'Loading service: {service.__module__}')
+        log.info('Loading service: {service}', service=service.__module__)
 
         s = service(bot=self)
         try:
@@ -372,7 +376,7 @@ class ClemBot(commands.Bot):
         self.active_services[service.__name__] = s
 
     def activate_route(self, client: ApiClient, route):
-        log.info(f'Loading route: {route.__module__}')
+        log.info('Loading route: {route}', route=route.__module__)
         r = route(api_client=client)
         # Here we remove the first 8 characters of the module name
         # That's because __module__ gives us the full name e.g bot.api.guild_route
@@ -397,7 +401,7 @@ class ClemBot(commands.Bot):
         log.info('Loading Cogs')
         for m in ClemBot.walk_modules('cogs', cogs):
             for c in ClemBot.walk_types(m, commands.Cog):
-                log.info(f'Loading cog: {c.__module__}')
+                log.info('Loading cog: {cog}', cog=c.__module__)
                 self.load_extension(c.__module__)
 
     @staticmethod
