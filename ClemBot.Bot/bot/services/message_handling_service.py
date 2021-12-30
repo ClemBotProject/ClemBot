@@ -92,7 +92,7 @@ class MessageHandlingService(BaseService):
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
         log.info('Message from {author}: "{content}" Guild {guild} Channel: {channel}',
-                 author=serializers.log_member(message.author),
+                 author=serializers.log_user(message.author),
                  content=message.content,
                  guild=serializers.log_guild(message.guild),
                  channel=serializers.log_channel(message.channel))
@@ -162,8 +162,7 @@ class MessageHandlingService(BaseService):
 
         try:
             if message is not None:
-                log.info('Uncached message edited in #{channel} By: {author} \nBefore: {before} \nAfter: {after}',
-                         channel=serializers.log_channel(message.channel),
+                log.info('Uncached message edited By: {author} \nBefore: {before} \nAfter: {after}',
                          author=message['userId'],
                          before=message['content'],
                          after=payload.data['content'])
