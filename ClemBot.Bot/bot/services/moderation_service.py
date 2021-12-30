@@ -130,7 +130,9 @@ class ModerationService(BaseService):
         if not mute_role:
             return
 
-        log.info(f'Setting mute role perms for channel: {channel.name} in guild {channel.guild.id} ')
+        log.info('Setting mute role perms for channel: {channel} in guild {guild_id} ',
+                 channel=channel.name,
+                 guild_id=channel.guild.id)
         await channel.set_permissions(mute_role,
                                       speak=False,
                                       connect=False,

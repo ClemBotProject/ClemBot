@@ -36,7 +36,7 @@ class GuildHandlingService(BaseService):
         # of the services
         await self.bot.messenger.publish(Events.on_new_guild_initialized, guild)
 
-        log.info(f'Guild {guild.name}: {guild.id} loaded')
+        log.info('Guild {guild_name}: {guild_id} loaded', guild_name=guild.name, guild_id=guild.id)
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
                                          OwnerDesignatedChannels.server_join_log,
@@ -50,7 +50,7 @@ class GuildHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_guild_leave)
     async def on_guild_leave(self, guild) -> None:
-        log.info(f'Bot removed from {guild.name}: {guild.id}')
+        log.info('Bot removed from {guild_name}: {guild_id}', guild_name=guild.name, guild_id=guild.id)
 
         await self.bot.messenger.publish(Events.on_broadcast_designated_channel,
                                          OwnerDesignatedChannels.server_join_log,

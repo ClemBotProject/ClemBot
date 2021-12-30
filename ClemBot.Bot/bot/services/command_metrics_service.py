@@ -20,6 +20,11 @@ class CommandMetricsService(BaseService):
     @BaseService.Listener(Events.on_after_command_invoke)
     async def log_invoked_commands(self, ctx: commands.Context):
 
+        log.info('Command "{command}" invoked in guild:{guild} by user:{user}',
+                 command=ctx.command.name,
+                 guild=ctx.guild.id,
+                 user=ctx.author.id)
+
         await self.bot.commands_route.add_command_invocation(ctx.command.name,
                                                              ctx.guild.id,
                                                              ctx.channel.id,

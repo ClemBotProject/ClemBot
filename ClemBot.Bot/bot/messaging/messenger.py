@@ -11,7 +11,7 @@ class Messenger:
     """This is the global message bus that handles all application level events"""
 
     def __init__(self, name=None) -> None:
-        log.info(f'New messenger created with name: {name}')
+        log.info('New messenger created with name: {name}', name=name)
         self.name = name
         self._events: t.Dict[str, t.Awaitable] = {}
 
@@ -22,17 +22,20 @@ class Messenger:
         Args:
             event (str): The event invoke the listeners on
         """
-        log.info(f'Recieved published event: {event}')
+        log.info('Received published event: {event}', event=event)
         event = event
         print(event)
         if event in self._events.keys():
             listeners = self._events[event]
             for i, sub in enumerate(listeners):
                 if sub._alive:
-                    log.info(f'Invoking listener: {sub} on event {event} in Messenger: {self.name}')
+                    log.info('Invoking listener: {sub} on event {event} in Messenger: {name}',
+                             sub=sub,
+                             event=event,
+                             name=self.name)
                     await sub()(*args, **kwargs)
                 else:
-                    log.info(f'Deleting dead reference in Event: {event} function: {sub}')
+                    log.info('Deleting dead reference in Event: {event} function: {sub}', event=event, sub=sub)
                     del listeners[i]
 
     def subscribe(self, event: str, callback: t.Awaitable) -> None:
@@ -40,23 +43,26 @@ class Messenger:
         if not asyncio.iscoroutinefunction(callback):
             raise TypeError('A given messenger callback must be awaitable')
 
-        weak_ref = self._getWeakRef(callback)
+        weak_ref = self._get_weak_ref(callback)
         if event in self._events.keys():
             self._events[event].append(weak_ref)
         else:
-            log.info(f'Registering new event: {event} to Messenger: {self.name}')
+            log.info('Registering new event: {event} to Messenger: {name}', event=event, name=self.name)
             self._events[event] = [weak_ref]
 
-        log.info(f'Registering listener {callback} to event: {event} in Messenger: {self.name}')
+        log.info('Registering listener {callback} to event: {event} in Messenger: {name}',
+                 callback=weak_ref.__callback__,
+                 event=event,
+                 name=self.name)
 
-    def _getWeakRef(self, obj):
+    def _get_weak_ref(self, obj):
         """
         Get a weak reference to obj. If obj is a bound method, a WeakMethod
         object, that behaves like a WeakRef, is returned; if it is
         anything else a WeakRef is returned.
         """
         if inspect.ismethod(obj):
-            createRef = wr.WeakMethod
+            create_ref = wr.WeakMethod
         else:
-            createRef = wr.ref
-        return createRef(obj)
+            create_ref = wr.ref
+        return create_ref(obj)

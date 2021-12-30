@@ -132,7 +132,7 @@ class PaginateService(BaseService):
             except:
                 pass
             finally:
-                log.info(f'Message: {msg.id} timed out as pageable')
+                log.info('Message: {msg_id} timed out as pageable', msg_id=msg.id)
 
     @BaseService.Listener(Events.on_reaction_add)
     async def change_page(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
