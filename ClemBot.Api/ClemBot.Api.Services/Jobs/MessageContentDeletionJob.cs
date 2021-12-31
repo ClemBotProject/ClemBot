@@ -28,12 +28,14 @@ public class MessageContentDeletionJob : IJob
         _logger.LogInformation("Beginning Discord compliance Message Content Deletion");
 
         _context.Database.SetCommandTimeout(9000);
-        var result = await _context.Database.ExecuteSqlRawAsync(@$"
-                UPDATE ""MessageContents""
-                SET ""Content"" = 'Content Deleted'
+        var result = await _context.Database.ExecuteSqlRawAsync(
+            @$"DELETE FROM ""Messages""
+            WHERE ""Messages"".""Id"" IN
+            (
+                SELECT ""MessageId"" FROM ""MessageContents""
                 WHERE ""MessageContents"".""Time""::date <= (NOW()::date -{MESSAGE_RETENTION_TIME}) at time zone 'utc'
-                ");
-
+                )"
+            );
         _logger.LogInformation("Discord compliance Message Content Deletion complete: {Result} row(s) effected", result);
     }
 }
