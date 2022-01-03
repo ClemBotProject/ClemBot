@@ -125,7 +125,7 @@ class SlotsCog(commands.Cog):
         self.bot = bot
 
     @ext.group(aliases=['slotmachine', '🎰'], invoke_without_command=True, case_insensitive=True)
-    # @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
+    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     @ext.long_help(
         'A slot machine inside discord with a chance to win fame and fortune'
     )
