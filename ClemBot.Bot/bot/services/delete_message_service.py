@@ -71,7 +71,7 @@ class DeleteMessageService(BaseService):
 
         if delete:
             for msg in self.messages[reaction.message.id]['MessagesToDelete']:
-                log.info('Mesaage {msg} deleted by delete message service', msg=msg.id)
+                log.info('Message {message} deleted by delete message service', message=msg.id)
                 await msg.delete()
             del self.messages[reaction.message.id]
 
