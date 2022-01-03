@@ -135,7 +135,10 @@ class SlotsCog(commands.Cog):
 
         score = self._calculate_score(np.array(paylines))
 
-        embed = await self._render_slots_embed(ctx, paylines, score[0])
+        embed, msg = await self._render_slots_embed(ctx, paylines, score[0])
+
+        # Wait a second before showing the score
+        await asyncio.sleep(1)
         embed.add_field(name='**SCORE!!**', value=score[1], inline=False)
         return await ctx.send(embed=embed)
 
@@ -145,7 +148,6 @@ class SlotsCog(commands.Cog):
 
         # Calculate the horizontal scores, while counting groupings of one
         horizontal_score = 0
-
         for i, line in enumerate(paylines):
             groups = self._calculate_line_score(results=line,
                                                 consecutive_multipliers=HORIZONTAL_MULTIPLIERS,
@@ -207,10 +209,6 @@ class SlotsCog(commands.Cog):
         for i, g in enumerate(groups):
             total_score += PAY_TABLE[g[0]] * len(g) * consecutive_multipliers[len(g)] * payline_multiplier
 
-        # Remove the singles from the winning groups, they have already been counted,
-        # and we don't need to pass them on
-        # groups = [g for g in groups if len(g) > 1 or g[0] == Symbols.jackpot]
-
         return groups, total_score
 
     def _get_all_diagonals(self, matrix: np.ndarray):
@@ -234,7 +232,11 @@ class SlotsCog(commands.Cog):
             results.append(generated)
         return results
 
-    async def _render_slots_embed(self, ctx: commands.Context, paylines: t.List[t.List[str]], winning_groups: t.List[t.List[str]]):
+    async def _render_slots_embed(self,
+                                  ctx: commands.Context,
+                                  paylines: t.List[t.List[str]],
+                                  winning_groups: t.List[t.List[str]]
+                                  ) -> t.Tuple[discord.Embed, discord.Message]:
 
         slots_title = '💎 ClemBot Slot Machine 💎'
 
@@ -263,7 +265,10 @@ class SlotsCog(commands.Cog):
                             value='\n'.join(f'{", ". join(k)} x{v}' for k, v in chunk),
                             inline=True)
 
-        return embed
+        # Send the final embed with groups included and return the embed so score can be added
+        await msg.edit(embed=embed)
+
+        return embed, msg
 
     def _render_board(self, paylines: t.List[t.List[str]], iter_num=3):
 
