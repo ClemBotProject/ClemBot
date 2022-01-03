@@ -140,6 +140,9 @@ class ModerationService(BaseService):
                                       connect=False,
                                       stream=False,
                                       send_messages=False,
+                                      send_messages_in_threads=False,
+                                      create_public_threads=False,
+                                      create_private_threads=False,
                                       send_tts_messages=False,
                                       add_reactions=False)
 

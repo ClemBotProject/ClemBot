@@ -23,7 +23,7 @@ class StartupService(BaseService):
         for guild in self.bot.guilds:
             if not await self.bot.guild_route.get_guild(guild.id):
                 log.info(f'Loading guild {guild.name}: {guild.id}')
-                tasks.append(asyncio.create_task(self.bot.guild_route.add_guild(guild.id, guild.name)))
+                tasks.append(asyncio.create_task(self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)))
         await asyncio.gather(*tasks)
 
     async def load_users(self):
