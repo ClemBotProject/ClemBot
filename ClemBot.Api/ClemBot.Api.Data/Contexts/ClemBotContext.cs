@@ -36,6 +36,7 @@ public class ClemBotContext : DbContext
     public DbSet<RoleUser> RoleUser { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<TagUse> TagUses { get; set; }
+    public DbSet<SlotScore> SlotScores { get; set; }
     public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

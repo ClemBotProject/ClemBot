@@ -33,6 +33,9 @@ class UserRoute(BaseRoute):
     async def get_user(self, user_id: int):
         return await self._client.get(f'bot/users/{user_id}')
 
+    async def get_user_slot_scores(self, user_id: int, guild_id: int, limit: int):
+        return await self._client.get(f'bot/users/{user_id}/{guild_id}/slotscores?limit={limit}')
+
     async def add_user_guild(self, user_id: int, guild_id: int, **kwargs):
         json = {
             'GuildId': guild_id,
