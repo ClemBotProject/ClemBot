@@ -261,6 +261,8 @@ class SlotsCog(commands.Cog):
                                   ) -> t.Tuple[discord.Embed, discord.Message]:
 
         slots_title = '💎 ClemBot Slot Machine 💎'
+        prefix = await self.bot.current_prefix(ctx)
+
 
         with open(PHRASES_PATH) as f:
             quote = random.choice(f.readlines())
@@ -269,7 +271,7 @@ class SlotsCog(commands.Cog):
             embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
 
             embed.add_field(name=self._render_board(paylines, iter), value='Spinning!!!', inline=False)
-            embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=f'{self.get_full_name(ctx.author)}\nTo view the leaderboard run {prefix}slots leaderboard' , icon_url=ctx.author.display_avatar.url)
             return embed
 
         msg = await ctx.send(embed=slots_rolling(0))
