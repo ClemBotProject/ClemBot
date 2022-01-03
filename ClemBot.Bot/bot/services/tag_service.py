@@ -39,7 +39,7 @@ class TagService(BaseService):
             log.info('Tag "{match}" invoked in guild: {guild} by: {author}',
                      match=match,
                      guild=serializers.log_guild(message.author.guild),
-                     author=serializers.log_member(message.author))
+                     author=serializers.log_user(message.author))
 
         if not tag_found:
             return

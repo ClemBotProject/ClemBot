@@ -20,7 +20,7 @@ class UserHandlingService(BaseService):
     @BaseService.Listener(Events.on_user_joined)
     async def on_user_joined(self, user: discord.Member) -> None:
         log.info('"{member}" has joined guild "{guild}"',
-                 member=serializers.log_member(user),
+                 member=serializers.log_user(user),
                  guild=serializers.log_guild(user.guild))
 
         db_user = await self.bot.user_route.get_user(user.id)

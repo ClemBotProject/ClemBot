@@ -117,7 +117,7 @@ class MessageHandlingService(BaseService):
         embed.set_footer(text=message.author, icon_url=message.author.display_avatar.url)
 
         log.info('Message from {author}: "{content}" Guild Unknown (DM)',
-                 author=serializers.log_member(message.author),
+                 author=serializers.log_user(message.author),
                  content=message.content)
 
         await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
@@ -128,7 +128,7 @@ class MessageHandlingService(BaseService):
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         log.info('Message edited in #{channel} By: {author} \nBefore: {before_content} \nAfter: {after_content}',
                  channel=serializers.log_channel(before.channel),
-                 author=serializers.log_member(after.author),
+                 author=serializers.log_user(after.author),
                  before_content=before.content,
                  after_content=after.content)
 
@@ -216,7 +216,7 @@ class MessageHandlingService(BaseService):
     async def on_message_delete(self, message: discord.Message):
         log.info('Uncached message deleted in #{channel} by {author}: {content}',
                  channel=serializers.log_channel(message.channel),
-                 author=serializers.log_member(message.author),
+                 author=serializers.log_user(message.author),
                  content=message.content)
 
         embed = discord.Embed(title=f':wastebasket: **Message Deleted in #{message.channel.name}**',
