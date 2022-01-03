@@ -308,6 +308,8 @@ class SlotsCog(commands.Cog):
                         continue
                     game_board[i][j-i] = paylines[i][j-i]
                 except:
+                    # Bare except to account for out of position offsets
+                    # which is expected as the animation hits the end
                     pass
 
         board = [['0️⃣️', *COLUMN_HEADERS]]
@@ -315,7 +317,7 @@ class SlotsCog(commands.Cog):
         for i in range(NUM_ROWS):
             board.append([ROW_HEADERS[i], *game_board[i]])
 
-        val = '\n'.join('` `' + ' | '.join(row) + '` `' for row in board)
+        val = '\n'.join(f'` `{" | ".join(row)}` `' for row in board)
 
         return val
 
