@@ -1,3 +1,5 @@
+import typing as t
+
 import discord
 
 
@@ -8,18 +10,14 @@ def log_guild(guild: discord.Guild):
     }
 
 
-def log_member(member: discord.Member):
+def log_user(member: t.Union[discord.Member, discord.User]):
     return {
         'id': member.id,
         'name': member.name,
         'guild': log_guild(member.guild)
-    }
-
-
-def log_user(user: discord.User):
-    return {
-        'id': user.id,
-        'name': user.name,
+    } if isinstance(member, discord.Member) else {
+        'id': member.id,
+        'name': member.name,
     }
 
 

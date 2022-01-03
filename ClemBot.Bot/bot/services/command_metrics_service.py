@@ -20,7 +20,7 @@ class CommandMetricsService(BaseService):
         log.info('Command "{command}" invoked in guild:{guild} by user:{user}',
                  command=ctx.command.name,
                  guild=serializers.log_guild(ctx.guild),
-                 user=serializers.log_member(ctx.author))
+                 user=serializers.log_user(ctx.author))
 
         await self.bot.commands_route.add_command_invocation(ctx.command.name,
                                                              ctx.guild.id,
