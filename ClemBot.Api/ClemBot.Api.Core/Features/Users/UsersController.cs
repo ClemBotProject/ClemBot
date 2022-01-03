@@ -48,6 +48,16 @@ public class UsersController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpGet("bot/[controller]/{UserId}/{GuildId}/slotscores")]
+    //[BotMasterAuthorize]
+    public async Task<IActionResult> Index([FromRoute] Bot.GetSlotsScores.Query command, int limit) =>
+        await _mediator.Send(command with { Limit = limit}) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NoContent(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpPost("bot/[controller]/CreateBulk")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Create(Bot.CreateBulk.Command command) =>

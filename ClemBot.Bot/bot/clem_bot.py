@@ -70,6 +70,7 @@ class ClemBot(commands.Bot):
         self.claim_route: claim_route.ClaimRoute = None
         self.commands_route: commands_route.CommandsRoute = None
         self.thread_route: thread_route.ThreadsRoute = None
+        self.slots_score_route: slots_score_route.SlotsScoreRoute = None
 
         self.load_cogs()
         self.active_services = {}
@@ -332,7 +333,7 @@ class ClemBot(commands.Bot):
             return
 
         # log the exception first thing so we can be sure we got it
-        log.exception(e)
+        log.exception('{error}', error=e)
 
         if traceback:
             embed = discord.Embed(title='Unhandled Exception Thrown', color=Colors.Error)

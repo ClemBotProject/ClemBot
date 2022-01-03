@@ -11,6 +11,7 @@ import discord.ext.commands as commands
 import numpy as np
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 
 
@@ -120,17 +121,17 @@ SLOTS_COMMAND_COOLDOWN = 60
 
 class SlotsCog(commands.Cog):
 
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
-    @ext.command(aliases=['slotmachine', '🎰'])
+    @ext.group(aliases=['slotmachine', '🎰'], invoke_without_command=True, case_insensitive=True)
     # @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     @ext.long_help(
         'A slot machine inside discord with a chance to win fame and fortune'
     )
     @ext.short_help('How lucky are you?')
     @ext.example('slots')
-    async def slots(self, ctx):
+    async def slots(self, ctx: commands.Context):
         paylines = self._generate_paylines()
 
         score = self._calculate_score(np.array(paylines))
@@ -140,7 +141,28 @@ class SlotsCog(commands.Cog):
         # Wait a second before showing the score
         await asyncio.sleep(1)
         embed.add_field(name='**SCORE!!**', value=score[1], inline=False)
-        return await ctx.send(embed=embed)
+        await msg.edit(embed=embed)
+
+        await self.bot.slots_score_route.add_slot_score(score[1], ctx.guild.id, ctx.author.id)
+
+    @slots.command(aliases=['top', 'winners'])
+    async def leaderboard(self, ctx: commands.Context):
+        scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10)
+
+        scores_str = ''
+        if len(scores) == 0:
+            scores_str = 'No scores found'
+
+        for i, score in enumerate(scores):
+            user = self.bot.get_user(score['userId'])
+            scores_str += f'{i+1: >3}. {user.name}: {score["highScore"]}\n'
+
+        embed = discord.Embed(title='💎 ClemBot Slot Machine Leaderboard 💎', colour=Colors.ClemsonOrange)
+
+        embed.add_field(name='Leaderboard', value=f'```{scores_str}```')
+        embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+
+        await ctx.send(embed=embed)
 
     def _calculate_score(self, paylines: np.ndarray) -> Tuple[List[Union[str, List[str]]], int]:
 
@@ -246,7 +268,7 @@ class SlotsCog(commands.Cog):
         def slots_rolling(iter: int):
             embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
 
-            embed.add_field(name=self._render_board(paylines, iter), value='Spinning!', inline=False)
+            embed.add_field(name=self._render_board(paylines, iter), value='Spinning!!!', inline=False)
             embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
             return embed
 
