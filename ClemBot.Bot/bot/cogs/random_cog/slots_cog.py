@@ -3,6 +3,8 @@ import dataclasses
 import logging
 import random
 import typing as t
+from typing import Tuple, List, Union
+from collections import Counter
 
 import discord
 import discord.ext.commands as commands
@@ -28,12 +30,12 @@ class Symbols:
 PAY_TABLE = {
     Symbols.apple: 1,
     Symbols.pear: 2,
-    Symbols.grape: 5,
-    Symbols.orange: 10,
-    Symbols.lemon: 20,
-    Symbols.cherry: 50,
-    Symbols.strawberry: 100,
-    Symbols.jackpot: 500
+    Symbols.grape: 10,
+    Symbols.orange: 20,
+    Symbols.lemon: 50,
+    Symbols.cherry: 200,
+    Symbols.strawberry: 1000,
+    Symbols.jackpot: 5000
 }
 
 
@@ -52,30 +54,33 @@ VERTICAL_MULTIPLIERS = {
 DIAGONAL_MULTIPLIERS = {
     1: 1,
     2: 1,
-    3: 2
+    3: 3
 }
 
 HORIZONTAL_MULTIPLIERS = {
     1: 1,
     2: 2,
-    3: 5,
+    3: 7,
     4: 20,
     5: 50
 }
 
 NUM_COLUMNS = 5
+COLUMN_HEADERS = ['1️⃣', '2️⃣', '3️⃣', '2️⃣', '1️⃣']
+
 NUM_ROWS = 3
+ROW_HEADERS = ['1️⃣', '4️⃣', '2️⃣']
 
 PAYLINE_VALUES = [
     PayLine(multiplier=1, weights={
-        Symbols.apple: 125,
-        Symbols.pear: 85,
+        Symbols.apple: 115,
+        Symbols.pear: 80,
         Symbols.grape: 75,
         Symbols.orange: 50,
         Symbols.lemon: 25,
         Symbols.cherry: 10,
         Symbols.strawberry: 5,
-        Symbols.jackpot: 2
+        Symbols.jackpot: 3
     }),
     PayLine(multiplier=4, weights={
         Symbols.apple: 150,
@@ -88,8 +93,8 @@ PAYLINE_VALUES = [
         Symbols.jackpot: 2
     }),
     PayLine(multiplier=2, weights={
-        Symbols.apple: 135,
-        Symbols.pear: 90,
+        Symbols.apple: 100,
+        Symbols.pear: 80,
         Symbols.grape: 75,
         Symbols.orange: 50,
         Symbols.lemon: 20,
@@ -107,20 +112,7 @@ COLUMN_MULTIPLIERS = [
     1
 ]
 
-PHRASES = [
-    'Will you get lucky?',
-    "You're feeling lucky I see",
-    "You're on a roll",
-    'Keep going hotshot',
-    'Good fortune in your future',
-    "Dang you're good",
-    'Ohh come on, one more try!',
-    'Absolutely Stupendous!',
-    'This is the start of something great',
-    'Right on!',
-    'High score incoming!',
-    'You got this!'
-]
+PHRASES_PATH = 'bot/cogs/random_cog/assets/phrases.txt'
 
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 60
@@ -143,64 +135,35 @@ class SlotsCog(commands.Cog):
 
         score = self._calculate_score(np.array(paylines))
 
-        return await ctx.send(score)
+        embed = await self._render_slots_embed(ctx, paylines, score[0])
+        embed.add_field(name='**SCORE!!**', value=score[1], inline=False)
+        return await ctx.send(embed=embed)
 
-        """
-        results = [random.choices(Symbols.combined, weights=WEIGHTS, k=5) for _ in range(3)]
-        # await ctx.send(results)
-        # score = self.calculate_score(results)
-        # await ctx.send(score)
+    def _calculate_score(self, paylines: np.ndarray) -> Tuple[List[Union[str, List[str]]], int]:
 
-        output = [list('⬜' * len(results[0])) for _ in range(3)]
-
-        quote = random.choice(PHRASES)
-
-        slotstitle = '💎 ClemBot Slot Machine 💎'
-
-        def slots_rolling(input, spinstatus):
-            slotembed = discord.Embed(title=f'{slotstitle}',
-                                      color=Colors.ClemsonOrange,
-                                      description=quote)
-
-            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
-            slotembed.add_field(name=input, value=spinstatus, inline=False)
-            return slotembed
-
-        val = '\n'.join(' | '.join(row) for row in output)
-        msg = await ctx.send(embed=slots_rolling(' | '.join(val), 'Spinning!!'))
-
-        for i in range(len(results[0])):
-            for j in range(len(results)):
-                output[j][i] = results[j][i]
-
-            val = '\n'.join(' | '.join(row) for row in output)
-            await msg.edit(embed=slots_rolling(val, 'Spinning!!'))
-            await asyncio.sleep(1)
-
-        final = slots_rolling(' | '.join(output), 'Spin Complete')
-        final.add_field(name='SCORE!!', value=score)
-
-        await msg.edit(embed=final)
-        """
-
-    def _calculate_score(self, paylines: np.ndarray) -> int:
+        winning_groups = []
 
         # Calculate the horizontal scores, while counting groupings of one
         horizontal_score = 0
+
         for i, line in enumerate(paylines):
-            horizontal_score += self._calculate_line_score(results=line,
-                                                           consecutive_multipliers=HORIZONTAL_MULTIPLIERS,
-                                                           count_singles=True,
-                                                           payline_multiplier=PAYLINE_VALUES[i].multiplier)
+            groups = self._calculate_line_score(results=line,
+                                                consecutive_multipliers=HORIZONTAL_MULTIPLIERS,
+                                                count_singles=True,
+                                                payline_multiplier=PAYLINE_VALUES[i].multiplier)
+            horizontal_score += groups[1]
+            winning_groups.extend(groups[0])
 
         # Transpose the matrix to easily check for vertical groupings
         flipped_arr = np.rot90(paylines)
         vertical_score = 0
         for i, line in enumerate(flipped_arr):
-            vertical_score += self._calculate_line_score(results=line,
-                                                         consecutive_multipliers=VERTICAL_MULTIPLIERS,
-                                                         count_singles=False,
-                                                         payline_multiplier=COLUMN_MULTIPLIERS[i])
+            groups = self._calculate_line_score(results=line,
+                                                consecutive_multipliers=VERTICAL_MULTIPLIERS,
+                                                count_singles=False,
+                                                payline_multiplier=COLUMN_MULTIPLIERS[i])
+            vertical_score += groups[1]
+            winning_groups.extend(groups[0])
 
         # Grab diagonals with a length greater than one and check for more groupings
         diagonals = self._get_all_diagonals(paylines)
@@ -208,17 +171,19 @@ class SlotsCog(commands.Cog):
 
         diagonal_score = 0
         for i, line in enumerate(diagonals):
-            diagonal_score += self._calculate_line_score(results=line,
-                                                         count_singles=False,
-                                                         consecutive_multipliers=DIAGONAL_MULTIPLIERS)
+            groups = self._calculate_line_score(results=line,
+                                                count_singles=False,
+                                                consecutive_multipliers=DIAGONAL_MULTIPLIERS)
+            diagonal_score += groups[1]
+            winning_groups.extend(groups[0])
 
-        return horizontal_score + vertical_score + diagonal_score
+        return winning_groups, horizontal_score + vertical_score + diagonal_score
 
     def _calculate_line_score(self, *,
                               results: t.List[str],
                               count_singles: bool,
                               consecutive_multipliers: t.Dict[int, int],
-                              payline_multiplier: int = 1) -> int:
+                              payline_multiplier: int = 1) -> t.Tuple[t.List[t.Union[str, t.List[str]]], int]:
 
         groups = []
         curr_group = []
@@ -234,7 +199,7 @@ class SlotsCog(commands.Cog):
 
         groups.append(curr_group)
 
-        # Filter out the single groups if we aren't supposed to count those
+        # Only count single jackpots on the horizontal pass
         if not count_singles:
             groups = [g for g in groups if len(g) > 1]
 
@@ -242,7 +207,11 @@ class SlotsCog(commands.Cog):
         for i, g in enumerate(groups):
             total_score += PAY_TABLE[g[0]] * len(g) * consecutive_multipliers[len(g)] * payline_multiplier
 
-        return total_score
+        # Remove the singles from the winning groups, they have already been counted,
+        # and we don't need to pass them on
+        # groups = [g for g in groups if len(g) > 1 or g[0] == Symbols.jackpot]
+
+        return groups, total_score
 
     def _get_all_diagonals(self, matrix: np.ndarray):
         """https://stackoverflow.com/a/6313414"""
@@ -265,10 +234,71 @@ class SlotsCog(commands.Cog):
             results.append(generated)
         return results
 
+    async def _render_slots_embed(self, ctx: commands.Context, paylines: t.List[t.List[str]], winning_groups: t.List[t.List[str]]):
+
+        slots_title = '💎 ClemBot Slot Machine 💎'
+
+        with open(PHRASES_PATH) as f:
+            quote = random.choice(f.readlines())
+
+        def slots_rolling(iter: int):
+            embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
+
+            embed.add_field(name=self._render_board(paylines, iter), value='Spinning!', inline=False)
+            embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+            return embed
+
+        msg = await ctx.send(embed=slots_rolling(0))
+
+        for i in range(NUM_COLUMNS+NUM_ROWS):
+            embed = slots_rolling(i)
+            await msg.edit(embed=embed)
+            await asyncio.sleep(1)
+
+        winning_counts = Counter(tuple(g) for g in winning_groups)
+        items = list(winning_counts.items())
+        items.sort(reverse=True, key=lambda k: len(k[0]))
+        for chunk in self.chunk_list(items, 4):
+            embed.add_field(name='Winning Groups!',
+                            value='\n'.join(f'{", ". join(k)} x{v}' for k, v in chunk),
+                            inline=True)
+
+        return embed
+
+    def _render_board(self, paylines: t.List[t.List[str]], iter_num=3):
+
+        # Generate empty game-board
+        game_board = [['◻️' for _ in range(NUM_COLUMNS)] for _ in range(NUM_ROWS)]
+
+        # Generate the animation frame based on the iteration number
+        # This uses the row number as the column offset
+        for i in range(NUM_ROWS):
+            for j in range(iter_num):
+                try:
+                    # Check if the offset is less then zero, if it is we
+                    # cant access that part of the array so skip it
+                    if j - i < 0:
+                        continue
+                    game_board[i][j-i] = paylines[i][j-i]
+                except:
+                    pass
+
+        board = [['0️⃣️', *COLUMN_HEADERS]]
+
+        for i in range(NUM_ROWS):
+            board.append([ROW_HEADERS[i], *game_board[i]])
+
+        val = '\n'.join('` `' + ' | '.join(row) + '` `' for row in board)
+
+        return val
+
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
 
-
+    def chunk_list(self, lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
 
 def setup(bot):
     bot.add_cog(SlotsCog(bot))
