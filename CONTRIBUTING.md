@@ -5,7 +5,7 @@ This is a guide on how to develop and contribute to this project
 ## Dependencies
 Make sure you can run these commands and install them if not present.
 ### ClemBot.Bot
-* Python 3.8 or higher [Link](https://www.python.org/downloads/release/python-380/)
+* Python 3.8 [Link](https://www.python.org/downloads/release/python-380/)
 * pip3 (packaged as python3-pip) 
 * A python IDE/Text Editor: Anything will work but people generally use Visual Studio Code [Link](https://code.visualstudio.com/) or Jetbrains Pycharm [Link](https://www.jetbrains.com/pycharm/)
 
@@ -68,6 +68,7 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 * `ClientToken`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
 * `ClientSecret`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
 * `BotPrefix`:(Required) Your discord bots prefix that it will default to responding too
+* `SiteUrl`: (Optional) The url of your local site or hosted instance for bot links to the site
 * `StartupLogChannelIds`:(Optional) The Id of the channel for the bot to send startup events too
 * `ErrorLogChannelIds`:(Optional) The Id of the channel for the bot to send error events too (recommended if you are doing work with services
 * `GifMeToken`:(Optional) GifMe api token
