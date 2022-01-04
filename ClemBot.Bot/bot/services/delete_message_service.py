@@ -51,7 +51,7 @@ class DeleteMessageService(BaseService):
             except:
                 pass
             finally:
-                log.info('Message: {msg} timed out as deletable', msg=msg[-1].id)
+                log.info('Message: {message} timed out as deletable', message=msg[-1].id)
 
     @BaseService.Listener(Events.on_reaction_add)
     async def delete_message(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
