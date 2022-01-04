@@ -10,6 +10,7 @@ import discord
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -90,7 +91,11 @@ class MessageHandlingService(BaseService):
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
-        log.info(f'Message from {message.author}: "{message.content}" Guild {message.guild.id}')
+        log.info('Message from {author}: "{content}" Guild {guild} Channel: {channel}',
+                 author=serializers.log_user(message.author),
+                 content=message.content,
+                 guild=serializers.log_guild(message.guild),
+                 channel=serializers.log_channel(message.channel))
 
         # Check if the message is a discord message link and check if this server has
         # Enabled embed message links
@@ -100,7 +105,6 @@ class MessageHandlingService(BaseService):
         await self.bot.process_commands(message)
 
         if not message.content:
-            log.warning('Invalid Message event received')
             return
 
         await self.batch_send_message(message)
@@ -111,15 +115,22 @@ class MessageHandlingService(BaseService):
                               color=Colors.ClemsonOrange,
                               description=f'{message.content}')
         embed.set_footer(text=message.author, icon_url=message.author.display_avatar.url)
-        log.info(f'Message from {message.author}: "{message.content}" Guild Unknown (DM)')
+
+        log.info('Message from {author}: "{content}" Guild Unknown (DM)',
+                 author=serializers.log_user(message.author),
+                 content=message.content)
+
         await self.messenger.publish(Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed)
         await message.author.send(
             'Hello there, I dont currently support DM commands. Please run my commands in a server')  # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
-        log.info(f'Message edited in #{before.channel.name} By: \
-            {self.get_full_name(before.author)} \nBefore: {before.content} \nAfter: {after.content}')
+        log.info('Message edited in #{channel} By: {author} \nBefore: {before_content} \nAfter: {after_content}',
+                 channel=serializers.log_channel(before.channel),
+                 author=serializers.log_user(after.author),
+                 before_content=before.content,
+                 after_content=after.content)
 
         await self.batch_send_message_edit(after.id, after.content)
 
@@ -142,6 +153,7 @@ class MessageHandlingService(BaseService):
                                          after.guild.id,
                                          embed)
 
+    # noinspection PyArgumentList
     @BaseService.Listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
 
@@ -150,8 +162,10 @@ class MessageHandlingService(BaseService):
 
         try:
             if message is not None:
-                log.info(f'Uncached message edited in #{channel.name} By: \
-                    {message["userId"]} \nBefore: {message["content"]} \nAfter: {payload.data["content"]}')
+                log.info('Uncached message edited By: {author} \nBefore: {before} \nAfter: {after}',
+                         author=message['userId'],
+                         before=message['content'],
+                         after=payload.data['content'])
 
                 await self.batch_send_message_edit(message['id'], payload.data['content'])
 
@@ -178,7 +192,7 @@ class MessageHandlingService(BaseService):
                     log.info(f'Uncached message edited in #{channel.name} By: \
                         {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["Content"]}')
                 except KeyError:
-                    log.error(json.dumps(payload.data))
+                    log.info('Uncached invalid message event received: {data}', data=json.dumps(payload.data))
 
                 embed = discord.Embed(title=f':repeat: **Uncached message edited in #{channel.name}**',
                                       color=Colors.ClemsonOrange)
@@ -196,12 +210,14 @@ class MessageHandlingService(BaseService):
                                                  int(payload.data['guild_id']),
                                                  embed)
         except KeyError as e:
-            log.error(f'raw_message_edit Error: {e} \n')
+            log.error('raw_message_edit Error: {e} \n', e=e)
 
     @BaseService.Listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):
-        log.info(f'Uncached message deleted in #{message.channel.name} by \
-            {self.get_full_name(message.author)}: {message.content}')
+        log.info('Uncached message deleted in #{channel} by {author}: {content}',
+                 channel=serializers.log_channel(message.channel),
+                 author=serializers.log_user(message.author),
+                 content=message.content)
 
         embed = discord.Embed(title=f':wastebasket: **Message Deleted in #{message.channel.name}**',
                               color=Colors.ClemsonOrange)

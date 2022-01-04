@@ -51,7 +51,7 @@ class DeleteMessageService(BaseService):
             except:
                 pass
             finally:
-                log.info(f'Message: {msg[-1].id} timed out as deletable')
+                log.info('Message: {msg} timed out as deletable', msg=msg[-1].id)
 
     @BaseService.Listener(Events.on_reaction_add)
     async def delete_message(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
@@ -71,7 +71,7 @@ class DeleteMessageService(BaseService):
 
         if delete:
             for msg in self.messages[reaction.message.id]['MessagesToDelete']:
-                log.info(f'Mesaage {msg.id} deleted by delete message service')
+                log.info('Message {message} deleted by delete message service', message=msg.id)
                 await msg.delete()
             del self.messages[reaction.message.id]
 

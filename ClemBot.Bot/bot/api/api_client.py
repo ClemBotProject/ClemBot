@@ -67,7 +67,7 @@ class ApiClient:
     @staticmethod
     def _build_url(url: str):
         url = f'{bot_secrets.secrets.api_url}{Urls.base_api_url}{quote(url)}'
-        log.info(f'Building URL: {url}')
+        log.info('Building URL: {url}', url=url)
         return url
 
     async def close(self) -> None:
@@ -83,8 +83,7 @@ class ApiClient:
     async def _reconnect(self):
 
         # Asynchronously lock here to make sure
-        # that only one task is checking the connection status
-        # at a time
+        # that only one task is checking the connection status at a time
         # otherwise we will have multiple tasks attempting to connect
         async with connect_lock:
             if not self.connected:
@@ -100,10 +99,10 @@ class ApiClient:
         await self._internal_connect()
 
     async def _internal_connect(self):
-        log.info(f'Connecting to ClemBot.Api at URL: {bot_secrets.secrets.api_url}')
+        log.info('Connecting to ClemBot.Api at URL: {url}', url=bot_secrets.secrets.api_url)
 
         # Check if we have an active session, this means we are trying to reconnect
-        # if we are do nothing
+        # if we are, do nothing
         if not self.session:
             self.session = aiohttp.ClientSession(raise_for_status=False)
 
@@ -167,7 +166,7 @@ class ApiClient:
 
     async def _request(self, http_type: str, endpoint: str, raise_on_error, params=None, body=None):
 
-        log.info(f'HTTP {http_type} Request initializing to route: {endpoint}')
+        log.info('HTTP {http_type} Request initializing to route: {endpoint}', http_type=http_type, endpoint=endpoint)
 
         req_args = {
             'method': http_type,
@@ -183,9 +182,23 @@ class ApiClient:
 
         async with self.session.request(**req_args) as resp:
             if resp.status == HTTPStatus.OK:
-                return Result(resp.status, await resp.json())
+                data = await resp.json()
+                log.info('{type} Request at endpoint "{endpoint}" with request data:{body}  Succeeded with response data:{data}',
+                         type=http_type,
+                         endpoint=endpoint,
+                         body=body,
+                         data=data)
 
-            log.error(f'Request at endpoint "{endpoint}" returned non 200 error code {resp.status}')
+                return Result(resp.status, data)
+
+            if not 200 <= resp.status < 300:
+                log.error('Request at endpoint "{endpoint}" returned non 2xx error code {status}',
+                          endpoint=endpoint,
+                          status=resp.status)
+            else:
+                log.info('Request at endpoint "{endpoint}" returned 2xx success status code {status}',
+                         endpoint=endpoint,
+                         status=resp.status)
 
             return Result(resp.status, None)
 

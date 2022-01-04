@@ -4,6 +4,7 @@ import discord
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +22,11 @@ class ThreadHandlingService(BaseService):
         if await self.bot.thread_route.get_thread(thread.id):
             return
 
-        log.info(f'New thread joined {thread.name}:{thread.id} in guild: {thread.guild.name}:{thread.guild.id}')
+        log.info('New thread joined {thread_name}:{thread_id} in guild: {guild}',
+                 thread_name=thread.name,
+                 thread_id=thread.id,
+                 guild=serializers.log_guild(thread.guild))
+
         await self.bot.thread_route.create_thread(thread.id,
                                                   thread.name,
                                                   thread.guild.id,

@@ -208,6 +208,16 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpGet("bot/[controller]/{GuildId}/SlotScores")]
+    //[BotMasterAuthorize]
+    public async Task<IActionResult> Index([FromRoute] Bot.GetSlotsScores.Query command, int limit = 10) =>
+        await _mediator.Send(command with { Limit = limit }) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NoContent(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpGet("bot/[controller]/{Id}/Infractions")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Infractions([FromRoute] Bot.Infractions.Query command) =>

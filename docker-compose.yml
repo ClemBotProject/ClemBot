@@ -3,6 +3,7 @@ services:
   # Create the reverse proxy to route requests and handle ssl/tsl
   nginx-proxy:
     image: ghcr.io/linuxserver/swag
+    restart: always
     cap_add:
       - NET_ADMIN
     environment:
@@ -25,6 +26,7 @@ services:
   clembot.api:
     restart: always
     image: ghcr.io/clembotproject/clembot.api:master
+    restart: always
     networks:
         - clembot-network
         - nginx-proxy
@@ -49,6 +51,7 @@ services:
   snekbox:
     image: ghcr.io/python-discord/snekbox:latest
     init: true
+    restart: always
     ipc: none
     depends_on:
       - nginx-proxy

@@ -115,51 +115,6 @@ class RandomCog(commands.Cog):
         embed = discord.Embed(title='🎱', description=f'{random.choice(responses)}', color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
-    @ext.command(hidden=True)
-    @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
-    @ext.long_help(
-        'A slot machine inside discord with a chance to win fame and fortune'
-    )
-    @ext.short_help('How lucky are you?')
-    @ext.example('slots')
-    async def ogslots(self, ctx):
-
-        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
-        a = random.choice(emojis)
-        b = random.choice(emojis)
-        c = random.choice(emojis)
-        blank = '⬜'
-
-        slotset = {a, b, c}
-
-        if (len(slotset) == 1):
-            message = f'{ctx.message.author.mention} won!'
-        elif (len(slotset) == 2):
-            message = f'{ctx.message.author.mention} almost won, 2/3!'
-        else:
-            message = f'{ctx.message.author.mention} lost, no matches.'
-
-        slotstitle = '💎 Slot Machine 💎'
-
-        async def slotsrolling(input, spinstatus, waittime):
-            slotembed = discord.Embed(title=f'{slotstitle}', color=Colors.ClemsonOrange,
-                                      description=f'**{ctx.message.author.name} has rolled the slots**')
-            slotembed.add_field(name=input, value=spinstatus, inline=False)
-            await asyncio.sleep(waittime)
-            return slotembed
-
-        embed = await slotsrolling(f'{blank} | {blank} | {blank}', 'Spinning', 0)
-        msg = await ctx.send(embed=embed)
-
-        embed = await slotsrolling(f'{a} | {blank} | {blank}', 'Spinning', 1)
-        await msg.edit(embed=embed)
-
-        embed = await slotsrolling(f'{a} | {b} | {blank}', 'Spinning', 1)
-        await msg.edit(embed=embed)
-
-        embed = await slotsrolling(f'{a} | {b} | {c}', f'**{message}**', 1)
-        await msg.edit(embed=embed)
-
     @ext.command()
     @ext.long_help(
         'Creates a raffle for giveaways inside discord and picks a random winner from all reactors after a specified time frame'

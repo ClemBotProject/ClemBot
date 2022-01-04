@@ -60,7 +60,8 @@ class DesignatedChannelService(BaseService):
 
         await self._send_dc_messages(assigned_channel_ids, content)
 
-    async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed]) -> List[int]:
+    async def _send_dc_messages(self, assigned_channel_ids: List[int], content: Union[str, discord.Embed])\
+            -> List[discord.Message]:
         sent_messages = []
 
         if len(assigned_channel_ids) > 0:

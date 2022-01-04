@@ -23,7 +23,7 @@ public class GetGlobalUserStats : IRequestHandler<GlobalUserStatsRequest, int>
 
     public async Task<int> Handle(GlobalUserStatsRequest request, CancellationToken cancellationToken) =>
         await _cache.GetOrAddAsync(GetCacheKey(),
-            () => _context.Users.CountAsync(), TimeSpan.FromHours(1));
+            () => _context.GuildUser.CountAsync(), TimeSpan.FromHours(1));
 
     private string GetCacheKey()
         => $"{nameof(GetGlobalUserStats)}";    }

@@ -1,49 +1,18 @@
-import logging
 import os
+import logging
 import sys
-from datetime import datetime
-from pathlib import Path
 
 import discord
-import seqlog
 
 import bot.bot_secrets as bot_secrets
-from bot.api.api_client import ApiClient
 from bot.clem_bot import ClemBot
 from bot.custom_prefix import CustomPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 
 
-def setup_logger() -> None:
-    handlers = []
-    handlers.append(logging.StreamHandler(sys.stdout))
-
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                        level=logging.INFO, handlers=handlers)
-
-    if url := os.environ.get('SEQ_URL'):
-        seqlog.log_to_seq(
-            # Initialize the seq logging url before the secrets are loaded
-            # this is ok because seq logging only happens in prod
-            server_url=url,
-            level=logging.INFO,
-            batch_size=5,
-            auto_flush_timeout=10,  # seconds
-            override_root_logger=True,
-        )
-
-
 def main():
-    if not os.path.exists('Logs'):
-        os.makedirs('Logs')
-    # creates the logger for the Bot Itself
-    setup_logger()
-    bot_log = logging.getLogger('bot')
-    bot_log_name = Path(f'Logs/{datetime.now().strftime("%Y-%m-%d-%H.%M.%S")}_bot.log')
-    bot_file_handle = logging.FileHandler(filename=bot_log_name, encoding='utf-8', mode='w')
-    bot_file_handle.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-    bot_log.addHandler(bot_file_handle)
+    bot_log = logging.getLogger()
 
     # check if this is a prod or a dev instance
     if bool(os.environ.get('PROD')):
@@ -55,13 +24,14 @@ def main():
             with open("BotSecrets.json") as f:
                 bot_secrets.secrets.load_development_secrets(f.read())
         except FileNotFoundError as e:
-            bot_log.error(f'{e}: The bot could not find your BotSecrets Json File')
+            bot_log.fatal(f'{e}: The bot could not find your BotSecrets Json File')
             sys.exit(0)
         except KeyError as e:
-            bot_log.error(f'{e} is not a valid key in BotSecrets')
+            bot_log.fatal(f'{e} is not a valid key in BotSecrets')
             sys.exit(0)
         except Exception as e:
-            bot_log.error(e)
+            bot_log.fatal(e)
+            sys.exit(0)
 
     # get the default prefix for the bot instance
     prefix = bot_secrets.secrets.bot_prefix
