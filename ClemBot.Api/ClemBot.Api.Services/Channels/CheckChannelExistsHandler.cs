@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Services.Channels;
 
-public class CheckChannelExistsHandler : IRequestHandler<ChannelExistsRequest, bool>
+public class CheckChannelExistsHandler : RequestHandler<ClearChannelCacheEntryRequest>, IRequestHandler<ChannelExistsRequest, bool>
+
 {
     private readonly IAppCache _cache;
 
@@ -20,10 +21,14 @@ public class CheckChannelExistsHandler : IRequestHandler<ChannelExistsRequest, b
         _context = context;
     }
 
-    public async Task<bool> Handle(ChannelExistsRequest request, CancellationToken cancellationToken) =>
-        await _cache.GetOrAddAsync(GetCacheKey(request.Id),
+    public async Task<bool> Handle(ChannelExistsRequest request, CancellationToken cancellationToken)
+        => await _cache.GetOrAddAsync(GetCacheKey(request.Id),
             () => _context.Channels.AnyAsync(x => x.Id == request.Id));
+
+    protected override void Handle(ClearChannelCacheEntryRequest request)
+        => _cache.Remove(GetCacheKey(request.Id));
 
     private static string GetCacheKey(ulong id)
         => $"{nameof(ChannelExistsRequest)}:{id}";
+
 }
