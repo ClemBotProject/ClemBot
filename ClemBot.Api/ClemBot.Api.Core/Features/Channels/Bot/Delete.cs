@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Services.Channels.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,8 +22,18 @@ public class Delete
         public string? Name { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public class QueryHandler : IRequestHandler<Query, IQueryResult<Model>>
     {
+        public ClemBotContext _context { get; init; }
+
+        public IMediator _mediatr { get; init; }
+
+        public QueryHandler(ClemBotContext context, IMediator mediatr)
+        {
+            _context = context;
+            _mediatr = mediatr;
+        }
+
         public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var channel = await _context.Channels
@@ -36,11 +47,20 @@ public class Delete
             _context.Channels.Remove(channel);
             await _context.SaveChangesAsync();
 
+            // Clear the channel from the cache so we dont try to insert a new message batch into it
+            await _mediatr.Send(new ClearChannelCacheEntryRequest {Id = request.Id});
+
             return QueryResult<Model>.Success(new Model()
             {
                 Id = channel.Id,
                 Name = channel.Name
             });
+        }
+
+        public void Deconstruct(out ClemBotContext _context, out IMediator _mediatr)
+        {
+            _context = this._context;
+            _mediatr = this._mediatr;
         }
     }
 }
