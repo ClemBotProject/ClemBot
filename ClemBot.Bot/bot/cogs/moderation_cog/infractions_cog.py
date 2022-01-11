@@ -83,7 +83,8 @@ class InfractionsCog(commands.Cog):
     @ext.example(('infractions delete 1', 'infractions remove 2'))
     @ext.required_claims(Claims.moderation_warn)
     async def delete(self, ctx: commands.Context, infraction_id: int):
-        if not await self.bot.moderation_route.get_infraction(infraction_id):
+        infraction = await self.bot.moderation_route.get_infraction(infraction_id)
+        if not infraction or infraction.guild_id != ctx.guild.id:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Infraction does not exist'
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
