@@ -100,7 +100,9 @@ class PaginateService(BaseService):
         if not all(isinstance(p, discord.Embed) for p in pages):
             raise BadArgument('All paginate embed pages need to be of type discord.Embed')
 
-        footer = pages[0].footer.text
+        footer = ''
+        if not pages[0].footer.text == discord.Embed.Empty:
+            footer = pages[0].footer.text
 
         message = Message(pages,
                           0,
