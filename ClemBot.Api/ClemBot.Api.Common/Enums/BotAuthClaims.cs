@@ -21,6 +21,7 @@ public enum BotAuthClaims
     moderation_mute,
     moderation_purge,
     moderation_infraction_view,
+    moderation_infraction_view_self,
     dashboard_view,
     dashboard_edit,
     guild_settings_view,

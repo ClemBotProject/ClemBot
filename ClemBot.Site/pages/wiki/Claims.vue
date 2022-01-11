@@ -123,7 +123,12 @@ export default Vue.extend({
       {
         name: 'moderation_infraction_view',
         description:
-          'Allows for usage of the infractions command to list a given users warnings',
+          'Allows for usage of the infractions command to list a given users infractions',
+      },
+      {
+        name: 'moderation_infraction_view_self',
+        description:
+          'Allows for usage of the infractions command to view only the users own infractions',
       },
     ]
 
