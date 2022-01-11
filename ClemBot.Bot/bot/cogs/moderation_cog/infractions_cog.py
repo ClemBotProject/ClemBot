@@ -36,7 +36,7 @@ class InfractionsCog(commands.Cog):
         user = user or ctx.author
         claims = await self.bot.claim_route.get_claims_user(ctx.author)
 
-        if user != ctx.author and Claims.moderation_infraction_view not in claims:
+        if user != ctx.author and Claims.moderation_infraction_view.name not in claims:
             raise ClaimsAccessError(f'Missing claims to run this operation on another user. '
                                     f'Need any of the following\n ```\n{Claims.moderation_infraction_view.name}```'
                                     f'\n **Help:** For more information on how claims work please visit my website [Link!]'
