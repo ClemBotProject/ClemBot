@@ -64,6 +64,7 @@ class Claims(Enum):
     moderation_mute = auto()
     moderation_purge = auto()
     moderation_infraction_view = auto()
+    moderation_infraction_view_self = auto()
     dashboard_view = auto()
     dashboard_edit = auto()
     guild_settings_view = auto()

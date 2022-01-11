@@ -157,6 +157,9 @@ class ClemBot(commands.Bot):
         if await self.claims_check(ctx):
             return
 
+        await self.raise_claims_access_error(command, ctx)
+
+    async def raise_claims_access_error(self, command, ctx):
         claims_str = '\n'.join(command.claims)
         raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
                                 f'\n **Help:** For more information on how claims work please visit my website [Link!]'

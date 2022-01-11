@@ -7,7 +7,9 @@ import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors
+from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
+import bot.bot_secrets as bot_secrets
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +31,17 @@ class InfractionsCog(commands.Cog):
     )
     @ext.short_help('Lists a users infractions')
     @ext.example(('infractions', 'infractions @SomeUser'))
-    @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_warn)
+    @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_infraction_view_self)
     async def infractions(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
         user = user or ctx.author
+        claims = await self.bot.claim_route.get_claims_user(ctx.author)
+
+        if user != ctx.author and Claims.moderation_infraction_view not in claims:
+            raise ClaimsAccessError(f'Missing claims to run this operation on another user. '
+                                    f'Need any of the following\n ```\n{Claims.moderation_infraction_view}```'
+                                    f'\n **Help:** For more information on how claims work please visit my website [Link!]'
+                                    f'({bot_secrets.secrets.site_url}wiki/claims)\n'
+                                    f'or run the `{await ctx.bot.current_prefix(ctx.message)}help claims` command')
 
         infractions = await self.bot.moderation_route.get_guild_infractions_user(ctx.guild.id, user.id)
         chunked_infractions = self.chunk_list(infractions, 5)
