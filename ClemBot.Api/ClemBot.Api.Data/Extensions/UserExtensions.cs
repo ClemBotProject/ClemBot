@@ -36,6 +36,7 @@ public static class UserExtensions
                            .SelectMany(
                                c => c.Claims.Select(
                                    d => d.Claim)))
+                   .Distinct()
                    .ToListAsync();
 
     /// <summary>
