@@ -1,5 +1,3 @@
-import { defineNuxtConfig } from '@nuxt/bridge'
-
 // eslint-disable-next-line eqeqeq
 const isProd = () => process.env.PROD == '1'
 const prodHost = '0.0.0.0'
@@ -7,10 +5,12 @@ const localHost = 'localhost'
 const prodUrl = 'https://clembot.io:443/api'
 const devUrl = 'https://localhost:5001/api'
 
+const runtimeUrl = isProd() ? prodUrl : devUrl
+
 // eslint-disable-next-line no-console
 console.log(process.env.DISCORD_CLIENT_ID)
 
-export default defineNuxtConfig({
+export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   //ssr: false,
 
@@ -42,7 +42,6 @@ export default defineNuxtConfig({
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/ClemBotLogo.svg' }],
   },
 
-  // @ts-ignore
   axios: {
     baseURL: isProd() ? prodUrl : devUrl, // Used as fallback if no runtime config is provided
   },
@@ -94,6 +93,8 @@ export default defineNuxtConfig({
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
+    // https://go.nuxtjs.dev/typescript
+    '@nuxt/typescript-build',
     '@nuxtjs/dotenv',
   ],
 
@@ -105,4 +106,14 @@ export default defineNuxtConfig({
     // https://go.nuxtjs.dev/buefy
     ['nuxt-buefy', { css: false }],
   ],
-})
+
+  // Build Configuration: https://go.nuxtjs.dev/config-build
+  build: {
+    extend(config, { isClient }) {
+      // Extend only webpack config for client-bundle
+      if (isClient) {
+        config.devtool = 'source-map'
+      }
+    },
+  },
+}
