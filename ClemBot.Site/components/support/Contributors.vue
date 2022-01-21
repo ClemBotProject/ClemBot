@@ -42,6 +42,7 @@ export default Vue.extend({
   },
 
   async fetch() {
+    // @ts-ignore
     this.contributors = await this.$api.$axios.$get<Array<Contributor>>(
       'https://api.github.com/repos/ClemBotProject/ClemBot/contributors'
     )
