@@ -89,6 +89,3 @@ sw.*
 
 # Vim swap files
 *.swp
-
-# ignore nuxt3 output folder
-.output

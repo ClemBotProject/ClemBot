@@ -26,6 +26,7 @@ services:
   clembot.api:
     restart: always
     image: ghcr.io/clembotproject/clembot.api:master
+    restart: always
     networks:
         - clembot-network
         - nginx-proxy

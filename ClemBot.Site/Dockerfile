@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:14-alpine
 
 # Create app directory
 WORKDIR /usr/src/clembot.site
@@ -18,6 +18,6 @@ COPY package*.json ./
 
 COPY . .
 
-RUN yarn install && yarn run build
+RUN npm install && npm run build
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
