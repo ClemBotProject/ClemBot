@@ -91,16 +91,16 @@ The Api utilizes the following technologies
 * Mediatr [Link](https://github.com/jbogard/MediatR)
 * Serilog [Link](https://serilog.net/)
 
-## ClemBot.Site
-The site is a server side Nuxt.js and vue.js app that integrates with discord oauth
-* Vue.js [Link](https://vuejs.org/)
-* Nuxt.js [Link](https://nuxtjs.org/)
-
 ClemBot.Api.Data folder contains the Entity Framework Code first db models and contexts
 </br>
 ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in the `Features` folder
 </br>
 ClemBot.Api.Services containes the caching and authorization services that perform more complex tasks
+
+## ClemBot.Site
+The site is a server side Nuxt.js and vue.js app that integrates with discord oauth
+* Vue.js [Link](https://vuejs.org/)
+* Nuxt.js [Link](https://nuxtjs.org/)
 
 ## ClemBot Pipeline Status
 
