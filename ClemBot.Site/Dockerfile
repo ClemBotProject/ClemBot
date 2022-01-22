@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:16-alpine
 
 # Create app directory
 WORKDIR /usr/src/clembot.site
@@ -14,10 +14,12 @@ ENV DISCORD_CLIENT_SECRET ${DISCORD_CLIENT_SECRET_ARG}
 ARG OAUTH_PERMISSIONS_ARG
 ENV OAUTH_PERMISSIONS ${OAUTH_PERMISSIONS_ARG}
 
+ENV HOST 0.0.0.0
+
 COPY package*.json ./
 
 COPY . .
 
-RUN npm install && npm run build
+RUN yarn install && yarn build
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
