@@ -21,7 +21,7 @@ CRAB_LINE_LENGTH = 58
 CRAB_COMMAND_COOLDOWN = 3
 
 
-def pillow_process(args, is_rave, lines_in_text, timestamp):
+def pillow_process(args, lines_in_text, timestamp):
     # Open crab.gif and add our font
     with Image.open('bot/cogs/memes_cog/assets/crab.gif') as im:
         fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
@@ -30,11 +30,12 @@ def pillow_process(args, is_rave, lines_in_text, timestamp):
         # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
         frames = []
         for frame in ImageSequence.Iterator(im):
+            frame = frame.quantize(colors=254) # quantize to make color palette size 254, leaving room for white and ClemsonOrange
             d = ImageDraw.Draw(frame)
             w, h = d.textsize(args, fnt)
             # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
-            d.text((im.size[0] / 2 - w / 2, im.size[1] - h - (5 * lines_in_text)), args, font=fnt, align='center',
-                   stroke_width=bool(is_rave), stroke_fill=Colors.ClemsonOrange, spacing=6)
+            d.text((im.size[0] / 2 - w / 2, im.size[1] - h - (7 * lines_in_text)), args, font=fnt, align='center',
+                   fill="#ffffff", stroke_width=2, stroke_fill=f'#{hex(Colors.ClemsonOrange)[2:]}', spacing=6)
             del d
 
             b = io.BytesIO()
@@ -140,10 +141,10 @@ class MemesCog(commands.Cog):
     @ext.short_help('Generates a crab rave gif')
     @ext.chainable_input()
     @ext.example('crab hello from crab world')
-    async def crab(self, ctx, is_rave: t.Optional[bool] = True, *, args='Bottom text\n is dead'):
+    async def crab(self, ctx, *, args='Bottom text\n is dead'):
         """
         Create your own crab rave.
-        Usage: <prefix>crab [is_rave=True] [text=Bottom text\\n is dead]
+        Usage: <prefix>crab [text=Bottom text\\n is dead]
         Aliases: rave, 🦀
         """
         # crab.gif dimensions - 352 by 200
@@ -168,7 +169,7 @@ class MemesCog(commands.Cog):
 
         loop = self.bot.loop
         with concurrent.futures.ProcessPoolExecutor() as pool:
-            pil_args = (args, is_rave, lines_in_text, timestamp)
+            pil_args = (args, lines_in_text, timestamp)
             await loop.run_in_executor(pool, pillow_process, *pil_args)
 
         # Attach, send, and delete created gif
@@ -197,7 +198,7 @@ class MemesCog(commands.Cog):
                     cookouttray 20
                     ctray 100
                     trayforjay 3.14
-        
+
         Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
         """
         money = round(float(input), 2)
