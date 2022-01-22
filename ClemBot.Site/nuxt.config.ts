@@ -11,8 +11,6 @@ const devUrl = 'https://localhost:5001/api'
 console.log(process.env.DISCORD_CLIENT_ID)
 
 export default defineNuxtConfig({
-  // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  //ssr: false,
 
   server: {
     port: 3000, // default: 3000
