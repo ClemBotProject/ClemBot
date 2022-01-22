@@ -1586,7 +1586,7 @@
     webpack-node-externals "^3.0.0"
     webpackbar "^5.0.2"
 
-"@nuxtjs/auth-next@^5.0.0-1642755117.7a526bb1":
+"@nuxtjs/auth-next@^5.0.0-1642755117.7a526bb":
   version "5.0.0-1642755117.7a526bb"
   resolved "https://registry.yarnpkg.com/@nuxtjs/auth-next/-/auth-next-5.0.0-1642755117.7a526bb.tgz#9be657242eeb06123fed4da04c302b88b31846dd"
   integrity sha512-Ju9n3QRbKuLsrNKRdakAi5I8Cxn3b9g9k1/haK1bll/GhFtYUNv1V5BRLBKjGOOVt9WIYxGnsFboYhlQ08wQRw==
