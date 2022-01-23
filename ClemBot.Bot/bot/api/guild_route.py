@@ -38,6 +38,9 @@ class GuildRoute(BaseRoute):
     async def get_guild(self, guild_id: int):
         return await self._client.get(f'bot/guilds/{guild_id}')
 
+    async def get_all_guilds(self):
+        return await self._client.get(f'bot/guilds')
+
     async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool):
         resp = await self._client.get(f'bot/Guilds/{guild_id}/SlotScores', params={'leader': str(leader), 'limit': limit})
         return resp['scores']
