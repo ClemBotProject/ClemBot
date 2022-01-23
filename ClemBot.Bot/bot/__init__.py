@@ -32,7 +32,7 @@ else:
     logging.Logger.manager = logging.Manager(logging.Logger.root)
 
     logging.basicConfig(
-        format='%(asctime)s %(levelname)s %(message)s',
+        format='%(asctime)s %(levelname)s %(module)s %(message)s',
         handlers=[
             ConsoleStructuredLogHandler()
         ],

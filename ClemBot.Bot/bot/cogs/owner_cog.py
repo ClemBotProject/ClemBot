@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from collections import deque
+import json
 
 import discord
 import discord.ext.commands as commands
@@ -69,6 +70,12 @@ class OwnerCog(commands.Cog):
         for guild in difference:
             await ctx.send(f'Deleting Guild {guild} from database')
             await self.bot.guild_route.leave_guild(guild)
+
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def userupdatequeuestats(self, ctx, full_output: bool=False):
+        queue = {k: str(v) if full_output else v.qsize() for k, v in self.bot.active_services['UserHandlingService'].user_update_queue.items()}
+        await ctx.send(json.dumps(queue, indent=True))
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()
