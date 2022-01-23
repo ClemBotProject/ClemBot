@@ -13,6 +13,10 @@ Make sure you can run these commands and install them if not present.
 * .Net 6 SDK [Link](https://dotnet.microsoft.com/download/dotnet/6.0)
 * A C# IDE, Preferably [Visual Studio Community](https://visualstudio.microsoft.com/) (Windows only) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (Cross Platform, Free with a student email)
 
+### ClemBot.Site
+* nvm [Link](https://github.com/nvm-sh/nvm#installing-and-updating)
+* yarn [Link](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) (Find your operating system in the dropdown)
+
 ### Database
 * PostgresSQL 14 [Link](https://www.postgresql.org/download/)
 * PgAdmin4 [Link](https://www.pgadmin.org/download/)
@@ -104,5 +108,23 @@ The bot should show up in the test server and respond to commands (test with `<y
 * Open the `ClemBot.Api.sln` file in the `ClemBot/ClemBot.Api` folder to open the project in either Visual Studio or Rider
 * Click the run button in your preferred IDE
 
+## Setting up the ClemBot.Site build environment
+
+* Navigate to the ClemBot.Site folder in your shell
+* Install Node.js 16 with nvm with the command `nvm install 16` then `nvm use 16`
+* Install dependencies with yarn with the command `yarn install`
+* The dev server can then be run with the command `yarn run dev` 
+
 ## Final Notes
-The ClemBot.Api and the ClemBot.Bot projects talk to each other over http, both projects need to be run simultaneously if you are not working in BotOnly mode.
+ClemBot is composed of several seperate components that all talk to each other over HTTP to form a complete system. Depending on what you are developing you might not need all of them setup to develop what you want. 
+
+Here are some common scenarios and what pieces you need to have running:
+
+1. Developing a simple Discord command that does not require the database
+  - You just need to run the ClemBot.Bot project with the BotOnly config flag set to true
+2. Developing functionality that does require the database and the api
+  - You will need to have the postgres server running, the ClemBot.Api project running and ClemBot.Bot running
+3. Developing or fixing a visual bug on the website that is not in the dashboard
+  - You will need just the ClemBot.Site codebase running to work on this
+4. Developing a dashboard page or fixing dashboard functionality
+  - You will need the complete ClemBot system running, the Bot, the Api, the Site and the database
