@@ -52,6 +52,24 @@ class OwnerCog(commands.Cog):
 
         await ctx.send(f'{guild.name} reloaded')
 
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def resetguilds(self, ctx, apply: bool = False):
+        db_guilds = await self.bot.guild_route.get_all_guilds()
+        db_guilds_ids = set(g['id'] for g in db_guilds)
+        disc_guilds = set(g.id for g in self.bot.guilds)
+
+        difference = db_guilds_ids - disc_guilds
+
+        await ctx.send(f'Found the following guilds {difference}')
+
+        if not apply:
+            return
+
+        for guild in difference:
+            await ctx.send(f'Deleting Guild {guild} from database')
+            await self.bot.guild_route.leave_guild(guild)
+
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()
     async def channel(self, ctx):
