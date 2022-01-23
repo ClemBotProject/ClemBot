@@ -29,7 +29,7 @@ class UserHandlingService(BaseService):
         self.user_id_cache: t.List[int] = []
 
         # Guild specific user update queue to only dispatch one update event per guild at a time
-        self.user_update_queue: t.Dict[int, asyncio.Queue[UpdateEvent]] = {}
+        self.user_update_queue: t.Dict[int, asyncio.Queue] = {}
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_user_joined)
