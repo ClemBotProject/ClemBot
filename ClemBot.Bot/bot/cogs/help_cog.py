@@ -82,7 +82,7 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def find_command(self, parent, command_name: str):
+    def find_command(self, parent: commands.Command, command_name: str):
         """
         Recursively searches the command tree to find a given command, if none found then returns None
         """
@@ -93,7 +93,7 @@ class HelpCog(commands.Cog):
                     found = result
             return found
 
-        if parent.qualified_name == command_name:
+        if command_name in (parent.qualified_name, *parent.aliases):
             return parent
 
         if isinstance(parent, ext.ClemBotGroup):
