@@ -93,14 +93,17 @@ class UserHandlingService(BaseService):
     async def add_to_queue(self, guild: discord.Guild, user: discord.Member, role_ids: t.List[int]):
 
         # Check if the guild_id is the in the queue dict, if it's not we need to create the queue first
+        log.info('starting add_to_queue')
         if guild.id not in self.user_update_queue:
             log.info('Creating user_update queue for guild {guild}', guild=serializers.log_guild(guild))
             self.user_update_queue[guild.id] = asyncio.Queue()
 
             # Create the polling task to loop over the queue and dispatch events
+            log.info('starting queue create task')
             asyncio.create_task(self.send_guild_queue(guild.id))
 
         event = UpdateEvent(user.id, role_ids)
+        log.info('starting queue get qsize')
         size = self.user_update_queue[guild.id].qsize()
         log.info('Adding UserUpdate {event} to {queue} with new size: {size}', event=event, queue=guild.id, size=size+1)
         await self.user_update_queue[guild.id].put(event)
@@ -114,6 +117,7 @@ class UserHandlingService(BaseService):
                 event = self.user_update_queue[guild_id].get_nowait()
                 size = self.user_update_queue[guild_id].qsize()
             except asyncio.QueueEmpty:
+                log.info('empty queue found, sleeping for time')
                 await asyncio.sleep(UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME)
                 continue
                 # The queue is empty we can delete it
@@ -121,6 +125,7 @@ class UserHandlingService(BaseService):
                 # del self.user_update_queue[guild_id]
                 # return
 
+            log.warning('test dispatch')
             log.info('Dispatching update event: {event} on queue: {queue} new queue size: {size}',
                      event=event,
                      queue=guild_id,
