@@ -117,7 +117,6 @@ class UserHandlingService(BaseService):
                 event = self.user_update_queue[guild_id].get_nowait()
                 size = self.user_update_queue[guild_id].qsize()
             except asyncio.QueueEmpty:
-                log.info('empty queue found, sleeping for time')
                 await asyncio.sleep(UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME)
                 continue
                 # The queue is empty we can delete it
