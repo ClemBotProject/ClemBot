@@ -102,7 +102,10 @@ class UserHandlingService(BaseService):
 
         event = UpdateEvent(user.id, role_ids)
         size = self.user_update_queue[guild.id].qsize()
-        log.info('Adding UserUpdate {event} to {queue} with new size: {size}', event=event, queue=guild.id, size=size+1)
+        log.info('Adding UserUpdate {event} to {queue} with new size: {size}',
+                 event=dataclasses.asdict(event),
+                 queue=guild.id,
+                 size=size+1)
         await self.user_update_queue[guild.id].put(event)
 
     async def send_guild_queue(self, guild_id: int):
@@ -114,13 +117,15 @@ class UserHandlingService(BaseService):
                 event = self.user_update_queue[guild_id].get_nowait()
                 size = self.user_update_queue[guild_id].qsize()
             except asyncio.QueueEmpty:
+                await asyncio.sleep(UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME)
+                continue
                 # The queue is empty we can delete it
-                log.info('Empty queue found, deleting UserUpdate Queue {queue}', queue=guild_id)
-                del self.user_update_queue[guild_id]
-                return
+                # log.info('Empty queue found, deleting UserUpdate Queue {queue}', queue=guild_id)
+                # del self.user_update_queue[guild_id]
+                # return
 
             log.info('Dispatching update event: {event} on queue: {queue} new queue size: {size}',
-                     event=event,
+                     event=dataclasses.asdict(event),
                      queue=guild_id,
                      size=size)
             await self.bot.user_route.update_roles(event.user_id, event.user_roles_ids, raise_on_error=False)
