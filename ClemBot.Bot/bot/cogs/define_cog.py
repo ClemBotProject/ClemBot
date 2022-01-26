@@ -3,6 +3,7 @@
 
 import logging
 import re
+import unicodedata
 
 import aiohttp
 import discord
@@ -115,6 +116,9 @@ class defineCog(commands.Cog):
 
         self.api_key = bot_secrets.secrets.merriam_key
 
+        # Break down the unicode string to split up any special characters into their base parts
+        # Ex: U+0239 (ï) -> U+0105 (i) + U+0776 (diaeresis modifier)
+        word = unicodedata.normalize('NFKD', word)
         # Remove any characters besides &, _, or - that are not in ranges a-z, A-Z, or 0-9
         # per the ASCII Table https://www.asciitable.com
         word = re.sub("[^a-zA-Z0-9 &_-]+", "", word)
