@@ -204,7 +204,7 @@ class ApiClient:
 
     async def _request_or_reconnect(self, http_type: str, endpoint: str, **kwargs):
 
-        raise_on_error = kwargs.get('raise_on_error', False),
+        raise_on_error = kwargs.get('raise_on_error', False)
         body = kwargs.get('data', None)
         params = kwargs.get('params', None)
 
@@ -212,7 +212,7 @@ class ApiClient:
         if self.bot_only:
             raise BotOnlyRequestError("Request Failed: Bot is in bot_only mode")
 
-        # Throw if we arent connected to notify commands or services the request failed
+        # Throw if we aren't connected to notify commands or services the request failed
         if not self.connected:
             raise ApiClientRequestError('ClemBot.Api not connected')
 
