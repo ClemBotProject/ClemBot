@@ -444,8 +444,9 @@ class EventsMeta(type):
         Published when a user is unmuted by clembot
 
         Args:
-            guild (discord.Guild): Guild id where the unmute happened
-            subject (discord.Member): The moderated user
+            guild_id (discord.Guild): Guild id where the unmute happened
+            subject_id (discord.Member): The moderated user id
+            mute_id (int): The id of a pardoned mute
             reason (Optional[str]): The reason for the unmute
         """
         return 'on_bot_unmute'
