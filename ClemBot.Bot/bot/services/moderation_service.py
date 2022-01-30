@@ -49,15 +49,17 @@ class ModerationService(BaseService):
                                                               reason=reason,
                                                               raise_on_error=True)
 
-        self.bot.scheduler.schedule_at(self._unmute_callback(subject, mute_id), time=duration)
+        self.bot.scheduler.schedule_at(self._unmute_callback(guild.id, subject.id, mute_id), time=duration)
 
     @BaseService.Listener(Events.on_bot_unmute)
     async def on_bot_unmute(self,
-                            guild: discord.Guild,
-                            subject: discord.Member,
+                            guild_id: int,
+                            subject_id: int,
                             mute_id: int,
                             reason: str,
                             author: discord.Member = None):
+
+        guild = self.bot.get_guild(guild_id)
 
         mute_role = discord.utils.get(guild.roles, name=Moderation.mute_role_name)
 
@@ -65,6 +67,20 @@ class ModerationService(BaseService):
             author = self.bot.user
 
         await self.bot.moderation_route.deactivate_mute(mute_id, raise_on_error=True)
+
+        subject = guild.get_member(subject_id)
+
+        if not subject:
+            embed = discord.Embed(color=Colors.ClemsonOrange)
+            embed.title = 'Guild Member Unmuted'
+            embed.add_field(name='Name unknown, member not in the server', value=f'Id: {subject_id}')
+            embed.set_author(name=self.get_full_name(author), icon_url=author.display_avatar.url)
+            embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+
+            return await self.bot.messenger.publish(Events.on_send_in_designated_channel,
+                                                    DesignatedChannels.moderation_log,
+                                                    guild.id,
+                                                    embed)
 
         if mute_role not in subject.roles:
             return
@@ -81,7 +97,7 @@ class ModerationService(BaseService):
             await subject.send(embed=embed)
         except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
-            embed.title = f'Dm unmute to {self.get_full_name(subject)} forbidden'
+            embed.title = f'Dm Unmute to {self.get_full_name(subject)} forbidden'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                              DesignatedChannels.moderation_log,
                                              guild.id,
@@ -166,8 +182,8 @@ class ModerationService(BaseService):
                                          guild.id,
                                          embed)
 
-    async def _unmute_callback(self, user: discord.Member, mute_id):
-        await self.bot.messenger.publish(Events.on_bot_unmute, user.guild, user, mute_id, 'Mute Time Expired')
+    async def _unmute_callback(self, guild_id: int, user_id: int, mute_id) -> None:
+        await self.bot.messenger.publish(Events.on_bot_unmute, guild_id, user_id, mute_id, 'Mute Time Expired')
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
@@ -178,12 +194,8 @@ class ModerationService(BaseService):
 
             for mute in (m for m in mutes if m.type == Infractions.mute and m.active):
                 wait: datetime = datetime.strptime(mute.duration, '%Y-%m-%dT%H:%M:%S.%f')
-                member = guild.get_member(mute.subject_id)
-
-                if not member:
-                    continue
 
                 if (wait - datetime.utcnow()).total_seconds() <= 0:
-                    await self._unmute_callback(member, mute.id)
+                    await self._unmute_callback(guild.id, mute.subject_id, mute.id)
                 else:
-                    self.bot.scheduler.schedule_at(self._unmute_callback(member, mute.id), time=wait)
+                    self.bot.scheduler.schedule_at(self._unmute_callback(guild.id, mute.subject_id, mute.id), time=wait)
