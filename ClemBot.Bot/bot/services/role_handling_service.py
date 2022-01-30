@@ -31,7 +31,11 @@ class RoleHandlingService(BaseService):
         await self.bot.role_route.remove_role(role.id, raise_on_error=True)
 
     @BaseService.Listener(Events.on_guild_role_update)
-    async def on_role_update(self, before, after: discord.Role):
+    async def on_role_update(self, before: discord.Role, after: discord.Role):
+        # Only send role updates that changed values we care about to the database
+        if before.name == after.name and before.permissions.administrator == after.permissions.administrator:
+            return
+
         log.info('Role:{before} {after} updated in guild: {guild}',
                  before=serializers.log_role(before),
                  after=serializers.log_role(after),
