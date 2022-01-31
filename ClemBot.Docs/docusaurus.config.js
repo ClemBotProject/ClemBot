@@ -38,6 +38,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       defaultMode: "dark",
+      respectPrefersColorScheme: false,
       navbar: {
         title: "ClemBot Wiki",
         logo: {
@@ -79,7 +80,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} ClemBot, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} The ClemBotProject. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
