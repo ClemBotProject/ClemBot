@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "ClemBot",
   tagline: "Modular and Configurable Discord Bot",
-  url: "https://clembot.netlify.app",
+  url: "https://clembotdocs.netlify.app",
   baseUrl: "/",
   onBrokenLinks: "log",
   onBrokenMarkdownLinks: "warn",
