@@ -7,6 +7,12 @@ sidebar_position: 2
 ## Overview
 A command prefix is the character or phrase that notifies ClemBot that you wish to invoke a command.
 
+### Command Example
+```txt title="Discord Message"
+!about
+```
+"!" is the command prefix and about is the name of the command that you wish to invoke.
+
 :::tip
 Clembots mention serves as a universal prefix, it can always be used to invoke the bots commands
 
