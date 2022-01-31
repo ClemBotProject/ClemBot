@@ -5,7 +5,7 @@ slug: /
 
 # Introduction
 
-Hello there and welcome to **ClemBot**! ClemBot is a modular and configurable Discord bot for all of your server needs. For a complete list of all ClemBot commands run the !help command in a server that ClemBot is in.
+Hello there, and welcome to **ClemBot**! ClemBot is a modular and configurable Discord bot for all of your server needs. For a complete list of all ClemBot commands run the !help command in a server that ClemBot is in.
 
 ## Getting Started
 
