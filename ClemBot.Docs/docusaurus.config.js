@@ -7,10 +7,10 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "ClemBot",
-  tagline: "Dinosaurs are cool",
+  tagline: "Modular and Configurable Discord Bot",
   url: "https://clembot.netlify.app",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "log",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/ClemBotLogo.svg",
   organizationName: "ClemBotProject", // Usually your GitHub org/user name.
