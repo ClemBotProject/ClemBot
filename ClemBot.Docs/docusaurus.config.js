@@ -36,6 +36,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      defaultMode: "dark",
       navbar: {
         title: "ClemBot Wiki",
         logo: {
