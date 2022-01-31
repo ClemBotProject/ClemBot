@@ -14,18 +14,31 @@ use `@ClemBot prefix` to find what prefix the bot has been set to in your server
 :::
 
 ## Dashboard
-The Custom Prefix can be changed in the guild settings tab on the dashboard
+Changes a servers prefix to a given value. If no value is provided the current in use prefix is shown.
 
-## Command
-"!" is the command prefix and about is the name of the command that you wish to invoke.
+## Commands
 
-To change the prefix that the bot responds to the prefix command should be invoked.
+### Prefix
 
-#### Command Format
+#### Aliases
+* `prefixs`
+
+#### Required [Claims](./Claims.md)
+* `custom_prefix_set`
+
+#### Format
+```txt title="View the current prefix"
+!prefix 
 ```
+
+```txt title="Change the current prefix"
 !prefix <NewPrefix>
 ```
-### Example
+#### Example
+```
+!prefix
+```
+
 ```
 !prefix ?
 ```

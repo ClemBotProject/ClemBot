@@ -6,7 +6,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "ClemBot",
+  title: "ClemBot Docs",
   tagline: "Modular and Configurable Discord Bot",
   url: "https://clembotdocs.netlify.app",
   baseUrl: "/",
@@ -41,7 +41,7 @@ const config = {
       defaultMode: "dark",
       respectPrefersColorScheme: false,
       navbar: {
-        title: "ClemBot Wiki",
+        title: "ClemBot Docs",
         logo: {
           alt: "My Site Logo",
           src: "img/ClemBotLogo.svg",

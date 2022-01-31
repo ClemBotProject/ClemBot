@@ -5,7 +5,7 @@ sidebar_position: 3
 # Authorization Claims
 
 ## Overview
-By default ClemBot allows for anyone with Admin permissions in Discord full access to ClemBot's functionality. If you want to grant people without Admin permission access to individual parts of the Bot (a team of moderators for example) you can do that through "Claims".
+By default ClemBot allows for anyone with Admin permissions in Discord full access to ClemBot's functionality. If you want to grant people without server admin permissions access to individual parts of the Bot (a team of moderators for example) you can do that through "Claims".
 
 :::info
 Server owners and users with administrator roles are automatically granted all claims regardless of what roles they posess
@@ -20,7 +20,7 @@ Claims are ClemBot's way of providing servers' incredibly granular and precise c
 | assignable_roles_delete         | Allows for removing a role as assignable                                           |
 | claims_modify                   | Allows for modifying the assigned claims of a role                                 |
 | claims_view                     | Allows for viewing of claims that a user or role has                               |
-| custom_prefix_set               | Allows for setting the [custom prefix](./CustomPrefix) the Clembot responds to     |
+| custom_prefix_set               | Allows for setting the [custom prefix](./CustomPrefix.md) the Clembot responds to     |
 | delete_message                  | Allows for deletion of any message that Clembot reacts with a trashcan too         |
 | designated_channel_modify       | Allows for adding and removing designations from channels in a server              |
 | designated_channel_view         | Allows for viewing of available and assigned designated channels in a server       |
@@ -36,6 +36,9 @@ Claims are ClemBot's way of providing servers' incredibly granular and precise c
 
 ### Claims
 View all the claims on a given user or role. If a role is given, the command will return the aggregate of all claims from all roles the user has.
+
+#### Required [Claims](./Claims.md)
+* `claims_view`
 
 #### Format
 ```
@@ -61,6 +64,9 @@ Adds a claim to a given role, everyone who has that role will be granted permiss
 #### Aliases
 * `set`
 
+#### Required [Claims](./Claims.md)
+* `claims_modify`
+
 #### Format
 
 ```
@@ -74,8 +80,12 @@ Adds a claim to a given role, everyone who has that role will be granted permiss
 
 ### Remove 
 Adds a claim to a given role, everyone who has that role will be granted permissions to that functionality
+
 #### Aliases
 * `delete`
+
+#### Required [Claims](./Claims.md)
+* `claims_modify`
 
 #### Format
 
