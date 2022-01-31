@@ -15,6 +15,7 @@ const config = {
   favicon: "img/ClemBotLogo.svg",
   organizationName: "ClemBotProject", // Usually your GitHub org/user name.
   projectName: "ClemBot", // Usually your repo name.
+  plugins: ['docusaurus-plugin-sass'],
 
   presets: [
     [
@@ -27,7 +28,7 @@ const config = {
         },
         blog: false, // Optional: disable the blog plugin
         theme: {
-          customCss: [require.resolve("./src/css/custom.css")],
+          customCss: [require.resolve("./src/css/custom.scss")],
         },
       }),
     ],
@@ -43,7 +44,15 @@ const config = {
           alt: "My Site Logo",
           src: "img/ClemBotLogo.svg",
         },
+        items: [
+          {
+            to: "https://github.com/ClemBotProject/ClemBot",
+            className: 'header-github-link',
+            position: "right",
+          },
+        ],
       },
+
       footer: {
         style: "dark",
         links: [
