@@ -154,16 +154,27 @@ class AssignableRolesCog(commands.Cog):
     async def send_role_list(self, ctx, title: str):
 
         results = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
-
-        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
+        # list of all available roles
+        pages = []
+        
 
         if results:
             for chunk in self.chunk_list([role['name'] for role in results], ROLE_LIST_CHUNK_SIZE):
+                embed = discord.Embed(title=title, color=Colors.ClemsonOrange) #new
                 embed.add_field(name='Available:', value='\n'.join(chunk), inline=True)
-        else:
-            embed.add_field(name='Available:', value='No currently assignable roles.')
 
-        await ctx.send(embed=embed)
+                pages.append(embed)
+        else:
+            embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
+            embed.add_field(name='Available:', value='No currently assignable roles. New Comment')
+
+        #Call paginate service
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
+                                         pages=pages,
+                                         author=ctx.author,
+                                         channel=ctx.channel,
+                                         timeout=360
+                                         )
 
     async def set_role(self, ctx, role: discord.Role = None) -> None:
 
