@@ -166,7 +166,7 @@ class AssignableRolesCog(commands.Cog):
                 pages.append(embed)
         else:
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-            embed.add_field(name='Available:', value='No currently assignable roles. New Comment')
+            embed.add_field(name='Available:', value='No currently assignable roles.')
 
         #Call paginate service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
