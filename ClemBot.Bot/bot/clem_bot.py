@@ -163,7 +163,7 @@ class ClemBot(commands.Bot):
         claims_str = '\n'.join(command.claims)
         raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
                                 f'\n **Help:** For more information on how claims work please visit my website [Link!]'
-                                f'({bot_secrets.secrets.site_url}wiki/claims)\n'
+                                f'({bot_secrets.secrets.docs_url}/claims)\n'
                                 f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
 
     async def claims_check(self, ctx: commands.Context):
