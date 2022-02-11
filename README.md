@@ -25,7 +25,7 @@
   </a>
 </p>
  
- ## Website and Configuration Dashboard
+ ## Website, Documentation and Configuration Dashboard
  https://clembot.io
  
  ## Intro
