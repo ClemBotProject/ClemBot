@@ -24,6 +24,8 @@ Claims are ClemBot's way of providing servers' incredibly granular and precise c
 | delete_message                  | Allows for deletion of any message that Clembot reacts with a trashcan too            |
 | designated_channel_modify       | Allows for adding and removing designations from [channels](./DesignatedChannels.md) in a server              |
 | designated_channel_view         | Allows for viewing of available and assigned designated [channels](./DesignatedChannels.md) in a server          |
+| guild_settings_view             | Allows for viewing of the guilds settings on the dashboard                            |
+| guild_settings_view             | Allows for modifying of the guilds settings on the dashboard                          |
 | moderation_ban                  | Allows for usage of the ban command                                                   |
 | moderation_infraction_view      | Allows for usage of the infractions command to list a given users infractions         |
 | moderation_infraction_view_self | Allows for usage of the infractions command to view only the users own infractions    |
@@ -31,6 +33,8 @@ Claims are ClemBot's way of providing servers' incredibly granular and precise c
 | moderation_warn                 | Allows for usage of the warn command                                                  |
 | tag_add                         | Allows for adding a [tag](./Tags.md) in a server                                      |
 | tag_delete                      | Allows for deleting other peoples [tags](./Tags.md) in a server                       |
+| welcome_message_view            | Allows for viewing the servers [welcome message](./WelcomeMessage.md)                 |
+| welcome_message_modify          | Allows for setting the servers [welcome message](./WelcomeMessage.md)                 |
 
 ## Commands
 
