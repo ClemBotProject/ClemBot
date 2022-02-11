@@ -29,7 +29,23 @@ Sets a servers welcome message
 #### Required [Claims](./Claims.md)
 * `welcome_message_modify`
 
+#### Format
+```
+!welcome set <WelcomeMessage>
+```
+
 #### Example
 ```txt
 !welcome set welcome to our amazing server
+```
+
+### Delete
+Deletes a servers welcome message
+
+#### Required [Claims](./Claims.md)
+* `welcome_message_modify`
+
+#### Example
+```txt
+!welcome delete
 ```
