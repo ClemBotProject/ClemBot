@@ -7,6 +7,10 @@ ClemBot provides powerful moderation tools to help you run your server. Every mo
 
 You have a complete history of every Infraction every committed in your server, to view them run these comands.
 
+## Logging
+
+ClemBot will log all moderation actions into a given channel if configured. See [Designated Channels](../DesignatedChannels.md) for more information on how to enable moderation logging.
+
 ## Commands
 
 ### Infractions

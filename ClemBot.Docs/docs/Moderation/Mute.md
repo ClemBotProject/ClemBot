@@ -7,7 +7,6 @@ sidebar_position: 4
 Mutes silence an individual and prevent them from sending messages or joining voice channels for a given amount of time.
 
 ## Setup
-Setup
 Mutes require a one time inital setup for ClemBot to create the mute role and add it to all the channels. This might take a while depending on how many channels your server has. To avoid a heavy startup load the bot will prompt you to initialize the role when you run the mute command for the first time. After the initial setup is complete it will then apply the mute as normal.
 
 :::caution
