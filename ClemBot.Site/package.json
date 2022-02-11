@@ -15,7 +15,7 @@
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.9.1",
     "discord-oauth2": "^2.7.1",
-    "fibers": "^5.0.0",
+    "fibers": "^5.0.1",
     "node-sass": "npm:sass@^1.45.0",
     "nuxt": "^2.15.3",
     "nuxt-buefy": "^0.4.4",
