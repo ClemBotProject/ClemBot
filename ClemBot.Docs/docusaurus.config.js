@@ -38,8 +38,10 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       image: 'img/ClemBotLogo.png',
-      defaultMode: "dark",
-      respectPrefersColorScheme: false,
+      colorMode: {
+        defaultMode: "dark",
+        respectPrefersColorScheme: false,
+      },
       navbar: {
         title: "ClemBot Docs",
         logo: {
