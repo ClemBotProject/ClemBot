@@ -10,7 +10,7 @@ const config = {
   tagline: "Modular and Configurable Discord Bot",
   url: "https://clembotdocs.netlify.app",
   baseUrl: "/",
-  onBrokenLinks: "log",
+  onBrokenLinks: "error",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/ClemBotLogo.svg",
   organizationName: "ClemBotProject", // Usually your GitHub org/user name.
@@ -62,8 +62,8 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
-                to: "/docs/intro",
+                label: "Intro",
+                to: "/",
               },
             ],
           },
