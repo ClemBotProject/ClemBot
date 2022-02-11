@@ -349,7 +349,9 @@ class TagCog(commands.Cog):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
             embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
             embed.description = f'To view all tags please visit: [site]({url})'
-            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            embed.set_author(name=f'{self.bot.user.name} - Tags',
+                             url=f'{bot_secrets.secrets.docs_url}/tags',
+                             icon_url=self.bot.user.display_avatar.url)
             for tag in chunk:
                 embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
             pages.append(embed)
