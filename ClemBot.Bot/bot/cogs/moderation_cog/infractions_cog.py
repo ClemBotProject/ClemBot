@@ -93,7 +93,7 @@ class InfractionsCog(commands.Cog):
         await self.bot.moderation_route.delete_infraction(infraction_id, raise_on_error=True)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'Infractions {infraction_id} deleted successfully  :white_check_mark:'
+        embed.title = f'Infraction {infraction_id} deleted successfully  :white_check_mark:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         return await ctx.send(embed=embed)
 
