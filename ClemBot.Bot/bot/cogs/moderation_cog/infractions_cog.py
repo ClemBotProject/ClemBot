@@ -40,7 +40,7 @@ class InfractionsCog(commands.Cog):
             raise ClaimsAccessError(f'Missing claims to run this operation on another user. '
                                     f'Need any of the following\n ```\n{Claims.moderation_infraction_view.name}```'
                                     f'\n **Help:** For more information on how claims work please visit my website [Link!]'
-                                    f'({bot_secrets.secrets.site_url}wiki/claims)\n'
+                                    f'({bot_secrets.secrets.docs_url}/Claims)\n'
                                     f'or run the `{await ctx.bot.current_prefix(ctx.message)}help claims` command')
 
         infractions = await self.bot.moderation_route.get_guild_infractions_user(ctx.guild.id, user.id)
