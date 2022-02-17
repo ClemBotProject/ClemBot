@@ -348,7 +348,7 @@ class TagCog(commands.Cog):
         for chunk in self.chunk_list(tags_list, n):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
             embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
-            embed.description = f'To view all tags please visit: [site]({url})'
+            embed.description = f'To view all tags please visit: [clembot.io]({url})'
             embed.set_author(name=f'{self.bot.user.name} - Tags',
                              url=f'{bot_secrets.secrets.docs_url}/tags',
                              icon_url=self.bot.user.display_avatar.url)
