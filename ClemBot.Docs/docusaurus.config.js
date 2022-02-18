@@ -56,6 +56,18 @@ const config = {
           },
         ],
       },
+      algolia: {
+        // The application ID provided by Algolia
+        appId: 'B26JM1DNH7',
+  
+        // Public API key: it is safe to commit it
+        apiKey: '31a0b1cfd9cbc150022377c3d10e9396',
+  
+        indexName: 'docs-clembot',
+  
+        // Optional: see doc section below
+        contextualSearch: true,
+      },
 
       footer: {
         style: "dark",
