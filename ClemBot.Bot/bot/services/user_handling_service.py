@@ -28,8 +28,6 @@ class UserHandlingService(BaseService):
         # UserId cache so that we don't hit the database on subsequent user updates
         self.user_id_cache: t.List[int] = []
 
-        # Guild specific user update queue to only dispatch one update event per guild at a time
-        self.user_update_queue: t.Dict[int, asyncio.Queue] = {}
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_user_joined)
@@ -54,7 +52,7 @@ class UserHandlingService(BaseService):
                  user=serializers.log_user(user),
                  guild=serializers.log_guild(user.guild))
 
-        # Even tho a user leaving a server doesn't clear them from the db
+        # Even though a user leaving a server doesn't clear them from the db
         # Its unlikely they are in multiple clembot servers
         # So remove them from the cache to keep its size down, and they will be
         # Readded the next time they are edited
@@ -88,47 +86,7 @@ class UserHandlingService(BaseService):
             # This user exists, add it to the cache
             self.user_id_cache.append(before.id)
 
-        await self.add_to_queue(after.guild, after, [r.id for r in after.roles])
-
-    async def add_to_queue(self, guild: discord.Guild, user: discord.Member, role_ids: t.List[int]):
-
-        # Check if the guild_id is the in the queue dict, if it's not we need to create the queue first
-        if guild.id not in self.user_update_queue:
-            log.info('Creating user_update queue for guild {guild}', guild=serializers.log_guild(guild))
-            self.user_update_queue[guild.id] = asyncio.Queue()
-
-            # Create the polling task to loop over the queue and dispatch events
-            asyncio.create_task(self.send_guild_queue(guild.id))
-
-        event = UpdateEvent(user.id, role_ids)
-        size = self.user_update_queue[guild.id].qsize()
-        log.info('Adding UserUpdate {update_event} to {queue} with new size: {size}',
-                 update_event=dataclasses.asdict(event),
-                 queue=guild.id,
-                 size=size+1)
-        await self.user_update_queue[guild.id].put(event)
-
-    async def send_guild_queue(self, guild_id: int):
-
-        # Loop infinitely to dispatch events
-        while True:
-            try:
-                # Attempt to get an enqueued event
-                event = self.user_update_queue[guild_id].get_nowait()
-                size = self.user_update_queue[guild_id].qsize()
-            except asyncio.QueueEmpty:
-                await asyncio.sleep(UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME)
-                continue
-                # The queue is empty we can delete it
-                # log.info('Empty queue found, deleting UserUpdate Queue {queue}', queue=guild_id)
-                # del self.user_update_queue[guild_id]
-                # return
-
-            log.info('Dispatching update event: {update_event} on queue: {queue} new queue size: {size}',
-                     update_event=dataclasses.asdict(event),
-                     queue=guild_id,
-                     size=size)
-            await self.bot.user_route.update_roles(event.user_id, event.user_roles_ids, raise_on_error=False)
+        await self.bot.user_route.update_roles(before.id, [r.id for r in after.roles], raise_on_error=False)
 
     async def notify_user_join(self, user: discord.Member):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
