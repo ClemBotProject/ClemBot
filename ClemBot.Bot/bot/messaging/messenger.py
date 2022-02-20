@@ -33,6 +33,7 @@ class Messenger:
         # Error callback to report exceptions in queued events back to
         self.error_callback: t.Callable = None
 
+        # pylint: disable=E1136
         self._guild_event_queue: t.Dict[int, asyncio.Queue[QueuedEvent]] = {}
 
         self._queue_dispatch_tasks: t.Dict[int, DispatchQueue] = {}
@@ -155,6 +156,7 @@ class Messenger:
                     # We don't want to raise the exception further than this because
                     # That will exit our loop and cause no more events to be dispatched
                     tb = traceback.format_exc()
+                    # pylint: disable=E1102
                     await self.error_callback(e, traceback=tb)
                 else:
                     log.exception('No error callback set in messenger {messenger} for error {error}',
