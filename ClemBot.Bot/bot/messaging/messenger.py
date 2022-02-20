@@ -82,12 +82,21 @@ class Messenger:
         log.info('Gracefully closing all dispatch tasks with ids: {tasks}', tasks=list(self._queue_dispatch_tasks.keys()))
 
         for guild_id, dispatch_task in self._queue_dispatch_tasks.items():
+
+            # Check if the event queue contains events to send, if it does not we can cancel the task
+            if self._guild_event_queue[guild_id].qsize() == 0:
+                dispatch_task.task.cancel()
+                continue
+
+            # Set the task to exit as soon as all events have cleared the queue
             dispatch_task.cancelled = True
 
         # Wait for all dispatch tasks to exit gracefully
         await asyncio.gather(*[task.task for _, task in self._queue_dispatch_tasks.items()])
 
         self._queue_dispatch_tasks.clear()
+
+        log.info('All messenger tasks cancelled successfully')
 
     async def __publish(self, event: str, *args, **kwargs) -> None:
         if event in self._events.keys():

@@ -136,6 +136,8 @@ class ClemBot(commands.Bot):
             log.error(f'Logout error embed failed with error {e}')
 
         log.info('Shutdown started: logging close time')
+
+        await self.messenger.close()
         await super().close()
 
     async def send_startup_log_embed(self, embed):
