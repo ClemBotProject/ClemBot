@@ -156,17 +156,16 @@ class AssignableRolesCog(commands.Cog):
         results = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
         # list of all available roles
         pages = []
-        
 
         if results:
             for chunk in self.chunk_list([role['name'] for role in results], ROLE_LIST_CHUNK_SIZE):
                 embed = discord.Embed(title=title, color=Colors.ClemsonOrange) #new
                 embed.add_field(name='Available:', value='\n'.join(chunk), inline=True)
-
                 pages.append(embed)
         else:
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.add_field(name='Available:', value='No currently assignable roles.')
+            pages.append(embed)
 
         #Call paginate service
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
