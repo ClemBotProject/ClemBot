@@ -19,7 +19,7 @@ namespace ClemBot.Api.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasPostgresEnum(null, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view" })
-                .HasPostgresEnum(null, "designated_channels", new[] { "message_log", "moderation_log", "user_join_log", "user_leave_log", "starboard", "server_join_log", "bot_dm_log" })
+                .HasPostgresEnum(null, "designated_channels", new[] { "message_log", "moderation_log", "user_join_log", "user_leave_log",  "server_join_log", "bot_dm_log" })
                 .HasPostgresEnum(null, "infraction_type", new[] { "ban", "mute", "warn" })
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.5")

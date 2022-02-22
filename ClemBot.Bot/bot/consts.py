@@ -22,7 +22,6 @@ class DesignatedChannels(DesignatedChannelBase):
     moderation_log = auto()
     user_join_log = auto()
     user_leave_log = auto()
-    starboard = auto()
 
     @staticmethod
     def has(member: str) -> bool:

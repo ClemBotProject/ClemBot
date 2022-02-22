@@ -6,7 +6,6 @@ public enum DesignatedChannels
     moderation_log,
     user_join_log,
     user_leave_log,
-    starboard,
     server_join_log,
     bot_dm_log
 }
