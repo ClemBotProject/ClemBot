@@ -67,7 +67,7 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 ### All Config Variables
 
 * `BotToken`:(Required) Your discord bots api access token
-* `ApiUrl`:(Required) Url of the ClemBot.Api ASP.Net endpoints (defaults to http://localhost:5001)
+* `ApiUrl`:(Required) Url of the ClemBot.Api ASP.Net endpoints (defaults to `http://localhost:5001/`)
 * `ApiKey`:(Required) Access key for the bot endpoints in ClemBot.Api
 * `ClientToken`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
 * `ClientSecret`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
@@ -92,7 +92,7 @@ Setup a virtual environment:
 `virtualenv venv`  windows: `py -m venv venv`
 
 Enter the virtualenv with:  
-`source venv/bin/activate` windows: `source .\venv\Scripts\activate`
+`source venv/bin/activate` windows: `.\venv\Scripts\activate`
 
 Then allow pip to get the latest libraries:  
 `pip3 install -r requirements.txt` windows: `py -m pip install -r requirements.txt`
