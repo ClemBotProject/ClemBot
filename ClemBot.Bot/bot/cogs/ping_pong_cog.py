@@ -6,6 +6,7 @@ import discord
 import re
 
 import discord.ext.commands as commands
+from bot.consts import Colors
 
 import bot.extensions as ext
 
@@ -15,7 +16,7 @@ class PingPongCog(commands.Cog):
         self.bot = bot
 
     @ext.command(name='ping', aliases=['pong'])
-    @ext.long_help('Shows the latency between the bot and Discord')
+    @ext.long_help('Shows the latency between the bot\'s internal components and Discord as well as ClemBot\'s API')
     @ext.short_help('shows bot latency')
     @ext.example('ping')
     async def ping(self, ctx: commands.Context) -> None:
@@ -23,8 +24,8 @@ class PingPongCog(commands.Cog):
         await self.bot.health_check_route.ping()
         clembot_api_latency = time.perf_counter() - start
 
-        embed = discord.Embed(title="ClemBot Latency :stopwatch:")
-        embed.add_field(name="Discord WS", value=f"{self.bot.latency * 1000 : 1.2f}ms")
+        embed = discord.Embed(color=Colors.ClemsonOrange, title="ClemBot Latency :stopwatch:")
+        embed.add_field(name="Discord WebSocket", value=f"{self.bot.latency * 1000 : 1.2f}ms")
         embed.add_field(name="Discord HTTP", value=":infinity:ms")
         embed.add_field(name="ClemBot API", value=f"{clembot_api_latency * 1000 : 1.2f}ms")
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)

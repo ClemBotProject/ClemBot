@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClemBot.Api.Common.Security.Policies.BotMaster;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClemBot.Api.Core.Features.HealthCheck;
 
