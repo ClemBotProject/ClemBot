@@ -7,5 +7,6 @@ namespace ClemBot.Api.Core.Features.HealthCheck;
 public class HealthCheckController : ControllerBase
 {
     [HttpGet("[controller]/ping")]
+    [BotMasterAuthorize]
     public IActionResult Ping() => Ok("pong!");
 }
