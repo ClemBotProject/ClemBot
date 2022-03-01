@@ -49,10 +49,9 @@ class TranslateCog(commands.Cog):
         else:
               raise UserInputError("Invalid input!")
 
-     return
+        return
 
-           
-
+          
     @translate.command()
     @ext.long_help('Shows all available languages to translate between')
     @ext.short_help('Shows available languages')
