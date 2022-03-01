@@ -386,3 +386,4 @@ def chunk_list(self, lst, n):
 
 def setup(bot):
     bot.add_cog(TranslateCog(bot))
+
