@@ -311,7 +311,7 @@ class TranslateCog(commands.Cog):
   
     
     
-   async def alternative_translate_lang(self, ctx, input):
+async def alternative_translate_lang(self, ctx, input):
     output_lang = await is_valid_lang_code(input[0]) 
     text = ' '.join(input[2:])       
     params = {
@@ -333,15 +333,15 @@ class TranslateCog(commands.Cog):
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
 
-        log.info(response[0]['translations'])
-        embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
-        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
-        embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
-        await ctx.send(embed=embed)
-        return
+    log.info(response[0]['translations'])
+    embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
+    name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
+    embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
+    await ctx.send(embed=embed)
+    return
 
     
-   def is_valid_lang_code(input: str):
+def is_valid_lang_code(input: str):
         if(input in LANGUAGE_NAME_TO_SHORT_CODE):
             return LANGUAGE_NAME_TO_SHORT_CODE.get(input)
         if(input in LANGUAGE_SHORT_CODE_TO_NAME):
