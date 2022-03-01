@@ -34,7 +34,7 @@ class TranslateCog(commands.Cog):
         if (is_valid_lang_code(input[0]) != None):
           await translate_given_lang(self, ctx, input)
         else:
-            raise UserInputError("Incorrect")
+            raise UserInputError("Ivalid input!")
 
     @translate.command()
     @ext.long_help('Alternative command to manually specify languages to convert to.')
@@ -43,11 +43,11 @@ class TranslateCog(commands.Cog):
 
     async def m(self, ctx, *input: str):
         if len(input) < 3:
-            raise UserInputError("Incorrect Number of Arguments. Minimum of 3 arguments")
+            raise UserInputError("Incorrect Number of Arguments. Minimum number of 3 arguments")
         if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])) != None:
             await alternative_translate_lang(self, ctx, input)
         else:
-              raise UserInputError("Incorrect")
+              raise UserInputError("Invalid input!")
 
      return
 
