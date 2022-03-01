@@ -126,6 +126,117 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
 CHUNK_SIZE = 15
 LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 
+LOWERCASE_LANGUAGENAME = {
+    
+"afrikaans":"af",      
+"albanian":"sq",      
+"amharic":"am",      
+"arabic":"ar",      
+"armenian":"hy",      
+"assamese":"as",      
+"azerbaijani":"az",      
+"bangla":"bn",      
+"bashkir":"ba",      
+"bosnian (latin)":"bs",      
+"bulgarian":"bg",      
+"cantonese (traditional)":"yue",        
+"catalan":"ca",      
+"chinese (literary)":"lzh",        
+"chinese simplified":"zh-hans",          
+"chinese traditional":"zh-hant",          
+"croatian":"hr",      
+"czech":"cs",      
+"danish":"da",      
+"dari":"prs",        
+"divehi":"dv",      
+"dutch":"nl",      
+"english":"en",      
+"estonian":"et",      
+"fijian":"fj",      
+"filipino":"fil",        
+"finnish":"fi",      
+"french":"fr",      
+"french (canada)":"fr-ca",        
+"georgian":"ka",      
+"german":"de",      
+"greek":"el",      
+"gujarati":"gu",      
+"haitian creole":"ht",      
+"hebrew":"he",      
+"hindi":"hi",      
+"hmong daw":"mww",        
+"hungarian":"hu",      
+"icelandic":"is",      
+"indonesian":"id",      
+"inuinnaqtun":"ikt",        
+"inuktitut":"iu",      
+"inuktitut (latin)":"iu-latn",          
+"irish":"ga",      
+"italian":"it",      
+"japanese":"ja",      
+"kannada":"kn",      
+"kazakh":"kk",      
+"khmer":"km",      
+"klingon":"tlh-lat",          
+"klingon (plqad)":"tlh-piq",          
+"korean":"ko",      
+"kurdish (central)  ":"ku",      
+"kurdish (northern)":"kmr",        
+"kyrgyz":"ky",      
+"lao":"lo",      
+"latvian":"lv",      
+"lithuanian":"lt",      
+"macedonian":"mk",      
+"malagasy":"mg",      
+"malay ":"ms",      
+"malayalam":"ml",      
+"maltese":"mt",      
+"maori":"mi",      
+"marathi":"mr",      
+"mongolian (cyrillic)":"mn-cyrl",          
+"mongolian (traditional)":"mn-mong",          
+"myanmar":"my",      
+"nepali":"ne",      
+"norwegian":"nb",      
+"odia":"or",      
+"pashto":"ps",      
+"persian ":"fa",      
+"polish":"pl",      
+"portuguese (brazil)":"pt",      
+"portuguese (portugal)":"pt-pt",        
+"punjabi":"pa",      
+"queretaro otomi":"otq",        
+"romanian":"ro",      
+"russian":"ru",      
+"samoan":"sm",      
+"serbian (cyrillic)":"sr-cyrl",          
+"serbian (latin)":"sr-latn",          
+"slovak":"sk",      
+"slovenian":"sl",      
+"spanish":"es",      
+"swahili":"sw",      
+"swedish":"sv",      
+"tahitian":"ty",      
+"tamil":"ta",      
+"tatar":"tt",      
+"telugu":"te",      
+"thai":"th",      
+"tibetan":"bo",      
+"tigrinya":"ti",      
+"tongan":"to",      
+"turkish":"tr",      
+"turkmen":"tk",      
+"ukrainian":"uk",      
+"upper sorbian":"hsb",        
+"urdu":"ur",      
+"uyghur":"ug",      
+"uzbek (latin)":"uz",      
+"vietnamese":"vi",      
+"welsh":"cy",      
+"yucatec maya":"yua",    
+    
+}
+LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LOWERCASE_LANGUAGENAME.items()}
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
 TRACE_ID = str(uuid.uuid4())
@@ -145,10 +256,10 @@ class TranslateCog(commands.Cog):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
-        if is_valid_lang_code(input[1]):
+        if is_valid_lang_code(input[0]):
             await self.translate_given_lang(ctx, input)
         else:
-            await self.translate_detect_lang(ctx, input)
+            raise UserInputError("Incorrect")
 
     @translate.command()
     @ext.long_help('Shows all available languages to translate between')
@@ -164,13 +275,13 @@ class TranslateCog(commands.Cog):
         return
 
     async def translate_given_lang(self, ctx, input):
-        input_lang = await get_lang_code(self, ctx, input[0])
-        output_lang = await get_lang_code(self, ctx, input[1])
-
-        if input_lang == None or output_lang == None:
-            return
-
+        output_lang = await is_valid_lang_code(input[0])
+        input_lang = await is_valid_lang_code(input[1])
         text = ' '.join(input[2:])
+        if input_lang == None:
+           return
+
+       
 
         params = {
             'api-version': '3.0',
@@ -198,73 +309,53 @@ class TranslateCog(commands.Cog):
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
+        return
 
-    async def translate_detect_lang(self, ctx, input):
-        output_lang = await get_lang_code(self, ctx, input[0])
-        if output_lang == None:
-            return
-
-        text = ' '.join(input[1:])
-
-        output_lang = await get_lang_code(self, ctx, output_lang)
-        log.info(f'Output Lang Code: {output_lang}')
-
-        params = {
-            'api-version': '3.0',
-            'to': output_lang
+  
+        
+   async def alternative_translate_lang(self, ctx, input):
+            
+    params = {
+       'api-version': '3.0',
+       'to': output_lang
         }
 
-        body = [{
+    body = [{
             'text': text
         }]
 
-        headers = {
+    headers = {
             'Ocp-Apim-Subscription-Key': bot_secrets.secrets.azure_translate_key,
             'Ocp-Apim-Subscription-Region': 'global',
             'Content-type': 'application/json',
             'X-ClientTraceId': TRACE_ID
         }
-
-        async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
 
+        log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
-        embed.add_field(name='Confidence Level:', value=response[0]['detectedLanguage']['score'], inline=True)
-        embed.add_field(name='Detected Language:', value=LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']], inline=True)
         await ctx.send(embed=embed)
         return
 
-
-def is_valid_lang_code(input: str):
-    return input.lower() in LANGUAGE_SHORT_CODE_TO_NAME or input.lower() in LANGUAGE_NAME_TO_SHORT_CODE
-
-
-async def get_lang_code(self, ctx, input: str):
-    if input.lower() in LANGUAGE_SHORT_CODE_TO_NAME:
-        return input.lower()
-    else:
-        try:
-            return LANGUAGE_NAME_TO_SHORT_CODE[input.lower()]
-        except KeyError:
-            pages = get_language_list(self)
-            await self.bot.messenger.publish(Events.on_set_pageable_text,
-                                             embed_name='Languages',
-                                             field_title='Given language \'' + input + '\' not valid. Here are the available languages:',
-                                             pages=pages,
-                                             author=ctx.author,
-                                             channel=ctx.channel)
-
-
+    
+   def is_valid_lang_code(input: str):
+        if(input in LANGUAGE_NAME_TO_SHORT_CODE):
+            return dict.get(input)
+        if(input in LANGUAGE_SHORT_CODE_TO_NAME):
+            return input
+        if(input in LOWERCASE_LANGUAGENAME):
+             return input
+    
 def get_language_list(self):
-    langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
-    return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
-
-
+            langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
+            return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
+    
 def chunk_list(self, lst, n):
-    for i in range(0, len(lst), n):
+      for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
 
