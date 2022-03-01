@@ -42,14 +42,14 @@ class TranslateCog(commands.Cog):
     @ext.example(('translate languages'))
 
     async def m(self, ctx, *input: str):
-        if len(input) != 3:
+        if len(input) < 3:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 3 arguments")
         if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])) != None:
             await alternative_translate_lang(self, ctx, input)
         else:
               raise UserInputError("Incorrect")
 
-        return
+     return
 
            
 
@@ -163,14 +163,10 @@ async def alternative_translate_lang(self, ctx, input):
     await ctx.send(embed=embed)
     return
 
-
-
-
-
-    
 def get_language_list(self):
             langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
             return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
+
     
 def chunk_list(self, lst, n):
       for i in range(0, len(lst), n):
