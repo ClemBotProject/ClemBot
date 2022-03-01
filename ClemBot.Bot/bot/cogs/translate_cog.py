@@ -256,10 +256,10 @@ class TranslateCog(commands.Cog):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
-        if is_valid_lang_code(input[0]) and is_valid_lang_code(input[1]):
+        if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])):
             alternative_translate_lang(self, ctx, input)
-        if is_valid_lang_code(input[0]):
-            translate_given_lang
+        elif (is_valid_lang_code(input[0])):
+            translate_given_lang(self, ctx, input)
         else:
             raise UserInputError("Incorrect")
 
@@ -280,11 +280,6 @@ class TranslateCog(commands.Cog):
         output_lang = await is_valid_lang_code(input[0])
         input_lang = await is_valid_lang_code(input[1])
         text = ' '.join(input[2:])
-        if input_lang == None:
-           return
-
-       
-
         params = {
             'api-version': '3.0',
             'from': input_lang,
@@ -314,9 +309,11 @@ class TranslateCog(commands.Cog):
         return
 
   
-        
+    
+    
    async def alternative_translate_lang(self, ctx, input):
-            
+    output_lang = await is_valid_lang_code(input[0]) 
+    text = ' '.join(input[2:])       
     params = {
        'api-version': '3.0',
        'to': output_lang
@@ -351,8 +348,8 @@ class TranslateCog(commands.Cog):
             return input
         if(input in LOWERCASE_LANGUAGENAME):
           b = LOWERCASE_LANGUAGENAME.index(input)
-          good_list = list(LANGUAGE_NAME_TO_SHORT_CODE)
-          return good_list[b].get()
+          good_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+          return good_list[b]
 
         if(input in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
           g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(input)
@@ -362,8 +359,8 @@ class TranslateCog(commands.Cog):
         if(input.lower in LOWERCASE_LANGUAGENAME):
             p = input.lower
             g = LOWERCASE_LANGUAGENAME.index(p)
-            awesome_list = list(LANGUAGE_NAME_TO_SHORT_CODE)
-            return awesome_list[g].get() 
+            awesome_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+            return awesome_list[g]
 
         if(input.lower in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
             l = input.lower
