@@ -352,7 +352,7 @@ class TranslateCog(commands.Cog):
         if(input in LOWERCASE_LANGUAGENAME):
           b = LOWERCASE_LANGUAGENAME.index(input)
           good_list = list(LANGUAGE_NAME_TO_SHORT_CODE)
-          return good_list.get[b]
+          return good_list[b].get()
 
         if(input in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
           g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(input)
@@ -370,6 +370,7 @@ class TranslateCog(commands.Cog):
             g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(l)
             biggest_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
             return biggest_list[g]
+        else: return None
 
 
 
