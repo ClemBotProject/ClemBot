@@ -32,17 +32,28 @@ class TranslateCog(commands.Cog):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
-        if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1]) != None):
-          await self.alternative_translate_lang(ctx, input)
-        elif (is_valid_lang_code(input[0]) != None):
-           await self.translate_given_lang(ctx, input)
+        if (is_valid_lang_code(input[0])) != None):
+          await self.translate_given_lang(self, ctx, input)
         else:
             raise UserInputError("Incorrect")
 
-    @translate.command()
-    @ext.long_help('Shows all available languages to translate between')
-    @ext.short_help('Shows available languages')
-    @ext.example(('translate languages'))
+        @translate.command()
+        @ext.long_help('Shows all available languages to translate between')
+        @ext.short_help('Shows available languages')
+        @ext.example(('translate languages'))
+
+    async def translatem(self, ctx, *input: str):
+        if len(input) < 2:
+            raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
+        if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])) != None:
+            await alternative_translate_lang(self, ctx, input)
+            else:
+                raise UserInputError("Incorrect")
+            @translatem.command()
+            @ext.long_help('Manual Translator')
+            @ext.short_help('Translator with 2 args')
+            @ext.example('translate')
+
     async def languages(self, ctx):
         await self.bot.messenger.publish(Events.on_set_pageable_text,
                                          embed_name='Languages',
@@ -54,11 +65,9 @@ class TranslateCog(commands.Cog):
 
     async def translate_given_lang(self, ctx, input):
         output_lang = await is_valid_lang_code(input[0])
-        input_lang = await is_valid_lang_code(input[1])
-        text = ' '.join(input[2:])
+        text = ' '.join(input[1:])
         params = {
             'api-version': '3.0',
-            'from': input_lang,
             'to': output_lang
         }
 
@@ -84,14 +93,17 @@ class TranslateCog(commands.Cog):
         await ctx.send(embed=embed)
         return
 
+
   
     
     
 async def alternative_translate_lang(self, ctx, input):
     output_lang = await is_valid_lang_code(input[0]) 
+    input_lang = await is_valid_lang_code(input[1])
     text = ' '.join(input[2:])       
     params = {
        'api-version': '3.0',
+       'from': input_lang,
        'to': output_lang
         }
 
