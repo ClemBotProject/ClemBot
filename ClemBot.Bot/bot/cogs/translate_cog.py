@@ -256,8 +256,10 @@ class TranslateCog(commands.Cog):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
+        if is_valid_lang_code(input[0]) and is_valid_lang_code(input[1]):
+            alternative_translate_lang(self, ctx, input)
         if is_valid_lang_code(input[0]):
-            await self.translate_given_lang(ctx, input)
+            translate_given_lang
         else:
             raise UserInputError("Incorrect")
 
@@ -344,11 +346,33 @@ class TranslateCog(commands.Cog):
     
    def is_valid_lang_code(input: str):
         if(input in LANGUAGE_NAME_TO_SHORT_CODE):
-            return dict.get(input)
+            return LANGUAGE_NAME_TO_SHORT_CODE.get(input)
         if(input in LANGUAGE_SHORT_CODE_TO_NAME):
             return input
         if(input in LOWERCASE_LANGUAGENAME):
-             return input
+          b = LOWERCASE_LANGUAGENAME.index(input)
+          good_list = list(LANGUAGE_NAME_TO_SHORT_CODE)
+          return good_list.get[b]
+
+        if(input in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
+          g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(input)
+          epic_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+          return epic_list[g] 
+
+        if(input.lower in LOWERCASE_LANGUAGENAME):
+            p = input.lower
+            g = LOWERCASE_LANGUAGENAME.index(p)
+            awesome_list = list(LANGUAGE_NAME_TO_SHORT_CODE)
+            return awesome_list[g].get() 
+
+        if(input.lower in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
+            l = input.lower
+            g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(l)
+            biggest_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+            return biggest_list[g]
+
+
+
     
 def get_language_list(self):
             langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
