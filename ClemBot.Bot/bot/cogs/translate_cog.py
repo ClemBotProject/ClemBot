@@ -24,9 +24,9 @@ class TranslateCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
-        'Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages\' to see available languages')
+        'Allows you to translate words or sentences by specifying an output language and autodetecting the language you entered. Use !translate m for specifying the language you entered. Use \'translate languages\' to see available languages')
     @ext.short_help('Translates words or phrases between two languages')
-    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish German Como estas?'))
+    @ext.example(('translate es Hello', 'translate german Hello', 'translate languages', 'translate German Como estas?, translate m german english I love partying with german people!'))
     async def translate(self, ctx, *input: str):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
@@ -34,12 +34,12 @@ class TranslateCog(commands.Cog):
         if (is_valid_lang_code(input[0]) != None):
           await self.translate_given_lang(ctx, input)
         else:
-            raise UserInputError("Ivalid input!")
+            raise UserInputError("Invalid input! Use !translate m for manual translation.")
 
     @translate.command()
     @ext.long_help('Alternative command to manually specify languages to convert to.')
-    @ext.short_help('!translate m')
-    @ext.example(('translate languages'))
+    @ext.short_help('!translate m <output lang> <input lang> <text>')
+    @ext.example(('!translate m english spanish Me encantan las fiestas con amigos'))
 
     async def m(self, ctx, *input: str):
         if len(input) < 3:
@@ -47,7 +47,7 @@ class TranslateCog(commands.Cog):
         if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])) != None:
             await self.alternative_translate_lang(ctx, input)
         else:
-              raise UserInputError("Invalid input!")
+              raise UserInputError("Invalid input! Specify the language you entered.")
 
         return
 
