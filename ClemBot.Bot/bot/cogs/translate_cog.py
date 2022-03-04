@@ -36,7 +36,7 @@ class TranslateCog(commands.Cog):
         else:
             raise UserInputError("Invalid input! Use !translate m for manual translation.")
 
-    @translate.command()
+    @translate.command(aliases=["manual", "man"])
     @ext.long_help('Alternative command to manually specify languages to convert to.')
     @ext.short_help('!translate m <output lang> <input lang> <text>')
     @ext.example(('!translate m english spanish Me encantan las fiestas con amigos'))
