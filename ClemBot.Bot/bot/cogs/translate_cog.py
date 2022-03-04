@@ -32,7 +32,7 @@ class TranslateCog(commands.Cog):
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
         if (is_valid_lang_code(input[0]) != None):
-          await translate_given_lang(self, ctx, input)
+          await self.translate_given_lang(self, ctx, input)
         else:
             raise UserInputError("Ivalid input!")
 
@@ -45,7 +45,7 @@ class TranslateCog(commands.Cog):
         if len(input) < 3:
             raise UserInputError("Incorrect Number of Arguments. Minimum number of 3 arguments")
         if (is_valid_lang_code(input[0]) and is_valid_lang_code(input[1])) != None:
-            await alternative_translate_lang(self, ctx, input)
+            await self.alternative_translate_lang(self, ctx, input)
         else:
               raise UserInputError("Invalid input!")
 
