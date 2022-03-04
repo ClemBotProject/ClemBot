@@ -40,7 +40,6 @@ class TranslateCog(commands.Cog):
     @ext.long_help('Alternative command to manually specify languages to convert to.')
     @ext.short_help('!translate m <output lang> <input lang> <text>')
     @ext.example(('!translate m english spanish Me encantan las fiestas con amigos'))
-
     async def m(self, ctx, *input: str):
         if len(input) < 3:
             raise UserInputError("Incorrect Number of Arguments. Minimum number of 3 arguments")
@@ -91,8 +90,6 @@ async def translate_given_lang(ctx, input):
         async with aiohttp.ClientSession() as session:
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
-
-        log.info(response[0]['translations'])
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
@@ -101,8 +98,8 @@ async def translate_given_lang(ctx, input):
 
 
 
-def is_valid_lang_code(input: str):
-    lowercaseinput = input.lower()
+def is_valid_lang_code(code: str):
+    lowercaseinput = code.lower()
     indexable_List = list(LANGUAGE_SHORT_CODE_TO_NAME)
     if(lowercaseinput in LOWERCASE_LANGUAGENAME):
         index = LOWERCASE_LANGUAGENAME.index(lowercaseinput)
@@ -138,7 +135,6 @@ async def alternative_translate_lang(ctx, input):
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
 
-    log.info(response[0]['translations'])
     embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
     name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
     embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
@@ -146,13 +142,13 @@ async def alternative_translate_lang(ctx, input):
     return
 
 def get_language_list(self):
-            langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
-            return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
+    langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
+    return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
 
     
 def chunk_list(self, lst, n):
-      for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+    for i in range(0, len(lst), n):
+    yield lst[i:i + n]
 
 LANGUAGE_NAME_TO_SHORT_CODE = {
 "Afrikaans":"af",      
