@@ -102,32 +102,15 @@ async def translate_given_lang(ctx, input):
 
 
 def is_valid_lang_code(input: str):
-        if(input in LANGUAGE_NAME_TO_SHORT_CODE):
-            return LANGUAGE_NAME_TO_SHORT_CODE.get(input)
-        elif(input in LANGUAGE_SHORT_CODE_TO_NAME):
-            return input
-        elif(input in LOWERCASE_LANGUAGENAME):
-          b = LOWERCASE_LANGUAGENAME.index(input)
-          good_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
-          return good_list[b]
-
-        elif(input in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
-          g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(input)
-          epic_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
-          return epic_list[g] 
-
-        elif(input.lower in LOWERCASE_LANGUAGENAME):
-            p = input.lower
-            g = LOWERCASE_LANGUAGENAME.index(p)
-            awesome_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
-            return awesome_list[g]
-
-        elif(input.lower in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
-            l = input.lower
-            g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(l)
-            biggest_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
-            return biggest_list[g]
-        else: return None
+    lowercaseinput = input.lower()
+    indexable_List = list(LANGUAGE_SHORT_CODE_TO_NAME)
+    if(lowercaseinput in LOWERCASE_LANGUAGENAME):
+        index = LOWERCASE_LANGUAGENAME.index(lowercaseinput)
+        return indexable_List[index]
+    elif(lowercaseinput in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
+        index = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(lowercaseinput)
+        return indexable_List[index]
+    else: return None
   
     
     
