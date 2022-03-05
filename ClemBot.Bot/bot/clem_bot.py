@@ -12,6 +12,7 @@ from discord.ext.commands import CommandNotFound
 
 from bot.api import *
 import bot.api as api
+from bot.api import health_check_route
 import bot.cogs as cogs
 import bot.extensions as ext
 import bot.services as services
@@ -72,8 +73,9 @@ class ClemBot(commands.Bot):
         self.moderation_route: moderation_route.ModerationRoute = None
         self.claim_route: claim_route.ClaimRoute = None
         self.commands_route: commands_route.CommandsRoute = None
-        self.thread_route: thread_route.ThreadsRoute = None
+        self.thread_route: thread_route.ThreadRoute = None
         self.slots_score_route: slots_score_route.SlotsScoreRoute = None
+        self.health_check_route: health_check_route.HealthCheckRoute = None
 
         self.load_cogs()
         self.active_services = {}
