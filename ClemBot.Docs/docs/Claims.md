@@ -83,7 +83,7 @@ Adds a claim to a given role, everyone who has that role will be granted permiss
 ```
 
 ### Remove 
-Adds a claim to a given role, everyone who has that role will be granted permissions to that functionality
+Removes a claim from a given role, everyone who has that role will no longer have permissions for that functionality
 
 #### Aliases
 * `delete`
