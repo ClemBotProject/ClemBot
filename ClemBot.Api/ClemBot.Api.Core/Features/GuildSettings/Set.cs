@@ -3,7 +3,6 @@ using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.CustomPrefix.Models;
 using ClemBot.Api.Services.GuildSettings;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
