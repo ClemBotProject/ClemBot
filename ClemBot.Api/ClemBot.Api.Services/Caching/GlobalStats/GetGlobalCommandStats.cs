@@ -23,7 +23,8 @@ public class GetGlobalCommandStats : IRequestHandler<GlobalCommandStatsRequest, 
 
     public async Task<int> Handle(GlobalCommandStatsRequest request, CancellationToken cancellationToken)
         => await _cache.GetOrAddAsync(GetCacheKey(),
-            () => _context.CommandInvocations.CountAsync(), TimeSpan.FromMinutes(30));
+            () => _context.CommandInvocations.CountAsync(),
+            DateTimeOffset.Now.AddMinutes(30));
 
     private string GetCacheKey()
         => $"{nameof(GetGlobalCommandStats)}";

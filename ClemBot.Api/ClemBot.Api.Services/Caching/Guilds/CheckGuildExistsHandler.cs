@@ -26,6 +26,6 @@ public class CheckGuildExistsHandler : IRequestHandler<GuildExistsRequest, bool>
             () => _context.Guilds.AnyAsync(x => x.Id == request.Id),
             TimeSpan.FromHours(6));
 
-    private string GetCacheKey(ulong id)
+    private static string GetCacheKey(ulong id)
         => $"{nameof(GuildExistsRequest)}:{id}";
 }

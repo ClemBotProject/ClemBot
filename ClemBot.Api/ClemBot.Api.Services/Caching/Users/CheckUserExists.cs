@@ -24,7 +24,7 @@ public class CheckUserExists : IRequestHandler<UserExistsRequest, bool>
     public async Task<bool> Handle(UserExistsRequest request, CancellationToken cancellationToken)
         => await _cache.GetOrAddAsync(GetCacheKey(request.Id),
             () => _context.Users.AnyAsync(x => x.Id == request.Id),
-            TimeSpan.FromHours(24));
+            TimeSpan.FromHours(12));
 
     private string GetCacheKey(ulong id)
         => $"{nameof(UserExistsRequest)}:{id}";

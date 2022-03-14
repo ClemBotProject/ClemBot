@@ -23,7 +23,8 @@ public class GetGlobalGuildStats : IRequestHandler<GlobalGuildStatsRequest, int>
 
     public async Task<int> Handle(GlobalGuildStatsRequest request, CancellationToken cancellationToken)
         => await _cache.GetOrAddAsync(GetCacheKey(),
-            () => _context.Guilds.CountAsync(), TimeSpan.FromHours(6));
+            () => _context.Guilds.CountAsync(),
+            DateTimeOffset.Now.AddHours(1));
 
     private string GetCacheKey()
         => $"{nameof(GetGlobalGuildStats)}";

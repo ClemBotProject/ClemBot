@@ -1,4 +1,6 @@
+using ClemBot.Api.Common.Extensions;
 using ClemBot.Api.Services.Caching;
+using LazyCache;
 
 namespace ClemBot.Api.Core.Behaviors;
 
@@ -7,19 +9,27 @@ public class CacheRequestBehavior<TRequest, TResponse> :
 {
     private readonly ILogger<CacheRequestBehavior<TRequest, TResponse>> _logger;
 
-    public CacheRequestBehavior(ILogger<CacheRequestBehavior<TRequest, TResponse>> logger)
+    private readonly IAppCache _cache;
+
+    public CacheRequestBehavior(ILogger<CacheRequestBehavior<TRequest, TResponse>> logger, IAppCache cache)
     {
         _logger = logger;
+        _cache = cache;
     }
 
     public async Task<TResponse> Handle(TRequest request,
         CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
-        _logger.LogInformation("Cache Request for  Data: {@Data}", request.GetType(), request);
-        var response = await next();
-        _logger.LogInformation("Response Data: {@Body}", response);
+        _logger.LogInformation("Cache Request: {Request} for Id: {Id}", typeof(TRequest).Name, request.Id);
+        var result = await next();
+        _logger.LogInformation("{Cache} request for Id: {Id} completed with result: {Result}",
+            typeof(TRequest).Name,
+            request.Id,
+            result);
 
-        return response;
+        _logger.LogInformation("Current API internal cache size: {Size}", _cache.Size());
+
+        return result;
     }
 }

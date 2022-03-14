@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,7 +30,8 @@ public class CustomPrefixHandlers :
             () => _context.CustomPrefixs
                 .Where(x => x.Guild.Id == request.Id)
                 .Select(y => y.Prefix)
-                .ToListAsync());
+                .ToListAsync(),
+            TimeSpan.FromHours(12));
 
     protected override void Handle(ClearCustomPrefixRequest request)
         => _cache.Remove(GetCacheKey(request.Id));
