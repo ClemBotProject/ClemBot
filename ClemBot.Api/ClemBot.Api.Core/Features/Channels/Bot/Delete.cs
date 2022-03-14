@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Services.Channels.Models;
+using ClemBot.Api.Services.Caching.Channels.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +48,7 @@ public class Delete
             await _context.SaveChangesAsync();
 
             // Clear the channel from the cache so we dont try to insert a new message batch into it
-            await _mediatr.Send(new ClearChannelCacheEntryRequest {Id = request.Id});
+            await _mediatr.Send(new ClearChannelRequest {Id = request.Id});
 
             return QueryResult<Model>.Success(new Model()
             {

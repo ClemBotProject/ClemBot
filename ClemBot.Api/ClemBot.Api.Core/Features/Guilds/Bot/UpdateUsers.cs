@@ -61,27 +61,27 @@ public class UpdateUsers
                 return QueryResult<ulong>.NotFound();
             }
 
-            List<User> newUsers = new();
-            List<GuildUser> newGuildUsers = new();
+            var newUsers = new List<User>();
+            var newGuildUsers = new List<GuildUser>();
 
             var guildUsersSet = guildEntity.Users.Select(x => x.Id).ToHashSet();
 
             foreach (var user in users)
             {
-                _logger.LogTrace("Updating {user}", user);
+                _logger.LogTrace("Updating {User}", user);
 
                 if (!usersDb.Contains(user.UserId))
                 {
-                    _logger.LogTrace("Adding new {user}", user);
+                    _logger.LogTrace("Adding new {User}", user);
                     var userEntity = new User { Id = user.UserId, Name = user.Name };
 
                     newUsers.Add(userEntity);
-                    newGuildUsers.Add(new GuildUser() { GuildId = request.GuildId, UserId = user.UserId });
+                    newGuildUsers.Add(new GuildUser { GuildId = request.GuildId, UserId = user.UserId });
                 }
                 else if (!guildUsersSet.Contains(user.UserId))
                 {
-                    _logger.LogTrace("Adding new user guild mapping {user}", user);
-                    newGuildUsers.Add(new GuildUser() { GuildId = request.GuildId, UserId = user.UserId });
+                    _logger.LogTrace("Adding new user guild mapping {User}", user);
+                    newGuildUsers.Add(new GuildUser { GuildId = request.GuildId, UserId = user.UserId });
                 }
             }
 
@@ -94,17 +94,17 @@ public class UpdateUsers
 
             if (newUsers.Count > 0)
             {
-                await _context.BulkCopyAsync(new BulkCopyOptions()
+                await _context.BulkCopyAsync(new BulkCopyOptions
                 {
-                    BulkCopyType = BulkCopyType.ProviderSpecific,
+                    BulkCopyType = BulkCopyType.ProviderSpecific
                 }, newUsers);
             }
 
             if (newGuildUsers.Count > 0)
             {
-                await _context.BulkCopyAsync(new BulkCopyOptions()
+                await _context.BulkCopyAsync(new BulkCopyOptions
                 {
-                    BulkCopyType = BulkCopyType.ProviderSpecific,
+                    BulkCopyType = BulkCopyType.ProviderSpecific
                 }, newGuildUsers);
             }
 

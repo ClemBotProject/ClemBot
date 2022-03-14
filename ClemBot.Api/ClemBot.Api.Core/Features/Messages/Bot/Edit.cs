@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.Messages.Models;
+using ClemBot.Api.Services.Caching.Messages.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
