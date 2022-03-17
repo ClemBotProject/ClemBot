@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.Channels.Models;
-using ClemBot.Api.Services.Guilds.Models;
-using ClemBot.Api.Services.Users.Models;
+using ClemBot.Api.Services.Caching.Channels.Models;
+using ClemBot.Api.Services.Caching.Guilds.Models;
+using ClemBot.Api.Services.Caching.Users.Models;
 using NodaTime.Text;
 using FluentValidation;
 using MediatR;
@@ -51,7 +51,7 @@ public class Create
                     continue;
                 }
 
-                if (!await _mediator.Send(new GuildExistsRequest { Id = messageDto.GuildId }))
+                if (!await _mediator.Send(new GuildExistsRequest{ Id = messageDto.GuildId }))
                 {
                     continue;
                 }

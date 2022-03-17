@@ -12,5 +12,6 @@ __all__ = ['guild_route',
            'claim_route',
            'commands_route',
            'thread_route',
-           'slots_score_route'
+           'slots_score_route',
+           'health_check_route'
            ]

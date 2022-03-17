@@ -1,6 +1,7 @@
 import importlib
 import logging
 import pkgutil
+import sys
 import traceback
 import typing as t
 import datetime
@@ -12,6 +13,7 @@ from discord.ext.commands import CommandNotFound
 
 from bot.api import *
 import bot.api as api
+from bot.api import health_check_route
 import bot.cogs as cogs
 import bot.extensions as ext
 import bot.services as services
@@ -39,6 +41,9 @@ class ClemBot(commands.Bot):
     def __init__(self, messenger, scheduler, **kwargs):
         # this super call is to pass the prefix up to the super class
         super().__init__(**kwargs)
+
+        # Set the error callback in the messenger for queued events
+        messenger.error_callback = self.global_error_handler
 
         # Initialize the ApiClient with callbacks and mode settings
         self.api_client = ApiClient(connect_callback=self.on_backend_connect,
@@ -69,8 +74,9 @@ class ClemBot(commands.Bot):
         self.moderation_route: moderation_route.ModerationRoute = None
         self.claim_route: claim_route.ClaimRoute = None
         self.commands_route: commands_route.CommandsRoute = None
-        self.thread_route: thread_route.ThreadsRoute = None
+        self.thread_route: thread_route.ThreadRoute = None
         self.slots_score_route: slots_score_route.SlotsScoreRoute = None
+        self.health_check_route: health_check_route.HealthCheckRoute = None
 
         self.load_cogs()
         self.active_services = {}
@@ -91,7 +97,7 @@ class ClemBot(commands.Bot):
         # startup service has active routes
         self.load_routes(self.api_client)
 
-        # Connect to the api Before the services are loaded so they can begin their startup routines
+        # Connect to the api Before the services are loaded, so they can begin their startup routines
         # this will block until the api is connected to, only THEN will we run our service startups
         # until this is connected no commands will be processed because there is no message_handling_service
         # to process commands
@@ -133,6 +139,8 @@ class ClemBot(commands.Bot):
             log.error(f'Logout error embed failed with error {e}')
 
         log.info('Shutdown started: logging close time')
+
+        await self.messenger.close()
         await super().close()
 
     async def send_startup_log_embed(self, embed):
@@ -163,12 +171,12 @@ class ClemBot(commands.Bot):
         claims_str = '\n'.join(command.claims)
         raise ClaimsAccessError(f'Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```'
                                 f'\n **Help:** For more information on how claims work please visit my website [Link!]'
-                                f'({bot_secrets.secrets.site_url}wiki/claims)\n'
+                                f'({bot_secrets.secrets.docs_url}/claims)\n'
                                 f'or run the `{await self.current_prefix(ctx.message)}help claims` command')
 
-    async def claims_check(self, ctx: commands.Context):
+    async def claims_check(self, ctx: commands.Context) -> bool:
         """
-        Before during cog execution to check if a user has the correct claims for aspects of a command
+        Before cog execution to check if a user has the correct claims for aspects of a command
         """
         command = ctx.command
         author = ctx.author
@@ -193,7 +201,14 @@ class ClemBot(commands.Bot):
             return True
         return False
 
-    async def on_message(self, message) -> None:
+    """
+    ---------------------
+    Events to dispatch immediately, we do not want to queue these events as they are user facing and 
+    We want the bot to respond as quickly as possible. All events dispatched inside of a command 
+    context are considered instant events that skip the queue
+    ---------------------
+    """
+    async def on_message(self, message: discord.Message) -> None:
         """
         Primary entry point for on_message events, all this serves to do is 
         fire that event forward on the internal message bus
@@ -206,48 +221,6 @@ class ClemBot(commands.Bot):
                 await self.publish_with_error(Events.on_dm_message_received, message)
             else:
                 await self.publish_with_error(Events.on_guild_message_received, message)
-
-    async def on_guild_join(self, guild):
-        await self.publish_with_error(Events.on_guild_joined, guild)
-
-    async def on_guild_update(self, before, after):
-        await self.publish_with_error(Events.on_guild_update, before, after)
-
-    async def on_guild_remove(self, guild):
-        await self.publish_with_error(Events.on_guild_leave, guild)
-
-    async def on_guild_role_create(self, role):
-        await self.publish_with_error(Events.on_guild_role_create, role)
-
-    async def on_guild_role_update(self, before, after):
-        await self.publish_with_error(Events.on_guild_role_update, before, after)
-
-    async def on_guild_role_delete(self, role):
-        await self.publish_with_error(Events.on_guild_role_delete, role)
-
-    async def on_guild_channel_create(self, channel):
-        await self.publish_with_error(Events.on_guild_channel_create, channel)
-
-    async def on_guild_channel_delete(self, channel):
-        await self.publish_with_error(Events.on_guild_channel_delete, channel)
-
-    async def on_guild_channel_update(self, before, after):
-        await self.publish_with_error(Events.on_guild_channel_update, before, after)
-
-    async def on_thread_join(self, channel):
-        await self.publish_with_error(Events.on_guild_thread_join, channel)
-
-    async def on_thread_update(self, before, after):
-        await self.publish_with_error(Events.on_guild_thread_update, before, after)
-
-    async def on_member_join(self, user):
-        await self.publish_with_error(Events.on_user_joined, user)
-
-    async def on_member_remove(self, user):
-        await self.publish_with_error(Events.on_user_removed, user)
-    
-    async def on_member_ban(self, guild, user):
-        await self.publish_with_error(Events.on_member_ban, guild, user)
 
     async def on_message_edit(self, before, after):
         if before.author.id != self.user.id and len(before.embeds) == 0:
@@ -266,33 +239,94 @@ class ClemBot(commands.Bot):
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_delete, payload)
 
+    async def on_after_command_invoke(self, ctx: commands.Context):
+        await self.publish_with_error(Events.on_after_command_invoke, ctx)
+    """
+    ----------------- End of immediate event block ---------------------
+    """
+
+    """
+    Events to queue on the guild event queue, these are background service events that are 
+    required for the bot to maintain its database state. These can queued and dispatched 
+    in a controlled fashion
+    """
+    async def on_guild_join(self, guild: discord.Guild):
+        await self.publish_to_queue_with_error(Events.on_guild_joined, guild.id, guild)
+
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        await self.publish_to_queue_with_error(Events.on_guild_update, before.id, before, after)
+
+    async def on_guild_remove(self, guild: discord.Guild):
+        await self.publish_to_queue_with_error(Events.on_guild_leave, guild.id, guild)
+
+    async def on_guild_role_create(self, role: discord.Role):
+        await self.publish_to_queue_with_error(Events.on_guild_role_create, role.guild.id, role)
+
+    async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
+        await self.publish_to_queue_with_error(Events.on_guild_role_update, before.guild.id, before, after)
+
+    async def on_guild_role_delete(self, role: discord.Role):
+        await self.publish_to_queue_with_error(Events.on_guild_role_delete, role.guild.id, role)
+
+    async def on_guild_channel_create(self, channel):
+        await self.publish_to_queue_with_error(Events.on_guild_channel_create, channel.guild.id, channel)
+
+    async def on_guild_channel_delete(self, channel):
+        await self.publish_to_queue_with_error(Events.on_guild_channel_delete, channel.guild.id, channel)
+
+    async def on_guild_channel_update(self, before, after):
+        await self.publish_to_queue_with_error(Events.on_guild_channel_update, before.guild.id, before, after)
+
+    async def on_thread_join(self, thread: discord.Thread):
+        await self.publish_to_queue_with_error(Events.on_guild_thread_join, thread.guild.id, thread)
+
+    async def on_thread_update(self, before: discord.Thread, after: discord.Thread):
+        await self.publish_to_queue_with_error(Events.on_guild_thread_update, before.guild.id, before, after)
+
+    async def on_member_join(self, user: discord.Member):
+        await self.publish_to_queue_with_error(Events.on_user_joined, user.guild.id, user)
+
+    async def on_member_remove(self, user: discord.Member):
+        await self.publish_to_queue_with_error(Events.on_user_removed, user.guild.id, user)
+    
+    async def on_member_ban(self, guild: discord.Guild, user):
+        await self.publish_to_queue_with_error(Events.on_member_ban, guild.id, guild, user)
+
     async def on_reaction_add(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
         if user.id != self.user.id:
-            await self.publish_with_error(Events.on_reaction_add, reaction, user)
+            await self.publish_to_queue_with_error(Events.on_reaction_add, reaction.message.guild.id, reaction, user)
 
     async def on_raw_reaction_add(self, reaction) -> None:
         pass
 
     async def on_reaction_remove(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
         if user.id != self.user.id:
-            await self.publish_with_error(Events.on_reaction_remove, reaction, user)
+            await self.publish_to_queue_with_error(Events.on_reaction_remove, reaction.message.guild.id, reaction, user)
 
     async def on_raw_reaction_remove(self, reaction) -> None:
         pass
 
-    async def on_member_update(self, before, after):
-        await self.publish_with_error(Events.on_member_update, before, after)
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        await self.publish_to_queue_with_error(Events.on_member_update, before.guild.id, before, after)
+    """
+    ----------------- End of queued event block ---------------------
+    """
 
-    async def publish_with_error(self, *args, **kwargs):
+    async def publish_to_queue_with_error(self, event: str, guild_id: int, *args, **kwargs):
         try:
             if not self.is_starting_up:
-                await self.messenger.publish(*args, **kwargs)
+                await self.messenger.publish_to_queue(event, guild_id, *args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def on_after_command_invoke(self, ctx):
-        await self.publish_with_error(Events.on_after_command_invoke, ctx)
+    async def publish_with_error(self, event: str, *args, **kwargs):
+        try:
+            if not self.is_starting_up:
+                await self.messenger.publish(event, *args, **kwargs)
+        except Exception as e:
+            tb = traceback.format_exc()
+            await self.global_error_handler(e, traceback=tb)
 
     async def on_command_error(self, ctx, error):
         """
@@ -336,7 +370,7 @@ class ClemBot(commands.Bot):
             return
 
         # log the exception first thing so we can be sure we got it
-        log.exception('{error}', error=e)
+        log.error('Unhandled Exception Thrown', exc_info=sys.exc_info())
 
         if traceback:
             embed = discord.Embed(title='Unhandled Exception Thrown', color=Colors.Error)
@@ -369,7 +403,6 @@ class ClemBot(commands.Bot):
     This is the reason that all services and cogs must inherit from their specified
     parent type.
     """
-
     async def activate_service(self, service):
         log.info('Loading service: {service}', service=service.__module__)
 

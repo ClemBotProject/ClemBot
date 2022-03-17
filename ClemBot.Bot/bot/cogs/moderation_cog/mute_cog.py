@@ -121,8 +121,8 @@ class MuteCog(commands.Cog):
 
         for mute in mutes:
             await self.bot.messenger.publish(Events.on_bot_unmute,
-                                             subject.guild,
-                                             subject,
+                                             subject.guild.id,
+                                             subject.id,
                                              mute.id,
                                              reason,
                                              ctx.author)

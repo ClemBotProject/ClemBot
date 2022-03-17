@@ -5,7 +5,6 @@ using ClemBot.Api.Common.Security.OAuth.OAuthUser;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Extensions;
-using ClemBot.Api.Services.Guilds.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 

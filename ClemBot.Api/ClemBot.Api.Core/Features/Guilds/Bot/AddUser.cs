@@ -1,10 +1,6 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot;
@@ -31,30 +27,25 @@ public class AddUser
     {
         public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var guild = await _context.Guilds
-                .Where(x => x.Id == request.GuildId)
-                .Include(y => y.Users)
-                .FirstOrDefaultAsync();
-
-            if (guild is null)
+            if (!await _context.Guilds.AnyAsync(x => x.Id == request.GuildId))
             {
                 return QueryResult<ulong>.NotFound();
             }
 
-            var user = await _context.Users
-                .Where(x => x.Id == request.UserId)
-                .Include(y => y.Guilds)
-                .FirstOrDefaultAsync();
-
-            if (guild.Users.Contains(user))
+            if (await _context.GuildUser.AnyAsync(x => x.GuildId == request.GuildId && x.UserId == request.UserId))
             {
                 return QueryResult<ulong>.Conflict();
             }
 
-            guild.Users.Add(user);
+            _context.GuildUser.Add(new GuildUser
+            {
+                GuildId = request.GuildId,
+                UserId = request.UserId
+            });
+
             await _context.SaveChangesAsync();
 
-            return QueryResult<ulong>.Success(guild.Id);
+            return QueryResult<ulong>.Success(request.GuildId);
         }
     }
 }

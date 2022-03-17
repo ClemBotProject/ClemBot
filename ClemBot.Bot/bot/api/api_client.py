@@ -116,7 +116,8 @@ class ApiClient:
                 await self.connect_callback()
                 break
 
-            log.error(f'Connecting to ClemBot.Api failed, retrying in {RECONNECT_TIMEOUT} seconds')
+            log.error('Connecting to ClemBot.Api failed, retrying in {reconnect_timeout} seconds',
+                      reconnect_timeout=RECONNECT_TIMEOUT)
             await asyncio.sleep(RECONNECT_TIMEOUT)
 
     async def _disconnected(self):
@@ -143,8 +144,8 @@ class ApiClient:
                 if resp.status == HTTPStatus.FORBIDDEN:
                     log.error('JWT Auth denied, Invalid API key')
 
-        except aiohttp.ClientConnectorError:
-            log.error('Error: ClemBot.Api not found')
+        except aiohttp.ClientConnectorError as e:
+            log.exception('Error: ClemBot.Api not found')
             return
 
     async def _authorize(self) -> bool:

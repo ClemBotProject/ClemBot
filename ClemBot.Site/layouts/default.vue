@@ -14,8 +14,8 @@
         <b-navbar-item
           id="nav"
           class="is-spaced is-tab"
-          tag="nuxt-link"
-          :to="{ path: '/wiki/intro' }"
+          target="_blank"
+          href="https://docs.clembot.io"
         >
           <b-icon icon="script" class="mr-1" size="is-small" /><b> Wiki </b>
         </b-navbar-item>

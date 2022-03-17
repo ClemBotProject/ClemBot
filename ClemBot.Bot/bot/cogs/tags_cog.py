@@ -16,7 +16,6 @@ MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
 TAG_CHUNK_SIZE = 12
 MAX_NON_ADMIN_LINE_LENGTH = 10
-LINK_URL = 'https://clembot.io/wiki'
 
 
 class TagCog(commands.Cog):
@@ -101,7 +100,9 @@ class TagCog(commands.Cog):
         pages = self.chunked_tags(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags', tags_url)
         for tag in ownedTags:
             embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{tag.name}')
-            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            embed.set_author(name=f'{self.bot.user.name} - Tags',
+                             url=f'{bot_secrets.secrets.docs_url}/tags',
+                             icon_url=self.bot.user.display_avatar.url)
             embed.add_field(name='Content', value=tag.content)
             embed.add_field(name='Uses', value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
             pages.append(embed)
@@ -347,8 +348,10 @@ class TagCog(commands.Cog):
         for chunk in self.chunk_list(tags_list, n):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
             embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
-            embed.description = f'To view all tags please visit: [site]({url})'
-            embed.set_author(name=f'{self.bot.user.name} - Tags', url=LINK_URL, icon_url=self.bot.user.display_avatar.url)
+            embed.description = f'To view all tags please visit: [clembot.io]({url})'
+            embed.set_author(name=f'{self.bot.user.name} - Tags',
+                             url=f'{bot_secrets.secrets.docs_url}/tags',
+                             icon_url=self.bot.user.display_avatar.url)
             for tag in chunk:
                 embed.add_field(name=tag.name, value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
             pages.append(embed)
