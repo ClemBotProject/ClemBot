@@ -32,7 +32,6 @@ class GradesCog(commands.Cog):
 
         self.grades_df.info()
 
-        self.all_profs = self.get_profs()
         self.all_courses = self.get_courses()
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
@@ -292,7 +291,13 @@ class GradesCog(commands.Cog):
                                          channel=ctx.channel,
                                          timeout=360)
 
-    def get_profs(self):
+    @prof.command(aliases=['list'])
+    @ext.long_help(
+        'Lists all available professors, some professors will just be a name with no data'
+    )
+    @ext.short_help('Lists all professors')
+    @ext.example('prof list')
+    async def list_prof(self, ctx):
         profs = self.grades_df.groupby(['Instructor']).mean().iterrows()
 
         embeds = []
@@ -321,17 +326,9 @@ class GradesCog(commands.Cog):
                             inline=False)
 
             embeds.append(embed)
-        return embeds
 
-    @prof.command(aliases=['list'])
-    @ext.long_help(
-        'Lists all available professors, some professors will just be a name with no data'
-    )
-    @ext.short_help('Lists all professors')
-    @ext.example('prof list')
-    async def list_prof(self, ctx):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
-                                         pages=self.all_profs,
+                                         pages=embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
                                          timeout=360)
