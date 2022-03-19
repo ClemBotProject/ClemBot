@@ -32,7 +32,6 @@ class GradesCog(commands.Cog):
 
         self.grades_df.info()
 
-        # self.all_profs = self.get_profs() get_profs() not used anymore - put within list_profs()
         self.all_courses = self.get_courses()
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
@@ -291,38 +290,6 @@ class GradesCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel,
                                          timeout=360)
-
-    # get_profs() was only used once, within the list_prof() function and was creating a duplicate footers bug - for every call, the footer was duplicated indefinetly 
-    # def get_profs(self):
-    #     profs = self.grades_df.groupby(['Instructor']).mean().iterrows()
-
-    #     embeds = []
-
-    #     # begin generating paginated columns
-    #     # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
-    #     for chunk in self.chunk_list([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
-
-    #         # we need to create the columns on the page so chunk the list again
-    #         content = ''
-    #         for col in self.chunk_list(chunk, 2):
-    #             #the columns wont have the perfect number of elements every time, we need to append spaces if
-    #             #the list entries is less then the number of columns
-    #             while len(col) < 3:
-    #                 col.append(' ')
-
-    #             # Cocatenate the formatted column string to the page content string
-    #             content += "{: <24}  {: <24}\n".format(*col)
-
-    #         #Append the content string to the list of pages to send to the paginator
-    #         #Marked as a code block to ensure a monospaced font and even columns
-    #         embed = discord.Embed(title='All Known Professors', color=Colors.ClemsonOrange)
-    #         embed.add_field(name='Listings:', value=f'```{content}```')
-    #         embed.add_field(name='Info:',
-    #                         value=f'Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
-    #                         inline=False)
-
-    #         embeds.append(embed)
-    #     return embeds
 
     @prof.command(aliases=['list'])
     @ext.long_help(
