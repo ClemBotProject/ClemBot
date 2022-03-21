@@ -63,7 +63,12 @@ class TranslateCog(commands.Cog):
                                          pages=get_language_list(self),
                                          author=ctx.author,
                                          channel=ctx.channel)
-    async def translate_given_lang(ctx, input):
+        return
+        
+
+    
+
+async def translate_given_lang(self, ctx, input):
         output_lang = is_valid_lang_code(input[0])
         text = ' '.join(input[1:])
         params = {
@@ -91,15 +96,47 @@ class TranslateCog(commands.Cog):
         await ctx.send(embed=embed)
         return
 
-    async def alternative_translate_lang(ctx, input):
-        output_lang = is_valid_lang_code(input[0])
-        input_lang = is_valid_lang_code(input[1])
-        text = ' '.join(input[2:])       
-        params = {
-        'api-version': '3.0',
-        'from': input_lang,
-        'to': output_lang
-         }
+
+
+def is_valid_lang_code(input: str):
+        if(input in LANGUAGE_NAME_TO_SHORT_CODE):
+            return LANGUAGE_NAME_TO_SHORT_CODE.get(input)
+        elif(input in LANGUAGE_SHORT_CODE_TO_NAME):
+            return input
+        elif(input in LOWERCASE_LANGUAGENAME):
+          b = LOWERCASE_LANGUAGENAME.index(input)
+          good_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+          return good_list[b]
+
+        elif(input in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
+          g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(input)
+          epic_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+          return epic_list[g] 
+
+        elif(input.lower in LOWERCASE_LANGUAGENAME):
+            p = input.lower
+            g = LOWERCASE_LANGUAGENAME.index(p)
+            awesome_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+            return awesome_list[g]
+
+        elif(input.lower in LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME):
+            l = input.lower
+            g = LOWERCASE_LANGUAGE_SHORT_CODE_TO_NAME.index(l)
+            biggest_list = list(LANGUAGE_SHORT_CODE_TO_NAME)
+            return biggest_list[g]
+        else: return None
+  
+    
+    
+async def alternative_translate_lang(self, ctx, input):
+    output_lang = is_valid_lang_code(input[0])
+    input_lang = is_valid_lang_code(input[1])
+    text = ' '.join(input[2:])       
+    params = {
+       'api-version': '3.0',
+       'from': input_lang,
+       'to': output_lang
+        }
 
         body = [{
         'text': text
@@ -115,12 +152,13 @@ class TranslateCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
                 response = json.loads(await resp.text())
-        
-            embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
-            name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
-            embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
-            await ctx.send(embed=embed)
-            return
+
+    log.info(response[0]['translations'])
+    embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
+    name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to'].lower()]
+    embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
+    await ctx.send(embed=embed)
+    return
 
 def is_valid_lang_code(code: str):
     code_lower = code.lower()
@@ -135,7 +173,7 @@ def get_language_list(self):
 
     
 def chunk_list(self, lst, n):
-    for i in range(0, len(lst), n):
+      for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
 LANGUAGE_NAME_TO_SHORT_CODE = {
