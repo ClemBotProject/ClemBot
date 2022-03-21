@@ -28,7 +28,7 @@ class TranslateCog(commands.Cog):
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
 
-        if get_lang_code(input[0]):
+        if get_lang_code(self, ctx, input[0]):
             await self.translate_given_lang(ctx, input)
         else:
             raise UserInputError("Incorrect country code or syntax. Use the help command")
