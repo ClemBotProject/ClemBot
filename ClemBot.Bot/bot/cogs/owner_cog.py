@@ -8,7 +8,7 @@ import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
+from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation, Claims
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class OwnerCog(commands.Cog):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @ext.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
