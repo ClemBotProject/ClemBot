@@ -4,8 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Services.GlobalStats;
-using ClemBot.Api.Services.GlobalStats.Models;
+using ClemBot.Api.Services.Caching.GlobalStats.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

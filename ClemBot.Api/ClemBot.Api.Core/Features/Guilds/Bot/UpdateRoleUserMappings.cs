@@ -1,19 +1,11 @@
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using CsvHelper;
-using FluentValidation;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
@@ -52,11 +44,11 @@ public class UpdateRolesUserMappings
                 .Where(x => roleSet.Contains(x.RoleId))
                 .DeleteAsync();
 
-            var mappedEntities = mappings.Select(x => new RoleUser() { RoleId = x.RoleId, UserId = x.UserId });
+            var mappedEntities = mappings.Select(x => new RoleUser { RoleId = x.RoleId, UserId = x.UserId });
 
-            await _context.BulkCopyAsync(new BulkCopyOptions()
+            await _context.BulkCopyAsync(new BulkCopyOptions
             {
-                BulkCopyType = BulkCopyType.ProviderSpecific,
+                BulkCopyType = BulkCopyType.ProviderSpecific
             }, mappedEntities);
 
             return QueryResult<ulong>.Success(request.GuildId);

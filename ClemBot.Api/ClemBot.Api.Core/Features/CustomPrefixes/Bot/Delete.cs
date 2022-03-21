@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Services.CustomPrefix.Models;
+using ClemBot.Api.Services.Caching.CustomPrefix.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

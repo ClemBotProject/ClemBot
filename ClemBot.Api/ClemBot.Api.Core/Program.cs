@@ -6,12 +6,9 @@ using ClemBot.Api.Common.Security.JwtToken;
 using ClemBot.Api.Common.Security.OAuth;
 using ClemBot.Api.Common.Security.Policies;
 using ClemBot.Api.Common.Security.Policies.BotMaster;
-using ClemBot.Api.Common.Security.Policies.GuildSandbox;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Behaviors;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Authorization;
-using ClemBot.Api.Services.Guilds.Models;
 using ClemBot.Api.Services.GuildSettings;
 using ClemBot.Api.Services.Jobs;
 using FluentValidation.AspNetCore;
@@ -103,9 +100,10 @@ builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 builder.Services.AddScoped<IDiscordAuthManager, DiscordAuthManager>();
 
 // Configure Mediatr and the pipelines
-builder.Services.AddMediatR(typeof(Program), typeof(GuildExistsRequest));
+builder.Services.AddMediatR(typeof(Program), typeof(GuildSandboxAuthorizeService));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(GuildSandboxAuthorizeBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CacheRequestBehavior<,>));
 
 // Specify Swagger startup options
 builder.Services.AddSwaggerGen(o => {

@@ -1,6 +1,7 @@
 import importlib
 import logging
 import pkgutil
+import sys
 import traceback
 import typing as t
 import datetime
@@ -369,7 +370,7 @@ class ClemBot(commands.Bot):
             return
 
         # log the exception first thing so we can be sure we got it
-        log.exception('{error}', error=e)
+        log.error('Unhandled Exception Thrown', exc_info=sys.exc_info())
 
         if traceback:
             embed = discord.Embed(title='Unhandled Exception Thrown', color=Colors.Error)
