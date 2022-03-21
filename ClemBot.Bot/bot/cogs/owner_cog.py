@@ -8,7 +8,7 @@ import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation, Claims
+from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
 
 log = logging.getLogger(__name__)
 
