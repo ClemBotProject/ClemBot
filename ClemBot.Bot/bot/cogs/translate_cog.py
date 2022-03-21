@@ -45,7 +45,7 @@ class TranslateCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel)
         return
-    @translate.command(aliases=['m'])
+    @ext.command(aliases=['m'])
     @ext.long_help('Manually specifies an output language to translate too')
     @ext.short_help('Specify an output language')
     @ext.example('translate m or translate manual')
