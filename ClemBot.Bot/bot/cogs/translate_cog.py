@@ -24,14 +24,14 @@ class TranslateCog(commands.Cog):
     @ext.short_help('Translates words or phrases between two languages')
     @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish German Como estas?'))
     async def translate(self, ctx, *input: str):
+
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
-
-        if get_lang_code(self, ctx, input[0]):
+        languagecode = get_lang_code(self, ctx, input[0])
+        if languagecode:
             await self.translate_given_lang(ctx, input)
         else:
-            await self.error_handling(ctx, input[0])
-            raise UserInputError("Incorrect country code or syntax. Use the help command. Here is a list of valid languages.")
+            await self.error_handling(ctx, languagecode)
             
 
     @translate.command()
@@ -39,6 +39,7 @@ class TranslateCog(commands.Cog):
     @ext.short_help('Shows available languages')
     @ext.example(('translate languages'))
     async def languages(self, ctx):
+
         await self.bot.messenger.publish(Events.on_set_pageable_text,
                                          embed_name='Languages',
                                          field_title='Here are the available languages:',
@@ -54,8 +55,10 @@ class TranslateCog(commands.Cog):
 
         output_lang = await get_lang_code(self, ctx, input[0])
         input_lang = await get_lang_code(self,ctx,input[1])
-        if not (input_lang and output_lang):
+        if not input_lang:
            await self.error_handling(ctx, input_lang)
+           return
+        elif not output_lang:
            await self.error_handling(ctx, output_lang)
            return
 
@@ -80,10 +83,11 @@ class TranslateCog(commands.Cog):
         await ctx.send(embed=embed)
 
     async def error_handling(self, ctx, error: str):
-        if not error:
+
+        if not error:   #Double making sure that the string isn't actually set so this doesn't get published multiple times.
               await self.bot.messenger.publish(Events.on_set_pageable_text,
                                                 embed_name='Languages',
-                                                field_title='Given language \'' + error + '\' not valid. Here are the available languages:',
+                                                field_title='Language entry is not valid. Here are the available languages:',
                                                 pages=get_language_list(self),
                                                 author=ctx.author,
                                                 channel=ctx.channel)
