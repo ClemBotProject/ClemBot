@@ -1,3 +1,4 @@
+from _typeshed import Self
 import json
 import logging
 import uuid
@@ -13,7 +14,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
-
+session = aiohttp.ClientSession()
 class TranslateCog(commands.Cog):
 
     def __init__(self, bot):
@@ -31,7 +32,9 @@ class TranslateCog(commands.Cog):
         if get_lang_code(self, ctx, input[0]):
             await self.translate_given_lang(ctx, input)
         else:
-            raise UserInputError("Incorrect country code or syntax. Use the help command")
+            await self.error_handling(ctx, input[0])
+            raise UserInputError("Incorrect country code or syntax. Use the help command. Here is a list of valid languages.")
+            
 
     @translate.command()
     @ext.long_help('Shows all available languages to translate between')
@@ -50,11 +53,16 @@ class TranslateCog(commands.Cog):
     @ext.short_help('Specify an output language')
     @ext.example('translate m or translate manual')
     async def manual(self, ctx, input):
+
         output_lang = await get_lang_code(self, ctx, input[0])
         input_lang = await get_lang_code(self,ctx,input[1])
         if not (input_lang and output_lang):
-            return
+           await self.error_handling(ctx, input_lang)
+           await self.error_handling(ctx, output_lang)
+           return
+
         text = ' '.join(input[2:])
+
         params = {
             'api-version': '3.0',
             'from': input_lang,
@@ -65,24 +73,31 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
 
-        headers = {
-            'Ocp-Apim-Subscription-Key': bot_secrets.secrets.azure_translate_key,
-            'Ocp-Apim-Subscription-Region': 'global',
-            'Content-type': 'application/json',
-            'X-ClientTraceId': TRACE_ID
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
-                response = json.loads(await resp.text())
+        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
+            response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
 
+    async def error_handling(self, ctx, error: str):
+        if not error:
+              await self.bot.messenger.publish(Events.on_set_pageable_text,
+                                                embed_name='Languages',
+                                                field_title='Given language \'' + error + '\' not valid. Here are the available languages:',
+                                                pages=get_language_list(self),
+                                                author=ctx.author,
+                                                channel=ctx.channel)
+        else:
+             return
+
+        
+
+
 
     async def translate_given_lang(self, ctx, input):
+
         output_lang = await get_lang_code(self, ctx, input[0])
         text = ' '.join(input[1:])
 
@@ -94,17 +109,10 @@ class TranslateCog(commands.Cog):
         body = [{
             'text': text
         }]
+        
+        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
+            response = json.loads(await resp.text())
 
-        headers = {
-            'Ocp-Apim-Subscription-Key': bot_secrets.secrets.azure_translate_key,
-            'Ocp-Apim-Subscription-Region': 'global',
-            'Content-type': 'application/json',
-            'X-ClientTraceId': TRACE_ID
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
-                response = json.loads(await resp.text())
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']]
         embed.add_field(name='Confidence Level:', value=response[0]['detectedLanguage']['score'], inline=True)
@@ -115,29 +123,24 @@ class TranslateCog(commands.Cog):
 
 
 async def get_lang_code(self, ctx, language: str):
+    
     language_lower = language.lower()
-
     if language_lower in LOWER_CODE_TO_CODE:
         return LOWER_CODE_TO_CODE[language_lower]
     elif language_lower in LOWER_LANGUAGE_TO_CODE:
         return LOWER_LANGUAGE_TO_CODE[language_lower]
     else:
-            pages = get_language_list(self)
-            await self.bot.messenger.publish(Events.on_set_pageable_text,
-                                   embed_name='Languages',
-                                   field_title='Given language \'' + language + '\' not valid. Here are the available languages:',
-                                   pages=pages,
-                                   author=ctx.author,
-                                   channel=ctx.channel)
-            return False
+            return None
 
 
 def get_language_list(self):
+
     langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
     return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
 
 
 def chunk_list(self, lst, n):
+
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
         
@@ -257,7 +260,13 @@ LOWER_CODE_TO_CODE = {k: k for k, _ in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
-TRACE_ID = str(uuid.uuid4())
+
+headers = {
+            'Ocp-Apim-Subscription-Key': bot_secrets.secrets.azure_translate_key,
+            'Ocp-Apim-Subscription-Region': 'global',
+            'Content-type': 'application/json',
+            'X-ClientTraceId': str(uuid.uuid4())
+        }
 
 
 def setup(bot):
