@@ -1,13 +1,11 @@
-from _typeshed import Self
+
 import json
 import logging
 import uuid
-
 import aiohttp
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
-
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
