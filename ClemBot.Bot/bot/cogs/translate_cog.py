@@ -29,7 +29,7 @@ class TranslateCog(commands.Cog):
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
         languagecode = get_lang_code(self, ctx, input[0])
         if languagecode:
-            await self.translate_given_lang(ctx, input)
+            await self.translate_given_lang(ctx, languagecode, input)
         else:
             await self.error_handling(ctx, languagecode)
             
@@ -98,9 +98,9 @@ class TranslateCog(commands.Cog):
 
 
 
-    async def translate_given_lang(self, ctx, input):
+    async def translate_given_lang(self, ctx, language: str, input):
 
-        output_lang = await get_lang_code(self, ctx, input[0])
+        output_lang = language
         text = ' '.join(input[1:])
 
         params = {
