@@ -1,3 +1,4 @@
+from _typeshed import Self
 import json
 import logging
 import uuid
@@ -11,11 +12,11 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
-session = aiohttp.ClientSession()
 class TranslateCog(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
@@ -73,7 +74,7 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
 
-        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
+        async with await self.session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
             response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
@@ -109,7 +110,7 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
         
-        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
+        async with await self.session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
             response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
@@ -118,6 +119,8 @@ class TranslateCog(commands.Cog):
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
         return
+    def cog_unload(self):
+        self.session.close()
 
 
 
