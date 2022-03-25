@@ -42,7 +42,7 @@ class TranslateCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_pageable_text,
                                          embed_name='Languages',
                                          field_title='Here are the available languages:',
-                                         pages=get_language_list(self),
+                                         pages=get_language_list(),
                                          author=ctx.author,
                                          channel=ctx.channel)
         return
@@ -87,7 +87,7 @@ class TranslateCog(commands.Cog):
               await self.bot.messenger.publish(Events.on_set_pageable_text,
                                                 embed_name='Languages',
                                                 field_title='Language entry is not valid. Here are the available languages:',
-                                                pages=get_language_list(self),
+                                                pages=get_language_list(),
                                                 author=ctx.author,
                                                 channel=ctx.channel)
 
