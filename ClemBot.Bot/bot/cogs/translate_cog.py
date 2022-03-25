@@ -1,4 +1,3 @@
-from _typeshed import Self
 import json
 import logging
 import uuid
@@ -12,6 +11,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
+
 class TranslateCog(commands.Cog):
 
     def __init__(self, bot):
