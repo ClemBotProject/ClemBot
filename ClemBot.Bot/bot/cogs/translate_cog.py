@@ -1,4 +1,3 @@
-
 import json
 import logging
 import uuid
@@ -74,7 +73,7 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
 
-        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
+        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
             response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
@@ -91,8 +90,6 @@ class TranslateCog(commands.Cog):
                                                 pages=get_language_list(self),
                                                 author=ctx.author,
                                                 channel=ctx.channel)
-        else:
-             return
 
         
 
@@ -112,7 +109,7 @@ class TranslateCog(commands.Cog):
             'text': text
         }]
         
-        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=headers, json=body) as resp:
+        async with await session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
             response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
@@ -131,129 +128,127 @@ async def get_lang_code(self, ctx, language: str):
         return LOWER_CODE_TO_CODE[language_lower]
     elif language_lower in LOWER_LANGUAGE_TO_CODE:
         return LOWER_LANGUAGE_TO_CODE[language_lower]
-    else:
-            return None
 
 
-def get_language_list(self):
+def get_language_list():
 
     langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
-    return ['\n'.join(i) for i in chunk_list(self, langs, CHUNK_SIZE)]
+    return ['\n'.join(i) for i in chunk_list(langs, CHUNK_SIZE)]
 
 
-def chunk_list(self, lst, n):
+def chunk_list(lst, n):
 
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
         
 
 LANGUAGE_NAME_TO_SHORT_CODE = {
-"Afrikaans":"af",      
-"Albanian":"sq",      
-"Amharic":"am",      
-"Arabic":"ar",      
-"Armenian":"hy",      
-"Assamese":"as",      
-"Azerbaijani":"az",      
-"Bangla":"bn",      
-"Bashkir":"ba",      
-"Bosnian (Latin)":"bs",      
-"Bulgarian":"bg",      
-"Cantonese (Traditional)":"yue",        
-"Catalan":"ca",      
-"Chinese (Literary)":"lzh",        
-"Chinese Simplified":"zh-Hans",          
-"Chinese Traditional":"zh-Hant",          
-"Croatian":"hr",      
-"Czech":"cs",      
-"Danish":"da",      
-"Dari":"prs",        
-"Divehi":"dv",      
-"Dutch":"nl",      
-"English":"en",      
-"Estonian":"et",      
-"Fijian":"fj",      
-"Filipino":"fil",        
-"Finnish":"fi",      
-"French":"fr",      
-"French (Canada)":"fr-ca",        
-"Georgian":"ka",      
-"German":"de",      
-"Greek":"el",      
-"Gujarati":"gu",      
-"Haitian Creole":"ht",      
-"Hebrew":"he",      
-"Hindi":"hi",      
-"Hmong Daw":"mww",        
-"Hungarian":"hu",      
-"Icelandic":"is",      
-"Indonesian":"id",      
-"Inuinnaqtun":"ikt",        
-"Inuktitut":"iu",      
-"Inuktitut (Latin)":"iu-Latn",          
-"Irish":"ga",      
-"Italian":"it",      
-"Japanese":"ja",      
-"Kannada":"kn",      
-"Kazakh":"kk",      
-"Khmer":"km",      
-"Klingon":"tlh-Lat",          
-"Klingon (plqaD)":"tlh-Piq",          
-"Korean":"ko",      
-"Kurdish (Central)  ":"ku",      
-"Kurdish (Northern)":"kmr",        
-"Kyrgyz":"ky",      
-"Lao":"lo",      
-"Latvian":"lv",      
-"Lithuanian":"lt",      
-"Macedonian":"mk",      
-"Malagasy":"mg",      
-"Malay ":"ms",      
-"Malayalam":"ml",      
-"Maltese":"mt",      
-"Maori":"mi",      
-"Marathi":"mr",      
-"Mongolian (Cyrillic)":"mn-Cyrl",          
-"Mongolian (Traditional)":"mn-Mong",          
-"Myanmar":"my",      
-"Nepali":"ne",      
-"Norwegian":"nb",      
-"Odia":"or",      
-"Pashto":"ps",      
-"Persian ":"fa",      
-"Polish":"pl",      
-"Portuguese (Brazil)":"pt",      
-"Portuguese (Portugal)":"pt-pt",        
-"Punjabi":"pa",      
-"Queretaro Otomi":"otq",        
-"Romanian":"ro",      
-"Russian":"ru",      
-"Samoan":"sm",      
-"Serbian (Cyrillic)":"sr-Cyrl",          
-"Serbian (Latin)":"sr-Latn",          
-"Slovak":"sk",      
-"Slovenian":"sl",      
-"Spanish":"es",      
-"Swahili":"sw",      
-"Swedish":"sv",      
-"Tahitian":"ty",      
-"Tamil":"ta",      
-"Tatar":"tt",      
-"Telugu":"te",      
-"Thai":"th",      
-"Tibetan":"bo",      
-"Tigrinya":"ti",      
-"Tongan":"to",      
-"Turkish":"tr",      
-"Turkmen":"tk",      
-"Ukrainian":"uk",      
-"Upper Sorbian":"hsb",        
-"Urdu":"ur",      
-"Uyghur":"ug",      
-"Uzbek (Latin)":"uz",      
-"Vietnamese":"vi",      
-"Welsh":"cy",      
-"Yucatec Maya":"yua",                           
+            "Afrikaans":"af",      
+            "Albanian":"sq",      
+            "Amharic":"am",      
+            "Arabic":"ar",      
+            "Armenian":"hy",      
+            "Assamese":"as",      
+            "Azerbaijani":"az",      
+            "Bangla":"bn",      
+            "Bashkir":"ba",      
+            "Bosnian (Latin)":"bs",      
+            "Bulgarian":"bg",      
+            "Cantonese (Traditional)":"yue",        
+            "Catalan":"ca",      
+            "Chinese (Literary)":"lzh",        
+            "Chinese Simplified":"zh-Hans",          
+            "Chinese Traditional":"zh-Hant",          
+            "Croatian":"hr",      
+            "Czech":"cs",      
+            "Danish":"da",      
+            "Dari":"prs",        
+            "Divehi":"dv",      
+            "Dutch":"nl",      
+            "English":"en",      
+            "Estonian":"et",      
+            "Fijian":"fj",      
+            "Filipino":"fil",        
+            "Finnish":"fi",      
+            "French":"fr",      
+            "French (Canada)":"fr-ca",        
+            "Georgian":"ka",      
+            "German":"de",      
+            "Greek":"el",      
+            "Gujarati":"gu",      
+            "Haitian Creole":"ht",      
+            "Hebrew":"he",      
+            "Hindi":"hi",      
+            "Hmong Daw":"mww",        
+            "Hungarian":"hu",      
+            "Icelandic":"is",      
+            "Indonesian":"id",      
+            "Inuinnaqtun":"ikt",        
+            "Inuktitut":"iu",      
+            "Inuktitut (Latin)":"iu-Latn",          
+            "Irish":"ga",      
+            "Italian":"it",      
+            "Japanese":"ja",      
+            "Kannada":"kn",      
+            "Kazakh":"kk",      
+            "Khmer":"km",      
+            "Klingon":"tlh-Lat",          
+            "Klingon (plqaD)":"tlh-Piq",          
+            "Korean":"ko",      
+            "Kurdish (Central)  ":"ku",      
+            "Kurdish (Northern)":"kmr",        
+            "Kyrgyz":"ky",      
+            "Lao":"lo",      
+            "Latvian":"lv",      
+            "Lithuanian":"lt",      
+            "Macedonian":"mk",      
+            "Malagasy":"mg",      
+            "Malay ":"ms",      
+            "Malayalam":"ml",      
+            "Maltese":"mt",      
+            "Maori":"mi",      
+            "Marathi":"mr",      
+            "Mongolian (Cyrillic)":"mn-Cyrl",          
+            "Mongolian (Traditional)":"mn-Mong",          
+            "Myanmar":"my",      
+            "Nepali":"ne",      
+            "Norwegian":"nb",      
+            "Odia":"or",      
+            "Pashto":"ps",      
+            "Persian ":"fa",      
+            "Polish":"pl",      
+            "Portuguese (Brazil)":"pt",      
+            "Portuguese (Portugal)":"pt-pt",        
+            "Punjabi":"pa",      
+            "Queretaro Otomi":"otq",        
+            "Romanian":"ro",      
+            "Russian":"ru",      
+            "Samoan":"sm",      
+            "Serbian (Cyrillic)":"sr-Cyrl",          
+            "Serbian (Latin)":"sr-Latn",          
+            "Slovak":"sk",      
+            "Slovenian":"sl",      
+            "Spanish":"es",      
+            "Swahili":"sw",      
+            "Swedish":"sv",      
+            "Tahitian":"ty",      
+            "Tamil":"ta",      
+            "Tatar":"tt",      
+            "Telugu":"te",      
+            "Thai":"th",      
+            "Tibetan":"bo",      
+            "Tigrinya":"ti",      
+            "Tongan":"to",      
+            "Turkish":"tr",      
+            "Turkmen":"tk",      
+            "Ukrainian":"uk",      
+            "Upper Sorbian":"hsb",        
+            "Urdu":"ur",      
+            "Uyghur":"ug",      
+            "Uzbek (Latin)":"uz",      
+            "Vietnamese":"vi",      
+            "Welsh":"cy",      
+            "Yucatec Maya":"yua",                           
                          
 }
 CHUNK_SIZE = 15
@@ -263,7 +258,7 @@ LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHO
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
 
-headers = {
+HEADERS = {
             'Ocp-Apim-Subscription-Key': bot_secrets.secrets.azure_translate_key,
             'Ocp-Apim-Subscription-Region': 'global',
             'Content-type': 'application/json',
