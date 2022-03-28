@@ -23,7 +23,7 @@ class HelpCog(commands.Cog):
     async def help(self, ctx, *, command_name=None):
 
         if command_name:
-            command = self.find_command(self.bot, command_name)
+            command = self.find_command(self.bot, command_name.lower())
             if isinstance(command, ext.ClemBotCommand):
                 await self.send_command_help(ctx, command)
             elif isinstance(command, ext.ClemBotGroup):
