@@ -27,7 +27,8 @@ class TranslateCog(commands.Cog):
 
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
-        languagecode = get_lang_code(input[0])
+        
+        languagecode = await get_lang_code(input[0])
         if languagecode:
             await self.translate_given_lang(ctx, languagecode, input)
         else:
@@ -47,40 +48,39 @@ class TranslateCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel)
         return
-    @ext.command(aliases=['m'])
+    @translate.command(aliases=['m'])
     @ext.long_help('Manually specifies an output language to translate too')
     @ext.short_help('Specify an output language')
     @ext.example('translate m or translate manual')
-    async def manual(self, ctx, input):
+    async def manual(self, ctx, *input: str):
 
         output_lang = await get_lang_code(input[0])
         input_lang = await get_lang_code(input[1])
-        if not input_lang:
-           await self.error_handling(ctx, input_lang)
-           return
-        elif not output_lang:
+        if output_lang and input_lang:
+
+         text = ' '.join(input[2:])
+
+         params = {
+             'api-version': '3.0',
+             'from': input_lang,
+             'to': output_lang
+         }
+
+         body = [{
+             'text': text
+         }]
+
+         async with await self.session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
+             response = json.loads(await resp.text())
+
+         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
+         name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
+         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
+         await ctx.send(embed=embed)
+         return
+        else:
            await self.error_handling(ctx, output_lang)
            return
-
-        text = ' '.join(input[2:])
-
-        params = {
-            'api-version': '3.0',
-            'from': input_lang,
-            'to': output_lang
-        }
-
-        body = [{
-            'text': text
-        }]
-
-        async with await self.session.post(url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body) as resp:
-            response = json.loads(await resp.text())
-
-        embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
-        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['translations'][0]['to']]
-        embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
-        await ctx.send(embed=embed)
 
     async def error_handling(self, ctx, error: str):
 
@@ -128,10 +128,10 @@ class TranslateCog(commands.Cog):
 async def get_lang_code(language: str):
     
     language_lower = language.lower()
-    if language_lower in LOWER_CODE_TO_CODE:
-        return LOWER_CODE_TO_CODE[language_lower]
-    elif language_lower in LOWER_LANGUAGE_TO_CODE:
+    if language_lower in LOWER_LANGUAGE_TO_CODE:
         return LOWER_LANGUAGE_TO_CODE[language_lower]
+    elif language_lower in LOWER_CODE_TO_CODE:
+        return LOWER_CODE_TO_CODE[language_lower]
 
 
 def get_language_list():
@@ -156,13 +156,13 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Azerbaijani":"az",      
             "Bangla":"bn",      
             "Bashkir":"ba",      
-            "Bosnian (Latin)":"bs",      
+            "Bosnian-(Latin)":"bs",      
             "Bulgarian":"bg",      
-            "Cantonese (Traditional)":"yue",        
+            "Cantonese-(Traditional)":"yue",        
             "Catalan":"ca",      
-            "Chinese (Literary)":"lzh",        
-            "Chinese Simplified":"zh-Hans",          
-            "Chinese Traditional":"zh-Hant",          
+            "Chinese-(Literary)":"lzh",        
+            "Chinese-Simplified":"zh-Hans",          
+            "Chinese-Traditional":"zh-Hant",          
             "Croatian":"hr",      
             "Czech":"cs",      
             "Danish":"da",      
@@ -175,21 +175,21 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Filipino":"fil",        
             "Finnish":"fi",      
             "French":"fr",      
-            "French (Canada)":"fr-ca",        
+            "French-(Canada)":"fr-ca",        
             "Georgian":"ka",      
             "German":"de",      
             "Greek":"el",      
             "Gujarati":"gu",      
-            "Haitian Creole":"ht",      
+            "Haitian-Creole":"ht",      
             "Hebrew":"he",      
             "Hindi":"hi",      
-            "Hmong Daw":"mww",        
+            "Hmong-Daw":"mww",        
             "Hungarian":"hu",      
             "Icelandic":"is",      
             "Indonesian":"id",      
             "Inuinnaqtun":"ikt",        
             "Inuktitut":"iu",      
-            "Inuktitut (Latin)":"iu-Latn",          
+            "Inuktitut-(Latin)":"iu-Latn",          
             "Irish":"ga",      
             "Italian":"it",      
             "Japanese":"ja",      
@@ -197,10 +197,10 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Kazakh":"kk",      
             "Khmer":"km",      
             "Klingon":"tlh-Lat",          
-            "Klingon (plqaD)":"tlh-Piq",          
+            "Klingon-(plqaD)":"tlh-Piq",          
             "Korean":"ko",      
-            "Kurdish (Central)  ":"ku",      
-            "Kurdish (Northern)":"kmr",        
+            "Kurdish-(Central)  ":"ku",      
+            "Kurdish-(Northern)":"kmr",        
             "Kyrgyz":"ky",      
             "Lao":"lo",      
             "Latvian":"lv",      
@@ -212,8 +212,8 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Maltese":"mt",      
             "Maori":"mi",      
             "Marathi":"mr",      
-            "Mongolian (Cyrillic)":"mn-Cyrl",          
-            "Mongolian (Traditional)":"mn-Mong",          
+            "Mongolian-(Cyrillic)":"mn-Cyrl",          
+            "Mongolian-(Traditional)":"mn-Mong",          
             "Myanmar":"my",      
             "Nepali":"ne",      
             "Norwegian":"nb",      
@@ -228,8 +228,8 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Romanian":"ro",      
             "Russian":"ru",      
             "Samoan":"sm",      
-            "Serbian (Cyrillic)":"sr-Cyrl",          
-            "Serbian (Latin)":"sr-Latn",          
+            "Serbian-(Cyrillic)":"sr-Cyrl",          
+            "Serbian-(Latin)":"sr-Latn",          
             "Slovak":"sk",      
             "Slovenian":"sl",      
             "Spanish":"es",      
@@ -249,15 +249,15 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Upper Sorbian":"hsb",        
             "Urdu":"ur",      
             "Uyghur":"ug",      
-            "Uzbek (Latin)":"uz",      
+            "Uzbek-(Latin)":"uz",      
             "Vietnamese":"vi",      
             "Welsh":"cy",      
-            "Yucatec Maya":"yua",                           
+            "Yucatec-Maya":"yua",                           
                          
 }
 CHUNK_SIZE = 15
-LOWER_LANGUAGE_TO_CODE = {k: v for k, v in LANGUAGE_NAME_TO_SHORT_CODE.items()}
-LOWER_CODE_TO_CODE = {k: k for k, _ in LANGUAGE_NAME_TO_SHORT_CODE.items()}
+LOWER_LANGUAGE_TO_CODE = {k.lower(): v for k, v in LANGUAGE_NAME_TO_SHORT_CODE.items()}
+LOWER_CODE_TO_CODE = {x.lower():x for x,x in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHORT_CODE.items()}
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
