@@ -20,7 +20,7 @@ class TranslateCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
-        'Allows you to translate words or sentences by specifying which langauge you want as an output, and autodetecting the input language. Use the command \'translate languages\' to see available languages')
+        'Allows you to translate words or sentences by specifying which langauge you want as an output and autodetecting the input language. Use the command \'translate languages\' to see available languages')
     @ext.short_help('Translates words or phrases between two languages')
     @ext.example(('translate spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish Como estas?'))
     async def translate(self, ctx, *input: str):
