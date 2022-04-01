@@ -119,12 +119,13 @@ class TranslateCog(commands.Cog):
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
         return
+    
     def cog_unload(self):
         self.session.close()
 
 
 
-async def get_lang_code(self, ctx, language: str):
+async def get_lang_code(language: str):
     
     language_lower = language.lower()
     if language_lower in LOWER_CODE_TO_CODE:
