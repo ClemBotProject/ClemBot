@@ -20,9 +20,9 @@ class TranslateCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
-        'Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages\' to see available languages')
+        'Allows you to translate words or sentences by specifying which langauge you want as an output, and autodetecting the input language. Use the command \'translate languages\' to see available languages')
     @ext.short_help('Translates words or phrases between two languages')
-    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish German Como estas?'))
+    @ext.example(('translate spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish Como estas?'))
     async def translate(self, ctx, *input: str):
 
         if len(input) < 2:
@@ -49,9 +49,9 @@ class TranslateCog(commands.Cog):
                                          channel=ctx.channel)
         return
     @translate.command(aliases=['m'])
-    @ext.long_help('Manually specifies an output language to translate too')
-    @ext.short_help('Specify an output language')
-    @ext.example('translate m or translate manual')
+    @ext.long_help('Manually specifies what input language you entered')
+    @ext.short_help('Specify which language you put in')
+    @ext.example('translate m en chinese-simplified or translate manual <output> <input> <text>')
     async def manual(self, ctx, *input: str):
 
         output_lang = await get_lang_code(input[0])
