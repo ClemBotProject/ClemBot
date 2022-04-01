@@ -27,7 +27,7 @@ class TranslateCog(commands.Cog):
 
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
-        languagecode = get_lang_code(self, ctx, input[0])
+        languagecode = get_lang_code(input[0])
         if languagecode:
             await self.translate_given_lang(ctx, languagecode, input)
         else:
@@ -53,8 +53,8 @@ class TranslateCog(commands.Cog):
     @ext.example('translate m or translate manual')
     async def manual(self, ctx, input):
 
-        output_lang = await get_lang_code(self, ctx, input[0])
-        input_lang = await get_lang_code(self,ctx,input[1])
+        output_lang = await get_lang_code(input[0])
+        input_lang = await get_lang_code(input[1])
         if not input_lang:
            await self.error_handling(ctx, input_lang)
            return
