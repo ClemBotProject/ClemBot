@@ -27,7 +27,7 @@ class OwnerCog(commands.Cog):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @ext.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
