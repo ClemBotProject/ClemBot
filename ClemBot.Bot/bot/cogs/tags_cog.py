@@ -97,15 +97,8 @@ class TagCog(commands.Cog):
             return
 
         tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
-        pages = self.chunked_tags(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, 'Available Tags', tags_url)
-        for tag in ownedTags:
-            embed = discord.Embed(color=Colors.ClemsonOrange, title=f'{tag.name}')
-            embed.set_author(name=f'{self.bot.user.name} - Tags',
-                             url=f'{bot_secrets.secrets.docs_url}/tags',
-                             icon_url=self.bot.user.display_avatar.url)
-            embed.add_field(name='Content', value=tag.content)
-            embed.add_field(name='Uses', value=f'{tag.use_count} use{"s" if tag.use_count != 1 else ""}')
-            pages.append(embed)
+        pages = self.chunked_tags(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, f"{user.name}'s Available Tags", tags_url)
+        
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=pages,
                                          author=ctx.author,
