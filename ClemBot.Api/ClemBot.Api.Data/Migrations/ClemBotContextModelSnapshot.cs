@@ -22,7 +22,7 @@ namespace ClemBot.Api.Data.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit", "custom_tag_prefix_set" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "config_settings", new[] { "allow_embed_links" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "designated_channels", new[] { "message_log", "moderation_log", "user_join_log", "user_leave_log", "starboard", "server_join_log", "bot_dm_log" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "infraction_type", new[] { "ban", "mute", "warn" });
@@ -125,6 +125,27 @@ namespace ClemBot.Api.Data.Migrations
                     b.HasIndex("GuildId");
 
                     b.ToTable("CustomPrefixs");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.CustomTagPrefix", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("TagPrefix")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("CustomTagPrefixs");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.DesignatedChannelMapping", b =>
@@ -516,6 +537,17 @@ namespace ClemBot.Api.Data.Migrations
                     b.Navigation("Guild");
                 });
 
+            modelBuilder.Entity("ClemBot.Api.Data.Models.CustomTagPrefix", b =>
+                {
+                    b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
+                        .WithMany("CustomTagPrefixes")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("ClemBot.Api.Data.Models.DesignatedChannelMapping", b =>
                 {
                     b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
@@ -748,6 +780,8 @@ namespace ClemBot.Api.Data.Migrations
                     b.Navigation("Channels");
 
                     b.Navigation("CustomPrefixes");
+
+                    b.Navigation("CustomTagPrefixes");
 
                     b.Navigation("GuildSettings");
 

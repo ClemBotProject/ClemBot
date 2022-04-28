@@ -5,11 +5,11 @@ import discord
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.custom_tag_prefix import CustomTagPrefix
 import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
-TAG_PREFIX = '$'
 TAG_PAGINATE_THRESHOLD = 500
 
 
@@ -21,9 +21,11 @@ class TagService(BaseService):
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
+        tagprefix = await self.bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
+        tagprefix = tagprefix[0]
         tags_content = []
         tag_found = False
-        pattern = re.compile(f'(^|\\s)[{TAG_PREFIX}](\\w+)')
+        pattern = re.compile(f'(^|\\s)[{tagprefix}](\\w+)')
         for match in set(i[1] for i in pattern.findall(message.content)):
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 

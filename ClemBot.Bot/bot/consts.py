@@ -69,6 +69,7 @@ class Claims(Enum):
     dashboard_edit = auto()
     guild_settings_view = auto()
     guild_settings_edit = auto()
+    custom_tag_prefix_set = auto()
 
     @staticmethod
     def get_claims_str():
