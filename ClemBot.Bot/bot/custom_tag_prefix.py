@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 class CustomTagPrefix:
 
     def __init__(self, *, default: str):
-        log.info(f'Setting default prefix too: "{default}""')
+        log.info(f'Setting default tag prefix too: "{default}""')
         self.default = default
 
     async def get_tag_prefix(self, bot: ClemBot, message: discord.Message):

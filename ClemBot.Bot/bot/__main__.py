@@ -67,7 +67,6 @@ def main():
         messenger=messenger,
         scheduler=scheduler,
         command_prefix=custom_prefix.get_prefix,  # noqa: E126
-        # tag_prefix=custom_tag_prefix.get_tag_prefix,
         activity=discord.Game(name='https://clembot.io'),
         help_command=None,
         case_insensitive=True,
