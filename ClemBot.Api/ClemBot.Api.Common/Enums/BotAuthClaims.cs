@@ -26,4 +26,5 @@ public enum BotAuthClaims
     dashboard_edit,
     guild_settings_view,
     guild_settings_edit,
+    custom_tag_prefix_set,
 }

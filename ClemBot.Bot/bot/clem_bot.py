@@ -71,6 +71,7 @@ class ClemBot(commands.Bot):
         self.designated_channel_route: designated_channel_route.DesignatedChannelRoute = None
         self.welcome_message_route: welcome_message_route.WelcomeMessageRoute = None
         self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None
+        self.custom_tag_prefix_route: custom_tag_prefix_route.CustomTagPrefixRoute = None
         self.moderation_route: moderation_route.ModerationRoute = None
         self.claim_route: claim_route.ClaimRoute = None
         self.commands_route: commands_route.CommandsRoute = None
@@ -460,3 +461,6 @@ class ClemBot(commands.Bot):
             is_cog = isinstance(obj, type) and issubclass(obj, base)
             if is_cog and obj.__module__ == module.__name__:
                 yield obj
+
+    async def get_tag_prefix(self, ctx):
+        return await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id)

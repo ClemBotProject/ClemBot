@@ -30,5 +30,7 @@ public class Guild
 
     public List<CustomPrefix> CustomPrefixes { get; set; } = new();
 
+    public List<CustomTagPrefix> CustomTagPrefixes { get; set; } = new();
+
     public List<GuildSetting> GuildSettings { get; set; } = new();
 }

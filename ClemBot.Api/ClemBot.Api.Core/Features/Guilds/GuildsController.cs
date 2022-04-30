@@ -178,6 +178,17 @@ public class GuildsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpGet("[controller]/{GuildId}/CustomTagPrefixes")]
+    [GuildSandboxAuthorize]
+    public async Task<IActionResult> CustomTagPrefixes([FromRoute] GetCustomTagPrefixes.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NoContent(),
+            { Status: QueryStatus.Forbidden } => Forbid(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpGet("bot/[controller]/{Id}/Channels")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Channels([FromRoute] Bot.Channels.Query query) =>
