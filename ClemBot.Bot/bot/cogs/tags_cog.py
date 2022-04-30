@@ -355,7 +355,6 @@ class TagCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    
 
     async def _delete_tag(self, name, ctx):
         name = name.lower()
