@@ -302,8 +302,10 @@ class TagCog(commands.Cog):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global so we dont care about them
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
-
+        
         if not tagprefix:
+            if not tag_prefixes:
+                tag_prefixes = [DEFAULT_TAG_PREFIX]
             embed = discord.Embed(title='Current Active Tag Prefixes',
                                   description=f'```{", ".join(tag_prefixes)}```',
                                   color=Colors.ClemsonOrange)
