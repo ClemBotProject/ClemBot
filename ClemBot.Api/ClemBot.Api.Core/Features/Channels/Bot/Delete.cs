@@ -44,7 +44,15 @@ public class Delete
                 return QueryResult<Model>.NotFound();
             }
 
+            // Grab any child threads the channel contains and delete those as well
+            // to preserve referential integrity
+            var childThreads = await _context.Channels
+                .Where(x => x.ParentId == channel.Id)
+                .ToListAsync();
+
             _context.Channels.Remove(channel);
+            _context.Channels.RemoveRange(childThreads);
+
             await _context.SaveChangesAsync();
 
             // Clear the channel from the cache so we dont try to insert a new message batch into it
