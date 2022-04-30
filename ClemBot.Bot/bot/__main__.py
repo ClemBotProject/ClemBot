@@ -7,7 +7,6 @@ import discord
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
 from bot.custom_prefix import CustomPrefix
-from bot.custom_tag_prefix import CustomTagPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 
@@ -37,9 +36,6 @@ def main():
     # get the default prefix for the bot instance
     prefix = bot_secrets.secrets.bot_prefix
 
-    # Set the default tag prefix
-    tag_prefix = '$'
-
     # Initialize the messenger here and inject it into the base bot class,
     # this is so it can be reused later on
     # if we decide to add something not related to the bot
@@ -48,9 +44,6 @@ def main():
 
     # create the custom prefix handler class
     custom_prefix = CustomPrefix(default=prefix)
-
-    # create the custom tag prefix handler class
-    custom_tag_prefix = CustomTagPrefix(default=tag_prefix)
 
     # enable privileged member gateway intents
     intents = discord.Intents.default()
