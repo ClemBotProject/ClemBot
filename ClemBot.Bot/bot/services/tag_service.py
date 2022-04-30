@@ -24,6 +24,9 @@ class TagService(BaseService):
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
         tagprefix = await self.get_tag_prefix(self.bot, message=message)
+        if tagprefix is None:
+            return
+        
         tagprefix = tagprefix[0]
         tags_content = []
         tag_found = False
@@ -86,7 +89,7 @@ class TagService(BaseService):
                 # if the api call fails for any reason then we bail out and return nothing 
                 # so as to not spam the servers with error messages on every message. 
                 # failing silently is preferable to that
-                return []
+                return None
                 
         if len(tagprefixes) == 0:
             tagprefixes = [TAG_PREFIX_DEFAULT]

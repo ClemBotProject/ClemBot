@@ -288,10 +288,7 @@ class TagCog(commands.Cog):
         embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
-# Tag prefix functions
-
-    
-    #@ext.group(case_insensitive=True, invoke_without_command=True, aliases=['tagprefixs'])
+    # Tag prefix functions
     @tag.group(invoke_without_command=True, case_insensitive=True)
     @ext.long_help(
         'Lists the current tag prefix or configures the command prefix that the bot will respond too'
@@ -354,9 +351,6 @@ class TagCog(commands.Cog):
             value=f'New Tag Prefix: ```{default_tag_prefix}```')
 
         await ctx.send(embed=embed)
-
-    
-
 
     async def _delete_tag(self, name, ctx):
         name = name.lower()
