@@ -23,12 +23,11 @@ class TagService(BaseService):
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
-        #tagprefix = await self.bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
         tagprefix = await self.get_tag_prefix(self.bot, message=message)
         tagprefix = tagprefix[0]
         tags_content = []
         tag_found = False
-        pattern = re.compile(f'(^|\\s)[{tagprefix}](\\w+)')
+        pattern = re.compile(fr'(^|\s)[{re.escape(tagprefix)}](\w+)')
         for match in set(i[1] for i in pattern.findall(message.content)):
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 

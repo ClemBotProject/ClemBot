@@ -301,7 +301,7 @@ class TagCog(commands.Cog):
     async def prefix(self, ctx, *, tagprefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global so we dont care about them
-        tag_prefixes = await self.bot.get_tag_prefix(ctx.message)
+        tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
 
         if not tagprefix:
             embed = discord.Embed(title='Current Active Tag Prefixes',
@@ -310,7 +310,7 @@ class TagCog(commands.Cog):
 
             return await ctx.send(embed=embed)
 
-        if tagprefix in await self.bot.get_tag_prefix(ctx.message):
+        if tagprefix in tag_prefixes:
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.add_field(name='Invalid tag prefix', value=f'"{tagprefix}" is already the tag prefix for this guild')
             await ctx.send(embed=embed)
