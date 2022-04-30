@@ -83,7 +83,10 @@ class TagService(BaseService):
                 # and bailout, we cant respond to anything at the moment
                 tagprefixes = await bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
             except Exception as e:
-                log.error('Custom tagprefix request failed with error: {error}', error=e)
+                # if the api call fails for any reason then we bail out and return nothing 
+                # so as to not spam the servers with error messages on every message. 
+                # failing silently is preferable to that
+                return []
                 
         if len(tagprefixes) == 0:
             tagprefixes = [TAG_PREFIX_DEFAULT]
