@@ -357,7 +357,6 @@ class TagCog(commands.Cog):
 
     
 
-
     async def _delete_tag(self, name, ctx):
         name = name.lower()
         dictionary = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
