@@ -301,7 +301,7 @@ class TagCog(commands.Cog):
     async def prefix(self, ctx, *, tagprefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global so we dont care about them
-        tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
+        tag_prefixes = await self.bot.get_tag_prefix(ctx.message)
         
         if not tagprefix:
             if not tag_prefixes:
