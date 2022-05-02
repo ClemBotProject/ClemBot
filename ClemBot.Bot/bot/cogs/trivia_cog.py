@@ -310,3 +310,4 @@ CATEGORYLIST_LOWER = [k.lower for k in CATEGORYLIST]
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
+    
