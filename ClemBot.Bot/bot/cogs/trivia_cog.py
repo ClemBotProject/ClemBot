@@ -50,10 +50,7 @@ class TriviaCog(commands.Cog):
      FunctionParameters = []   
      for x in range(0, 3):
          if input[x] != None:
-             FunctionParameters.insert(x, self.Matching_Function(x))
-         else:
-             FunctionParameters.insert(x, None)
-             break  # End of input we parsed as much as possible     
+             FunctionParameters.insert(x, self.Matching_Function(x))    
 
          
        
