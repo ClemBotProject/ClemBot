@@ -49,16 +49,13 @@ class TriviaCog(commands.Cog):
         raise UserInputError("You need more arguments to use this command")
      FunctionParameters = []   
      for x in range(0, 3):
-         if input[x] != None:
-             FunctionParameters.insert(x, self.Matching_Function(x))    
+        FunctionParameters.insert(x, self.Matching_Function(x))    
 
-         
-       
+
      url = self.Url_Builder(FunctionParameters)
      async with await self.session.get(url=url) as resp:  
             response = json.loads(await resp.text())
             correct_answers = await self.JsonParser(response)
-
 
      return
     async def Url_Builder(self, functionlist):
@@ -92,7 +89,7 @@ class TriviaCog(commands.Cog):
         case 1:
             if input[1].isnumeric():
                 trivianumber = int(input[1])
-                if 0< trivianumber <= 24:
+                if 0 < trivianumber <= 24:
                     return trivianumber+8
                 elif trivianumber == 0:
                     return None    
@@ -100,7 +97,7 @@ class TriviaCog(commands.Cog):
             else:
                 triviacategory = input[1].lower()
                 for x in CATEGORYLIST_LOWER:
-                 if(x.find(triviacategory) != -1):
+                 if x.find(triviacategory) != -1:
                      Returnthis = CATEGORYLIST_LOWER.index(x)+9
                      return Returnthis
                  else:
