@@ -56,6 +56,7 @@ class TriviaCog(commands.Cog):
      async with await self.session.get(url=url) as resp:  
             response = json.loads(await resp.text())
             correct_answers = await self.JsonParser(response)
+     theembed = self.Dict_Publisher(response, correct_answers, response)       
 
      return
     async def Url_Builder(self, functionlist):
@@ -72,7 +73,7 @@ class TriviaCog(commands.Cog):
                         case 3:
                             url = url + "&type="+functionlist[x]             
 
-        return
+        return url
     async def Matching_Function(self, case, *input:str):
      
      match case:
@@ -176,7 +177,6 @@ class TriviaCog(commands.Cog):
             embed.addfield(name=chr(a)+":", value = iterative, inline=False)
             a=a+1
          cog_embeds.append(embed)
-        
         msgembed = await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=cog_embeds,
                                          author=ctx.author,
@@ -187,37 +187,27 @@ class TriviaCog(commands.Cog):
         await msgembed.add_reaction('🇧')
         await msgembed.add_reaction('🇨')
         await msgembed.add_reaction('🇩')
-        current_pagenumber = 1
-        max_pagenumber = len(cog_embeds)
+        max_pagenumber = discord.ext.pages.Paginator.current_page
+        def check(reaction, user):
+            return user == ctx.author and ANSWER_KEY.find(str(reaction.emoji)) != -1
         while not msgembed.empty:
             
-         reaction  = await self.client.wait_for("reaction_add", timeout=360, check=check)
-         current_pagenumber = await self.On_Reaction(reaction.emoji, List_Index, msgembed, current_pagenumber, max_pagenumber)
+         reaction, user  = await self.client.wait_for("reaction_add", timeout=360, check=check)
+         current_pagenumber = discord.ext.pages.Paginator.current_page
         return msgembed
     
-
+   
     async def On_Reaction(self, ctx, reaction, rightanswer, msgembeds, current_page, max_pagenumber):
 
             if ANSWER_KEY[rightanswer[current_page]] == reaction:
                 del msgembeds[current_page] # Add something to scoreboard to give indication it was right
-            elif MOVEMENT_ARROWS.find(reaction):      
-                Index_Of = MOVEMENT_ARROWS.index(reaction)
-                match Index_Of:
-                    case 0:
-                        return current_page+1
-                    case 1:
-                        if current_page > 1:
-                            return current_page-1
-                    case 2:
-                        return max_pagenumber
-                    case 3:
-                        return 1            
+          
                 
-            return current_page
+            return
 
     def helper_fixer(formatthis):
          newlist = []
-         for x in formatthis:
+         for x in formatthis:   #Fix this+ formatting
            newlist[x] = '\n'.append(formatthis[x]) + "     Index Of Element:"+formatthis.index([x])
          for i in range(0, len(formatthis), CHUNK_SIZE):
              yield newlist[i:i+CHUNK_SIZE]          
@@ -276,15 +266,15 @@ QUESTIONTYPE = [
     "bool"
 ]
 QUESTIONTYPE_LOWER = [k.lower for k in QUESTIONTYPE]
-CATEGORYLIST = ["General Knowledge", #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
+CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
                  "Books", 
                  "Film", 
                  "Music", 
-                 "Musicals & Theatres", 
+                 "Musicals&Theatres", 
                  "Television",
-                 "Video Games",
-                 "Board Games",
-                 "Science & Nature", 
+                 "Video-Games",
+                 "Board-Games",
+                 "Science&Nature", 
                  "Computers", 
                  "Mathematics", 
                  "Mythology", 
@@ -298,8 +288,8 @@ CATEGORYLIST = ["General Knowledge", #Including this out of consistency to avoid
                "Vehicles",
               "Comics",
              "Gadgets",
-            "Japanese Anime & Manga",
-           "Cartoon & Animations"]
+            "Japanese-Anime&Manga",
+           "Cartoon&Animations"]
 CATEGORYLIST_LOWER = [k.lower for k in CATEGORYLIST]
 
 def setup(bot):
