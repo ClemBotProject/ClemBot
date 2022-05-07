@@ -74,8 +74,9 @@ class TriviaCog(commands.Cog):
     async def Url_Builder(self, functionlist, inputlength):
             max_index = inputlength-1
             url = URL_BUILDER+ str(functionlist[0])
-            for x in range(1, max_index):
-                if functionlist[x]:
+            x = 1
+            while x <= max_index:
+                 if functionlist[x]:
                      match x:
                          case 1:
                                  url+=("&category="+ str(functionlist[1]))
@@ -83,6 +84,7 @@ class TriviaCog(commands.Cog):
                                 url+=("&difficulty=" + functionlist[2])
                          case 3:
                                  url+=("&type="+functionlist[max_index])
+                 x+=1                
             return url   
                           
           
