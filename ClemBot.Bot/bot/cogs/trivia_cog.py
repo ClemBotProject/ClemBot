@@ -1,10 +1,11 @@
 import json
 import logging
-from threading import currentThread
+import threading
 from urllib import response
 import uuid
 import random
 import aiohttp
+import asyncio
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
@@ -12,7 +13,7 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-
+import requests
 
 
 
@@ -21,23 +22,24 @@ from bot.messaging.events import Events
 
 
 class TriviaCog(commands.Cog):
-
+    def cog_unload(self):
+            self.session.close() 
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(headers={'Connection': 'keep-alive'})
+        
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
-    @ext.long.help(
+    @ext.long_help(
     "Use !trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice"    )
     @ext.short_help(
     "!trivia use !trivia m for custom arguments"    )
-    async def Trivia(self, ctx, *input:str):
-       async with await self.session.get(url=DEFAULT_URL) as resp:  
-            response = json.loads(await resp.text())
-            correct_answers = self.JsonParser(response)
-            await self.Dict_Publisher(ctx, response)
-
-       return
+    async def Trivia(self, ctx, *input: str):
+        async with await self.session.get(DEFAULT_URL) as resp:
+                theresponse = json.loads(await resp.text())
+        correct_answers = await self.Json_Parser(ctx, theresponse)
+        dictreturn = await self.Dict_Publisher(ctx, theresponse, correct_answers)                  
+                       
     @Trivia.command()
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories!")
@@ -55,8 +57,9 @@ class TriviaCog(commands.Cog):
      url = self.Url_Builder(FunctionParameters)
      async with await self.session.get(url=url) as resp:  
             response = json.loads(await resp.text())
-            correct_answers = await self.JsonParser(response)
-     theembed = self.Dict_Publisher(response, correct_answers, response)       
+            correct_answers = self.JsonParser(response)
+       
+     theembed = self.Dict_Publisher(ctx, response, correct_answers)       
 
      return
     async def Url_Builder(self, functionlist):
@@ -147,7 +150,7 @@ class TriviaCog(commands.Cog):
         embed.addfield(name="Categories:", value=CATEGORYLIST)
          
         return
-    async def Json_Parser(dictionary):
+    async def Json_Parser(self,ctx, dictionary):
         Correct_Answers= []
         for x in dictionary['results']:
             Correct_Answers.append(x['correct_answer'])
@@ -157,44 +160,61 @@ class TriviaCog(commands.Cog):
         x=0
         cog_embeds = []
         List_Index = []
-        for bob in dictionary['result']:
+        for bob in dictionary['results']:
+             Answers_List= []   
+             Answers_List = bob['incorrect_answers']
+             Answers_List.append(bob['correct_answer'])
+             Right_Answer = bob['correct_answer']
+             random.shuffle(Answers_List)
+             List_Index.append(Answers_List.index(Right_Answer))  
+             x+=1   
+             embed = discord.Embed(title= "Your Trivia Question #"+str(x)+":",
+             color=Colors.ClemsonOrange)
+             embed.add_field(name="Question:", value=bob['question'])
+             embed.add_field(name="Category:", value=bob['category'])
+             a = 65
+             for iterative in Answers_List:
 
-         Answers_List= []   
-         Answers_List = bob['incorrect_answers']
-         Answers_List.append(bob['correct_answer'])
-         random.shuffle(Answers_List)
-         List_Index.append(Answers_List.index(Correct_answers[bob]))  
-         x+=1   
-         embed = discord.Embed(title= "Your Trivia Question:",
-         descripton="Question #"+x,
-         color=Colors.ClemsonOrange)
-         embed.addfield(name="Question:", value=bob['question'])
-         embed.addfield(name="Category:", value=bob['category'])
-         embed.addfield(name="Pick your Answer choice:", inline=False)
-         a = 65
-         for iterative in Answers_List:
-
-            embed.addfield(name=chr(a)+":", value = iterative, inline=False)
-            a=a+1
-         cog_embeds.append(embed)
-        msgembed = await self.bot.messenger.publish(Events.on_set_pageable_embed,
+                embed.add_field(name="Answer Choice  "+chr(a)+" :", value = iterative, inline=False)
+                a=a+1
+             cog_embeds.append(embed)
+          
+        
+        
+       
+        
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=cog_embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=360
-                                         ) 
-        await msgembed.add_reaction('🇦')
-        await msgembed.add_reaction('🇧')
-        await msgembed.add_reaction('🇨')
-        await msgembed.add_reaction('🇩')
-        max_pagenumber = discord.ext.pages.Paginator.current_page
+                                         timeout=10
+                                        )
+                                        
+        tester = discord.ext.commands.Paginator.pages  
+        print(tester)                          
+       
+                                      
+                                                                       
+        print("yes\n\n\n\n\n")
+        def newcheck(bot):
+            return bot.author == self.bot.user.id
+        msg = await self.bot.wait_for("message", check=newcheck)                                                                   
+       # await msgembed.add_reaction('🇦')
+       # await msgembed.add_reaction('🇧')
+       # await msgembed.add_reaction('🇨')
+        #await msgembed.add_reaction('🇩')
+       
         def check(reaction, user):
             return user == ctx.author and ANSWER_KEY.find(str(reaction.emoji)) != -1
-        while not msgembed.empty:
             
-         reaction, user  = await self.client.wait_for("reaction_add", timeout=360, check=check)
-         current_pagenumber = discord.ext.pages.Paginator.current_page
-        return msgembed
+            
+        while Publish_Embed.is_alive():
+            
+                reaction, user  = await self.client.wait_for("reaction_add", timeout=360, check=check)
+                current_pagenumber = discord.ext.pages.Paginator.current_page
+        
+        return                                                                          
+        
     
    
     async def On_Reaction(self, ctx, reaction, rightanswer, msgembeds, current_page, max_pagenumber):
@@ -204,6 +224,7 @@ class TriviaCog(commands.Cog):
           
                 
             return
+   
 
     def helper_fixer(formatthis):
          newlist = []
@@ -225,6 +246,12 @@ MOVEMENT_ARROWS=['➡️',
                '⏮️' ]
 
 CATEGORY_OFFSET = 9
+URL_PARAMS = {
+    "amount":"10",
+    "category":"",
+    "difficulty":"",
+    "type":""
+}
 
 URL_BUILDER = R"https://opentdb.com/api.php?amount="
 
