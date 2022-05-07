@@ -34,13 +34,13 @@ class TriviaCog(commands.Cog):
     "Use !trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice"    )
     @ext.short_help(
     "!trivia use !trivia m for custom arguments"    )
-    async def Trivia(self, ctx, *input: str):
+    async def Trivia(self, ctx):
         async with await self.session.get(DEFAULT_URL) as resp:
                 theresponse = json.loads(await resp.text())
-        correct_answers = await self.Json_Parser(ctx, theresponse)
+                correct_answers = await self.Json_Parser(ctx, theresponse)
         dictreturn = await self.Dict_Publisher(ctx, theresponse, correct_answers)                  
                        
-    @Trivia.command()
+    @Trivia.command(aliases=['m'])
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories!")
     @ext.short_help("!trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
@@ -49,34 +49,44 @@ class TriviaCog(commands.Cog):
     async def manual(self, ctx, *input:str):
      if len(input) < 1:
         raise UserInputError("You need more arguments to use this command")
-     FunctionParameters = []   
-     for x in range(0, 3):
-        FunctionParameters.insert(x, self.Matching_Function(x))    
+     FunctionParameters = []
+     inputlength = len(input)
+     x=0
+     while x < inputlength:
+        
+        appendthis = await self.Matching_Function(x, *input)
+        print(appendthis)
+        FunctionParameters.append(appendthis)
+        x+=1    
 
-
-     url = self.Url_Builder(FunctionParameters)
-     async with await self.session.get(url=url) as resp:  
+     print("bob")
+     url = await self.Url_Builder(FunctionParameters, inputlength)
+     print(url)
+     async with await self.session.get(url) as resp:  
             response = json.loads(await resp.text())
-            correct_answers = self.JsonParser(response)
-       
-     theembed = self.Dict_Publisher(ctx, response, correct_answers)       
+            correct_answers = await self.Json_Parser(ctx, response)
+     theembed = await self.Dict_Publisher(ctx, response, correct_answers)       
 
      return
-    async def Url_Builder(self, functionlist):
-        url = URL_BUILDER
-        for x in range(0,3):
-            if functionlist[x] != None:
-                    match x:
+    async def Url_Builder(self, functionlist, inputlength):
+            max_index = inputlength-1
+            print(max_index)
+            if functionlist[max_index]:
+                    match max_index:
                         case 0:
-                            url = url+ str(functionlist[x])
+                            url = URL_BUILDER+ str(functionlist[0])
+                            return url
                         case 1:
-                            url = url + "&category="+ str(functionlist[x])
+                            url = URL_BUILDER+ str(functionlist[0]) + "&category="+ str(functionlist[1])
+                            return url
                         case 2: 
-                            url = url + "&difficulty=" + functionlist[x]
+                            url = URL_BUILDER+ str(functionlist[0])+ "&category="+ str(functionlist[1]) + "&difficulty=" + functionlist[2]
+                            return url
                         case 3:
-                            url = url + "&type="+functionlist[x]             
-
-        return url
+                            url = URL_BUILDER + str(functionlist[0])+ "&category="+ str(functionlist[1]) + "&difficulty=" + functionlist[2]+ "&type="+functionlist[max_index]
+                            return url             
+          
+            return
     async def Matching_Function(self, case, *input:str):
      
      match case:
@@ -84,6 +94,7 @@ class TriviaCog(commands.Cog):
             if input[0].isnumeric():
                 questionnumber = int(input[0])
                 if 0 < questionnumber <= 50:
+                    print(questionnumber)
                     return questionnumber    
 
             else:
@@ -101,10 +112,11 @@ class TriviaCog(commands.Cog):
             else:
                 triviacategory = input[1].lower()
                 for x in CATEGORYLIST_LOWER:
+                 print(x)
                  if x.find(triviacategory) != -1:
                      Returnthis = CATEGORYLIST_LOWER.index(x)+9
                      return Returnthis
-                 else:
+                else:
                      raise UserInputError("Category not found!")     
         case 2:                         
             if input[2].isnumeric():
@@ -119,24 +131,23 @@ class TriviaCog(commands.Cog):
                  difficulty = input[2].lower()
                  for x in DIFFICULTY_LOWER:
                      if(x.find(difficulty) != -1):
-                         Returnthisint = DIFFICULTY_LOWER.index(x)+9
-                         return Returnthisint
-                     else:
+                         return x
+                 else:
                          raise UserInputError("Difficulty not found")
         case 3:
              if input[3].isnumeric():
                 EvaluteInt = int(input[3])
                 if 0 < EvaluteInt < 3:
-                    finalreturn = QUESTIONTYPE_LOWER[EvaluteInt-1]
+                    finalreturn = QUESTIONTYPE[EvaluteInt-1]
                     return finalreturn
                 elif EvaluteInt == 0:
                     return None    
              else:
-                 questiontype = questiontype.lower()
-                 for x in QUESTIONTYPE_LOWER:
+                 questiontype = input[3].lower()
+                 for x in QUESTIONTYPE:
                     if(x.find(questiontype) != -1):
                      return x 
-                    else:
+                 else:
                         raise UserInputError("Question type invalid.")    
      return                      
     async def List_Help(self):
@@ -187,7 +198,6 @@ class TriviaCog(commands.Cog):
                                          pages=cog_embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=10
                                         )
                                         
         tester = discord.ext.commands.Paginator.pages  
@@ -290,9 +300,8 @@ DIFFICULTY_LOWER = [k.lower() for k in DIFFICULTY]
 
 QUESTIONTYPE = [
     "multiple", 
-    "bool"
+    "boolean"
 ]
-QUESTIONTYPE_LOWER = [k.lower for k in QUESTIONTYPE]
 CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
                  "Books", 
                  "Film", 
@@ -317,7 +326,7 @@ CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid
              "Gadgets",
             "Japanese-Anime&Manga",
            "Cartoon&Animations"]
-CATEGORYLIST_LOWER = [k.lower for k in CATEGORYLIST]
+CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
