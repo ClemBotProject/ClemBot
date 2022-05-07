@@ -13,7 +13,6 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-import requests
 
 
 
@@ -74,22 +73,20 @@ class TriviaCog(commands.Cog):
      return
     async def Url_Builder(self, functionlist, inputlength):
             max_index = inputlength-1
-            if functionlist[max_index]:
-                    match max_index:
-                        case 0:
-                            url = URL_BUILDER+ str(functionlist[0])
-                            return url
-                        case 1:
-                            url = URL_BUILDER+ str(functionlist[0]) + "&category="+ str(functionlist[1])
-                            return url
-                        case 2: 
-                            url = URL_BUILDER+ str(functionlist[0])+ "&category="+ str(functionlist[1]) + "&difficulty=" + functionlist[2]
-                            return url
-                        case 3:
-                            url = URL_BUILDER + str(functionlist[0])+ "&category="+ str(functionlist[1]) + "&difficulty=" + functionlist[2]+ "&type="+functionlist[max_index]
-                            return url             
+            url = URL_BUILDER+ str(functionlist[0])
+            for x in range(1, max_index):
+                if functionlist[x]:
+                     match x:
+                         case 1:
+                                 url+=("&category="+ str(functionlist[1]))
+                         case 2: 
+                                url+=("&difficulty=" + functionlist[2])
+                         case 3:
+                                 url+=("&type="+functionlist[max_index])
+            return url   
+                          
           
-            return
+            
     async def Matching_Function(self, case, *input:str):
      
      match case:
