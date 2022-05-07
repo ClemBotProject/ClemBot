@@ -38,6 +38,7 @@ class TriviaCog(commands.Cog):
         async with await self.session.get(DEFAULT_URL) as resp:
                 theresponse = json.loads(await resp.text())
                 correct_answers = await self.Json_Parser(ctx, theresponse)
+             
         dictreturn = await self.Dict_Publisher(ctx, theresponse, correct_answers)                  
                        
     @Trivia.command(aliases=['m'])
@@ -58,19 +59,21 @@ class TriviaCog(commands.Cog):
         print(appendthis)
         FunctionParameters.append(appendthis)
         x+=1    
-
-     print("bob")
      url = await self.Url_Builder(FunctionParameters, inputlength)
      print(url)
      async with await self.session.get(url) as resp:  
             response = json.loads(await resp.text())
             correct_answers = await self.Json_Parser(ctx, response)
+     if response['response_code'] == 1:
+         raise Exception(
+                            "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
+
+
      theembed = await self.Dict_Publisher(ctx, response, correct_answers)       
 
      return
     async def Url_Builder(self, functionlist, inputlength):
             max_index = inputlength-1
-            print(max_index)
             if functionlist[max_index]:
                     match max_index:
                         case 0:
@@ -94,7 +97,6 @@ class TriviaCog(commands.Cog):
             if input[0].isnumeric():
                 questionnumber = int(input[0])
                 if 0 < questionnumber <= 50:
-                    print(questionnumber)
                     return questionnumber    
 
             else:
@@ -112,7 +114,6 @@ class TriviaCog(commands.Cog):
             else:
                 triviacategory = input[1].lower()
                 for x in CATEGORYLIST_LOWER:
-                 print(x)
                  if x.find(triviacategory) != -1:
                      Returnthis = CATEGORYLIST_LOWER.index(x)+9
                      return Returnthis
@@ -198,10 +199,10 @@ class TriviaCog(commands.Cog):
                                          pages=cog_embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
+                                         timeout=360,
                                         )
                                         
-        tester = discord.ext.commands.Paginator.pages  
-        print(tester)                          
+        tester = discord.ext.commands.Paginator.pages                           
        
                                       
                                                                        
