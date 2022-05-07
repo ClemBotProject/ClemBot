@@ -263,29 +263,6 @@ URL_PARAMS = {
 
 URL_BUILDER = R"https://opentdb.com/api.php?amount="
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 DEFAULT_URL = "https://opentdb.com/api.php?amount=10"
    
 
