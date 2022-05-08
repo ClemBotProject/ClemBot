@@ -12,7 +12,9 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-client = discord.Client()
+
+
+
 class TriviaCog(commands.Cog):
 
     def cog_unload(self):
@@ -55,8 +57,9 @@ class TriviaCog(commands.Cog):
         first_Reaction = await thereaction
         current_page = 0
         run_once = True
+       
         while True:
-            print(current_page)
+
             if run_once:
                 current_page = await self.Parse_Reaction(first_Reaction, current_page, length, best_list[0], msg)
                 run_once = False
@@ -390,7 +393,6 @@ class TriviaCog(commands.Cog):
               
     async def Parse_Reaction(self, reaction,current_page, length, right_answer, msg):
 
-        print(str(reaction.emoji))
         if reaction.emoji == "⏮️":
             if current_page != 0:
                 current_page = 0
@@ -406,8 +408,9 @@ class TriviaCog(commands.Cog):
         if reaction.emoji in ANSWER_KEY:
             index_of = ANSWER_KEY.index(reaction.emoji)
             if right_answer[current_page] == index_of:
-                print("\n\n\n\nIt was right!")
-                await msg.add_reaction("⭐")
+                pub = discord.Embed(title="You are a star!", description="yeah!")
+                self.bot.messenger.publish(pub)
+
                 return current_page
 
         return current_page        
@@ -479,4 +482,5 @@ CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
+
     
