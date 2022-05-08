@@ -126,18 +126,15 @@ class PaginateService(BaseService):
             await msg.add_reaction(reaction)
 
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
-
         if timeout:
             await asyncio.sleep(timeout)
             try:
-                for reaction in self.reactions:
-                    await msg.clear_reaction(reaction)
-                del self.messages[msg.id]
+                await msg.delete()
             except:
                 pass
             finally:
                 log.info('Message: {msg_id} timed out as pageable', msg_id=msg.id)
-
+            
     @BaseService.Listener(Events.on_reaction_add)
     async def change_page(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
 
