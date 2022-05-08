@@ -3,7 +3,7 @@ import logging
 import uuid
 import random
 import aiohttp
-import asyncio
+import html
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
@@ -31,11 +31,15 @@ class TriviaCog(commands.Cog):
     async def trivia(self, ctx):
         
         async with await self.session.get(DEFAULT_URL) as resp:
+                parse_text = await resp.text()
+                new_response = json.loads(parse_text)
+            
+                parsed_response = await self.HTML_Parser(new_response)                
 
-                theresponse = json.loads(await resp.text())
-                correct_answers = await self.Json_Parser(ctx, theresponse)  #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
+                correct_answers = await self.Json_Parser(ctx, parsed_response)  #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
              
-        dictreturn = await self.Dict_Publisher(ctx, theresponse, correct_answers)                  
+        dictreturn = await self.Dict_Publisher(ctx, parsed_response, correct_answers)
+        return                  
                        
     @trivia.command(aliases=['m'])
     @ext.long_help(
@@ -68,8 +72,8 @@ class TriviaCog(commands.Cog):
          raise Exception(
                             "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
-
-     theembed = await self.Dict_Publisher(ctx, response, correct_answers)       
+     parsed_response = await self.HTML_Parser(response)
+     theembed = await self.Dict_Publisher(ctx, parsed_response, correct_answers)       
 
      return
 
@@ -219,7 +223,45 @@ class TriviaCog(commands.Cog):
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")    
      return                      
-  
+    async def HTML_Parser(self, new_response):
+                dictionary_list = [] #pain
+                for x in new_response['results']:
+                  new_dictionary = x
+                  new_list_values = x.values()
+                  proper_values = []
+                  for b in new_list_values:
+                      print(b)
+                      if isinstance(b, list):
+                            print("yes")
+                            new_list = []
+                            for y in b:
+                              if not y.isnumeric():
+                                 new_list.append(html.unescape(y))
+                              else:
+                                  new_list.append(y)
+                            proper_values.append(new_list)             
+                                  
+                      elif not b.isnumeric():
+                          proper_values.append(html.unescape(b))  # good luck maintaining this 
+                      else:
+                          proper_values.append(b)
+                  propervalues_size = len(proper_values)        
+                  biggest_loop = 0
+                  print(proper_values)      
+                  for key, value in new_dictionary.items():
+                        new_dictionary[key] = proper_values[biggest_loop]
+                        if biggest_loop < propervalues_size:
+                            biggest_loop+=1
+                        else:
+                            break    
+                  dictionary_list.append(new_dictionary)
+                dictionarysize = len(new_response['results'])
+                best_loopint = 0  
+                while best_loopint < dictionarysize:
+                      print(dictionary_list[best_loopint])
+                      new_response['results'][best_loopint] = dictionary_list[best_loopint] 
+                      best_loopint+=1
+                return new_response
     async def Json_Parser(self,ctx, dictionary):
         Correct_Answers= []
 
