@@ -69,4 +69,23 @@ public class TagsController : ControllerBase
             { Status: QueryStatus.Conflict } => Conflict(),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpPost("[controller]/AddCustomTagPrefix")]
+    [GuildSandboxAuthorize(BotAuthClaims.custom_tag_prefix_set)]
+    public async Task<IActionResult> AddCustomTagPrefix(SetCustomTagPrefix.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.Forbidden } => Forbid(),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpDelete("bot/[controller]/DeleteCustomTagPrefix")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> DeleteCustomTagPrefix(Bot.DeleteCustomTagPrefix.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
 }

@@ -20,9 +20,9 @@ class TranslateCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
-        'Allows you to translate words or sentences by either specifying both the input and output language with the text to translate, or just the output language and the text to translate. run \'translate languages\' to see available languages')
-    @ext.short_help('Translates words or phrases between two languages')
-    @ext.example(('translate en spanish Hello', 'translate german Hello', 'translate languages', 'translate Spanish German Como estas?'))
+        'Allows you to translate words or sentences by entering an output language and autodetecting the language you input. run \'translate languages\' to see available languages')
+    @ext.short_help('Translates words or phrases using autodetect.')
+    @ext.example(('translate spanish Hello', 'translate german Hello', 'translate languages', 'translate German Como estas?', "!translate <outputlang> <text>"))
     async def translate(self, ctx, *input: str):
 
         if len(input) < 2:
@@ -49,8 +49,8 @@ class TranslateCog(commands.Cog):
                                          channel=ctx.channel)
         return
     @translate.command(aliases=['m'])
-    @ext.long_help('Manually specifies an output language to translate too')
-    @ext.short_help('Specify an output language')
+    @ext.long_help('Manually specifies an input langauge !translate m <outputlang> <input language> <text>')
+    @ext.short_help('Specify an output language + the language you entered to translate')
     @ext.example('translate m or translate manual')
     async def manual(self, ctx, *input: str):
 
@@ -114,7 +114,7 @@ class TranslateCog(commands.Cog):
             response = json.loads(await resp.text())
 
         embed = discord.Embed(title='Translate', color=Colors.ClemsonOrange)
-        name = 'Translated to ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']]
+        name = 'Translated from: ' + LANGUAGE_SHORT_CODE_TO_NAME[response[0]['detectedLanguage']['language']]
         embed.add_field(name='Confidence Level:', value=response[0]['detectedLanguage']['score'], inline=True)
         embed.add_field(name=name, value=response[0]['translations'][0]['text'], inline=False)
         await ctx.send(embed=embed)
@@ -156,11 +156,11 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Azerbaijani":"az",      
             "Bangla":"bn",      
             "Bashkir":"ba",      
-            "Bosnian-(Latin)":"bs",      
+            "Bosnian-Latin":"bs",      
             "Bulgarian":"bg",      
-            "Cantonese-(Traditional)":"yue",        
+            "Cantonese-Traditional":"yue",        
             "Catalan":"ca",      
-            "Chinese-(Literary)":"lzh",        
+            "Chinese-Literary":"lzh",        
             "Chinese-Simplified":"zh-Hans",          
             "Chinese-Traditional":"zh-Hant",          
             "Croatian":"hr",      
@@ -175,7 +175,7 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Filipino":"fil",        
             "Finnish":"fi",      
             "French":"fr",      
-            "French-(Canada)":"fr-ca",        
+            "French-Canada":"fr-ca",        
             "Georgian":"ka",      
             "German":"de",      
             "Greek":"el",      
@@ -189,7 +189,7 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Indonesian":"id",      
             "Inuinnaqtun":"ikt",        
             "Inuktitut":"iu",      
-            "Inuktitut-(Latin)":"iu-Latn",          
+            "Inuktitut-Latin":"iu-Latn",          
             "Irish":"ga",      
             "Italian":"it",      
             "Japanese":"ja",      
@@ -197,23 +197,23 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Kazakh":"kk",      
             "Khmer":"km",      
             "Klingon":"tlh-Lat",          
-            "Klingon-(plqaD)":"tlh-Piq",          
+            "Klingon-plqaD":"tlh-Piq",          
             "Korean":"ko",      
-            "Kurdish-(Central)  ":"ku",      
-            "Kurdish-(Northern)":"kmr",        
+            "Kurdish-Central":"ku",      
+            "Kurdish-Northern":"kmr",        
             "Kyrgyz":"ky",      
             "Lao":"lo",      
             "Latvian":"lv",      
             "Lithuanian":"lt",      
             "Macedonian":"mk",      
             "Malagasy":"mg",      
-            "Malay ":"ms",      
+            "Malay":"ms",      
             "Malayalam":"ml",      
             "Maltese":"mt",      
             "Maori":"mi",      
             "Marathi":"mr",      
-            "Mongolian-(Cyrillic)":"mn-Cyrl",          
-            "Mongolian-(Traditional)":"mn-Mong",          
+            "Mongolian-Cyrillic":"mn-Cyrl",          
+            "Mongolian-Traditional":"mn-Mong",          
             "Myanmar":"my",      
             "Nepali":"ne",      
             "Norwegian":"nb",      
@@ -221,15 +221,15 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Pashto":"ps",      
             "Persian ":"fa",      
             "Polish":"pl",      
-            "Portuguese (Brazil)":"pt",      
-            "Portuguese (Portugal)":"pt-pt",        
+            "Portuguese-Brazil":"pt",      
+            "Portuguese-Portugal":"pt-pt",        
             "Punjabi":"pa",      
             "Queretaro Otomi":"otq",        
             "Romanian":"ro",      
             "Russian":"ru",      
             "Samoan":"sm",      
-            "Serbian-(Cyrillic)":"sr-Cyrl",          
-            "Serbian-(Latin)":"sr-Latn",          
+            "Serbian-Cyrillic":"sr-Cyrl",          
+            "Serbian-Latin":"sr-Latn",          
             "Slovak":"sk",      
             "Slovenian":"sl",      
             "Spanish":"es",      
@@ -246,10 +246,10 @@ LANGUAGE_NAME_TO_SHORT_CODE = {
             "Turkish":"tr",      
             "Turkmen":"tk",      
             "Ukrainian":"uk",      
-            "Upper Sorbian":"hsb",        
+            "Upper-Sorbian":"hsb",        
             "Urdu":"ur",      
             "Uyghur":"ug",      
-            "Uzbek-(Latin)":"uz",      
+            "Uzbek-Latin":"uz",      
             "Vietnamese":"vi",      
             "Welsh":"cy",      
             "Yucatec-Maya":"yua",                           
