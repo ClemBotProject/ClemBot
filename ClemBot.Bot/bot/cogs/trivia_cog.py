@@ -4,6 +4,7 @@ import uuid
 import random
 import aiohttp
 import html
+import asyncio
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
@@ -36,8 +37,22 @@ class TriviaCog(commands.Cog):
                 parsed_response = await self.HTML_Parser(new_response)                
 
                 #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
-             
-        dictreturn = await self.Dict_Publisher(ctx, parsed_response)
+        length = len(parsed_response['results'])
+        thetask = asyncio.create_task(
+            self.Event_listener(ctx)
+        )
+        
+        best_list = await self.Dict_Publisher(ctx, parsed_response)
+        newtask = asyncio.create_task(
+                    self.Asyncio_Publisher(ctx, best_list[1]))
+        done= await thetask
+
+        thereaction = asyncio.create_task(
+           self.On_Reaction(ctx, length,done, best_list[0])
+       )
+       
+        await thereaction
+        await newtask
         return                  
                        
     @trivia.command(aliases=['m'])
@@ -63,7 +78,6 @@ class TriviaCog(commands.Cog):
      url = await self.Url_Builder(FunctionParameters, inputlength)
 
      async with await self.session.get(url) as resp:  
-
             response = json.loads(await resp.text())
 
      if response['response_code'] == 1:
@@ -71,8 +85,22 @@ class TriviaCog(commands.Cog):
                             "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
      parsed_response = await self.HTML_Parser(response)
-     theembed = await self.Dict_Publisher(ctx, parsed_response)       
-
+     big_list = await self.Dict_Publisher(ctx, parsed_response)
+     length = len(parsed_response['results'])
+     thetask = asyncio.run(
+            self.Event_listener(ctx)
+        )
+     theembed = asyncio.create_task(
+         self.Asyncio_Publisher(ctx, big_list[1]))
+     await thetask
+     thereaction = asyncio.create_task(
+           self.On_Reaction(ctx, length,thetask, big_list[0])
+       )
+       
+        
+    
+     await thereaction    
+     await theembed       
      return
 
     @trivia.command(aliases=['help'])
@@ -124,7 +152,7 @@ class TriviaCog(commands.Cog):
                                          pages=Final_Page,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=360,
+                                         timeout=60,
                                         )
        
          
@@ -224,7 +252,13 @@ class TriviaCog(commands.Cog):
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")    
      return    
+    async def Json_Parser(self, dictionary):
+        Correct_Answers= []
 
+        for x in dictionary['results']:
+            Correct_Answers.append(x['correct_answer'])
+
+        return Correct_Answers
 
     async def HTML_Parser(self, new_response):
                 dictionary_list = [] #pain
@@ -307,27 +341,61 @@ class TriviaCog(commands.Cog):
                 a=a+1
 
              cog_embeds.append(embed)
-
+        mega_list=[]
+        mega_list.append(List_Index)
+        mega_list.append(cog_embeds)
+        return mega_list                                                                    
+    async def Asyncio_Publisher(self,ctx, cog_embeds):
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=cog_embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=360,
+                                         timeout=len(cog_embeds),
                                         )
-                                        
-        
-        return                                                                          
-        
-
-    async def On_Reaction(self, ctx, reaction, rightanswer, msgembeds, current_page, max_pagenumber):
-
-            if ANSWER_KEY[rightanswer[current_page]] == reaction:
-                del msgembeds[current_page] # Add something to scoreboard to give indication it was right
-          
-                
-            return
-   
-
+        return                                    
+    async def Event_listener(self, ctx):
+        def check(m):
+            return m.author.id == self.bot.user.id and m.channel == ctx.channel  
+        msg = await self.bot.wait_for("message", check=check)
+        await asyncio.sleep(2)
+        for x in ANSWER_KEY:
+           await msg.add_reaction(x)
+        return msg     
+    async def On_Reaction(self,ctx, length, msg, right_answer):
+        author = ctx.author
+        def check(reaction, user):
+            return user == author
+        current_page = 0
+           
+        while True:
+                reaction, user = await self.bot.wait_for("reaction_add", check=check)
+                current_page = await self.Parse_Reaction(reaction, current_page, length, right_answer)
+                print(current_page)
+              
+       
+        return
+    async def Parse_Reaction(self, reaction,current_page, length, right_answer):
+        print(reaction.emoji)
+        if reaction.emoji == "⏮️":
+            if current_page != 0:
+                current_page = 0
+        elif reaction.emoji == "⬅️":
+            if current_page != 0:
+               current_page -= 1
+        elif reaction.emoji == "➡️":
+            if current_page < length - 1:
+               current_page += 1
+        elif reaction.emoji == "⏭️":
+            if current_page != length - 1:
+                current_page = length - 1
+        if reaction.emoji in ANSWER_KEY:
+            index_of = ANSWER_KEY.index(reaction.emoji)
+            if right_answer[current_page] == index_of:
+                print("\n\n\n\nIt was right!")
+        return current_page        
+    async def Delete_Emojis(self,ctx, timeout):
+        return
+       
 def helper_fixer(formatthis):
 
          new_list = [f'#{formatthis.index(x)+1}.    {x}' for x in formatthis]
