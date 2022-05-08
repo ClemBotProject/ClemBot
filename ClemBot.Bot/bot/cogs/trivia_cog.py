@@ -33,12 +33,11 @@ class TriviaCog(commands.Cog):
         async with await self.session.get(DEFAULT_URL) as resp:
                 parse_text = await resp.text()
                 new_response = json.loads(parse_text)
-            
                 parsed_response = await self.HTML_Parser(new_response)                
 
-                correct_answers = await self.Json_Parser(ctx, parsed_response)  #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
+                #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
              
-        dictreturn = await self.Dict_Publisher(ctx, parsed_response, correct_answers)
+        dictreturn = await self.Dict_Publisher(ctx, parsed_response)
         return                  
                        
     @trivia.command(aliases=['m'])
@@ -66,14 +65,13 @@ class TriviaCog(commands.Cog):
      async with await self.session.get(url) as resp:  
 
             response = json.loads(await resp.text())
-            correct_answers = await self.Json_Parser(ctx, response)
 
      if response['response_code'] == 1:
          raise Exception(
                             "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
      parsed_response = await self.HTML_Parser(response)
-     theembed = await self.Dict_Publisher(ctx, parsed_response, correct_answers)       
+     theembed = await self.Dict_Publisher(ctx, parsed_response)       
 
      return
 
@@ -132,7 +130,7 @@ class TriviaCog(commands.Cog):
          
         return 
 
-        
+
     async def Url_Builder(self, functionlist, inputlength):
 
             max_index = inputlength-1
@@ -282,16 +280,7 @@ class TriviaCog(commands.Cog):
                 return new_response
 
 
-    async def Json_Parser(self,ctx, dictionary):
-        Correct_Answers= []
-
-        for x in dictionary['results']:
-            Correct_Answers.append(x['correct_answer'])
-
-        return Correct_Answers
-
-
-    async def Dict_Publisher(self, ctx, dictionary, Correct_answers):
+    async def Dict_Publisher(self, ctx, dictionary):
         x=0
         cog_embeds = []
         List_Index = []
