@@ -12,29 +12,28 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 
-
-
-
-
-
-
 class TriviaCog(commands.Cog):
+
     def cog_unload(self):
+
             self.session.close() 
+
     def __init__(self, bot):
+
         self.bot = bot
         self.session = aiohttp.ClientSession(headers={'Connection': 'keep-alive'})
         
-
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
     "Use !trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice"    )
     @ext.short_help(
     "!trivia use !trivia m for custom arguments"    )
     async def trivia(self, ctx):
+        
         async with await self.session.get(DEFAULT_URL) as resp:
+
                 theresponse = json.loads(await resp.text())
-                correct_answers = await self.Json_Parser(ctx, theresponse)
+                correct_answers = await self.Json_Parser(ctx, theresponse)  #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
              
         dictreturn = await self.Dict_Publisher(ctx, theresponse, correct_answers)                  
                        
@@ -47,18 +46,24 @@ class TriviaCog(commands.Cog):
     async def manual(self, ctx, *input:str):
      if len(input) < 1:
         raise UserInputError("You need more arguments to use this command")
+
      FunctionParameters = []
      inputlength = len(input)
      x=0
+
      while x < inputlength:
         
         appendthis = await self.Matching_Function(x, *input)
         FunctionParameters.append(appendthis)
-        x+=1    
+        x+=1  
+
      url = await self.Url_Builder(FunctionParameters, inputlength)
+
      async with await self.session.get(url) as resp:  
+
             response = json.loads(await resp.text())
             correct_answers = await self.Json_Parser(ctx, response)
+
      if response['response_code'] == 1:
          raise Exception(
                             "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
@@ -67,44 +72,52 @@ class TriviaCog(commands.Cog):
      theembed = await self.Dict_Publisher(ctx, response, correct_answers)       
 
      return
+
     @trivia.command(aliases=['help'])
     @ext.long_help(
                     "Lists the categories, difficulty, and type of questions. Useful for finding the index of categories!")
     @ext.short_help(
                 "Use this to find the category you want!" )     
-    @ext.example(
-            "!trivia help" )                        
+    @ext.example("!trivia help" )                        
     async def List_Help(self, ctx):
+
         embed_list = []
         Final_Page = []
+
         Category_Generator = helper_fixer(CATEGORYLIST)
         for x in Category_Generator:
             embed_list.append(x)
         sizeofcategory = len(embed_list)
         x = 0
+
         while x < sizeofcategory:
             Category_embed = discord.Embed(title="Category List:", color = Colors.ClemsonOrange)
             Category_embed.add_field(name="Index:",value=embed_list[x])
             Final_Page.append(Category_embed)
             x+=1
+
         Difficulty_Generator = helper_fixer(DIFFICULTY)    
         for i in Difficulty_Generator:
             embed_list.append(i)
+
         new_insertion = len(embed_list)
         while sizeofcategory < new_insertion:
             Difficulty_embed = discord.Embed(title="Difficulty List:", color = Colors.ClemsonOrange)
             Difficulty_embed.add_field(name="Index:",value=embed_list[sizeofcategory])
             Final_Page.append(Difficulty_embed)
             sizeofcategory+=1
+
         Question_Generator = helper_fixer(QUESTIONTYPE)
         for i in Question_Generator:
             embed_list.append(i)
+
         last_size = len(embed_list)
         while new_insertion < last_size:
             Type_embed = discord.Embed(title="Question Type:", color = Colors.ClemsonOrange)
             Type_embed.add_field(name="Index:",value=embed_list[new_insertion])
             Final_Page.append(Type_embed)
             new_insertion+=1 
+
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=Final_Page,
                                          author=ctx.author,
@@ -115,9 +128,11 @@ class TriviaCog(commands.Cog):
          
         return 
     async def Url_Builder(self, functionlist, inputlength):
+
             max_index = inputlength-1
             url = URL_BUILDER+ str(functionlist[0])
             x = 1
+
             while x <= max_index:
                  if functionlist[x]:
                      match x:
@@ -127,7 +142,8 @@ class TriviaCog(commands.Cog):
                                 url+=("&difficulty=" + functionlist[2])
                          case 3:
                                  url+=("&type="+functionlist[max_index])
-                 x+=1                
+                 x+=1  
+
             return url   
                             
     async def Matching_Function(self, case, *input:str):
@@ -140,7 +156,8 @@ class TriviaCog(commands.Cog):
                     return questionnumber    
 
             else:
-                raise UserInputError("Question Number has to be a number within the range of 1 to 50")
+                raise UserInputError(
+                    "Question Number has to be a number within the range of 1 to 50")
                      
             
         case 1:
@@ -149,7 +166,10 @@ class TriviaCog(commands.Cog):
                 if 0 < trivianumber <= 24:
                     return trivianumber+8
                 elif trivianumber == 0:
-                    return None    
+                    return None 
+                else:
+                    raise UserInputError(
+                                "Category Number out of bounds(Number has to be 1-24) or enter the category you want! Type ?trivia help to see the category list")       
 
             else:
                 triviacategory = input[1].lower()
@@ -166,7 +186,11 @@ class TriviaCog(commands.Cog):
                     ReturnString = DIFFICULTY_LOWER[EvaluteInt-1]
                     return ReturnString
                 elif EvaluteInt==0:
-                    return None    
+                    return None
+                else:
+                    raise UserInputError(
+                        "Difficulty Number out of bounds(Number has to be 1-3) or enter Easy-Hard! Type ?trivia help to see the difficulty list.")
+
         
             else: 
                  difficulty = input[2].lower()
@@ -182,20 +206,26 @@ class TriviaCog(commands.Cog):
                     finalreturn = QUESTIONTYPE[EvaluteInt-1]
                     return finalreturn
                 elif EvaluteInt == 0:
-                    return None    
+                    return None
+                else:
+                    raise UserInputError(
+                            "Question type number out of bounds(1 or 2) 1: Multiple Choice 2: Boolean. Type ?trivia help to see our question types.")        
              else:
                  questiontype = input[3].lower()
                  for x in QUESTIONTYPE:
                     if(x.find(questiontype) != -1):
                      return x 
                  else:
-                        raise UserInputError("Question type invalid.")    
+                        raise UserInputError(
+                            "Couldn't find the question type you are looking for!.")    
      return                      
   
     async def Json_Parser(self,ctx, dictionary):
         Correct_Answers= []
+
         for x in dictionary['results']:
             Correct_Answers.append(x['correct_answer'])
+
         return Correct_Answers
 
     async def Dict_Publisher(self, ctx, dictionary, Correct_answers):
@@ -203,28 +233,29 @@ class TriviaCog(commands.Cog):
         cog_embeds = []
         List_Index = []
         for bob in dictionary['results']:
+
              Answers_List= []   
              Answers_List = bob['incorrect_answers']
              Answers_List.append(bob['correct_answer'])
              Right_Answer = bob['correct_answer']
+
              random.shuffle(Answers_List)
              List_Index.append(Answers_List.index(Right_Answer))  
              x+=1   
              embed = discord.Embed(title= "Question #"+str(x)+":",
              color=Colors.ClemsonOrange)
+
              embed.add_field(name="Question:", value=bob['question'])
              embed.add_field(name="Category:", value=bob['category'])
+
              a = 65
              for iterative in Answers_List:
 
                 embed.add_field(name="Answer Choice  "+chr(a)+" :", value = iterative, inline=False)
                 a=a+1
+
              cog_embeds.append(embed)
-          
-        
-        
-       
-        
+
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=cog_embeds,
                                          author=ctx.author,
@@ -250,6 +281,7 @@ def helper_fixer(formatthis):
 
          new_list = [f'#{formatthis.index(x)+1}.    {x}' for x in formatthis]
          return ['\n'.join(i) for i in chunk_list(new_list, CHUNK_SIZE)]  #Decided to implement chunking. Although useless now if the category lists expands alot it will be an easy fix.
+
 def chunk_list(lst, n):
  for i in range(0, len(lst), n):   
     yield lst[i:i+n]       
@@ -266,20 +298,10 @@ MOVEMENT_ARROWS=['➡️',
                '⏭️',
                '⏮️' ]
 
-CATEGORY_OFFSET = 9
-URL_PARAMS = {
-    "amount":"10",
-    "category":"",
-    "difficulty":"",
-    "type":""
-}
-
 URL_BUILDER = R"https://opentdb.com/api.php?amount="
 
 DEFAULT_URL = "https://opentdb.com/api.php?amount=10"
    
-
-
 DIFFICULTY = ["Easy", 
               "Medium", 
               "Hard"]
@@ -290,6 +312,7 @@ QUESTIONTYPE = [
     "multiple", 
     "boolean"
 ]
+
 CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
                  "Books", 
                  "Film", 
@@ -314,6 +337,7 @@ CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid
              "Gadgets",
             "Japanese-Anime&Manga",
            "Cartoon&Animations"]
+
 CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
 
 def setup(bot):
