@@ -131,6 +131,8 @@ class TriviaCog(commands.Cog):
        
          
         return 
+
+        
     async def Url_Builder(self, functionlist, inputlength):
 
             max_index = inputlength-1
@@ -149,7 +151,8 @@ class TriviaCog(commands.Cog):
                  x+=1  
 
             return url   
-                            
+
+
     async def Matching_Function(self, case, *input:str):
      
      match case:
@@ -222,42 +225,63 @@ class TriviaCog(commands.Cog):
                  else:
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")    
-     return                      
+     return    
+
+
     async def HTML_Parser(self, new_response):
                 dictionary_list = [] #pain
+
                 for x in new_response['results']:
+
                   new_dictionary = x
                   new_list_values = x.values()
                   proper_values = []
+
                   for b in new_list_values:
+
                       if isinstance(b, list):
+
                             new_list = []
+
                             for y in b:
+
                               if not y.isnumeric():
                                  new_list.append(html.unescape(y))
                               else:
                                   new_list.append(y)
+
                             proper_values.append(new_list)             
                                   
                       elif not b.isnumeric():
+
                           proper_values.append(html.unescape(b))  # good luck maintaining this 
                       else:
                           proper_values.append(b)
+
                   propervalues_size = len(proper_values)        
                   biggest_loop = 0   
+
                   for key, value in new_dictionary.items():
+
                         new_dictionary[key] = proper_values[biggest_loop]
                         if biggest_loop < propervalues_size:
                             biggest_loop+=1
                         else:
-                            break    
+                            break  
+
                   dictionary_list.append(new_dictionary)
+
                 dictionarysize = len(new_response['results'])
                 best_loopint = 0  
+
                 while best_loopint < dictionarysize:
+
                       new_response['results'][best_loopint] = dictionary_list[best_loopint] 
                       best_loopint+=1
+
                 return new_response
+
+
     async def Json_Parser(self,ctx, dictionary):
         Correct_Answers= []
 
@@ -265,6 +289,7 @@ class TriviaCog(commands.Cog):
             Correct_Answers.append(x['correct_answer'])
 
         return Correct_Answers
+
 
     async def Dict_Publisher(self, ctx, dictionary, Correct_answers):
         x=0
@@ -304,8 +329,7 @@ class TriviaCog(commands.Cog):
         
         return                                                                          
         
-    
-   
+
     async def On_Reaction(self, ctx, reaction, rightanswer, msgembeds, current_page, max_pagenumber):
 
             if ANSWER_KEY[rightanswer[current_page]] == reaction:
