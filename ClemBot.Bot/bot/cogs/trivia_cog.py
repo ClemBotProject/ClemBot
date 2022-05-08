@@ -230,9 +230,7 @@ class TriviaCog(commands.Cog):
                   new_list_values = x.values()
                   proper_values = []
                   for b in new_list_values:
-                      print(b)
                       if isinstance(b, list):
-                            print("yes")
                             new_list = []
                             for y in b:
                               if not y.isnumeric():
@@ -246,8 +244,7 @@ class TriviaCog(commands.Cog):
                       else:
                           proper_values.append(b)
                   propervalues_size = len(proper_values)        
-                  biggest_loop = 0
-                  print(proper_values)      
+                  biggest_loop = 0   
                   for key, value in new_dictionary.items():
                         new_dictionary[key] = proper_values[biggest_loop]
                         if biggest_loop < propervalues_size:
@@ -258,7 +255,6 @@ class TriviaCog(commands.Cog):
                 dictionarysize = len(new_response['results'])
                 best_loopint = 0  
                 while best_loopint < dictionarysize:
-                      print(dictionary_list[best_loopint])
                       new_response['results'][best_loopint] = dictionary_list[best_loopint] 
                       best_loopint+=1
                 return new_response
