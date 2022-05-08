@@ -12,7 +12,7 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-
+client = discord.Client()
 class TriviaCog(commands.Cog):
 
     def cog_unload(self):
@@ -38,20 +38,40 @@ class TriviaCog(commands.Cog):
 
                 #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
         length = len(parsed_response['results'])
+        
+        best_list = await self.Dict_Publisher(ctx, parsed_response)
+
+        thereaction = asyncio.create_task(
+           self.On_Reaction(ctx)
+       )
         thetask = asyncio.create_task(
             self.Event_listener(ctx)
         )
         
-        best_list = await self.Dict_Publisher(ctx, parsed_response)
+        
         newtask = asyncio.create_task(
                     self.Asyncio_Publisher(ctx, best_list[1]))
-        done= await thetask
-
-        thereaction = asyncio.create_task(
-           self.On_Reaction(ctx, length,done, best_list[0])
+        msg = await thetask
+        first_Reaction = await thereaction
+        current_page = 0
+        run_once = True
+        while True:
+            print(current_page)
+            if run_once:
+                current_page = await self.Parse_Reaction(first_Reaction, current_page, length, best_list[0], msg)
+                run_once = False
+            else:
+                new_reaction = asyncio.create_task(
+           self.On_Reaction(ctx)
        )
+                get_reaction = await new_reaction
+                current_page =  await self.Parse_Reaction(get_reaction, current_page, length, best_list[0], msg)    
+            
+
+
+        
        
-        await thereaction
+        
         await newtask
         return                  
                        
@@ -94,7 +114,7 @@ class TriviaCog(commands.Cog):
          self.Asyncio_Publisher(ctx, big_list[1]))
      await thetask
      thereaction = asyncio.create_task(
-           self.On_Reaction(ctx, length,thetask, big_list[0])
+           self.On_Reaction(ctx)
        )
        
         
@@ -350,7 +370,7 @@ class TriviaCog(commands.Cog):
                                          pages=cog_embeds,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=len(cog_embeds),
+                                         timeout=len(cog_embeds)*5,
                                         )
         return                                    
     async def Event_listener(self, ctx):
@@ -361,21 +381,16 @@ class TriviaCog(commands.Cog):
         for x in ANSWER_KEY:
            await msg.add_reaction(x)
         return msg     
-    async def On_Reaction(self,ctx, length, msg, right_answer):
+    async def On_Reaction(self,ctx):
         author = ctx.author
         def check(reaction, user):
             return user == author
-        current_page = 0
-           
-        while True:
-                reaction, user = await self.bot.wait_for("reaction_add", check=check)
-                current_page = await self.Parse_Reaction(reaction, current_page, length, right_answer)
-                print(current_page)
+        reaction, user = await self.bot.wait_for("reaction_add", check=check)
+        return reaction
               
-       
-        return
-    async def Parse_Reaction(self, reaction,current_page, length, right_answer):
-        print(reaction.emoji)
+    async def Parse_Reaction(self, reaction,current_page, length, right_answer, msg):
+
+        print(str(reaction.emoji))
         if reaction.emoji == "⏮️":
             if current_page != 0:
                 current_page = 0
@@ -392,6 +407,9 @@ class TriviaCog(commands.Cog):
             index_of = ANSWER_KEY.index(reaction.emoji)
             if right_answer[current_page] == index_of:
                 print("\n\n\n\nIt was right!")
+                await msg.add_reaction("⭐")
+                return current_page
+
         return current_page        
     async def Delete_Emojis(self,ctx, timeout):
         return
