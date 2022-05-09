@@ -18,7 +18,7 @@ colorama==0.4.3
 contextlib2==0.6.0
 dataclasses-json==0.5.3
 dateutils==0.6.8
-discord.py==2.0.0a3575+g45d498c1
+discord.py==1.7.3
 distlib==0.3.1
 distro==1.4.0
 Django==4.0.4
