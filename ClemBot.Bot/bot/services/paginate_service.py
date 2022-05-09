@@ -129,7 +129,9 @@ class PaginateService(BaseService):
         if timeout:
             await asyncio.sleep(timeout)
             try:
-                await msg.delete()
+                for reaction in self.reactions:
+                    await msg.clear_reaction(reaction)
+                del self.messages[msg.id]
             except:
                 pass
             finally:
