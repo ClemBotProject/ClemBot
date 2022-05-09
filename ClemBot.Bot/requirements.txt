@@ -18,9 +18,10 @@ colorama==0.4.3
 contextlib2==0.6.0
 dataclasses-json==0.5.3
 dateutils==0.6.8
-discord.py @ git+https://github.com/Rapptz/discord.py@45d498c1b76deaf3b394d17ccf56112fa691d160
+discord.py==2.0.0a3575+g45d498c1
 distlib==0.3.1
 distro==1.4.0
+Django==4.0.4
 entrypoints==0.3
 filelock==3.0.12
 flake8==3.7.9
@@ -44,7 +45,7 @@ mock==4.0.2
 more-itertools==8.4.0
 msgpack==0.6.2
 multidict==4.7.5
-mypy==0.770
+mypy==0.950
 mypy-extensions==0.4.3
 numpy==1.21.0
 ordered-set==4.0.2
@@ -80,7 +81,8 @@ sqlparse==0.4.2
 stevedore==1.32.0
 stringcase==1.2.0
 toml==0.10.1
-typed-ast==1.4.1
+tomli==2.0.1
+typed-ast==1.5.3
 typing-extensions==3.10.0.0
 typing-inspect==0.7.1
 tzdata==2021.5
