@@ -17,6 +17,7 @@ from bot.messaging.events import Events
 
 
 log = logging.getLogger(__name__)
+
 class TriviaCog(commands.Cog):
 
     def cog_unload(self):
@@ -264,6 +265,7 @@ class TriviaCog(commands.Cog):
     
 
     async def HTML_Parser(self, new_response):
+
                 dictionary_list = [] #pain
 
                 for x in new_response['results']:
@@ -321,12 +323,12 @@ class TriviaCog(commands.Cog):
         x=0
         cog_embeds = []
         List_Index = []
-        for bob in dictionary['results']:
+        for create_lists in dictionary['results']:
 
              Answers_List= []   
-             Answers_List = bob['incorrect_answers']
-             Answers_List.append(bob['correct_answer'])
-             Right_Answer = bob['correct_answer']
+             Answers_List = create_lists['incorrect_answers']
+             Answers_List.append(create_lists['correct_answer'])
+             Right_Answer = create_lists['correct_answer']
 
              random.shuffle(Answers_List)
              List_Index.append(Answers_List.index(Right_Answer))  
@@ -334,8 +336,8 @@ class TriviaCog(commands.Cog):
              embed = discord.Embed(title= "Question #"+str(x)+":",
              color=Colors.ClemsonOrange)
 
-             embed.add_field(name="Question:", value=bob['question'])
-             embed.add_field(name="Category:", value=bob['category'])
+             embed.add_field(name="Question:", value=create_lists['question'])
+             embed.add_field(name="Category:", value=create_lists['category'])
 
              a = 65
              for iterative in Answers_List:
@@ -344,9 +346,11 @@ class TriviaCog(commands.Cog):
                 a=a+1
 
              cog_embeds.append(embed)
+             
         mega_list=[]
         mega_list.append(List_Index)
         mega_list.append(cog_embeds)
+
         return mega_list                                                                    
     async def Asyncio_Publisher(self,ctx, cog_embeds):
         Coroutine_Object = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, 60)
