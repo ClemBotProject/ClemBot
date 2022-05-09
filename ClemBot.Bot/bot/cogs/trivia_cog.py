@@ -38,6 +38,7 @@ class TriviaCog(commands.Cog):
     async def trivia(self, ctx):
         
         async with await self.session.get(DEFAULT_URL) as resp:
+
                 parse_text = await resp.text()
                 new_response = json.loads(parse_text)
                 parsed_response = await self.HTML_Parser(new_response)                
@@ -49,17 +50,21 @@ class TriviaCog(commands.Cog):
         
        
         newtask = await self.Asyncio_Publisher(ctx, best_list[1]) #this will return None when completed ending the loop
+
         thereaction = asyncio.create_task(
-           self.On_Reaction(ctx, newtask[3])
-         )
+           self.On_Reaction(ctx, newtask[3]))
         
         task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
+
         user_reaction = await thereaction
+
         await self.Parse_Reaction(newtask[0],user_reaction[0],user_reaction[1], best_list[0])
         
         while not task1.done():
+
             New_reaction = asyncio.create_task(
             self.On_Reaction(ctx, newtask[3]))
+
             new_reaction = await New_reaction
             await self.Parse_Reaction(newtask[0],new_reaction[0], new_reaction[1], best_list[0])    
 
@@ -93,24 +98,31 @@ class TriviaCog(commands.Cog):
 
      if response['response_code'] == 1:
          raise Exception(
-                            "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
+                        "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
      parsed_response = await self.HTML_Parser(response)
+
      big_list = await self.Dict_Publisher(parsed_response)
      
 
      newtask = await self.Asyncio_Publisher(ctx, big_list[1])
+
      thereaction = asyncio.create_task(
            self.On_Reaction(ctx, newtask[3])
        )
+
      task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
+
      reaction = await thereaction
+
      await self.Parse_Reaction(newtask[0],reaction[0],reaction[1], big_list[0])
 
      while not task1.done():
         new_reaction = asyncio.create_task(
                 self.On_Reaction(ctx, newtask[3]))
+
         use_reaction = await new_reaction
+
         await self.Parse_Reaction(newtask[0],use_reaction[0],use_reaction[1], big_list[0])
   
      return
@@ -129,35 +141,47 @@ class TriviaCog(commands.Cog):
 
         Category_Generator = helper_fixer(CATEGORYLIST)
         for x in Category_Generator:
+
             embed_list.append(x)
+
         sizeofcategory = len(embed_list)
         x = 0
 
         while x < sizeofcategory:
+
             Category_embed = discord.Embed(title="Category List:", color = Colors.ClemsonOrange)
             Category_embed.add_field(name="Index:",value=embed_list[x])
+
             Final_Page.append(Category_embed)
             x+=1
 
-        Difficulty_Generator = helper_fixer(DIFFICULTY)    
+        Difficulty_Generator = helper_fixer(DIFFICULTY)
+
         for i in Difficulty_Generator:
+
             embed_list.append(i)
 
         new_insertion = len(embed_list)
+
         while sizeofcategory < new_insertion:
+
             Difficulty_embed = discord.Embed(title="Difficulty List:", color = Colors.ClemsonOrange)
             Difficulty_embed.add_field(name="Index:",value=embed_list[sizeofcategory])
+
             Final_Page.append(Difficulty_embed)
             sizeofcategory+=1
 
         Question_Generator = helper_fixer(QUESTIONTYPE)
+
         for i in Question_Generator:
             embed_list.append(i)
 
         last_size = len(embed_list)
         while new_insertion < last_size:
+
             Type_embed = discord.Embed(title="Question Type:", color = Colors.ClemsonOrange)
             Type_embed.add_field(name="Index:",value=embed_list[new_insertion])
+
             Final_Page.append(Type_embed)
             new_insertion+=1 
 
@@ -165,8 +189,7 @@ class TriviaCog(commands.Cog):
                                          pages=Final_Page,
                                          author=ctx.author,
                                          channel=ctx.channel,
-                                         timeout=60,
-                                        )
+                                         timeout=60,)
        
          
         return 
@@ -197,8 +220,11 @@ class TriviaCog(commands.Cog):
      match case:
         case 0:
             if input[0].isnumeric():
+
                 questionnumber = int(input[0])
+
                 if 0 < questionnumber <= 50:
+
                     return questionnumber    
 
             else:
@@ -208,10 +234,15 @@ class TriviaCog(commands.Cog):
             
         case 1:
             if input[1].isnumeric():
+
                 trivianumber = int(input[1])
+
                 if 0 < trivianumber <= 24:
+
                     return trivianumber+8
+
                 elif trivianumber == 0:
+
                     return None 
                 else:
                     raise UserInputError(
@@ -219,37 +250,56 @@ class TriviaCog(commands.Cog):
 
             else:
                 triviacategory = input[1].lower()
+
                 for x in CATEGORYLIST_LOWER:
+
                  if x.find(triviacategory) != -1:
+
                      Returnthis = CATEGORYLIST_LOWER.index(x)+9
+
                      return Returnthis
                 else:
                      raise UserInputError("Category not found!")     
-        case 2:                         
+        case 2:      
+
             if input[2].isnumeric():
+
                 EvaluteInt = int(input[2])
+
                 if 0 < EvaluteInt <= 3:
+
                     ReturnString = DIFFICULTY_LOWER[EvaluteInt-1]
+
                     return ReturnString
+
                 elif EvaluteInt==0:
                     return None
+
                 else:
                     raise UserInputError(
                         "Difficulty Number out of bounds(Number has to be 1-3) or enter Easy-Hard! Type ?trivia help to see the difficulty list.")
 
         
             else: 
+
                  difficulty = input[2].lower()
+
                  for x in DIFFICULTY_LOWER:
+
                      if(x.find(difficulty) != -1):
                          return x
                  else:
                          raise UserInputError("Difficulty not found")
         case 3:
+
              if input[3].isnumeric():
+
                 EvaluteInt = int(input[3])
+
                 if 0 < EvaluteInt < 3:
+
                     finalreturn = QUESTIONTYPE[EvaluteInt-1]
+
                     return finalreturn
                 elif EvaluteInt == 0:
                     return None
@@ -258,7 +308,9 @@ class TriviaCog(commands.Cog):
                             "Question type number out of bounds(1 or 2) 1: Multiple Choice 2: Boolean. Type ?trivia help to see our question types.")        
              else:
                  questiontype = input[3].lower()
+
                  for x in QUESTIONTYPE:
+
                     if(x.find(questiontype) != -1):
                      return x 
                  else:
@@ -323,9 +375,11 @@ class TriviaCog(commands.Cog):
 
 
     async def Dict_Publisher(self, dictionary):
+
         x=0
         cog_embeds = []
         List_Index = []
+
         for create_lists in dictionary['results']:
 
              Answers_List= []   
@@ -365,10 +419,13 @@ class TriviaCog(commands.Cog):
 
         def check(reaction, user):
             return user == author and reaction.message.id == message
+
         reaction, user = await self.bot.wait_for("reaction_add", check=check)
+
         Return_list = []
         Return_list.append(reaction)
         Return_list.append(user)
+
         return Return_list
               
     async def Parse_Reaction(self, message, reaction,user, right_answer):
@@ -394,10 +451,13 @@ class TriviaCog(commands.Cog):
 
 
         if len(msg.pages) <= 1:
+
             await message.delete()
+
             return
         else:
             del msg.pages[current_page]    
+
             await reaction.message.edit(embed=msg.curr_content)
             await reaction.message.remove_reaction(reaction.emoji, user)
                     
@@ -427,6 +487,7 @@ class TriviaCog(commands.Cog):
 
         msg = await channel.send(embed=pages[0])
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
+
         self.messages[msg.id] = message
         return_list= []
         return_list.append(msg)
@@ -515,6 +576,7 @@ CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
 
 @dataclass
 class Message:
+
     pages: t.Union[t.List[discord.Embed], t.List[str]]
     _curr_page_num: int
     author: int
@@ -539,6 +601,7 @@ class Message:
 
         page = self.curr_page
         if isinstance(page, discord.Embed):
+
             page.set_footer(text=f'{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)}')
             return page
         elif not isinstance(page, str):
@@ -547,6 +610,7 @@ class Message:
         embed = discord.Embed(title=self.embed_name, color=Colors.ClemsonOrange)
         embed.add_field(name=self.field_title, value=self.pages[self._curr_page_num])
         embed.set_footer(text=f'Page {self.curr_page_num + 1} of {len(self.pages)}')
+
         return embed
 
 
