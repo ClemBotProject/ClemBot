@@ -5,6 +5,8 @@ import random
 import aiohttp
 import html
 import asyncio
+import typing as t
+from dataclasses import dataclass
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
@@ -14,7 +16,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 
 
-
+log = logging.getLogger(__name__)
 class TriviaCog(commands.Cog):
 
     def cog_unload(self):
@@ -22,7 +24,7 @@ class TriviaCog(commands.Cog):
             self.session.close() 
 
     def __init__(self, bot):
-
+        self.messages = {}
         self.bot = bot
         self.session = aiohttp.ClientSession(headers={'Connection': 'keep-alive'})
         
@@ -42,40 +44,23 @@ class TriviaCog(commands.Cog):
         length = len(parsed_response['results'])
         
         best_list = await self.Dict_Publisher(ctx, parsed_response)
-
         thereaction = asyncio.create_task(
            self.On_Reaction(ctx)
-       )
-        thetask = asyncio.create_task(
-            self.Event_listener(ctx)
-        )
-        
-        
-        newtask = asyncio.create_task(
-                    self.Asyncio_Publisher(ctx, best_list[1]))
-        msg = await thetask
-        first_Reaction = await thereaction
-        current_page = 0
-        run_once = True
-       
-        while True:
-
-            if run_once:
-                current_page = await self.Parse_Reaction(first_Reaction, current_page, length, best_list[0], msg)
-                run_once = False
-            else:
-                new_reaction = asyncio.create_task(
-           self.On_Reaction(ctx)
-       )
-                get_reaction = await new_reaction
-                current_page =  await self.Parse_Reaction(get_reaction, current_page, length, best_list[0], msg)    
-            
-
-
-        
+         )
        
         
-        await newtask
+        newtask = await self.Asyncio_Publisher(ctx, best_list[1]) #this will return None when completed ending the loop
+        
+        task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
+        user_reaction = await thereaction
+        await self.Parse_Reaction(user_reaction[0],user_reaction[1], best_list[0])
+        
+        while not task1.done():
+            New_reaction = asyncio.create_task(
+            self.On_Reaction(ctx))
+            new_reaction = await New_reaction
+            await self.Parse_Reaction(new_reaction[0], new_reaction[1], best_list[0])    
+
         return                  
                        
     @trivia.command(aliases=['m'])
@@ -109,21 +94,22 @@ class TriviaCog(commands.Cog):
 
      parsed_response = await self.HTML_Parser(response)
      big_list = await self.Dict_Publisher(ctx, parsed_response)
-     length = len(parsed_response['results'])
-     thetask = asyncio.run(
-            self.Event_listener(ctx)
-        )
-     theembed = asyncio.create_task(
-         self.Asyncio_Publisher(ctx, big_list[1]))
-     await thetask
+     
+
+     newtask = await self.Asyncio_Publisher(ctx, big_list[1])
      thereaction = asyncio.create_task(
            self.On_Reaction(ctx)
        )
-       
-        
-    
-     await thereaction    
-     await theembed       
+     task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
+     reaction = await thereaction
+     await self.Parse_Reaction(reaction[0],reaction[1], big_list[0])
+
+     while not task1.done():
+        new_reaction = asyncio.create_task(
+                self.On_Reaction(ctx))
+        use_reaction = await new_reaction
+        await self.Parse_Reaction(use_reaction[0],use_reaction[1], big_list[0])
+  
      return
 
     @trivia.command(aliases=['help'])
@@ -275,13 +261,7 @@ class TriviaCog(commands.Cog):
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")    
      return    
-    async def Json_Parser(self, dictionary):
-        Correct_Answers= []
-
-        for x in dictionary['results']:
-            Correct_Answers.append(x['correct_answer'])
-
-        return Correct_Answers
+    
 
     async def HTML_Parser(self, new_response):
                 dictionary_list = [] #pain
@@ -369,53 +349,109 @@ class TriviaCog(commands.Cog):
         mega_list.append(cog_embeds)
         return mega_list                                                                    
     async def Asyncio_Publisher(self,ctx, cog_embeds):
-        await self.bot.messenger.publish(Events.on_set_pageable_embed,
-                                         pages=cog_embeds,
-                                         author=ctx.author,
-                                         channel=ctx.channel,
-                                         timeout=len(cog_embeds)*5,
-                                        )
-        return                                    
-    async def Event_listener(self, ctx):
-        def check(m):
-            return m.author.id == self.bot.user.id and m.channel == ctx.channel  
-        msg = await self.bot.wait_for("message", check=check)
-        await asyncio.sleep(2)
-        for x in ANSWER_KEY:
-           await msg.add_reaction(x)
-        return msg     
+        Coroutine_Object = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, 60)
+        return Coroutine_Object                                    
+        
     async def On_Reaction(self,ctx):
         author = ctx.author
         def check(reaction, user):
             return user == author
         reaction, user = await self.bot.wait_for("reaction_add", check=check)
-        return reaction
+        Return_list = []
+        Return_list.append(reaction)
+        Return_list.append(user)
+        return Return_list
               
-    async def Parse_Reaction(self, reaction,current_page, length, right_answer, msg):
+    async def Parse_Reaction(self, reaction,user, right_answer):
+        
+        msg = self.messages[reaction.message.id]
+        current_page = msg.curr_page_num
+       
+        match reaction.emoji:
+            case '🇦':
+                if right_answer[current_page] == ANSWER_KEY.index('🇦'):
+                    print("It's right")
+                    del msg.pages[current_page]
+                else:
+                    del msg.pages[current_page]    
 
-        if reaction.emoji == "⏮️":
-            if current_page != 0:
-                current_page = 0
-        elif reaction.emoji == "⬅️":
-            if current_page != 0:
-               current_page -= 1
-        elif reaction.emoji == "➡️":
-            if current_page < length - 1:
-               current_page += 1
-        elif reaction.emoji == "⏭️":
-            if current_page != length - 1:
-                current_page = length - 1
-        if reaction.emoji in ANSWER_KEY:
-            index_of = ANSWER_KEY.index(reaction.emoji)
-            if right_answer[current_page] == index_of:
-                pub = discord.Embed(title="You are a star!", description="yeah!")
-                self.bot.messenger.publish(pub)
+            case '🇧':
+                if right_answer[current_page] == ANSWER_KEY.index('🇧'):
+                    print("It's right")
+                    del msg.pages[current_page]
+                else:
+                    del msg.pages[current_page]    
+                   
 
-                return current_page
+            case '🇨':
+                if right_answer[current_page] == ANSWER_KEY.index('🇨'):
+                    print("It's right")
+                    del msg.pages[current_page]
+                   
+                else:
+                    del msg.pages[current_page]    
 
-        return current_page        
-    async def Delete_Emojis(self,ctx, timeout):
+            case '🇩':
+                if right_answer[current_page] ==  ANSWER_KEY.index('🇩'):
+                    print("It's right")
+                    del msg.pages[current_page]
+                else:
+                    del msg.pages[current_page]    
+
+        await reaction.message.edit(embed=msg.curr_content)
+        await reaction.message.remove_reaction(reaction.emoji, user)
+                    
         return
+    async def set_embed_pageable(self, pages: t.List[discord.Embed],author: discord.Member, channel: discord.TextChannel, timeout: int = 60):
+
+        if not isinstance(pages, t.List):
+            pages = [pages]
+
+        pages = [e.copy() for e in pages]
+
+        if not all(isinstance(p, discord.Embed) for p in pages):
+            raise Exception('All paginate embed pages need to be of type discord.Embed')
+
+        footer = ''
+        if not pages[0].footer.text == discord.Embed.Empty:
+            footer = pages[0].footer.text
+
+        message = Message(pages,
+                          0,
+                          author.id if author else None,
+                          footer=footer)
+        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)}')
+        # send the first initial embed
+        
+
+
+        msg = await channel.send(embed=pages[0])
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
+        self.messages[msg.id] = message
+        return_list= []
+        return_list.append(msg)
+        return_list.append(author)
+        return_list.append(timeout)
+
+        
+        return return_list
+
+
+    async def send_scroll_reactions(self, msg: discord.Message, author: discord.Member, timeout: int):
+        # add every emoji from the reaction list
+        for reaction in ANSWER_KEY:
+            await msg.add_reaction(reaction)
+        
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
+        if timeout:
+            await asyncio.sleep(timeout)
+            try:
+                await msg.delete()
+            except:
+                pass
+            finally:
+                log.info('Message: {msg_id} timed out as pageable', msg_id=msg.id) 
+        return None                    
        
 def helper_fixer(formatthis):
 
@@ -425,18 +461,13 @@ def helper_fixer(formatthis):
 def chunk_list(lst, n):
  for i in range(0, len(lst), n):   
     yield lst[i:i+n]       
-
 CHUNK_SIZE = 24
 
 ANSWER_KEY=['🇦',
             '🇧',
             '🇨',
             '🇩']
-             
-MOVEMENT_ARROWS=['➡️',
-                '⬅️',
-               '⏭️',
-               '⏮️' ]
+
 
 URL_BUILDER = R"https://opentdb.com/api.php?amount="
 
@@ -479,6 +510,43 @@ CATEGORYLIST = ["General-Knowledge", #Including this out of consistency to avoid
            "Cartoon&Animations"]
 
 CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
+
+@dataclass
+class Message:
+    pages: t.Union[t.List[discord.Embed], t.List[str]]
+    _curr_page_num: int
+    author: int
+    footer: str = None
+    embed_name: str = None
+    field_title: str = None
+
+    @property
+    def curr_page_num(self) -> int:
+        return self._curr_page_num
+
+    @curr_page_num.setter
+    def curr_page_num(self, page_num: int):
+        self._curr_page_num = page_num
+
+    @property
+    def curr_page(self) -> t.Union[discord.Embed, str]:
+        return self.pages[self._curr_page_num]
+
+    @property
+    def curr_content(self) -> discord.Embed:
+
+        page = self.curr_page
+        if isinstance(page, discord.Embed):
+            page.set_footer(text=f'{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)}')
+            return page
+        elif not isinstance(page, str):
+            raise Exception(f'Embed or string expected in the paginator service: {type(page)} found')
+
+        embed = discord.Embed(title=self.embed_name, color=Colors.ClemsonOrange)
+        embed.add_field(name=self.field_title, value=self.pages[self._curr_page_num])
+        embed.set_footer(text=f'Page {self.curr_page_num + 1} of {len(self.pages)}')
+        return embed
+
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
