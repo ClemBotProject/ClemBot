@@ -1,3 +1,7 @@
+#Stephen Martin
+#5/9/2022
+#trivia_Cog.py
+
 import json
 import logging
 import uuid
@@ -50,16 +54,16 @@ class TriviaCog(commands.Cog):
                 best_list = await self.Dict_Publisher(parsed_response)
                 
                
-                newtask = await self.Asyncio_Publisher(ctx, best_list[1]) #this will return None when completed ending the loop
+                newtask = await self.Asyncio_Publisher(ctx, best_list[1]) #This returns key values for our list
     
                 thereaction = asyncio.create_task(
-                   self.On_Reaction(ctx, newtask[3]))
+                   self.On_Reaction(ctx, newtask[3])) #This used to be first to prevent a race condition where the user could mess something up. However, without the message ID the bot registers EVERY emoji in current channel from user as responding to the embed. I don't think its possible to beat the bot though and mess up the embed
                 
                 task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
     
                 user_reaction = await thereaction
     
-                await self.Parse_Reaction(newtask[0],user_reaction[0],user_reaction[1], best_list[0])
+                await self.Parse_Reaction(newtask[0],user_reaction[0],user_reaction[1], best_list[0]) 
                 
                 while not task1.done():
     
@@ -118,11 +122,11 @@ class TriviaCog(commands.Cog):
     
              await self.Parse_Reaction(newtask[0],reaction[0],reaction[1], big_list[0])
     
-             while not task1.done():
+             while not task1.done():  #This loop SHOULD terminate when the timeout task is done
                 new_reaction = asyncio.create_task(
                         self.On_Reaction(ctx, newtask[3]))
     
-                use_reaction = await new_reaction
+                use_reaction = await new_reaction #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
     
                 await self.Parse_Reaction(newtask[0],use_reaction[0],use_reaction[1], big_list[0])
       
@@ -135,7 +139,7 @@ class TriviaCog(commands.Cog):
                         "Use this to find the category you want!" ) 
             @commands.cooldown(1, 30, commands.BucketType.user)                
             @ext.example("!trivia help" )                        
-            async def List_Help(self, ctx):
+            async def List_Help(self, ctx): #Overengineered this slightly. If the categories/difficulty/whatever else changes it will be a short fix
     
                 embed_list = []
                 Final_Page = []
@@ -287,7 +291,7 @@ class TriviaCog(commands.Cog):
     
                          for x in DIFFICULTY_LOWER:
     
-                             if(x.find(difficulty) != -1):
+                             if(x.find(difficulty) != -1):   #Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
                                  return x
                          else:
                                  raise UserInputError("Difficulty not found")
@@ -369,8 +373,8 @@ class TriviaCog(commands.Cog):
     
                         while best_loopint < dictionarysize:
     
-                              new_response['results'][best_loopint] = dictionary_list[best_loopint] 
-                              best_loopint+=1
+                              new_response['results'][best_loopint] = dictionary_list[best_loopint] #Sets the real dictionary to our parsed results
+                              best_loopint+=1 
     
                         return new_response
     
@@ -407,13 +411,13 @@ class TriviaCog(commands.Cog):
     
                 mega_list=[]
                 mega_list.append(List_Index)
-                mega_list.append(cog_embeds)
+                mega_list.append(cog_embeds) #Returns pages needed for pagination and a INDEX based value for what the answer is. e.g 0 = A 1 = B.
     
                 return mega_list                                                                    
             async def Asyncio_Publisher(self,ctx, cog_embeds):
     
-                Coroutine_Object = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds)*9)
-                return Coroutine_Object                                    
+                Embed_List = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds)*9)
+                return Embed_List                                    
                 
             async def On_Reaction(self,ctx, message):
                 author = ctx.author
@@ -439,7 +443,7 @@ class TriviaCog(commands.Cog):
                             print("It's right")
     
                     case '🇧':
-                        if right_answer[current_page] == ANSWER_KEY.index('🇧'):
+                        if right_answer[current_page] == ANSWER_KEY.index('🇧'): #TODO: Implement scoring/ Database system!
                             print("It's right")
     
                     case '🇨':
@@ -447,13 +451,13 @@ class TriviaCog(commands.Cog):
                             print("It's right")   
     
                     case '🇩':
-                        if right_answer[current_page] ==  ANSWER_KEY.index('🇩'):
+                        if right_answer[current_page] ==  ANSWER_KEY.index('🇩'): #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
                             print("It's right")   
     
     
                 if len(msg.pages) <= 1:
     
-                    await message.delete()
+                    await message.delete() #Deletes embed if the page queue has runout
     
                     return
                 else:
@@ -504,13 +508,13 @@ class TriviaCog(commands.Cog):
                 # add every emoji from the reaction list
                 
                 for reaction in ANSWER_KEY:
-                    await msg.add_reaction(reaction)
+                    await msg.add_reaction(reaction) #Removed arrows because I made the decision it made the embed look too clunky, took too long to add, and added unneeded complexity
                 
                 await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
                 if timeout:
                     await asyncio.sleep(timeout)
                     try:
-                        await msg.delete()
+                        await msg.delete() #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
                     except:
                         pass
                     finally:
@@ -617,4 +621,5 @@ class Message:
     
 def setup(bot):
    bot.add_cog(TriviaCog(bot))
-    
+ 
+   
