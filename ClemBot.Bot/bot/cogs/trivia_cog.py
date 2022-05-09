@@ -1,6 +1,6 @@
 #Stephen Martin
 #5/9/2022
-#trivia_Cog.py
+#trivia_cog.py
 
 import json
 import logging
