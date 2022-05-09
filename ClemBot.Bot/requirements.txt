@@ -18,10 +18,9 @@ colorama==0.4.3
 contextlib2==0.6.0
 dataclasses-json==0.5.3
 dateutils==0.6.8
-discord.py==1.7.3
+discord.py @ git+https://github.com/Rapptz/discord.py@45d498c1b76deaf3b394d17ccf56112fa691d160
 distlib==0.3.1
 distro==1.4.0
-Django==4.0.4
 entrypoints==0.3
 filelock==3.0.12
 flake8==3.7.9
