@@ -32,6 +32,7 @@ class TriviaCog(commands.Cog):
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
     "Use !trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice"    )
+    @commands.cooldown(1, 25, commands.BucketType.user)
     @ext.short_help(
     "!trivia use !trivia m for custom arguments"    )
     async def trivia(self, ctx):
@@ -42,25 +43,25 @@ class TriviaCog(commands.Cog):
                 parsed_response = await self.HTML_Parser(new_response)                
 
                 #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
-        length = len(parsed_response['results'])
+      
         
-        best_list = await self.Dict_Publisher(ctx, parsed_response)
-        thereaction = asyncio.create_task(
-           self.On_Reaction(ctx)
-         )
+        best_list = await self.Dict_Publisher(parsed_response)
+        
        
-        
         newtask = await self.Asyncio_Publisher(ctx, best_list[1]) #this will return None when completed ending the loop
+        thereaction = asyncio.create_task(
+           self.On_Reaction(ctx, newtask[3])
+         )
         
         task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
         user_reaction = await thereaction
-        await self.Parse_Reaction(user_reaction[0],user_reaction[1], best_list[0])
+        await self.Parse_Reaction(newtask[0],user_reaction[0],user_reaction[1], best_list[0])
         
         while not task1.done():
             New_reaction = asyncio.create_task(
-            self.On_Reaction(ctx))
+            self.On_Reaction(ctx, newtask[3]))
             new_reaction = await New_reaction
-            await self.Parse_Reaction(new_reaction[0], new_reaction[1], best_list[0])    
+            await self.Parse_Reaction(newtask[0],new_reaction[0], new_reaction[1], best_list[0])    
 
         return                  
                        
@@ -68,11 +69,12 @@ class TriviaCog(commands.Cog):
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories!")
     @ext.short_help("!trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
+    @commands.cooldown(1, 40, commands.BucketType.user)
     @ext.example(
      "Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
     async def manual(self, ctx, *input:str):
-     if len(input) < 1:
-        raise UserInputError("You need more arguments to use this command")
+     if len(input) < 1 or 4 < len(input):
+        raise UserInputError("Invalid arguments! Specify between 1 to 4")
 
      FunctionParameters = []
      inputlength = len(input)
@@ -94,22 +96,22 @@ class TriviaCog(commands.Cog):
                             "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
      parsed_response = await self.HTML_Parser(response)
-     big_list = await self.Dict_Publisher(ctx, parsed_response)
+     big_list = await self.Dict_Publisher(parsed_response)
      
 
      newtask = await self.Asyncio_Publisher(ctx, big_list[1])
      thereaction = asyncio.create_task(
-           self.On_Reaction(ctx)
+           self.On_Reaction(ctx, newtask[3])
        )
      task1 = asyncio.create_task(self.send_scroll_reactions(newtask[0], newtask[1], newtask[2]))
      reaction = await thereaction
-     await self.Parse_Reaction(reaction[0],reaction[1], big_list[0])
+     await self.Parse_Reaction(newtask[0],reaction[0],reaction[1], big_list[0])
 
      while not task1.done():
         new_reaction = asyncio.create_task(
-                self.On_Reaction(ctx))
+                self.On_Reaction(ctx, newtask[3]))
         use_reaction = await new_reaction
-        await self.Parse_Reaction(use_reaction[0],use_reaction[1], big_list[0])
+        await self.Parse_Reaction(newtask[0],use_reaction[0],use_reaction[1], big_list[0])
   
      return
 
@@ -117,7 +119,8 @@ class TriviaCog(commands.Cog):
     @ext.long_help(
                     "Lists the categories, difficulty, and type of questions. Useful for finding the index of categories!")
     @ext.short_help(
-                "Use this to find the category you want!" )     
+                "Use this to find the category you want!" ) 
+    @commands.cooldown(1, 30, commands.BucketType.user)                
     @ext.example("!trivia help" )                        
     async def List_Help(self, ctx):
 
@@ -319,7 +322,7 @@ class TriviaCog(commands.Cog):
                 return new_response
 
 
-    async def Dict_Publisher(self, ctx, dictionary):
+    async def Dict_Publisher(self, dictionary):
         x=0
         cog_embeds = []
         List_Index = []
@@ -346,64 +349,57 @@ class TriviaCog(commands.Cog):
                 a=a+1
 
              cog_embeds.append(embed)
-             
+
         mega_list=[]
         mega_list.append(List_Index)
         mega_list.append(cog_embeds)
 
         return mega_list                                                                    
     async def Asyncio_Publisher(self,ctx, cog_embeds):
-        Coroutine_Object = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, 60)
+
+        Coroutine_Object = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds)*9)
         return Coroutine_Object                                    
         
-    async def On_Reaction(self,ctx):
+    async def On_Reaction(self,ctx, message):
         author = ctx.author
+
         def check(reaction, user):
-            return user == author
+            return user == author and reaction.message.id == message
         reaction, user = await self.bot.wait_for("reaction_add", check=check)
         Return_list = []
         Return_list.append(reaction)
         Return_list.append(user)
         return Return_list
               
-    async def Parse_Reaction(self, reaction,user, right_answer):
+    async def Parse_Reaction(self, message, reaction,user, right_answer):
         
         msg = self.messages[reaction.message.id]
         current_page = msg.curr_page_num
-       
         match reaction.emoji:
             case '🇦':
                 if right_answer[current_page] == ANSWER_KEY.index('🇦'):
                     print("It's right")
-                    del msg.pages[current_page]
-                else:
-                    del msg.pages[current_page]    
 
             case '🇧':
                 if right_answer[current_page] == ANSWER_KEY.index('🇧'):
                     print("It's right")
-                    del msg.pages[current_page]
-                else:
-                    del msg.pages[current_page]    
-                   
 
             case '🇨':
                 if right_answer[current_page] == ANSWER_KEY.index('🇨'):
-                    print("It's right")
-                    del msg.pages[current_page]
-                   
-                else:
-                    del msg.pages[current_page]    
+                    print("It's right")   
 
             case '🇩':
                 if right_answer[current_page] ==  ANSWER_KEY.index('🇩'):
-                    print("It's right")
-                    del msg.pages[current_page]
-                else:
-                    del msg.pages[current_page]    
+                    print("It's right")   
 
-        await reaction.message.edit(embed=msg.curr_content)
-        await reaction.message.remove_reaction(reaction.emoji, user)
+
+        if len(msg.pages) <= 1:
+            await message.delete()
+            return
+        else:
+            del msg.pages[current_page]    
+            await reaction.message.edit(embed=msg.curr_content)
+            await reaction.message.remove_reaction(reaction.emoji, user)
                     
         return
     async def set_embed_pageable(self, pages: t.List[discord.Embed],author: discord.Member, channel: discord.TextChannel, timeout: int = 60):
@@ -436,6 +432,7 @@ class TriviaCog(commands.Cog):
         return_list.append(msg)
         return_list.append(author)
         return_list.append(timeout)
+        return_list.append(msg.id)
 
         
         return return_list
@@ -443,6 +440,7 @@ class TriviaCog(commands.Cog):
 
     async def send_scroll_reactions(self, msg: discord.Message, author: discord.Member, timeout: int):
         # add every emoji from the reaction list
+        
         for reaction in ANSWER_KEY:
             await msg.add_reaction(reaction)
         
