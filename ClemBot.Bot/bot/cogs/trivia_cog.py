@@ -322,58 +322,58 @@ class TriviaCog(commands.Cog):
             
     
             async def html_parser(self, new_response):
-    
-                        dictionary_list = [] #pain
-    
-                        for x in new_response['results']:
-    
-                          new_dictionary = x
-                          new_list_values = x.values()
-                          proper_values = []
-    
-                          for b in new_list_values:
-    
-                              if isinstance(b, list):
-    
-                                    new_list = []
-    
-                                    for y in b:
-    
-                                      if not y.isnumeric():
-                                         new_list.append(html.unescape(y)) #This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
-                                      else:
-                                          new_list.append(y)
-    
-                                    proper_values.append(new_list)             
-                                          
-                              elif not b.isnumeric():
-    
-                                  proper_values.append(html.unescape(b))  # good luck maintaining this 
-                              else:
-                                  proper_values.append(b)
-    
-                          proper_values_size = len(proper_values)        
-                          biggest_loop = 0   
-    
-                          for key, value in new_dictionary.items(): #.items is special because it contains an active view 
-    
-                                new_dictionary[key] = proper_values[biggest_loop]
-                                if biggest_loop < proper_values_size:
-                                    biggest_loop+=1
-                                else:
-                                    break  
-    
-                          dictionary_list.append(new_dictionary)
-    
-                        dictionary_size = len(new_response['results'])
-                        best_loopint = 0  
-    
-                        while best_loopint < dictionary_size:
-    
-                              new_response['results'][best_loopint] = dictionary_list[best_loopint] #Sets the real dictionary to our parsed results
-                              best_loopint+=1 
-    
-                        return new_response
+ 
+                     dictionary_list = [] #pain
+ 
+                     for x in new_response['results']:
+ 
+                       new_dictionary = x
+                       new_list_values = x.values()
+                       proper_values = []
+ 
+                       for b in new_list_values:
+ 
+                           if isinstance(b, list):
+ 
+                                 new_list = []
+ 
+                                 for y in b:
+ 
+                                   if not y.isnumeric():
+                                      new_list.append(html.unescape(y)) #This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
+                                   else:
+                                       new_list.append(y)
+ 
+                                 proper_values.append(new_list)             
+                                       
+                           elif not b.isnumeric():
+ 
+                               proper_values.append(html.unescape(b))  # good luck maintaining this 
+                           else:
+                               proper_values.append(b)
+ 
+                       proper_values_size = len(proper_values)        
+                       biggest_loop = 0   
+ 
+                       for key, value in new_dictionary.items(): #.items is special because it contains an active view 
+ 
+                             new_dictionary[key] = proper_values[biggest_loop]
+                             if biggest_loop < proper_values_size:
+                                 biggest_loop+=1
+                             else:
+                                 break  
+ 
+                       dictionary_list.append(new_dictionary)
+ 
+                     dictionary_size = len(new_response['results'])
+                     best_loopint = 0  
+ 
+                     while best_loopint < dictionary_size:
+ 
+                           new_response['results'][best_loopint] = dictionary_list[best_loopint] #Sets the real dictionary to our parsed results
+                           best_loopint+=1 
+ 
+                     return new_response
     
     
             async def dict_publisher(self, dictionary):
