@@ -51,26 +51,23 @@ class TriviaCog(commands.Cog):
                         #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
               
                 
-                best_list = await self.dict_publisher(parsed_response)
+                best_list = await self.dict_publisher(parsed_response) #Publishes the dictionary
                 
                
                 new_task = await self.asyncio_publisher(ctx, best_list[1]) #This returns key values for our list
     
                 the_reaction = asyncio.create_task(
-                   self.on_reaction(ctx, new_task[3])) #This used to be first to prevent a race condition where the user could mess something up. However, without the message ID the bot registers EVERY emoji in current channel from user as responding to the embed. I don't think its possible to beat the bot though and mess up the embed
+                   self.on_reaction(ctx, new_task[3])) #Starts the event listener for the reaction BEFORE emojis are sent
                 
-                task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2]))
+                task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2])) #Sends the answer key
     
-                user_reaction = await the_reaction
+                user_reaction = await the_reaction #Gets the user's reaction
     
-                await self.parse_reaction(new_task[0],user_reaction[0],user_reaction[1], best_list[0]) 
+                await self.parse_reaction(new_task[0],user_reaction[0],user_reaction[1], best_list[0])  #Parses the user reaction
                 
-                while not task1.done():
-    
-                    new_reaction = asyncio.create_task(
-                    self.on_reaction(ctx, new_task[3]))
-    
-                    new_reaction = await new_reaction
+                while not task1.done(): #Loops reading the user's 
+
+                    new_reaction = await self.on_reaction(ctx, new_task[3])
                     await self.parse_reaction(new_task[0],new_reaction[0], new_reaction[1], best_list[0])    
     
                 return                  
