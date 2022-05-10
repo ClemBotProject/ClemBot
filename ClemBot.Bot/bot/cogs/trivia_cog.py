@@ -1,10 +1,5 @@
-#Stephen Martin
-#5/9/2022
-#trivia_cog.py
-
 import json
 import logging
-import uuid
 import random
 import aiohttp
 import html
@@ -14,7 +9,6 @@ from dataclasses import dataclass
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
-import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
@@ -35,10 +29,12 @@ class TriviaCog(commands.Cog):
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
-        "Use !trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice")
+        "Use trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice")
     @commands.cooldown(1, 25, commands.BucketType.user)
     @ext.short_help(
-        "!trivia use !trivia m for custom arguments")
+        "Returns trivia questions")
+    @ext.example(
+        "!trivia")
     async def trivia(self, ctx):
 
         async with await self.session.get(DEFAULT_URL) as resp:
@@ -70,11 +66,12 @@ class TriviaCog(commands.Cog):
 
     @trivia.command(aliases=['m'])
     @ext.long_help(
-        "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories!")
-    @ext.short_help("!trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
+        "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories! Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
+    @ext.short_help(
+            "trivia m allows specification of manual arguments. With as many or as few as you want using 0 for arguments you don't want")
     @commands.cooldown(1, 40, commands.BucketType.user)
     @ext.example(
-        "Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
+        "!trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
     async def manual(self, ctx, *input: str):
         if len(input) < 1 or 4 < len(input):
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
