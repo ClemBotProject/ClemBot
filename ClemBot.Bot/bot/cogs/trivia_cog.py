@@ -46,32 +46,32 @@ class TriviaCog(commands.Cog):
     
                         parse_text = await resp.text()
                         new_response = json.loads(parse_text)
-                        parsed_response = await self.HTML_Parser(new_response)                
+                        parsed_response = await self.html_parser(new_response)                
     
                         #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
               
                 
-                best_list = await self.Dict_Publisher(parsed_response)
+                best_list = await self.dict_publisher(parsed_response)
                 
                
-                new_task = await self.Asyncio_Publisher(ctx, best_list[1]) #This returns key values for our list
+                new_task = await self.asyncio_publisher(ctx, best_list[1]) #This returns key values for our list
     
                 the_reaction = asyncio.create_task(
-                   self.On_Reaction(ctx, new_task[3])) #This used to be first to prevent a race condition where the user could mess something up. However, without the message ID the bot registers EVERY emoji in current channel from user as responding to the embed. I don't think its possible to beat the bot though and mess up the embed
+                   self.on_reaction(ctx, new_task[3])) #This used to be first to prevent a race condition where the user could mess something up. However, without the message ID the bot registers EVERY emoji in current channel from user as responding to the embed. I don't think its possible to beat the bot though and mess up the embed
                 
                 task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2]))
     
                 user_reaction = await the_reaction
     
-                await self.Parse_Reaction(new_task[0],user_reaction[0],user_reaction[1], best_list[0]) 
+                await self.parse_reaction(new_task[0],user_reaction[0],user_reaction[1], best_list[0]) 
                 
                 while not task1.done():
     
                     new_reaction = asyncio.create_task(
-                    self.On_Reaction(ctx, new_task[3]))
+                    self.on_reaction(ctx, new_task[3]))
     
                     new_reaction = await new_reaction
-                    await self.Parse_Reaction(new_task[0],new_reaction[0], new_reaction[1], best_list[0])    
+                    await self.parse_reaction(new_task[0],new_reaction[0], new_reaction[1], best_list[0])    
     
                 return                  
                                
@@ -92,7 +92,7 @@ class TriviaCog(commands.Cog):
     
              while x < input_length:
                 
-                append_this = await self.Matching_Function(x, *input)
+                append_this = await self.matching_function(x, *input)
                 function_parameters.append(append_this)
                 x+=1  
     
@@ -105,30 +105,30 @@ class TriviaCog(commands.Cog):
                  raise Exception(
                                 "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
     
-             parsed_response = await self.HTML_Parser(response)
+             parsed_response = await self.html_parser(response)
     
-             big_list = await self.Dict_Publisher(parsed_response)
+             big_list = await self.dict_publisher(parsed_response)
              
     
-             new_task = await self.Asyncio_Publisher(ctx, big_list[1])
+             new_task = await self.asyncio_publisher(ctx, big_list[1])
     
              thereaction = asyncio.create_task(
-                   self.On_Reaction(ctx, new_task[3])
+                   self.on_reaction(ctx, new_task[3])
                )
     
              task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2]))
     
              reaction = await thereaction
     
-             await self.Parse_Reaction(new_task[0],reaction[0],reaction[1], big_list[0])
+             await self.parse_reaction(new_task[0],reaction[0],reaction[1], big_list[0])
     
              while not task1.done():  #This loop SHOULD terminate when the timeout task is done
                 new_reaction = asyncio.create_task(
-                        self.On_Reaction(ctx, new_task[3]))
+                        self.on_reaction(ctx, new_task[3]))
     
                 use_reaction = await new_reaction #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
     
-                await self.Parse_Reaction(new_task[0],use_reaction[0],use_reaction[1], big_list[0])
+                await self.parse_reaction(new_task[0],use_reaction[0],use_reaction[1], big_list[0])
       
              return
     
@@ -139,7 +139,7 @@ class TriviaCog(commands.Cog):
                         "Use this to find the category you want!" ) 
             @commands.cooldown(1, 30, commands.BucketType.user)                
             @ext.example("!trivia help" )                        
-            async def List_Help(self, ctx): #Overengineered this slightly. If the categories/difficulty/whatever else changes it will be a short fix
+            async def list_help(self, ctx): #Overengineered this slightly. If the categories/difficulty/whatever else changes it will be a short fix
     
                 embed_list = []
                 final_page = []
@@ -220,7 +220,7 @@ class TriviaCog(commands.Cog):
                     return url   
     
     
-            async def Matching_Function(self, case, *input:str):
+            async def matching_function(self, case, *input:str):
              
              match case:       #Revolves around beautiful O(1) based indexing
                 case 0:
@@ -324,7 +324,7 @@ class TriviaCog(commands.Cog):
              return    
             
     
-            async def HTML_Parser(self, new_response):
+            async def html_parser(self, new_response):
     
                         dictionary_list = [] #pain
     
@@ -379,7 +379,7 @@ class TriviaCog(commands.Cog):
                         return new_response
     
     
-            async def Dict_Publisher(self, dictionary):
+            async def dict_publisher(self, dictionary):
     
                 x=0
                 cog_embeds = []
@@ -414,12 +414,12 @@ class TriviaCog(commands.Cog):
                 mega_list.append(cog_embeds) #Returns pages needed for pagination and a INDEX based value for what the answer is. e.g 0 = A 1 = B.
     
                 return mega_list                                                                    
-            async def Asyncio_Publisher(self,ctx, cog_embeds):
+            async def asyncio_publisher(self,ctx, cog_embeds):
     
                 embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds)*9)
                 return embed_list                                    
                 
-            async def On_Reaction(self,ctx, message):
+            async def on_reaction(self,ctx, message):
                 author = ctx.author
     
                 def check(reaction, user):
@@ -433,7 +433,7 @@ class TriviaCog(commands.Cog):
     
                 return return_list
                       
-            async def Parse_Reaction(self, message, reaction,user, right_answer):
+            async def parse_reaction(self, message, reaction,user, right_answer):
                 
                 msg = self.messages[reaction.message.id]
                 current_page = msg.curr_page_num #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant 
