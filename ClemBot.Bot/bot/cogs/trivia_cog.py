@@ -114,11 +114,8 @@ class TriviaCog(commands.Cog):
         await self.parse_reaction(new_task[0], reaction[0], reaction[1], big_list[0])
 
         while not task1.done():  #This loop SHOULD terminate when the timeout task is done
-            new_reaction = asyncio.create_task(
-                self.on_reaction(ctx, new_task[3]))
-
-            use_reaction = await new_reaction  #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
-
+            
+            new_reaction = await self.on_reaction(ctx, new_task[3]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
             await self.parse_reaction(new_task[0], use_reaction[0], use_reaction[1], big_list[0])
 
         return
