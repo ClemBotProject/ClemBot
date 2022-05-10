@@ -5,7 +5,7 @@ This is a guide on how to develop and contribute to this project
 ## Dependencies
 Make sure you can run these commands and install them if not present.
 ### ClemBot.Bot
-* Python 3.10 [Link](https://www.python.org/downloads/release/python-310/)
+* Python 3.10 [Link](https://www.python.org/downloads/release/python-3100/)
 * pip3 (packaged as python3-pip) 
 * A python IDE/Text Editor: Anything will work but people generally use Visual Studio Code [Link](https://code.visualstudio.com/) or Jetbrains Pycharm [Link](https://www.jetbrains.com/pycharm/)
 
