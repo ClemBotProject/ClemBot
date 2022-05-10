@@ -34,7 +34,7 @@ class TriviaCog(commands.Cog):
     @ext.short_help(
         "Returns trivia questions")
     @ext.example(
-        "!trivia")
+        "trivia")
     async def trivia(self, ctx):
 
         async with await self.session.get(DEFAULT_URL) as resp:
@@ -71,7 +71,7 @@ class TriviaCog(commands.Cog):
             "trivia m allows specification of manual arguments. With as many or as few as you want using 0 for arguments you don't want")
     @commands.cooldown(1, 40, commands.BucketType.user)
     @ext.example(
-        "!trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
+        "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
     async def manual(self, ctx, *input: str):
         if len(input) < 1 or 4 < len(input):
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
@@ -123,7 +123,7 @@ class TriviaCog(commands.Cog):
     @ext.short_help(
         "Use this to find the category you want!")
     @commands.cooldown(1, 30, commands.BucketType.user)
-    @ext.example("!trivia help")
+    @ext.example("trivia help")
     async def list_help(self, ctx):  #Overengineered this slightly. If the categories/difficulty/whatever else changes it will be a short fix
 
         embed_list = []
@@ -244,8 +244,7 @@ class TriviaCog(commands.Cog):
                     difficulty = input[2].lower()
                     for x in DIFFICULTY_LOWER:
 
-                        if (
-                                x.find(difficulty) != -1):  #Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
+                        if (x.find(difficulty) != -1):  #Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
                             return x
                     else:
                         raise UserInputError("Difficulty not found")
@@ -284,8 +283,7 @@ class TriviaCog(commands.Cog):
                     new_list = []
                     for y in b:
                         if not y.isnumeric():
-                            new_list.append(html.unescape(
-                                y))  #This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
+                            new_list.append(html.unescape(y))  #This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
                         else:
                             new_list.append(y)
                     proper_values.append(new_list)
@@ -326,10 +324,10 @@ class TriviaCog(commands.Cog):
             answers_list = []
             answers_list = create_lists['incorrect_answers']
             answers_list.append(create_lists['correct_answer'])
-            Right_Answer = create_lists['correct_answer']
+            right_answer = create_lists['correct_answer']
 
             random.shuffle(answers_list)
-            list_index.append(answers_list.index(Right_Answer))
+            list_index.append(answers_list.index(right_answer))
             x += 1
             embed = discord.Embed(title="Question #" + str(x) + ":",
                                   color=Colors.ClemsonOrange)
