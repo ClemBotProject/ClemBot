@@ -9,6 +9,8 @@ Logs/
 #Bot Secrets
 ClemBot.Bot/BotSecrets.json
 
+.DS_Store
+
 # Environments
 *.env
 .venv

@@ -147,7 +147,7 @@ class SlotsCog(commands.Cog):
 
     @slots.command(aliases=['top', 'winners'])
     async def leaderboard(self, ctx: commands.Context):
-        scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10)
+        scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, True)
 
         scores_str = ''
         if len(scores) == 0:
@@ -160,6 +160,25 @@ class SlotsCog(commands.Cog):
         embed = discord.Embed(title='💎 ClemBot Slot Machine Leaderboard 💎', colour=Colors.ClemsonOrange)
 
         embed.add_field(name='Leaderboard', value=f'```{scores_str}```')
+        embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+
+        await ctx.send(embed=embed)
+
+    @slots.command(aliases=['bottom', 'losers'])
+    async def loserboard(self, ctx: commands.Context):
+        scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, False)
+
+        scores_str = ''
+        if len(scores) == 0:
+            scores_str = 'No scores found'
+
+        for i, score in enumerate(scores):
+            user = self.bot.get_user(score['userId'])
+            scores_str += f'{i+1: >3}. {user.name}: {score["highScore"]}\n'
+
+        embed = discord.Embed(title='💩 ClemBot Slot Machine Loserboard 💩', colour=Colors.ClemsonOrange)
+
+        embed.add_field(name='Loserboard', value=f'```{scores_str}```')
         embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
@@ -271,7 +290,7 @@ class SlotsCog(commands.Cog):
             embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
 
             embed.add_field(name=self._render_board(paylines, iter), value='Spinning!!!', inline=False)
-            embed.set_footer(text=f'{self.get_full_name(ctx.author)}\nTo view the leaderboard run {prefix}slots leaderboard' , icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=f'{self.get_full_name(ctx.author)}\nTo view the leaderboard run {prefix}slots leaderboard\nTo view the loserboard run {prefix}slots loserboard\n' , icon_url=ctx.author.display_avatar.url)
             return embed
 
         msg = await ctx.send(embed=slots_rolling(0))

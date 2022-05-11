@@ -5,13 +5,17 @@ This is a guide on how to develop and contribute to this project
 ## Dependencies
 Make sure you can run these commands and install them if not present.
 ### ClemBot.Bot
-* Python 3.8 or higher [Link](https://www.python.org/downloads/release/python-380/)
+* Python 3.10 [Link](https://www.python.org/downloads/release/python-3100/)
 * pip3 (packaged as python3-pip) 
 * A python IDE/Text Editor: Anything will work but people generally use Visual Studio Code [Link](https://code.visualstudio.com/) or Jetbrains Pycharm [Link](https://www.jetbrains.com/pycharm/)
 
 ### ClemBot.Api
 * .Net 6 SDK [Link](https://dotnet.microsoft.com/download/dotnet/6.0)
 * A C# IDE, Preferably [Visual Studio Community](https://visualstudio.microsoft.com/) (Windows only) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (Cross Platform, Free with a student email)
+
+### ClemBot.Site
+* nvm [Link](https://github.com/nvm-sh/nvm#installing-and-updating)
+* yarn [Link](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) (Find your operating system in the dropdown)
 
 ### Database
 * PostgresSQL 14 [Link](https://www.postgresql.org/download/)
@@ -63,11 +67,12 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 ### All Config Variables
 
 * `BotToken`:(Required) Your discord bots api access token
-* `ApiUrl`:(Required) Url of the ClemBot.Api ASP.Net endpoints (defaults to http://localhost:5001)
+* `ApiUrl`:(Required) Url of the ClemBot.Api ASP.Net endpoints (defaults to `http://localhost:5001/`)
 * `ApiKey`:(Required) Access key for the bot endpoints in ClemBot.Api
 * `ClientToken`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
 * `ClientSecret`:(Optional) Used for the Website Frontend, can be ignored if you are not working on that
 * `BotPrefix`:(Required) Your discord bots prefix that it will default to responding too
+* `SiteUrl`: (Optional) The url of your local site or hosted instance for bot links to the site
 * `StartupLogChannelIds`:(Optional) The Id of the channel for the bot to send startup events too
 * `ErrorLogChannelIds`:(Optional) The Id of the channel for the bot to send error events too (recommended if you are doing work with services
 * `GifMeToken`:(Optional) GifMe api token
@@ -87,7 +92,7 @@ Setup a virtual environment:
 `virtualenv venv`  windows: `py -m venv venv`
 
 Enter the virtualenv with:  
-`source venv/bin/activate` windows: `source .\venv\Scripts\activate`
+`source venv/bin/activate` windows: `.\venv\Scripts\activate`
 
 Then allow pip to get the latest libraries:  
 `pip3 install -r requirements.txt` windows: `py -m pip install -r requirements.txt`
@@ -103,5 +108,23 @@ The bot should show up in the test server and respond to commands (test with `<y
 * Open the `ClemBot.Api.sln` file in the `ClemBot/ClemBot.Api` folder to open the project in either Visual Studio or Rider
 * Click the run button in your preferred IDE
 
+## Setting up the ClemBot.Site build environment
+
+* Navigate to the ClemBot.Site folder in your shell
+* Install Node.js 16 with nvm with the command `nvm install 16` then `nvm use 16`
+* Install dependencies with yarn with the command `yarn install`
+* The dev server can then be run with the command `yarn run dev` 
+
 ## Final Notes
-The ClemBot.Api and the ClemBot.Bot projects talk to each other over http, both projects need to be run simultaneously if you are not working in BotOnly mode.
+ClemBot is composed of several seperate components that all talk to each other over HTTP to form a complete system. Depending on what you are developing you might not need all of them setup to develop what you want. 
+
+Here are some common scenarios and what pieces you need to have running:
+
+1. Developing a simple Discord command that does not require the database
+  - You just need to run the ClemBot.Bot project with the BotOnly config flag set to true
+2. Developing functionality that does require the database and the api
+  - You will need to have the postgres server running, the ClemBot.Api project running and ClemBot.Bot running
+3. Developing or fixing a visual bug on the website that is not in the dashboard
+  - You will need just the ClemBot.Site codebase running to work on this
+4. Developing a dashboard page or fixing dashboard functionality
+  - You will need the complete ClemBot system running, the Bot, the Api, the Site and the database

@@ -8,9 +8,11 @@ __all__ = ['guild_route',
            'designated_channel_route',
            'welcome_message_route',
            'custom_prefix_route',
+           'custom_tag_prefix_route',
            'moderation_route',
            'claim_route',
            'commands_route',
            'thread_route',
-           'slots_score_route'
+           'slots_score_route',
+           'health_check_route'
            ]

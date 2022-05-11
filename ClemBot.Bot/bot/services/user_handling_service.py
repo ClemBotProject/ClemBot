@@ -1,6 +1,9 @@
 import datetime as datetime
 import logging
 from datetime import datetime
+import typing as t
+import dataclasses
+import asyncio
 
 import discord
 
@@ -11,10 +14,20 @@ import bot.utils.log_serializers as serializers
 
 log = logging.getLogger(__name__)
 
+UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME = 0.5
+
+@dataclasses.dataclass
+class UpdateEvent:
+    user_id: int
+    user_roles_ids: t.List[int]
+
 
 class UserHandlingService(BaseService):
 
     def __init__(self, *, bot):
+        # UserId cache so that we don't hit the database on subsequent user updates
+        self.user_id_cache: t.List[int] = []
+
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_user_joined)
@@ -39,6 +52,16 @@ class UserHandlingService(BaseService):
                  user=serializers.log_user(user),
                  guild=serializers.log_guild(user.guild))
 
+        # Even though a user leaving a server doesn't clear them from the db
+        # Its unlikely they are in multiple clembot servers
+        # So remove them from the cache to keep its size down, and they will be
+        # Readded the next time they are edited
+        if user.id in self.user_id_cache:
+            log.info('Removing {user} from the cache, new cache size is {size}',
+                     user=serializers.log_user(user),
+                     size=len(self.user_id_cache) - 1)
+            self.user_id_cache.remove(user.id)
+
         await self.bot.user_route.remove_user_guild(user.id, user.guild.id)
 
         await self.notify_user_remove(user)
@@ -46,13 +69,24 @@ class UserHandlingService(BaseService):
     @BaseService.Listener(Events.on_member_update)
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         # only update roles if they have changed
-        if not await self.bot.user_route.get_user(before.id):
-            # Possibly add them to the db if they dont exist
-            # For future enhancement
+        if set(r.id for r in before.roles) == set(r.id for r in after.roles):
             return
 
-        if set(r.id for r in before.roles) != set(r.id for r in after.roles):
-            await self.bot.user_route.update_roles(after.id, [r.id for r in after.roles])
+        # If user is not in local cache check the db
+        if before.id not in self.user_id_cache:
+            # If user is not in the db bail out
+            if not await self.bot.user_route.get_user(before.id):
+                # Possibly add them to the db if they don't exist
+                # For future enhancement
+                return
+
+            log.info('Adding {user} to the cache, new cache size is {size}',
+                     user=serializers.log_user(before),
+                     size=(len(self.user_id_cache) + 1))
+            # This user exists, add it to the cache
+            self.user_id_cache.append(before.id)
+
+        await self.bot.user_route.update_roles(before.id, [r.id for r in after.roles], raise_on_error=False)
 
     async def notify_user_join(self, user: discord.Member):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)

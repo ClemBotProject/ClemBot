@@ -25,7 +25,7 @@
   </a>
 </p>
  
- ## Website and Configuration Dashboard
+ ## Website, Documentation and Configuration Dashboard
  https://clembot.io
  
  ## Intro
@@ -96,6 +96,11 @@ ClemBot.Api.Data folder contains the Entity Framework Code first db models and c
 ClemBot.Api.Core Contains the startup project and Asp.Net endpoints located in the `Features` folder
 </br>
 ClemBot.Api.Services containes the caching and authorization services that perform more complex tasks
+
+## ClemBot.Site
+The site is a server side Nuxt.js and vue.js app that integrates with discord oauth
+* Vue.js [Link](https://vuejs.org/)
+* Nuxt.js [Link](https://nuxtjs.org/)
 
 ## ClemBot Pipeline Status
 

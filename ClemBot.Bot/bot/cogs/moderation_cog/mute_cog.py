@@ -39,42 +39,8 @@ class MuteCog(commands.Cog):
 
         mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
         if not mute_role:
-            get_input = UserChoice(ctx=ctx, timeout=30)
-            choice = await get_input.send_confirmation(
-                content='Error: ClemBots Mute role not found. Would you like me to create it?',
-                is_error=True)
-
-            if not choice:
-                embed = discord.Embed(color=Colors.Error)
-                embed.title = f'Error: Mute Role not found, Cancelling operation'
-                embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            if not await self._create_mute_role(ctx):
                 return
-
-            mute_role = await ctx.guild.create_role(name=Moderation.mute_role_name)
-            await mute_role.edit(position=ctx.guild.me.top_role.position - 1)
-
-            msg = await ctx.send('Configuring ClemBot Mute role (This might take a minute)')
-
-            for channel in ctx.guild.channels:
-                try:
-                    await channel.set_permissions(mute_role,
-                                                  speak=False,
-                                                  connect=False,
-                                                  stream=False,
-                                                  send_messages=False,
-                                                  send_messages_in_threads=False,
-                                                  create_public_threads=False,
-                                                  create_private_threads=False,
-                                                  send_tts_messages=False,
-                                                  add_reactions=False)
-                except:
-                    pass
-
-            await msg.delete()
-
-            embed = discord.Embed(color=Colors.ClemsonOrange)
-            embed.title = f'@{Moderation.mute_role_name} Successfully Configured  :white_check_mark:'
-            await ctx.send(embed=embed)
 
         #Publish that a mute happened
         await self.bot.messenger.publish(Events.on_bot_mute,
@@ -126,6 +92,7 @@ class MuteCog(commands.Cog):
                                              ctx.guild.id,
                                              embed)
 
+
     @ext.command()
     @ext.long_help(
         'Unmutes a user for a with an optional reason'
@@ -154,8 +121,8 @@ class MuteCog(commands.Cog):
 
         for mute in mutes:
             await self.bot.messenger.publish(Events.on_bot_unmute,
-                                             subject.guild,
-                                             subject,
+                                             subject.guild.id,
+                                             subject.id,
                                              mute.id,
                                              reason,
                                              ctx.author)
@@ -167,6 +134,41 @@ class MuteCog(commands.Cog):
         embed.set_thumbnail(url=subject.display_avatar.url)
 
         await ctx.send(embed=embed)
+
+    async def _create_mute_role(self, ctx) -> bool:
+        get_input = UserChoice(ctx=ctx, timeout=30)
+        choice = await get_input.send_confirmation(
+            content='Error: ClemBots Mute role not found. Would you like me to create it?',
+            is_error=True)
+        if not choice:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Error: Mute Role not found, Cancelling operation'
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return False
+
+        mute_role = await ctx.guild.create_role(name=Moderation.mute_role_name)
+        await mute_role.edit(position=ctx.guild.me.top_role.position - 1)
+        msg = await ctx.send('Configuring ClemBot Mute role (This might take a minute)')
+        for channel in ctx.guild.channels:
+            try:
+                await channel.set_permissions(mute_role,
+                                              speak=False,
+                                              connect=False,
+                                              stream=False,
+                                              send_messages=False,
+                                              send_messages_in_threads=False,
+                                              create_public_threads=False,
+                                              create_private_threads=False,
+                                              send_tts_messages=False,
+                                              add_reactions=False)
+            except:
+                pass
+
+        await msg.delete()
+        embed = discord.Embed(color=Colors.ClemsonOrange)
+        embed.title = f'@{Moderation.mute_role_name} Successfully Configured  :white_check_mark:'
+        await ctx.send(embed=embed)
+        return True
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'

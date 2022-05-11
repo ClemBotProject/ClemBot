@@ -1,7 +1,7 @@
 using ClemBot.Api.Common;
 using ClemBot.Api.Common.Security.Policies.GuildSandbox;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Services.CustomPrefix.Models;
+using ClemBot.Api.Services.Caching.CustomPrefix.Models;
 
 namespace ClemBot.Api.Core.Features.Guilds;
 

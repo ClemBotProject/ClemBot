@@ -271,13 +271,23 @@ class ManageClassesCog(commands.Cog):
             role = await commands.converter.RoleConverter().convert(ctx, class_repr.role)
         except:
             role = await ctx.guild.create_role(name=class_repr.role, mentionable=False)
-        await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+
+        try:
+            # wait a split second to insert the role in the db
+            await asyncio.sleep(0.25)
+            await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+        except:
+            # If the marking of the role as assignable fails
+            # Wait a second for the api to finish inserting the role then try it again
+            await asyncio.sleep(1)
+            await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+
         return role
 
     async def sync_perms(self, ctx, channel, role):
         #Check if cleanup role exists
-        if (discord.utils.get(ctx.guild.roles,name="Cleanup")):
-            cleanup = discord.utils.get(ctx.guild.roles,name="Cleanup")
+        if discord.utils.get(ctx.guild.roles, name="Cleanup"):
+            cleanup = discord.utils.get(ctx.guild.roles, name="Cleanup")
         else:
             cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)
             await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)

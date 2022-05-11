@@ -7,7 +7,9 @@ import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors
+from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
+import bot.bot_secrets as bot_secrets
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +31,17 @@ class InfractionsCog(commands.Cog):
     )
     @ext.short_help('Lists a users infractions')
     @ext.example(('infractions', 'infractions @SomeUser'))
-    @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_warn)
+    @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_infraction_view_self)
     async def infractions(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
         user = user or ctx.author
+        claims = await self.bot.claim_route.get_claims_user(ctx.author)
+
+        if user != ctx.author and Claims.moderation_infraction_view.name not in claims:
+            raise ClaimsAccessError(f'Missing claims to run this operation on another user. '
+                                    f'Need any of the following\n ```\n{Claims.moderation_infraction_view.name}```'
+                                    f'\n **Help:** For more information on how claims work please visit my website [Link!]'
+                                    f'({bot_secrets.secrets.docs_url}/Claims)\n'
+                                    f'or run the `{await ctx.bot.current_prefix(ctx.message)}help claims` command')
 
         infractions = await self.bot.moderation_route.get_guild_infractions_user(ctx.guild.id, user.id)
         chunked_infractions = self.chunk_list(infractions, 5)
@@ -73,7 +83,8 @@ class InfractionsCog(commands.Cog):
     @ext.example(('infractions delete 1', 'infractions remove 2'))
     @ext.required_claims(Claims.moderation_warn)
     async def delete(self, ctx: commands.Context, infraction_id: int):
-        if not await self.bot.moderation_route.get_infraction(infraction_id):
+        infraction = await self.bot.moderation_route.get_infraction(infraction_id)
+        if not infraction or infraction['guildId'] != ctx.guild.id:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Infraction does not exist'
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
@@ -82,7 +93,7 @@ class InfractionsCog(commands.Cog):
         await self.bot.moderation_route.delete_infraction(infraction_id, raise_on_error=True)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'Infractions {infraction_id} deleted successfully  :white_check_mark:'
+        embed.title = f'Infraction {infraction_id} deleted successfully  :white_check_mark:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         return await ctx.send(embed=embed)
 

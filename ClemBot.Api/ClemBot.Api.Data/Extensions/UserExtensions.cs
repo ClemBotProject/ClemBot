@@ -36,6 +36,7 @@ public static class UserExtensions
                            .SelectMany(
                                c => c.Claims.Select(
                                    d => d.Claim)))
+                   .Distinct()
                    .ToListAsync();
 
     /// <summary>
@@ -50,8 +51,13 @@ public static class UserExtensions
     {
         var userGuilds = await users
             .Where(y => y.Id == userId)
-            .Select(x => x.Guilds.Select( z => z.Id))
+            .Select(x => x.Guilds.Select(z => z.Id))
             .FirstOrDefaultAsync();
+
+        if (userGuilds is null)
+        {
+            return new Dictionary<ulong, IEnumerable<BotAuthClaims>>();
+        }
 
         var dictionary = new Dictionary<ulong, IEnumerable<BotAuthClaims>>();
         foreach (var guild in userGuilds)

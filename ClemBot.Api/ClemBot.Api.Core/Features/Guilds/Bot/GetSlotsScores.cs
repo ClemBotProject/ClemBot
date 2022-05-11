@@ -10,6 +10,8 @@ public class GetSlotsScores
     {
         public ulong GuildId { get; init; }
 
+        public bool Leader { get; init; }
+
         public int Limit { get; init; }
     }
 
@@ -38,7 +40,9 @@ public class GetSlotsScores
         {
             var scores = await _context.SlotScores
                 .Where(x => x.GuildId == request.GuildId)
-                .OrderByDescending(y => y.Score)
+                .QueryIfElse(() => request.Leader,
+                    q => q.OrderByDescending(y => y.Score),
+                    q => q.OrderBy(y => y.Score))
                 .Select(z => new { z.Score, z.UserId })
                 .Take(request.Limit)
                 .ToListAsync();
@@ -46,10 +50,10 @@ public class GetSlotsScores
             return QueryResult<Model>.Success(new Model
             {
                 Scores = scores.Select(x => new Score
-                    {
-                        HighScore = x.Score,
-                        UserId = x.UserId
-                    })
+                {
+                    HighScore = x.Score,
+                    UserId = x.UserId
+                })
             });
         }
     }

@@ -28,6 +28,7 @@ class BotSecrets:
         self._startup_log_channel_ids = None
         self._error_log_channel_ids = None
         self._site_url = None
+        self._docs_url = None
 
     @property
     def client_token(self) -> str:
@@ -258,6 +259,18 @@ class BotSecrets:
             raise ConfigAccessError(f'site_url has already been initialized')
         self._site_url = value
 
+    @property
+    def docs_url(self) -> str:
+        if not self._docs_url:
+            raise ConfigAccessError(f'docs_url has not been initialized')
+        return self._docs_url
+
+    @docs_url.setter
+    def docs_url(self, value: str) -> None:
+        if self._docs_url:
+            raise ConfigAccessError(f'docs_url has already been initialized')
+        self._docs_url = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
 
@@ -278,6 +291,7 @@ class BotSecrets:
         self.api_url = secrets['ApiUrl']
         self.api_key = secrets['ApiKey']
         self.site_url = secrets['SiteUrl']
+        self.docs_url = secrets['DocsUrl']
 
         log.info('Bot Secrets Loaded')
 
@@ -300,6 +314,7 @@ class BotSecrets:
         self.api_url = os.environ.get('API_URL')
         self.api_key = os.environ.get('API_KEY')
         self.site_url = os.environ.get('SITE_URL')
+        self.docs_url = os.environ.get('DOCS_URL')
 
         log.info('Production keys loaded')
 

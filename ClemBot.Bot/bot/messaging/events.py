@@ -84,6 +84,7 @@ class EventsMeta(type):
         """
         return 'on_message_delete'
 
+    @property
     def on_reaction_add(self):
         """
         Published whenever a reaction is sent in a server, and that message is stored
@@ -95,8 +96,6 @@ class EventsMeta(type):
             user (Union[Member, User]) – The user who added the reaction.
         """
         return 'on_reaction_add'
-
-    _on_raw_reaction_add = 'on_raw_reaction_add'
 
     @property
     def on_raw_reaction_add(self):
@@ -426,6 +425,7 @@ class EventsMeta(type):
         """
         return 'on_reminder_set'
 
+    @property
     def on_bot_mute(self):
         """
         Published when a user is warned with clembot
@@ -444,8 +444,9 @@ class EventsMeta(type):
         Published when a user is unmuted by clembot
 
         Args:
-            guild (discord.Guild): Guild id where the unmute happened
-            subject (discord.Member): The moderated user
+            guild_id (discord.Guild): Guild id where the unmute happened
+            subject_id (discord.Member): The moderated user id
+            mute_id (int): The id of a pardoned mute
             reason (Optional[str]): The reason for the unmute
         """
         return 'on_bot_unmute'

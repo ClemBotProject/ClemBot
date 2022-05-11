@@ -1,11 +1,13 @@
 import asyncio
 import logging
 from collections import deque
+import json
 
 import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
 
 log = logging.getLogger(__name__)
@@ -17,7 +19,7 @@ class OwnerCog(commands.Cog):
     """ This is a cog for bot owner commands, things like log viewing and bot stats are shown here"""
 
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: ClemBot = bot
 
     @ext.group(hidden=True, case_insensitive=True)
     @commands.is_owner()
@@ -25,7 +27,7 @@ class OwnerCog(commands.Cog):
         """For User by the bots owner to get errors and metrics"""
         pass
 
-    @ext.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):
         server = self.bot.get_guild(id)
@@ -51,6 +53,39 @@ class OwnerCog(commands.Cog):
         await self.bot.guild_route.update_guild_threads(guild)
 
         await ctx.send(f'{guild.name} reloaded')
+
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def resetguilds(self, ctx, apply: bool = False):
+        db_guilds = await self.bot.guild_route.get_all_guilds()
+        db_guilds_ids = set(g['id'] for g in db_guilds)
+        disc_guilds = set(g.id for g in self.bot.guilds)
+
+        difference = db_guilds_ids - disc_guilds
+
+        await ctx.send(f'Found the following guilds {difference}')
+
+        if not apply:
+            return
+
+        for guild in difference:
+            await ctx.send(f'Deleting Guild {guild} from database')
+            await self.bot.guild_route.leave_guild(guild)
+
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def userupdatequeuestats(self, ctx, full_output: bool=False):
+        queue = {k: str(v) if full_output else v.qsize() for k, v in self.bot.active_services['UserHandlingService'].user_update_queue.items()}
+        await ctx.send(json.dumps(queue, indent=True))
+
+    @owner.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def queuestatus(self, ctx):
+        stats = {}
+        for k, v in self.bot.messenger._guild_event_queue.items():
+            stats[k] = v.qsize()
+
+        await ctx.send(json.dumps(stats, indent=2))
 
     @owner.group(invoke_without_command=True, aliases=['channels'])
     @commands.is_owner()

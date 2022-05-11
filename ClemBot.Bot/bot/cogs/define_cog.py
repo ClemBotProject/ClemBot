@@ -3,6 +3,7 @@
 
 import logging
 import re
+import unicodedata
 
 import aiohttp
 import discord
@@ -25,8 +26,12 @@ class defineCog(commands.Cog):
     def getPageData(self, jsonData, word):
         pages = []
 
+        # If the word is not found and there are no suggestions.
+        if not jsonData:
+            return ['Word not found.']
+
         # If the word is found, the JSON will return a dictionary of information.
-        if (isinstance(jsonData[0], dict)):
+        if isinstance(jsonData[0], dict):
 
             # For words with several definitions, it will return several dictionaries.
             for wordData in jsonData:
@@ -99,7 +104,7 @@ class defineCog(commands.Cog):
     async def define(self, ctx, word):
         """
         Given a word, find its definition and any other relevant information
-        
+
         USE: define <word>
         EXAMPLE: define schadenfreude
 
@@ -111,12 +116,22 @@ class defineCog(commands.Cog):
 
         self.api_key = bot_secrets.secrets.merriam_key
 
+        # Break down the unicode string to split up any special characters into their base parts
+        # Ex: U+0239 (ï) -> U+0105 (i) + U+0776 (diaeresis modifier)
+        word = unicodedata.normalize('NFKD', word)
         # Remove any characters besides &, _, or - that are not in ranges a-z, A-Z, or 0-9
         # per the ASCII Table https://www.asciitable.com
         word = re.sub("[^a-zA-Z0-9 &_-]+", "", word)
 
         actualWord = word.replace('_', ' ')
         word = word.replace('_', '%20').lower()
+
+        if len(word) == 0:
+            embed = discord.Embed(title='Merriam-Webster Dictionary', color=Colors.Error)
+            ErrMsg = 'Unable to parse word out of argument'
+            embed.add_field(name='Error', value=ErrMsg, inline=False)
+            await ctx.send(embed=embed)
+            return
 
         url = f'{API_URL}{word}?key={self.api_key}'
         wordPages = []
@@ -129,7 +144,7 @@ class defineCog(commands.Cog):
                     wordPages = self.getPageData(jsonData, word)
 
                 else:
-                    embed = discord.Embed(title='Merriam_Webster Dictionary', color=Colors.Error)
+                    embed = discord.Embed(title='Merriam-Webster Dictionary', color=Colors.Error)
                     ErrMsg = f'Oh No! There appears to be an issue! Yell at one of the developers with the following code.\nError Code: {response.status}'
                     embed.add_field(name='Error with API', value=ErrMsg, inline=False)
                     await ctx.send(embed=embed)
