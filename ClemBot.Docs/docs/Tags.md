@@ -183,7 +183,7 @@ A group of commands used to preview, set, or reset the prefix for tags.
 #### Format
 
 ```
-!tag prefix [set <prefix> | reset]
+!tag prefix [<prefix> | reset]
 ```
 
 #### Examples
@@ -197,8 +197,14 @@ A group of commands used to preview, set, or reset the prefix for tags.
 ##### Set Tag
 
 ```
-!tag prefix set @
+!tag prefix @
 ```
+:::note
+Custom tag prefixes can have more than one character.
+:::
+:::caution
+Custom tag prefixes cannot contain the character <code>`</code>.
+:::
 
 ##### Reset Tag
 
