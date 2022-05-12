@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 TAG_PAGINATE_THRESHOLD = 500
 TAG_PREFIX_DEFAULT = '$'
 
+
 class TagService(BaseService):
 
     def __init__(self, *, bot):
@@ -30,7 +31,7 @@ class TagService(BaseService):
         tagprefix = tagprefix[0]
         tags_content = []
         tag_found = False
-        pattern = re.compile(fr'(^|\s)[{re.escape(tagprefix)}](\w+)')
+        pattern = re.compile(fr'(^|\s){re.escape(tagprefix)}(\w+)')
         for match in set(i[1] for i in pattern.findall(message.content)):
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 
