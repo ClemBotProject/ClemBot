@@ -5,18 +5,29 @@ sidebar_position: 6
 # Tags
 
 ## Overview
-Tags are custom commands that allow for users to create custom responses to a given tag name. Simply add a tag, and then invoke it with either command notation or inline notation and ClemBot will respond with that tags content in a given channel.
+Tags are custom commands that allow for users to create custom responses to a given tag name. 
+Simply add a tag, and then invoke it with either command notation or inline notation and ClemBot will respond with that tags content in a given channel.
 
-ClemBot's tags support the idea of ownership. If a user creates a tag, that tag is owned by them until they either leave the server or transfer the tag to someone else. By owning the tag they are allowed to either edit or delete the tag. When a user leaves a server all their owned tags become unclaimed and are free to be claimed by anyone else in the server.
+ClemBot's tags support the idea of ownership. 
+If a user creates a tag, that tag is owned by them until they either leave the server or transfer the tag to someone else. 
+By owning the tag they are allowed to either edit or delete the tag. 
+When a user leaves a server all their owned tags become unclaimed and are free to be claimed by anyone else in the server.
 
-ClemBot also tracks what tags are popular and allows for you to access that information. You can view the total number of uses of a tag as well as its owner and creation date with the tag info command or on the dashboard.
+ClemBot also tracks what tags are popular and allows for you to access that information. 
+You can view the total number of uses of a tag as well as its owner and creation date with the tag info command or on the dashboard.
 
 :::caution
-If you leave the server all your tags will become unowned, and be up for grabs from anyone else in the server
+If you leave the server, all your tags will become unowned and be up for grabs for anyone else in the server.
 :::
 
 ### Inline Notation
-Tags in clembot can be invoked in the middle of a message by prefixing the tag name with a `$`. This allows for more organic tag usage in the middle of a conversation.
+Tags in ClemBot can be invoked in the middle of a message by prefixing the tag name with a `$`. 
+This allows for more organic tag usage in the middle of a conversation.
+
+:::note 
+By default, the tag prefix for any server is `$`. However, this can be changed.
+See [Prefix](./Tags.md#prefix) on how to view, change, and reset the prefix.
+:::
 
 #### Example
 
@@ -25,12 +36,14 @@ Hello there new person. Have you checked out $funstufftodo here yet?
 ```
 
 ## Dashboard
-A guilds tags can be viewed from the tag tab on the dashboard. You can filter tags, create new tags or just view what tags have been created.
+A guilds tags can be viewed from the tag tab on the dashboard. 
+You can filter tags, create new tags or just view what tags have been created.
 
 ## Commands
 
 ### Tag
-If invoked with no tag name it will show all tags in the server. If a name is provided it will attempt to invoke that tag
+If invoked with no tag name it will show all tags in the server. 
+If a name is provided, it will attempt to invoke that tag.
 
 #### Aliases
 * `tags`
@@ -54,7 +67,7 @@ If invoked with no tag name it will show all tags in the server. If a name is pr
 ```
 
 ### Add
-Create a tag in the server
+Create a tag in the server.
 
 #### Aliases
 * `create`
@@ -75,7 +88,7 @@ Create a tag in the server
 ```
 
 ### Remove
-Delete a tag from the server
+Delete a tag from the server.
 
 #### Aliases
 * `delete`
@@ -113,7 +126,7 @@ Edit a tag in the server.
 !tag edit MyTag ClemBot is an super super super awesome bot!
 ```
 ### Info
-Gets info about a given tag in a server
+Gets info about a given tag in a server.
 
 #### Aliases
 * `about`
@@ -129,7 +142,7 @@ Gets info about a given tag in a server
 ```
 
 ### Claim
-Claims a given unowned tag 
+Claims a given unowned tag.
 
 #### Format
 ```
@@ -142,7 +155,7 @@ Claims a given unowned tag
 ```
 
 ### Transfer
-Transers a given owned tag to a new owner in the same server
+Transfers a given owned tag to a new owner in the same server.
 
 #### Format
 ```
@@ -155,10 +168,50 @@ Transers a given owned tag to a new owner in the same server
 ```
 
 ### Unclaimed
-Lists all unclaimed tags in the server
+Lists all unclaimed tags in the server.
 
 #### Example
 
 ```
 !tag unclaimed
 ```
+
+### Prefix
+
+A group of commands used to preview, set, or reset the prefix for tags.
+
+#### Format
+
+```
+!tag prefix [<prefix> | reset]
+```
+
+#### Examples
+
+##### View Tag
+
+```
+!tag prefix
+```
+
+##### Set Tag
+
+```
+!tag prefix @
+```
+:::note
+Custom tag prefixes can have more than one character.
+:::
+:::caution
+Custom tag prefixes cannot contain the character <code>`</code>.
+:::
+
+##### Reset Tag
+
+```
+!tag reset
+```
+
+:::note
+When running `!tag reset`, the prefix will be reverted back to `$`.
+:::
