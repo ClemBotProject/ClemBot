@@ -19,7 +19,6 @@ log = logging.getLogger(__name__)
 class TriviaCog(commands.Cog):
 
     def cog_unload(self):
-
         self.session.close()
 
     def __init__(self, bot):
@@ -54,14 +53,14 @@ class TriviaCog(commands.Cog):
         user_reaction = await the_reaction  #Awaits the users reaction
 
         page_int = await self.parse_reaction(ctx,new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0, new_task[4])  #Parses the user reaction
-
+        
         while not task1.done():  #Loops reading the user's reaction
 
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
             if new_reaction != None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
-            else:
-                break
+           
+                 
 
 
     @trivia.command(aliases=['m'])
@@ -109,11 +108,11 @@ class TriviaCog(commands.Cog):
         page_int = await self.parse_reaction(ctx,new_task[0], reaction[0], reaction[1], big_list[0], 0, new_task[4])
         
         while not task1.done():  #This loop SHOULD terminate when the timeout task is done
+
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
             if new_reaction != None:
                 page_int = await self.parse_reaction(ctx, new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4]) # Solves potentially undefined behavior around the client.wait_for event listener. It has no checks by default to check if the message/listener is still valid.
-            else:  #The timeout gets reset everytime but it doesn't really matter since the max time it could ever be is 150 seconds
-                break
+            
 
 
     @trivia.command(aliases=['help'])
@@ -344,7 +343,7 @@ class TriviaCog(commands.Cog):
             return user == author and reaction.message.id == message
         try:
             reaction, user = await self.bot.wait_for("reaction_add",timeout=timeout, check=check)
-        except asyncio.TimeoutError:
+        except:
             return None
 
 
