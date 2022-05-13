@@ -55,12 +55,12 @@ class TriviaCog(commands.Cog):
 
         user_reaction = await the_reaction  #Gets the user's reaction
 
-        await self.parse_reaction(new_task[0], user_reaction[0], user_reaction[1], best_list[0])  #Parses the user reaction
+        page_int = await self.parse_reaction(new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0)  #Parses the user reaction
 
         while not task1.done():  #Loops reading the user's
 
             new_reaction = await self.on_reaction(ctx, new_task[3])
-            await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], best_list[0])
+            page_int = await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int)
 
     @trivia.command(aliases=['m'])
     @ext.long_help(
@@ -106,12 +106,12 @@ class TriviaCog(commands.Cog):
 
         reaction = await thereaction
 
-        await self.parse_reaction(new_task[0], reaction[0], reaction[1], big_list[0])
+        page_int = await self.parse_reaction(new_task[0], reaction[0], reaction[1], big_list[0], 0)
 
         while not task1.done():  #This loop SHOULD terminate when the timeout task is done
             
             new_reaction = await self.on_reaction(ctx, new_task[3]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
-            await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], big_list[0])
+            page_int = await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int)
 
 
     @trivia.command(aliases=['help'])
@@ -310,6 +310,7 @@ class TriviaCog(commands.Cog):
 
             random.shuffle(answers_list)
             list_index.append(answers_list.index(right_answer))
+      
             x += 1
             embed = discord.Embed(title=f"Question # {str(x)}:",
                                   color=Colors.ClemsonOrange)
@@ -349,26 +350,27 @@ class TriviaCog(commands.Cog):
 
         return return_list
 
-    async def parse_reaction(self, message, reaction, user, right_answer):
+    async def parse_reaction(self, message, reaction, user, right_answer, page_int):
 
-        msg = self.messages[reaction.message.id]
-        current_page = msg.curr_page_num  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
-   
+        msg = self.messages[reaction.message.id]  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
+        CURRENT_PAGE = 0
         match reaction.emoji:
             case '🇦':
-                if right_answer[current_page] == ANSWER_KEY.index('🇦'):  # parsing reactions with match case because it is slightly quicker
+                if right_answer[page_int] == 0:  # parsing reactions with match case because it is slightly quicker
                     msg.score_setter+=1
-                   
+                    
             case '🇧':
-                if right_answer[current_page] == ANSWER_KEY.index('🇧'):  #TODO: Implement scoring/ Database system!
+                if right_answer[page_int] == 1:  #TODO: Implement scoring/ Database system!
                     msg.score_setter+=1
+                    
 
-            case '🇨':
-                if right_answer[current_page] == ANSWER_KEY.index('🇨'):
+            case '🇨':            
+                if right_answer[page_int] == 2:
                     msg.score_setter+=1
+                    
 
             case '🇩':
-                if right_answer[current_page] == ANSWER_KEY.index('🇩'):  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
+                if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
                    msg.score_setter+=1
 
         
@@ -378,11 +380,12 @@ class TriviaCog(commands.Cog):
 
             return
         else:
-            del msg.pages[current_page]
+            del msg.pages[CURRENT_PAGE]
+            page_int+=1
             await reaction.message.edit(embed=msg.curr_content)
             await reaction.message.remove_reaction(reaction.emoji, user)
 
-        return
+        return page_int
 
     async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int, score: int):
 
@@ -402,7 +405,7 @@ class TriviaCog(commands.Cog):
                           0,
                           author.id if author else None,
                           footer=footer)
-        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)} Current score: 0')
+        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)} Score: 0')
         # send the first initial embed
 
         msg = await channel.send(embed=pages[0])
