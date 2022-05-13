@@ -69,7 +69,7 @@ class TriviaCog(commands.Cog):
             "trivia m allows specification of manual arguments. With as many or as few as you want using 0 for arguments you don't want")
     @commands.cooldown(1, 40, commands.BucketType.user)
     @ext.example(
-        "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type>")
+        "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>")
     async def manual(self, ctx, *input: str):
         if len(input) < 1 or 4 < len(input):
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
@@ -88,7 +88,7 @@ class TriviaCog(commands.Cog):
         async with await self.session.get(url) as resp:
             response = json.loads(await resp.text())
 
-        if response['response_code'] == 1:
+        if response["response_code"] == 1:
             raise Exception(
                 "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
@@ -301,7 +301,6 @@ class TriviaCog(commands.Cog):
 
         for create_lists in dictionary['results']:
 
-            answers_list = []
             answers_list = create_lists['incorrect_answers']
             answers_list.append(create_lists['correct_answer'])
             right_answer = create_lists['correct_answer']
@@ -309,7 +308,7 @@ class TriviaCog(commands.Cog):
             random.shuffle(answers_list)
             list_index.append(answers_list.index(right_answer))
             x += 1
-            embed = discord.Embed(title="Question #" + str(x) + ":",
+            embed = discord.Embed(title=f"Question # {str(x)}:",
                                   color=Colors.ClemsonOrange)
 
             embed.add_field(name="Question:", value=create_lists['question'])
@@ -317,7 +316,7 @@ class TriviaCog(commands.Cog):
 
             a = 65
             for iterative in answers_list:
-                embed.add_field(name="Answer Choice  " + chr(a) + " :", value=iterative, inline=False)
+                embed.add_field(name=f"Answer Choice  {chr(a)}:", value=iterative, inline=False)
                 a = a + 1
 
             cog_embeds.append(embed)
@@ -536,3 +535,4 @@ class Message:
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
+
