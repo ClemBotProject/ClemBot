@@ -51,16 +51,16 @@ class TriviaCog(commands.Cog):
         the_reaction = asyncio.create_task(
             self.on_reaction(ctx, new_task[3]))  #Starts the event listener for the reaction BEFORE emojis are sent
 
-        task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2]))  #Sends the answer key
+        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2]))  #Sends the answer key
 
         user_reaction = await the_reaction  #Gets the user's reaction
 
-        page_int = await self.parse_reaction(new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0)  #Parses the user reaction
+        page_int = await self.parse_reaction(ctx,new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0)  #Parses the user reaction
 
         while not task1.done():  #Loops reading the user's
 
             new_reaction = await self.on_reaction(ctx, new_task[3])
-            page_int = await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int)
+            page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int)
 
     @trivia.command(aliases=['m'])
     @ext.long_help(
@@ -102,16 +102,16 @@ class TriviaCog(commands.Cog):
             self.on_reaction(ctx, new_task[3])
         )
 
-        task1 = asyncio.create_task(self.send_scroll_reactions(new_task[0], new_task[1], new_task[2]))
+        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2]))
 
         reaction = await thereaction
 
-        page_int = await self.parse_reaction(new_task[0], reaction[0], reaction[1], big_list[0], 0)
+        page_int = await self.parse_reaction(ctx,new_task[0], reaction[0], reaction[1], big_list[0], 0)
 
         while not task1.done():  #This loop SHOULD terminate when the timeout task is done
             
             new_reaction = await self.on_reaction(ctx, new_task[3]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
-            page_int = await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int)
+            page_int = await self.parse_reaction(ctx, new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int)
 
 
     @trivia.command(aliases=['help'])
@@ -335,7 +335,7 @@ class TriviaCog(commands.Cog):
 
     async def asyncio_publisher(self, ctx, cog_embeds):
 
-        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 9, 0)
+        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 9)
         return embed_list
 
     async def on_reaction(self, ctx, message):
@@ -352,7 +352,7 @@ class TriviaCog(commands.Cog):
 
         return return_list
 
-    async def parse_reaction(self, message, reaction, user, right_answer, page_int):
+    async def parse_reaction(self,ctx, message, reaction, user, right_answer, page_int):
 
         msg = self.messages[reaction.message.id]  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
         CURRENT_PAGE = 0
@@ -377,9 +377,8 @@ class TriviaCog(commands.Cog):
 
         
         if len(msg.pages) <= 1:
-
+            await self.scoreboard_embed(ctx, msg.score)
             await message.delete()  #Deletes embed if the page queue has runout
-
             return
         else:
             del msg.pages[CURRENT_PAGE]
@@ -389,7 +388,7 @@ class TriviaCog(commands.Cog):
 
         return page_int
 
-    async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int, score: int):
+    async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int):
 
         if not isinstance(pages, t.List):
             pages = [pages]
@@ -421,25 +420,35 @@ class TriviaCog(commands.Cog):
         return_list.append(msg.id)
 
         return return_list
+    async def scoreboard_embed(self, ctx, score):
+        current_author = ctx.author
+        score_embed = discord.Embed(title=(f"{current_author}'s score for this round is:  {score}"), color=Colors.ClemsonOrange)
+        await ctx.send(embed=score_embed) 
 
-    async def send_scroll_reactions(self, msg: discord.Message, author: discord.Member, timeout: int):
+
+    async def send_scroll_reactions(self,ctx, msg: discord.Message, author: discord.Member, timeout: int):
         # add every emoji from the reaction list
-
+       
         for reaction in ANSWER_KEY:
-            await msg.add_reaction(
-                reaction)  #Removed arrows because I made the decision it made the embed look too clunky, took too long to add, and added unneeded complexity
+            await msg.add_reaction(reaction)  #Removed arrows because I made the decision it made the embed look too clunky, took too long to add, and added unneeded complexity
 
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
+        
         if timeout:
             await asyncio.sleep(timeout)
             try:
-                await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
+                channel = ctx.channel
+                cog_message = self.messages[msg.id]
+                message_checker = await channel.fetch_message(reaction.message.id)
+                if message_checker:
+                    await self.scoreboard_embed(ctx, cog_message.score)
+                    await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
             except:
                 pass
             finally:
                 log.info('Message: {msg_id} timed out as pageable', msg_id=msg.id)
         return None
-
+    
 
 def helper_fixer(format_this):
     new_list = [f'#{format_this.index(x) + 1}.    {x}' for x in format_this]
