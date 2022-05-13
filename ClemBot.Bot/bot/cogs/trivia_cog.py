@@ -335,7 +335,7 @@ class TriviaCog(commands.Cog):
 
     async def asyncio_publisher(self, ctx, cog_embeds):
 
-        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 9)
+        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 3)
         return embed_list
 
     async def on_reaction(self, ctx, message):
@@ -441,8 +441,8 @@ class TriviaCog(commands.Cog):
             try:
                 channel = ctx.channel
                 cog_message = self.messages[msg.id]
-                message_checker = await channel.fetch_message(reaction.message.id)
-                if message_checker:
+                message_checker = await channel.fetch_message(msg.id)
+                if message_checker != None:
                     await self.scoreboard_embed(ctx, cog_message.score, total_questions)
                     await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
             except:
