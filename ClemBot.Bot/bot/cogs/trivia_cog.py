@@ -46,17 +46,14 @@ class TriviaCog(commands.Cog):
 
         new_task = await self.asyncio_publisher(ctx, best_list[1])  #This returns key values for our list
 
-        the_reaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))  #Starts the event listener for the reaction BEFORE emojis are sent
+          #Starts the event listener for the reaction BEFORE emojis are sent
 
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the emojis for the reaction
-
-        user_reaction = await the_reaction  #Awaits the users reaction
-
-        page_int = await self.parse_reaction(ctx,new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0, new_task[4])  #Parses the user reaction
         
         while not task1.done():  #Loops reading the user's reaction
 
-            new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
+            task_reaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))
+            new_reaction = await task_reaction
             if new_reaction != None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
            
@@ -68,7 +65,7 @@ class TriviaCog(commands.Cog):
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. The arguments go: <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>. With the only MANDATORY argument being question number. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories! Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
     @ext.short_help(
             "trivia m allows specification of manual arguments. With as many or as few as you want using 0 for arguments you don't want")
-    @commands.cooldown(1, 25, commands.BucketType.user)
+    @commands.cooldown(1, 15, commands.BucketType.user)
     @ext.example(
         "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>")
     async def manual(self, ctx, *input: str):
@@ -99,20 +96,17 @@ class TriviaCog(commands.Cog):
 
         new_task = await self.asyncio_publisher(ctx, big_list[1])
 
-        thereaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))
+        
 
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4])) #Same deal as above
 
-        reaction = await thereaction
-
-        page_int = await self.parse_reaction(ctx,new_task[0], reaction[0], reaction[1], big_list[0], 0, new_task[4])
         
-        while not task1.done():  #This loop SHOULD terminate when the timeout task is done
+        while not task1.done():  #Loops reading the user's reaction
 
-            new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
+            task_reaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))
+            new_reaction = await task_reaction
             if new_reaction != None:
-                page_int = await self.parse_reaction(ctx, new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4]) # Solves potentially undefined behavior around the client.wait_for event listener. It has no checks by default to check if the message/listener is still valid.
-            
+                page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4])  #client.wait_for event listeners are fine. They get unloaded/disposed of at unload
 
 
     @trivia.command(aliases=['help'])
@@ -569,4 +563,3 @@ class Message:
 
 def setup(bot):
     bot.add_cog(TriviaCog(bot))
-
