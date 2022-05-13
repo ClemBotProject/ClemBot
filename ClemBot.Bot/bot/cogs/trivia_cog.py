@@ -30,7 +30,7 @@ class TriviaCog(commands.Cog):
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
         "Use trivia to return a random assortment of 10 trivia questions. React with emojis to submit your answer choice")
-    @commands.cooldown(1, 25, commands.BucketType.user)
+    @commands.cooldown(1, 15, commands.BucketType.user)
     @ext.short_help(
         "Returns trivia questions")
     @ext.example(
@@ -51,23 +51,23 @@ class TriviaCog(commands.Cog):
         the_reaction = asyncio.create_task(
             self.on_reaction(ctx, new_task[3]))  #Starts the event listener for the reaction BEFORE emojis are sent
 
-        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2]))  #Sends the answer key
+        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the answer key
 
         user_reaction = await the_reaction  #Gets the user's reaction
 
-        page_int = await self.parse_reaction(ctx,new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0)  #Parses the user reaction
+        page_int = await self.parse_reaction(ctx,new_task[0], user_reaction[0], user_reaction[1], best_list[0], 0, new_task[4])  #Parses the user reaction
 
         while not task1.done():  #Loops reading the user's
 
             new_reaction = await self.on_reaction(ctx, new_task[3])
-            page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int)
+            page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
 
     @trivia.command(aliases=['m'])
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories! Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
     @ext.short_help(
             "trivia m allows specification of manual arguments. With as many or as few as you want using 0 for arguments you don't want")
-    @commands.cooldown(1, 40, commands.BucketType.user)
+    @commands.cooldown(1, 25, commands.BucketType.user)
     @ext.example(
         "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>")
     async def manual(self, ctx, *input: str):
@@ -102,16 +102,16 @@ class TriviaCog(commands.Cog):
             self.on_reaction(ctx, new_task[3])
         )
 
-        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2]))
+        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))
 
         reaction = await thereaction
 
-        page_int = await self.parse_reaction(ctx,new_task[0], reaction[0], reaction[1], big_list[0], 0)
+        page_int = await self.parse_reaction(ctx,new_task[0], reaction[0], reaction[1], big_list[0], 0, new_task[4])
 
         while not task1.done():  #This loop SHOULD terminate when the timeout task is done
             
             new_reaction = await self.on_reaction(ctx, new_task[3]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
-            page_int = await self.parse_reaction(ctx, new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int)
+            page_int = await self.parse_reaction(ctx, new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4])
 
 
     @trivia.command(aliases=['help'])
@@ -352,7 +352,7 @@ class TriviaCog(commands.Cog):
 
         return return_list
 
-    async def parse_reaction(self,ctx, message, reaction, user, right_answer, page_int):
+    async def parse_reaction(self,ctx, message, reaction, user, right_answer, page_int, total_questions):
 
         msg = self.messages[reaction.message.id]  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
         CURRENT_PAGE = 0
@@ -377,7 +377,7 @@ class TriviaCog(commands.Cog):
 
         
         if len(msg.pages) <= 1:
-            await self.scoreboard_embed(ctx, msg.score)
+            await self.scoreboard_embed(ctx, msg.score, total_questions)
             await message.delete()  #Deletes embed if the page queue has runout
             return
         else:
@@ -397,7 +397,7 @@ class TriviaCog(commands.Cog):
 
         if not all(isinstance(p, discord.Embed) for p in pages):
             raise Exception('All paginate embed pages need to be of type discord.Embed')
-
+        pages_length = len(pages)
         footer = ''
         if not pages[0].footer.text == discord.Embed.Empty:
             footer = pages[0].footer.text
@@ -418,15 +418,17 @@ class TriviaCog(commands.Cog):
         return_list.append(author)
         return_list.append(timeout)
         return_list.append(msg.id)
+        return_list.append(pages_length)
 
         return return_list
-    async def scoreboard_embed(self, ctx, score):
+    async def scoreboard_embed(self, ctx, score, total_questions):
         current_author = ctx.author
-        score_embed = discord.Embed(title=(f"{current_author}'s score for this round is:  {score}"), color=Colors.ClemsonOrange)
+        percent_questions = (score/total_questions)*100
+        score_embed = discord.Embed(title=(f"{current_author}'s score for this round is:  {score} out of {total_questions} this is {percent_questions}% correct"), color=Colors.ClemsonOrange)
         await ctx.send(embed=score_embed) 
 
 
-    async def send_scroll_reactions(self,ctx, msg: discord.Message, author: discord.Member, timeout: int):
+    async def send_scroll_reactions(self,ctx, msg: discord.Message, author: discord.Member, timeout: int, total_questions):
         # add every emoji from the reaction list
        
         for reaction in ANSWER_KEY:
@@ -441,7 +443,7 @@ class TriviaCog(commands.Cog):
                 cog_message = self.messages[msg.id]
                 message_checker = await channel.fetch_message(reaction.message.id)
                 if message_checker:
-                    await self.scoreboard_embed(ctx, cog_message.score)
+                    await self.scoreboard_embed(ctx, cog_message.score, total_questions)
                     await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
             except:
                 pass
