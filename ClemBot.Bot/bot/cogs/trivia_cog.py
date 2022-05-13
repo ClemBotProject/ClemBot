@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-from tkinter.messagebox import QUESTION
 import aiohttp
 import html
 import asyncio
@@ -171,11 +170,11 @@ class TriviaCog(commands.Cog):
             if function_list[x]:
                 match x:
                     case 1:
-                        url += ("&category=" + str(function_list[1]))
+                       url= (f"{url}&category={str(function_list[1])}")
                     case 2:
-                        url += ("&difficulty=" + function_list[2])
+                        url = (f"{url}&difficulty={function_list[2]}")
                     case 3:
-                        url += ("&type=" + function_list[max_index])
+                        url = (f"{url}&type={function_list[max_index]}")
             x += 1
 
         return url
