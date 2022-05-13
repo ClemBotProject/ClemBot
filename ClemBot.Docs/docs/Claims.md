@@ -5,13 +5,18 @@ sidebar_position: 3
 # Authorization Claims
 
 ## Overview
-By default ClemBot allows for anyone with Admin permissions in Discord full access to ClemBot's functionality. If you want to grant people without server admin permissions access to individual parts of the Bot (a team of moderators for example) you can do that through "Claims".
+By default, ClemBot allows for anyone with Admin permissions in Discord full access to ClemBot's functionality. 
+If you want to grant people without server admin permissions access to individual parts of the Bot (a team of moderators for example) you can do that through "Claims".
 
 :::info
-Server owners and users with administrator roles are automatically granted all claims regardless of what roles they posess
+Server owners and users with administrator roles are automatically granted all claims regardless of what roles they possess.
 :::
 
-Claims are ClemBot's way of providing servers' incredibly granular and precise control over WHO has access to different parts of ClemBot. Claims are added to roles within your server. Anyone who has a role that has associated claims is granted access to the functionality of the Bot that the claim correlates to. A role can have multiple claims associated with it, and a claim can be associated with multiple roles. You decide how to set up your server!
+Claims are ClemBot's way of providing servers incredibly granular and precise control over WHO has access to different parts of ClemBot. 
+Claims are added to roles within your server. 
+Anyone who has a role that has associated claims is granted access to the functionality of the Bot that the claim correlates to. 
+A role can have multiple claims associated with it, and a claim can be associated with multiple roles.
+You decide how to set up your server!
 
 ## Available Claims
 | Name                            | Description                                                                           |
@@ -39,7 +44,8 @@ Claims are ClemBot's way of providing servers' incredibly granular and precise c
 ## Commands
 
 ### Claims
-View all the claims on a given user or role. If a role is given, the command will return the aggregate of all claims from all roles the user has.
+View all the claims on a given user or role. 
+If a role is given, the command will return the aggregate of all claims from all roles the user has.
 
 #### Required [Claims](./Claims.md)
 * `claims_view`
@@ -63,7 +69,7 @@ View all the claims on a given user or role. If a role is given, the command wil
 ```
 
 ### Add 
-Adds a claim to a given role, everyone who has that role will be granted permissions to that functionality
+Adds a claim to a given role, everyone who has that role will be granted permissions to that functionality.
 
 #### Aliases
 * `set`
@@ -83,7 +89,7 @@ Adds a claim to a given role, everyone who has that role will be granted permiss
 ```
 
 ### Remove 
-Removes a claim from a given role, everyone who has that role will no longer have permissions for that functionality
+Removes a claim from a given role, everyone who has that role will no longer have permissions for that functionality.
 
 #### Aliases
 * `delete`
