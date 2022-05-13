@@ -19,27 +19,28 @@ A role can have multiple claims associated with it, and a claim can be associate
 You decide how to set up your server!
 
 ## Available Claims
-| Name                            | Description                                                                           |
-|---------------------------------|---------------------------------------------------------------------------------------|
-| assignable_roles_add            | Allows for marking a role as assignable                                               |
-| assignable_roles_delete         | Allows for removing a role as assignable                                              |
-| claims_modify                   | Allows for modifying the assigned claims of a role                                    |
-| claims_view                     | Allows for viewing of claims that a user or role has                                  |
-| custom_prefix_set               | Allows for setting the [custom prefix](./CustomPrefix.md) the Clembot responds to     |
-| delete_message                  | Allows for deletion of any message that Clembot reacts with a trashcan too            |
-| designated_channel_modify       | Allows for adding and removing designations from [channels](./DesignatedChannels.md) in a server              |
-| designated_channel_view         | Allows for viewing of available and assigned designated [channels](./DesignatedChannels.md) in a server          |
-| guild_settings_view             | Allows for viewing of the guilds settings on the dashboard                            |
-| guild_settings_view             | Allows for modifying of the guilds settings on the dashboard                          |
-| moderation_ban                  | Allows for usage of the ban command                                                   |
-| moderation_infraction_view      | Allows for usage of the infractions command to list a given users infractions         |
-| moderation_infraction_view_self | Allows for usage of the infractions command to view only the users own infractions    |
-| moderation_mute                 | Allows for usage of the mute command                                                  |
-| moderation_warn                 | Allows for usage of the warn command                                                  |
-| tag_add                         | Allows for adding a [tag](./Tags.md) in a server                                      |
-| tag_delete                      | Allows for deleting other peoples [tags](./Tags.md) in a server                       |
-| welcome_message_view            | Allows for viewing the servers [welcome message](./WelcomeMessage.md)                 |
-| welcome_message_modify          | Allows for setting the servers [welcome message](./WelcomeMessage.md)                 |
+| Name                             | Description                                                                                             |
+|----------------------------------|---------------------------------------------------------------------------------------------------------|
+| assignable_roles_add             | Allows for marking a role as assignable                                                                 |
+| assignable_roles_delete          | Allows for removing a role as assignable                                                                |
+| claims_modify                    | Allows for modifying the assigned claims of a role                                                      |
+| claims_view                      | Allows for viewing of claims that a user or role has                                                    |
+| custom_tag_prefix_set            | Allows for setting the [custom tag prefix](./Tags#prefix) that ClemBot responds to                      |                                 
+| custom_prefix_set                | Allows for setting the [custom prefix](./CustomPrefix.md) that ClemBot responds to                      |
+| delete_message                   | Allows for deletion of any message that ClemBot reacts with a trashcan too                              |
+| designated_channel_modify        | Allows for adding and removing designations from [channels](./DesignatedChannels.md) in a server        |
+| designated_channel_view          | Allows for viewing of available and assigned designated [channels](./DesignatedChannels.md) in a server |
+| guild_settings_view              | Allows for viewing of the guilds settings on the dashboard                                              |
+| guild_settings_view              | Allows for modifying of the guilds settings on the dashboard                                            |
+| moderation_ban                   | Allows for usage of the ban command                                                                     |
+| moderation_infraction_view       | Allows for usage of the infractions command to list a given users infractions                           |
+| moderation_infraction_view_self  | Allows for usage of the infractions command to view only the users own infractions                      |
+| moderation_mute                  | Allows for usage of the mute command                                                                    |
+| moderation_warn                  | Allows for usage of the warn command                                                                    |
+| tag_add                          | Allows for adding a [tag](./Tags.md) in a server                                                        |
+| tag_delete                       | Allows for deleting other peoples [tags](./Tags.md) in a server                                         |
+| welcome_message_view             | Allows for viewing the servers [welcome message](./WelcomeMessage.md)                                   |
+| welcome_message_modify           | Allows for setting the servers [welcome message](./WelcomeMessage.md)                                   |
 
 ## Commands
 
