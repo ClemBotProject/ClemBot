@@ -188,6 +188,9 @@ class TriviaCog(commands.Cog):
 
                     if 0 < question_number <= 50:
                         return question_number
+                    else:
+                        raise UserInputError(
+                            "Question Number entered is out of range!")
                 else:
                     raise UserInputError(
                         "Question Number has to be a number within the range of 1 to 50")
@@ -329,7 +332,7 @@ class TriviaCog(commands.Cog):
 
     async def asyncio_publisher(self, ctx, cog_embeds):
 
-        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 9)
+        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 9, 0)
         return embed_list
 
     async def on_reaction(self, ctx, message):
@@ -350,24 +353,25 @@ class TriviaCog(commands.Cog):
 
         msg = self.messages[reaction.message.id]
         current_page = msg.curr_page_num  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
+   
         match reaction.emoji:
             case '🇦':
                 if right_answer[current_page] == ANSWER_KEY.index('🇦'):  # parsing reactions with match case because it is slightly quicker
-                    print("It's right")
-
+                    msg.score_setter+=1
+                   
             case '🇧':
                 if right_answer[current_page] == ANSWER_KEY.index('🇧'):  #TODO: Implement scoring/ Database system!
-                    print("It's right")
+                    msg.score_setter+=1
 
             case '🇨':
                 if right_answer[current_page] == ANSWER_KEY.index('🇨'):
-                    print("It's right")
+                    msg.score_setter+=1
 
             case '🇩':
-                if right_answer[current_page] == ANSWER_KEY.index(
-                        '🇩'):  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
-                    print("It's right")
+                if right_answer[current_page] == ANSWER_KEY.index('🇩'):  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
+                   msg.score_setter+=1
 
+        
         if len(msg.pages) <= 1:
 
             await message.delete()  #Deletes embed if the page queue has runout
@@ -375,13 +379,12 @@ class TriviaCog(commands.Cog):
             return
         else:
             del msg.pages[current_page]
-
             await reaction.message.edit(embed=msg.curr_content)
             await reaction.message.remove_reaction(reaction.emoji, user)
 
         return
 
-    async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int = 60):
+    async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int, score: int):
 
         if not isinstance(pages, t.List):
             pages = [pages]
@@ -399,7 +402,7 @@ class TriviaCog(commands.Cog):
                           0,
                           author.id if author else None,
                           footer=footer)
-        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)}')
+        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)} Current score: 0')
         # send the first initial embed
 
         msg = await channel.send(embed=pages[0])
@@ -502,15 +505,27 @@ class Message:
     footer: str = None
     embed_name: str = None
     field_title: str = None
+    score: int = 0
+    
 
     @property
     def curr_page_num(self) -> int:
         return self._curr_page_num
 
+    @property
+    def score_setter(self) -> int:
+        return self.score
+    @property
+    def curr_score(self) -> int:
+        return self.score
+
     @curr_page_num.setter
     def curr_page_num(self, page_num: int):
         self._curr_page_num = page_num
 
+    @score_setter.setter
+    def score_setter(self, score: int):
+        self.score = score
     @property
     def curr_page(self) -> t.Union[discord.Embed, str]:  #From Paginator cog
         return self.pages[self._curr_page_num]
@@ -519,16 +534,17 @@ class Message:
     def curr_content(self) -> discord.Embed:
 
         page = self.curr_page
+        score = self.curr_score
         if isinstance(page, discord.Embed):
 
-            page.set_footer(text=f'{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)}')
+            page.set_footer(text=f"{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)} Score: {score}")
             return page
         elif not isinstance(page, str):
-            raise Exception(f'Embed or string expected in the paginator service: {type(page)} found')
+            raise Exception(f"Embed or string expected in the paginator service: {type(page)} found")
 
         embed = discord.Embed(title=self.embed_name, color=Colors.ClemsonOrange)
         embed.add_field(name=self.field_title, value=self.pages[self._curr_page_num])
-        embed.set_footer(text=f'Page {self.curr_page_num + 1} of {len(self.pages)}')
+        embed.set_footer(text=f"Page {self.curr_page_num + 1} of {len(self.pages)}")
 
         return embed
 
