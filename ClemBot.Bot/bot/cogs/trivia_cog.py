@@ -40,7 +40,7 @@ class TriviaCog(commands.Cog):
         async with await self.session.get(DEFAULT_URL) as resp:
             parse_text = await resp.text()
             new_response = json.loads(parse_text)
-            parsed_response = await self.html_parser(new_response)
+            parsed_response = self.html_parser(new_response)
 
             #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
 
@@ -92,7 +92,7 @@ class TriviaCog(commands.Cog):
             raise Exception(
                 "There isn't enough questions in that category. Lower your question amount or select another! Or select a different question type!")
 
-        parsed_response = await self.html_parser(response)
+        parsed_response = self.html_parser(response)
 
         big_list = await self.dict_publisher(parsed_response)
 
@@ -251,8 +251,10 @@ class TriviaCog(commands.Cog):
                     else:
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")
+        return
 
-    async def html_parser(self, new_response):
+
+    def html_parser(self, new_response):
 
         dictionary_list = []  #pain
 
