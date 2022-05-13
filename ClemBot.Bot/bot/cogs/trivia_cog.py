@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+from tkinter.messagebox import QUESTION
 import aiohttp
 import html
 import asyncio
@@ -62,8 +63,6 @@ class TriviaCog(commands.Cog):
             new_reaction = await self.on_reaction(ctx, new_task[3])
             await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], best_list[0])
 
-        return
-
     @trivia.command(aliases=['m'])
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories! Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
@@ -115,7 +114,6 @@ class TriviaCog(commands.Cog):
             new_reaction = await self.on_reaction(ctx, new_task[3]) #However, This thing is still being awaited..... A real debugger might be needed to see if this leaks memory/hogs threads. I believe the threads die at cog_unload anyway.
             await self.parse_reaction(new_task[0], new_reaction[0], new_reaction[1], big_list[0])
 
-        return
 
     @trivia.command(aliases=['help'])
     @ext.long_help(
@@ -126,49 +124,34 @@ class TriviaCog(commands.Cog):
     @ext.example("trivia help")
     async def list_help(self, ctx):  #Overengineered this slightly. If the categories/difficulty/whatever else changes it will be a short fix
 
-        embed_list = []
         final_page = []
 
         category_generator = helper_fixer(CATEGORYLIST)
+       
         for x in category_generator:
-            embed_list.append(x)
-
-        sizeofcategory = len(embed_list)
-        x = 0
-
-        while x < sizeofcategory:
             category_embed = discord.Embed(title="Category List:", color=Colors.ClemsonOrange)
-            category_embed.add_field(name="Index:", value=embed_list[x])
+            category_embed.add_field(name="Index:", value=x)
 
             final_page.append(category_embed)
-            x += 1
 
         difficulty_generator = helper_fixer(DIFFICULTY)
 
-        for i in difficulty_generator:
-            embed_list.append(i)
-
-        new_insertion = len(embed_list)
-
-        while sizeofcategory < new_insertion:
+      
+        for y in difficulty_generator:
             difficulty_embed = discord.Embed(title="Difficulty List:", color=Colors.ClemsonOrange)
-            difficulty_embed.add_field(name="Index:", value=embed_list[sizeofcategory])
+            difficulty_embed.add_field(name="Index:", value=y)
 
             final_page.append(difficulty_embed)
-            sizeofcategory += 1
+            
 
         question_generator = helper_fixer(QUESTIONTYPE)
-
-        for i in question_generator:
-            embed_list.append(i)
-
-        last_size = len(embed_list)
-        while new_insertion < last_size:
+        
+        for z in question_generator:
             type_embed = discord.Embed(title="Question Type:", color=Colors.ClemsonOrange)
-            type_embed.add_field(name="Index:", value=embed_list[new_insertion])
+            type_embed.add_field(name="Index:", value=z)
 
             final_page.append(type_embed)
-            new_insertion += 1
+          
 
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=final_page,
@@ -176,7 +159,6 @@ class TriviaCog(commands.Cog):
                                          channel=ctx.channel,
                                          timeout=60, )
 
-        return
 
     async def url_builder(self, function_list, input_length):
 
@@ -267,7 +249,6 @@ class TriviaCog(commands.Cog):
                     else:
                         raise UserInputError(
                             "Couldn't find the question type you are looking for!.")
-        return
 
     async def html_parser(self, new_response):
 
