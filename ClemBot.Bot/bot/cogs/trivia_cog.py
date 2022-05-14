@@ -54,6 +54,7 @@ class TriviaCog(commands.Cog):
 
             task_reaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))
             new_reaction = await task_reaction
+            page_int = 0
             if new_reaction != None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
            
@@ -100,7 +101,7 @@ class TriviaCog(commands.Cog):
 
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4])) #Same deal as above
 
-        
+        page_int = 0
         while not task1.done():  #Loops reading the user's reaction
 
             task_reaction = asyncio.create_task(self.on_reaction(ctx, new_task[3], new_task[2]))
