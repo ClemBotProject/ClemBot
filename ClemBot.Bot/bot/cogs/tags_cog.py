@@ -291,9 +291,11 @@ class TagCog(commands.Cog):
     @ext.long_help(
         'Lists the current tag prefix or configures the command prefix that the bot will respond too'
     )
-    @ext.short_help('Configure a custom command tag prefix')
-    @ext.example('tag prefix')
-    async def prefix(self, ctx):
+    @ext.required_claims(Claims.custom_tag_prefix_set)
+    @ext.ignore_claims_pre_invoke()
+    @ext.short_help('List or configure a custom tag prefix')
+    @ext.example(['tag prefix', 'tag prefix #', 'tag prefix >>'])
+    async def prefix(self, ctx, *, tag_prefix: Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
@@ -301,17 +303,15 @@ class TagCog(commands.Cog):
         if not tag_prefixes:
             tag_prefixes = [DEFAULT_TAG_PREFIX]
 
-        embed = discord.Embed(title='Current Tag Prefix',
-                              description=f'```{", ".join(tag_prefixes)}```',
-                              color=Colors.ClemsonOrange)
-        return await ctx.send(embed=embed)
+        if not tag_prefix:
+            embed = discord.Embed(title='Current Tag Prefix',
+                                  description=f'```{", ".join(tag_prefixes)}```',
+                                  color=Colors.ClemsonOrange)
+            return await ctx.send(embed=embed)
 
-    @prefix.command(pass_context=True, case_insensitive=True)
-    @ext.required_claims(Claims.custom_tag_prefix_set)
-    @ext.short_help('Set the tag prefix')
-    @ext.long_help('Set the tag prefix for the entire server')
-    @ext.example(['tag prefix set #', 'tag prefix set >>'])
-    async def set(self, ctx, *, tag_prefix: str):
+        if not await self.bot.claims_check(ctx):
+            return await self._error_embed(ctx, 'Could not set prefix: missing `custom_tag_prefix_set` claim.')
+
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
         if tag_prefix in tag_prefixes:
             await self._error_embed(ctx, f'`{tag_prefix}` is already the tag prefix for this server.')

@@ -212,3 +212,14 @@ class ClemBotGroup(discord.ext.commands.Group, ExtBase):
             return result
 
         return decorator
+
+    def group(self, name=None, **attrs):
+        """A decorator that transforms a function into a :class:`.Group`.
+        This is similar to the :func:`.command` decorator but the ``cls``
+        parameter is set to :class:`Group` by default.
+        .. versionchanged:: 1.1
+            The ``cls`` parameter can now be passed.
+        """
+
+        attrs.setdefault('cls', ClemBotGroup)
+        return self.command(name=name, **attrs)

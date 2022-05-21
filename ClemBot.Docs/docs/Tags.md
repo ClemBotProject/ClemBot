@@ -183,7 +183,7 @@ A group of commands used to preview, set, or reset the prefix for tags.
 #### Format
 
 ```
-!tag prefix [set <prefix> | reset]
+!tag prefix [<prefix> | reset]
 ```
 
 #### Tag Prefix
@@ -196,21 +196,18 @@ Gets the current tag prefix.
 !tag prefix
 ```
 
-#### Tag Set
-
-Sets the new tag prefix.
-
-##### Example
-
-```txt title="Set a new tag prefix"
-!tag prefix set >>
+```txt title="Set a custom tag prefix"
+!tag prefix #
 ```
+:::caution
+Custom tag prefixes cannot contain the character <code>`</code>.
+:::
 
 ##### Required [Claims](./Claims)
 - `custom_tag_prefix_set`
 
-:::caution
-Custom tag prefixes cannot contain the character <code>`</code>.
+:::note
+The command `!tag prefix` does not require the claim, but `!tag prefix <new prefix>` does.
 :::
 
 #### Tag Reset
