@@ -15,6 +15,7 @@ import bot.utils.log_serializers as serializers
 log = logging.getLogger(__name__)
 
 MESSAGE_BATCH_SIZE = 20
+MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')
 
 
 @dataclasses.dataclass()
@@ -266,7 +267,7 @@ class MessageHandlingService(BaseService):
             message (discord.Message): the original message containing the link
         """
 
-        pattern = r'^http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})\n*$'  # noqa: E501
+        pattern = r'(.+)?http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{18})\/(?P<channel_id>\d{18})\/(?P<message_id>\d{18})\n*(.+)?'  # noqa: E501
 
         result = re.search(pattern, message.content)
 
@@ -281,20 +282,28 @@ class MessageHandlingService(BaseService):
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(matches['channel_id'])
         link_message = await link_channel.fetch_message(matches['message_id'])
+        should_reply = message.reference or len(result.group(1)) != 0 or len(result.group(8)) != 0
 
         if len(link_message.embeds) > 0:
             embed = link_message.embeds[0]
             full_name = f'{self.get_full_name(message.author)}'
             embed.add_field(name=f'Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
-            await message.delete()
-            await source_channel.send(embed=embed)
+            if not should_reply:
+                await message.delete()
+            msg = await source_channel.send(embed=embed)
+            await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
             return
 
         embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color=Colors.ClemsonOrange)
         embed.set_author(name=f'Quoted by: {self.get_full_name(message.author)}', icon_url=avi)
 
         if link_message.content:
-            embed.add_field(name='Content', value=link_message.content, inline=False)
+            if len(link_message.content) < MAX_QUOTED_CONTENT_SIZE:
+                embed.add_field(name='Content', value=link_message.content, inline=False)
+            else:
+                embed.add_field(name='Content',
+                                value=link_message.content[0:MAX_QUOTED_CONTENT_SIZE] + '...',
+                                inline=False)
 
         image = None
         if link_message.attachments:
@@ -307,8 +316,10 @@ class MessageHandlingService(BaseService):
         embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
         embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
 
-        await source_channel.send(embed=embed)
-        await message.delete()
+        msg = await source_channel.send(embed=embed, reference=message if should_reply else None)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
+        if not should_reply:
+            await message.delete()
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
