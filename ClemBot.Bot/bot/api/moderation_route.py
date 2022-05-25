@@ -6,8 +6,6 @@ from bot.api.base_route import BaseRoute
 from bot.consts import Infractions
 from bot.models import Infraction
 
-MAX_REASON_LENGTH = 1024
-
 
 class ModerationRoute(BaseRoute):
 
