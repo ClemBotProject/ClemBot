@@ -12,7 +12,7 @@ from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
 
-MAX_REASON_LENGTH = 1021  # 1024 - 3 (for '...')
+MAX_REASON_LENGTH = 1015  # 1024 - 9 (for "```REASON...```")
 
 
 class MuteCog(commands.Cog):

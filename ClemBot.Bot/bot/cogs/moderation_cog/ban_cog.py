@@ -10,7 +10,7 @@ from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
-MAX_REASON_LENGTH = 1021  # 1024 - 3 (for '...')
+MAX_REASON_LENGTH = 1015  # 1024 - 9 (for "```REASON...```")
 
 
 class BanCog(commands.Cog):
