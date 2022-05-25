@@ -42,7 +42,7 @@ class MuteCog(commands.Cog):
             if not await self._create_mute_role(ctx):
                 return
 
-        #Publish that a mute happened
+        # Publish that a mute happened
         await self.bot.messenger.publish(Events.on_bot_mute,
                                          guild=ctx.guild,
                                          author=ctx.author,
