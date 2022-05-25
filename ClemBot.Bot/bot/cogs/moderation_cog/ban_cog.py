@@ -10,6 +10,8 @@ from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
+MAX_REASON_LENGTH = 1021  # 1024 - 3 (for '...')
+
 
 class BanCog(commands.Cog):
 
@@ -40,12 +42,14 @@ class BanCog(commands.Cog):
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
+        sent_reason = reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1] + '...'
+
         # Dm the user who was banned
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been banned from Guild {ctx.guild.name}  :hammer:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{sent_reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
 
         try:
@@ -70,7 +74,7 @@ class BanCog(commands.Cog):
         embed.title = f'{self.get_full_name(subject)} Banned  :hammer:'
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=subject.display_avatar.url)
-        embed.description = reason
+        embed.description = sent_reason
 
         await ctx.send(embed=embed)
 
@@ -78,7 +82,7 @@ class BanCog(commands.Cog):
         embed.title = 'Guild Member Banned  :hammer:'
         embed.set_author(name=f'{self.get_full_name(ctx.author)}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{sent_reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         if purge_days != 0:
             embed.add_field(name='Messages Purged :no_entry_sign:', value=f'{purge_days} day{"s" if not purge_days == 1 else ""} of messages purged')

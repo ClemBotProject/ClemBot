@@ -24,7 +24,7 @@ class ModerationRoute(BaseRoute):
             'GuildId': guild_id,
             'AuthorId': author_id,
             'SubjectId': subject_id,
-            'Reason': reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1],
+            'Reason': reason,
             'Type': Infractions.ban
         }
 
@@ -46,7 +46,7 @@ class ModerationRoute(BaseRoute):
             'GuildId': guild_id,
             'AuthorId': author_id,
             'SubjectId': subject_id,
-            'Reason': reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1],
+            'Reason': reason,
             'Duration': duration,
             'Type': Infractions.mute,
             'Active': True

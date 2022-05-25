@@ -12,6 +12,8 @@ from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
 
+MAX_REASON_LENGTH = 1021  # 1024 - 3 (for '...')
+
 
 class MuteCog(commands.Cog):
 
@@ -58,13 +60,15 @@ class MuteCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
+        sent_reason = reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1] + '...'
+
         # Send the mute in the mod channels
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Muted :mute:'
         embed.set_author(name=f'{self.get_full_name(ctx.author)}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
         embed.add_field(name='Duration :timer:', value=duration_str)
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{sent_reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         embed.set_thumbnail(url=subject.display_avatar.url)
 
@@ -79,7 +83,7 @@ class MuteCog(commands.Cog):
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
         embed.add_field(name='Duration :timer:', value=duration_str)
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
+        embed.add_field(name='Reason :page_facing_up:', value=f'```{sent_reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
 
         try:
@@ -91,7 +95,6 @@ class MuteCog(commands.Cog):
                                              DesignatedChannels.moderation_log,
                                              ctx.guild.id,
                                              embed)
-
 
     @ext.command()
     @ext.long_help(
@@ -118,6 +121,10 @@ class MuteCog(commands.Cog):
             embed.title = f'Error: This user has no active mutes'
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
+
+        # since it's an optional, I have to reassign it if it exists.
+        if reason:
+            reason = reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1] + '...'
 
         for mute in mutes:
             await self.bot.messenger.publish(Events.on_bot_unmute,
