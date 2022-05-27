@@ -67,6 +67,19 @@ class Duration(DurationDelta):
         except ValueError:
             raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
 
+    async def subtract(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+        """
+        Converts a `duration` string to a datetime object that's `duration` in the past.
+        The converter supports the same symbols for each unit of time as its parent class.
+        """
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
+        now = datetime.utcnow()
+
+        try:
+            return now - delta
+        except ValueError:
+            raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+
 
 class ClaimsConverter(Converter):
     """Convert a given claim string into its enum representation"""
@@ -76,6 +89,7 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
+
 
 class HonorsConverter(Converter):
     """Sanitize honors argument input for grades_cog"""
