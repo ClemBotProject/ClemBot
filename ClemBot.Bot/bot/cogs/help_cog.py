@@ -21,7 +21,6 @@ class HelpCog(commands.Cog):
 
     @ext.command()
     async def help(self, ctx, *, command_name=None):
-
         if command_name:
             command = self.find_command(self.bot, command_name.lower())
             if isinstance(command, ext.ClemBotCommand):
@@ -34,6 +33,9 @@ class HelpCog(commands.Cog):
             await self.send_default_help(ctx)
 
     async def send_group_help(self, ctx, command: ext.ClemBotGroup):
+        if command.hidden and not await self.bot.is_owner(ctx.author):
+            return await self.send_default_help(ctx, f'Command: {command.name} not found.')
+
         prefix = await self.bot.current_prefix(ctx)
 
         embed = discord.Embed(title=f'```{prefix}{command.qualified_name}```',
@@ -52,7 +54,11 @@ class HelpCog(commands.Cog):
         if len(command.aliases) > 0:
             embed.add_field(name='Aliases', value=', '.join(command.aliases))
 
-        com_repr = '\n'.join(self.get_commands_repr(command.commands, f'{prefix}{command.qualified_name} '))
+        com_repr = '\n'.join(self.get_commands_repr(
+            command.commands,
+            f'{prefix}{command.qualified_name} ',
+            await self.bot.is_owner(ctx.author)
+        ))
         embed.add_field(name='Subcommands', value=com_repr or 'No example provided', inline=False)
 
         embed.set_author(name=f'{self.bot.user.name} - Help', url=bot_secrets.secrets.site_url, icon_url=self.bot.user.display_avatar.url)
@@ -62,6 +68,9 @@ class HelpCog(commands.Cog):
         await ctx.send(embed=embed)
 
     async def send_command_help(self, ctx, command: ext.ClemBotCommand):
+        if command.hidden and not await self.bot.is_owner(ctx.author):
+            return await self.send_default_help(ctx, f'Command {command.name} not found.')
+
         prefix = await self.bot.current_prefix(ctx)
 
         embed = discord.Embed(title=f'```{prefix}{command.qualified_name}```', color=Colors.ClemsonOrange)
@@ -107,7 +116,7 @@ class HelpCog(commands.Cog):
         prefix = await self.bot.current_prefix(ctx)
 
         cog_embeds = []
-        commands_str = self.get_commands_repr(self.bot.commands, prefix)
+        commands_str = self.get_commands_repr(self.bot.commands, prefix, await self.bot.is_owner(ctx.author))
 
         for command in self.chunk_list(commands_str, HELP_EMBED_SIZE):
             embed = discord.Embed(
@@ -129,11 +138,11 @@ class HelpCog(commands.Cog):
                                          timeout=360
                                          )
 
-    def get_commands_repr(self, commands, prefix):
+    def get_commands_repr(self, commands, prefix, is_owner: bool = False):
         commands_repr = []
         for command in commands:
             # check to see if a command has been hidden from the public help command
-            if command.hidden:
+            if command.hidden and not is_owner:
                 continue
             if not isinstance(command, ext.ExtBase):
                 log.warning(f'Help command invoked but none Clembot ext command found name: {command.name}, skipping command help')
