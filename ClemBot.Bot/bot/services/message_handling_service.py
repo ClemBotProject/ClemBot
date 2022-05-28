@@ -49,7 +49,6 @@ class MessageHandlingService(BaseService):
         """
 
         if len(self.message_batch) > MESSAGE_BATCH_SIZE:
-
             # Copy the list values and clear the batch list BEFORE
             # we send them. This way we can accept new messages while
             # the current batch is being sent
@@ -76,7 +75,6 @@ class MessageHandlingService(BaseService):
             return
 
         if len(self.message_edit_batch) > MESSAGE_BATCH_SIZE:
-
             # Copy the list and clear the batch edit list BEFORE
             # we send them. This way we can accept new message edits while
             # the current batch is being sent
@@ -135,7 +133,8 @@ class MessageHandlingService(BaseService):
 
         await self.batch_send_message_edit(after.id, after.content)
 
-        embed = discord.Embed(title=f':repeat: **Message Edited in #{before.channel.name}**', color=Colors.ClemsonOrange)
+        embed = discord.Embed(title=f':repeat: **Message Edited in #{before.channel.name}**',
+                              color=Colors.ClemsonOrange)
         embed.add_field(name=f'Message Link', value=f'[Click Here]({after.jump_url})')
 
         before_chunk = self.split_string_chunks(before.content, 900)
@@ -282,13 +281,16 @@ class MessageHandlingService(BaseService):
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(matches['channel_id'])
         link_message = await link_channel.fetch_message(matches['message_id'])
-        should_reply = message.reference or len(result.group(1)) != 0 or len(result.group(8)) != 0
+        has_reply = message.reference is not None
+        # result.group(1) and result.group(8) can return None, so we check both != None and len()
+        raw_text = (bool(result.group(1)) and len(result.group(1)) != 0) or \
+                   (bool(result.group(8)) and len(result.group(8)) != 0)
 
         if len(link_message.embeds) > 0:
             embed = link_message.embeds[0]
             full_name = f'{self.get_full_name(message.author)}'
             embed.add_field(name=f'Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
-            if not should_reply:
+            if not has_reply and not raw_text:
                 await message.delete()
             msg = await source_channel.send(embed=embed)
             await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
@@ -316,10 +318,16 @@ class MessageHandlingService(BaseService):
         embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
         embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
 
-        msg = await source_channel.send(embed=embed, reference=message if should_reply else None)
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
-        if not should_reply:
+        reply_to = None
+        if has_reply:
+            reply_to = message.reference
+        elif raw_text and not has_reply:
+            reply_to = message
+
+        msg = await source_channel.send(embed=embed, reference=reply_to)
+        if not raw_text:
             await message.delete()
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
