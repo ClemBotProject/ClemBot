@@ -28,15 +28,15 @@ class PurgeCog(commands.Cog):
     @ext.short_help('Purges up to 7 days of messages.')
     @ext.long_help('Purge up to 7 days of messages from a given user.')
     @ext.example(['purge @User 10m NSFW', 'purge @User 7d Cleanup'])
-    async def purge(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str] = None):
-        duration_str = self._get_time_str(time)
-        time = await Duration().subtract(ctx, time)
+    async def purge(self, ctx: commands.Context, subject: discord.Member, duration: DurationDelta, *, reason: t.Optional[str] = None):
+        duration = Duration(ctx, duration)
+        time = await duration.as_past()
         # invalid role
         if ctx.author.top_role.position <= subject.top_role.position:
             return await self._error_embed(ctx, 'Invalid Permissions',
                                            desc='Cannot moderate someone with same rank or higher.')
         # send an embed saying we're processing
-        msg = await self._processing_embed(ctx, subject, duration_str)
+        msg = await self._processing_embed(ctx, subject, str(duration))
         # start purging
         deleted_messages = await ctx.channel.purge(limit=None, check=lambda m: m.author == subject, after=time)
         if len(deleted_messages) == 0:
@@ -44,14 +44,14 @@ class PurgeCog(commands.Cog):
             return await self._error_embed(ctx, desc='No messages to purge within the timeframe.')
 
         # create the log
-        file_path = self._create_log(ctx, subject, reason, time, deleted_messages)
+        file_path = self._create_log(ctx, subject, reason, duration, deleted_messages)
         # create the embed to send to the mod log channel
         sent_reason = reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH] + '...'
 
         embed = discord.Embed(title='Guild Member Purged :speech_balloon:', color=Colors.ClemsonOrange)
         embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
-        embed.add_field(name='Duration :timer:', value=duration_str)
+        embed.add_field(name='Duration :timer:', value=str(duration))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{sent_reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         embed.set_thumbnail(url=subject.display_avatar.url)
@@ -63,7 +63,7 @@ class PurgeCog(commands.Cog):
         # cleanup the log, delete old message, and send report
         self._cleanup_log(file_path)
         await msg.delete()
-        await self._finished_embed(ctx, subject, len(deleted_messages), duration_str)
+        await self._finished_embed(ctx, subject, len(deleted_messages), str(time))
 
     def _cleanup_log(self, file_path: str):
         try:
@@ -71,18 +71,19 @@ class PurgeCog(commands.Cog):
         except OSError:
             log.error(f'Failed to delete {file_path}.')
 
-    def _create_log(self, ctx, subject: discord.Member, reason: str, time: datetime, messages) -> str:
+    def _create_log(self, ctx, subject: discord.Member, reason: str, duration: DurationDelta, messages) -> str:
         temp_file = ASSETS_FOLDER + str(uuid.uuid4()) + '.txt'
         with open(temp_file, 'w', encoding='utf8') as f:
             f.write('-------------------------- PURGE LOG --------------------------\n')
             f.write(f'Subject: {self.get_full_name(subject)} (ID: {subject.id})\n')
-            f.write(f'Purged by: {self.get_full_name(ctx.author)} (ID: {ctx.author.id})\n')
+            f.write(f'Purged By: {self.get_full_name(ctx.author)} (ID: {ctx.author.id})\n')
             f.write(f'Reason: {reason}\n')
-            f.write(f'Date & Time: {time.date()} at {time.timetz()}\n')
-            f.write(f'Messages purged: {len(messages)}\n\n')
+            f.write(f'Date: {datetime.utcnow().strftime("%d/%m/%y at %I:%M:%S UTC")}\n')
+            f.write(f'Duration: {str(duration)}\n')
+            f.write(f'Messages Purged: {len(messages)}\n\n')
             f.write('-------------------------- BEGIN LOG --------------------------\n')
             for msg in messages:
-                f.write(f'[{msg.created_at}] {msg.content}\n')
+                f.write(f'[{msg.created_at.strftime("%d/%m/%y %I:%M:%S")}] {msg.content}\n')
             f.write('-------------------------- END - LOG --------------------------\n')
             f.close()
         return temp_file
@@ -112,16 +113,6 @@ class PurgeCog(commands.Cog):
 
     def get_full_name(self, author) -> str:
         return f'{author.name}#{author.discriminator}'
-
-    def _get_time_str(self, elapsed):
-        s = ''
-        if elapsed.days > 0:
-            s += f'{elapsed.days} Day{"s" if elapsed.days > 1 else ""} '
-        if elapsed.hours > 0:
-            s += f'{elapsed.hours} Hour{"s" if elapsed.hours > 1 else ""} '
-        if elapsed.minutes > 0:
-            s += f'{elapsed.minutes} Minute{"s" if elapsed.minutes > 1 else ""}'
-        return s
 
 
 def setup(bot):

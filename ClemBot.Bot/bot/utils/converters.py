@@ -54,31 +54,59 @@ class DurationDelta(Converter):
 class Duration(DurationDelta):
     """Convert duration strings into UTC datetime.datetime objects."""
 
-    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+    def __init__(self, ctx: Context, duration: t.Union[str, relativedelta]):
+        self.ctx = ctx
+        self.duration = duration
+        if isinstance(duration, relativedelta):
+            self.delta = duration
+        else:  # super.convert() is an async method - this is not
+            match = self.duration_parser.fullmatch(duration)
+            if not match:
+                raise ConversionError(f"`{duration}` is not a valid duration string.")
+            duration_dict = {unit: int(amount) for unit, amount in match.groupdict(default=0).items()}
+            self.delta = relativedelta(**duration_dict)
+
+    async def as_future(self) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` in the future.
         The converter supports the same symbols for each unit of time as its parent class.
         """
-        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
 
         try:
-            return now + delta
+            return now + self.delta
         except ValueError:
-            raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+            raise ConversionError(f"`{self.duration}` results in a datetime outside the supported range.")
 
-    async def subtract(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+    async def as_past(self) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` in the past.
         The converter supports the same symbols for each unit of time as its parent class.
         """
-        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
 
         try:
-            return now - delta
+            return now - self.delta
         except ValueError:
-            raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+            raise ConversionError(f"`{self.duration}` results in a datetime outside the supported range.")
+
+    def __str__(self):
+        s = ''
+        if self.delta.years > 0:
+            s += f'{self.delta.years} Year{"s" if self.delta.years > 1 else ""} '
+        if self.delta.months > 0:
+            s += f'{self.delta.months} Month{"s" if self.delta.months > 1 else ""} '
+        if self.delta.weeks > 0:
+            s += f'{self.delta.weeks} Week{"s" if self.delta.weeks > 1 else ""}'
+        if self.delta.days > 0:
+            s += f'{self.delta.days} Day{"s" if self.delta.days > 1 else ""} '
+        if self.delta.hours > 0:
+            s += f'{self.delta.hours} Hour{"s" if self.delta.hours > 1 else ""} '
+        if self.delta.minutes > 0:
+            s += f'{self.delta.minutes} Minute{"s" if self.delta.minutes > 1 else ""} '
+        if self.delta.seconds > 0:
+            s += f'{self.delta.seconds} Second{"s" if self.delta.seconds > 1 else ""}'
+        return s
 
 
 class ClaimsConverter(Converter):
