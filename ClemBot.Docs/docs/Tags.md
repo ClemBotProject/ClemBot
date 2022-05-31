@@ -199,6 +199,9 @@ Gets the current tag prefix.
 ```txt title="Set a custom tag prefix"
 !tag prefix #
 ```
+:::note
+Custom tag prefixes can have more than one character.
+:::
 :::caution
 Custom tag prefixes cannot contain the character <code>`</code>.
 :::
