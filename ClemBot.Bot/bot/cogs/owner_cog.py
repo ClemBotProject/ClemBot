@@ -33,7 +33,7 @@ class OwnerCog(commands.Cog):
         server = self.bot.get_guild(id)
         await server.leave()
 
-    @ext.group(invoke_without_command=True)
+    @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def reload(self, ctx, id: int):
         guild = self.bot.get_guild(id)
@@ -74,7 +74,7 @@ class OwnerCog(commands.Cog):
 
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
-    async def userupdatequeuestats(self, ctx, full_output: bool=False):
+    async def userupdatequeuestats(self, ctx, full_output: bool = False):
         queue = {k: str(v) if full_output else v.qsize() for k, v in self.bot.active_services['UserHandlingService'].user_update_queue.items()}
         await ctx.send(json.dumps(queue, indent=True))
 
