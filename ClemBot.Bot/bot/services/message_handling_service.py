@@ -126,6 +126,10 @@ class MessageHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        # We do not want to track messages that have embeds inserted via links
+        if before.content == after.content:
+            return
+
         log.info('Message edited in #{channel} By: {author} \nBefore: {before_content} \nAfter: {after_content}',
                  channel=serializers.log_channel(before.channel),
                  author=serializers.log_user(after.author),
