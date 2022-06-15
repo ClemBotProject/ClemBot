@@ -68,7 +68,12 @@ class TagService(BaseService):
                                              author=message.author,
                                              channel=message.channel)
 
-        msg = await message.channel.send(tag_str)
+        msg: discord.Message = None
+        if message.reference:
+            msg = await message.channel.send(tag_str, reference=message.reference, mention_author=False)
+        else:
+            msg = await message.channel.send(tag_str)
+
         await self.bot.messenger.publish(Events.on_set_deletable,
                                          msg=msg,
                                          author=message.author,
