@@ -181,11 +181,10 @@ class TriviaCog(commands.Cog):
             dictionary_list.append(new_dictionary)
 
         dictionary_size = len(new_response['results'])
-        best_loopint = 0
-
-        while best_loopint < dictionary_size:
+       
+        
+        for best_loopint in range (0,dictionary_size):
             new_response['results'][best_loopint] = dictionary_list[best_loopint]  #Sets the real dictionary to our parsed results
-            best_loopint += 1
 
         return new_response
 

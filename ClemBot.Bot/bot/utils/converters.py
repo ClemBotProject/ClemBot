@@ -98,9 +98,8 @@ class HonorsConverter(Converter):
 def trivia_cog_converter(input_length, input_list):
 
         url_parameters = []
-        i=0
 
-        while i < input_length:
+        for i in range (0, input_length):
             match i:  #Revolves around beautiful O(1) based indexing
                 case 0:
                     if input_list[0].isnumeric():
@@ -174,13 +173,10 @@ def trivia_cog_converter(input_length, input_list):
                         else:
                             raise UserInputError(
                                 "Couldn't find the question type you are looking for!.")
-            i=i+1
         
-        max_index = input_length - 1
         url = URL_BUILDER + str(url_parameters[0])
-        x = 1
 
-        while x <= max_index:
+        for x in range (1, input_length):
             if url_parameters[x]:
                 match x:
                     case 1:
@@ -188,8 +184,7 @@ def trivia_cog_converter(input_length, input_list):
                     case 2:
                         url = (f"{url}&difficulty={url_parameters[2]}")
                     case 3:
-                        url = (f"{url}&type={url_parameters[max_index]}")
-            x += 1
+                        url = (f"{url}&type={url_parameters[input_length-1]}")
         return url
 
 
