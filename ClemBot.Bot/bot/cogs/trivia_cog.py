@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
+from bot.utils.converters import trivia_cog_converter
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
@@ -69,21 +70,12 @@ class TriviaCog(commands.Cog):
     @commands.cooldown(1, 15, commands.BucketType.user)
     @ext.example(
         "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>")
-    async def manual(self, ctx, *input: str):
-        if len(input) < 1 or 4 < len(input):
+    async def manual(self, ctx, *input_list: str):
+        input_length = len(input_list)
+        if input_length < 1 or 4 < input_length:
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
-
-        function_parameters = []
-        input_length = len(input)
-        x = 0
-
-        while x < input_length:
-            append_this = await self.matching_function(x, *input)
-            function_parameters.append(append_this)
-            x += 1
-
-        url = await self.url_builder(function_parameters, input_length)
-
+        url = await trivia_cog_converter(input_length, input_list);
+        
         async with await self.session.get(url) as resp:
             response = json.loads(await resp.text())
 
@@ -155,98 +147,6 @@ class TriviaCog(commands.Cog):
                                          timeout=60,)
 
 
-    async def url_builder(self, function_list, input_length):
-
-        max_index = input_length - 1
-        url = URL_BUILDER + str(function_list[0])
-        x = 1
-
-
-        while x <= max_index:
-            if function_list[x]:
-                match x:
-                    case 1:
-                       url= (f"{url}&category={str(function_list[1])}")
-                    case 2:
-                        url = (f"{url}&difficulty={function_list[2]}")
-                    case 3:
-                        url = (f"{url}&type={function_list[max_index]}")
-            x += 1
-
-        return url
-
-    async def matching_function(self, case, *input: str):
-
-        match case:  #Revolves around beautiful O(1) based indexing
-            case 0:
-                if input[0].isnumeric():
-                    question_number = int(input[0])
-
-                    if 0 < question_number <= 50:
-                        return question_number
-                    else:
-                        raise UserInputError(
-                            "Question Number entered is out of range!")
-                else:
-                    raise UserInputError(
-                        "Question Number has to be a number within the range of 1 to 50")
-            case 1:
-                if input[1].isnumeric():
-                    trivia_number = int(input[1])
-                    if 0 < trivia_number <= 24:
-                        return trivia_number + 8
-                    elif trivia_number == 0:
-                        return None
-                    else:
-                        raise UserInputError(
-                            "Category Number out of bounds(Number has to be 1-24) or enter the category you want! Type ?trivia help to see the category list")
-                else:
-                    trivia_category = input[1].lower()
-
-                    for x in CATEGORYLIST_LOWER:
-                        if x.find(trivia_category) != -1:
-                            return_this = CATEGORYLIST_LOWER.index(x) + 9
-                            return return_this
-                    else:
-                        raise UserInputError("Category not found!")
-            case 2:
-                if input[2].isnumeric():
-                    evaluate_int = int(input[2])
-                    if 0 < evaluate_int <= 3:
-                        return_string = DIFFICULTY_LOWER[evaluate_int - 1]
-                        return return_string
-                    elif evaluate_int == 0:
-                        return None
-                    else:
-                        raise UserInputError(
-                            "Difficulty Number out of bounds(Number has to be 1-3) or enter Easy-Hard! Type ?trivia help to see the difficulty list.")
-                else:
-                    difficulty = input[2].lower()
-                    for x in DIFFICULTY_LOWER:
-
-                        if (x.find(difficulty) != -1):  #Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
-                            return x
-                    else:
-                        raise UserInputError("Difficulty not found")
-            case 3:
-                if input[3].isnumeric():
-                    evaluate_int = int(input[3])
-                    if 0 < evaluate_int < 3:
-                        final_return = QUESTIONTYPE[evaluate_int - 1]
-                        return final_return
-                    elif evaluate_int == 0:
-                        return None
-                    else:
-                        raise UserInputError(
-                            "Question type number out of bounds(1 or 2) 1: Multiple Choice 2: Boolean. Type ?trivia help to see our question types.")
-                else:
-                    question_type = input[3].lower()
-                    for x in QUESTIONTYPE:
-                        if (x.find(question_type) != -1):
-                            return x
-                    else:
-                        raise UserInputError(
-                            "Couldn't find the question type you are looking for!.")
 
     def html_parser(self, new_response):
 
