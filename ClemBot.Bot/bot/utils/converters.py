@@ -95,13 +95,13 @@ class HonorsConverter(Converter):
         return honors
 
 
-def trivia_cog_converter(input_length, input_list):
+def trivia_cog_converter(input_length, input_list): #converts the args as fast as possible 
 
         url_parameters = []
 
         for i in range (0, input_length):
             match i:  #Revolves around beautiful O(1) based indexing
-                case 0:
+                case 0: # question number
                     if input_list[0].isnumeric():
                         question_number = int(input_list[0])
 
@@ -113,12 +113,12 @@ def trivia_cog_converter(input_length, input_list):
                     else:
                         raise UserInputError(
                             "Question Number has to be a number within the range of 1 to 50")
-                case 1:
+                case 1: #category
                     if input_list[1].isnumeric():
                         trivia_number = int(input_list[1])
                         if 0 < trivia_number <= 24:
                             url_parameters.append(trivia_number + 8)
-                        elif trivia_number == 0:
+                        elif trivia_number == 0: # special number to allow entry of empty arguments since it would be impossible otherwise
                             url_parameters.append(None)
                         else:
                             raise UserInputError(
@@ -133,7 +133,7 @@ def trivia_cog_converter(input_length, input_list):
                                 break;
                         else:
                             raise UserInputError("Category not found!")
-                case 2:
+                case 2: #difficulty
                     if input_list[2].isnumeric():
                         evaluate_int = int(input_list[2])
                         if 0 < evaluate_int <= 3:
@@ -153,7 +153,7 @@ def trivia_cog_converter(input_length, input_list):
                                 break;
                         else:
                             raise UserInputError("Difficulty not found")
-                case 3:
+                case 3: #question type
                     if input_list[3].isnumeric():
                         evaluate_int = int(input_list[3])
                         if 0 < evaluate_int < 3:
@@ -174,7 +174,7 @@ def trivia_cog_converter(input_length, input_list):
                             raise UserInputError(
                                 "Couldn't find the question type you are looking for!.")
         
-        url = URL_BUILDER + str(url_parameters[0])
+        url = URL_BUILDER + str(url_parameters[0]) #This has to exist or else it would have raised an exception and exited
 
         for x in range (1, input_length):
             if url_parameters[x]:

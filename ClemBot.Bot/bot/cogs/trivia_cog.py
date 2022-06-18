@@ -316,7 +316,7 @@ class TriviaCog(commands.Cog):
         return return_list
     async def scoreboard_embed(self, ctx, score, total_questions):
         current_author = ctx.author
-        percent_questions = (score/total_questions)*100
+        percent_questions = round((score/total_questions)*100,2)
         score_embed = discord.Embed(title=(f"{current_author}'s score for this round is:  {score} out of {total_questions} this is {percent_questions}% correct"), color=Colors.ClemsonOrange)
         await ctx.send(embed=score_embed) 
 
