@@ -94,7 +94,8 @@ class HonorsConverter(Converter):
 
         return honors
 
-async def trivia_cog_converter(input_length, input_list):
+
+def trivia_cog_converter(input_length, input_list):
 
         url_parameters = []
         i=0
@@ -179,7 +180,6 @@ async def trivia_cog_converter(input_length, input_list):
         url = URL_BUILDER + str(url_parameters[0])
         x = 1
 
-
         while x <= max_index:
             if url_parameters[x]:
                 match x:
@@ -234,4 +234,8 @@ CATEGORYLIST = ["General-Knowledge",  #Including this out of consistency to avoi
                 "Cartoon&Animations"]
 
 CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
+
+
+
+
 

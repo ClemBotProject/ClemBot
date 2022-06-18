@@ -72,7 +72,7 @@ class TriviaCog(commands.Cog):
         input_length = len(input_list)
         if input_length < 1 or 4 < input_length:
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
-        url = await trivia_cog_converter(input_length, input_list);
+        url = trivia_cog_converter(input_length, input_list);
         
         async with await self.session.get(url) as resp:
             response = json.loads(await resp.text())
