@@ -51,15 +51,13 @@ class TriviaCog(commands.Cog):
 
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the emojis for the reaction
         page_int = 0
+
         while not task1.done():  #Loops reading the user's reaction
 
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
             if new_reaction != None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
-           
-                 
-
-
+       
     @trivia.command(aliases=['m'])
     @ext.long_help(
         "Specify arguments you want to return such as question number (max 35), category, difficulty, or question type. The arguments go: <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>. With the only MANDATORY argument being question number. Use numbers for quicker specification of category by typing in the number beside the category in !help. Use 0 for unused categories! Say you want only bool question types (True/False) and default everything else: !trivia m 10 0 0 2 The only truly required argument is Question Number. You can use 0's for categories you don't want to specify")
@@ -86,12 +84,10 @@ class TriviaCog(commands.Cog):
         big_list = await self.dict_publisher(parsed_response)
 
         new_task = await self.asyncio_publisher(ctx, big_list[1])
-
         
-
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4])) #Same deal as above
-
         page_int = 0
+
         while not task1.done():  #Loops reading the user's reaction
 
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
@@ -142,8 +138,6 @@ class TriviaCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel,
                                          timeout=60,)
-
-
 
     def html_parser(self, new_response):
 
@@ -267,7 +261,6 @@ class TriviaCog(commands.Cog):
                 if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
                    msg.score_setter+=1
 
-        
         if len(msg.pages) <= 1:
             await self.scoreboard_embed(ctx, msg.score, total_questions)
             await message.delete()  #Deletes embed if the page queue has runout
@@ -335,9 +328,8 @@ class TriviaCog(commands.Cog):
                 channel = ctx.channel
                 cog_message = self.messages[msg.id]
                 message_checker = await channel.fetch_message(msg.id)
-
+                await self.scoreboard_embed(ctx, cog_message.score, total_questions)
                 if message_checker != None:
-                    await self.scoreboard_embed(ctx, cog_message.score, total_questions)
                     await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
             except:
                 pass

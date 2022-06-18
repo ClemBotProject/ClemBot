@@ -104,7 +104,6 @@ def trivia_cog_converter(input_length, input_list): #converts the args as fast a
                 case 0: # question number
                     if input_list[0].isnumeric():
                         question_number = int(input_list[0])
-
                         if 0 < question_number <= 50:
                              url_parameters.append(question_number)
                         else:
@@ -229,8 +228,3 @@ CATEGORYLIST = ["General-Knowledge",  #Including this out of consistency to avoi
                 "Cartoon&Animations"]
 
 CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
-
-
-
-
-
