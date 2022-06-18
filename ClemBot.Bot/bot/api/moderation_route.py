@@ -84,7 +84,8 @@ class ModerationRoute(BaseRoute):
         return await self._client.patch(f'bot/infractions/{infraction_id}/deactivate', **kwargs)
 
     async def get_infraction(self, infraction_id: int) -> t.Optional[Infraction]:
-        return await self._client.get(f'bot/infractions/{infraction_id}')
+        dict = await self._client.get(f'bot/infractions/{infraction_id}')
+        return Infraction.from_dict(dict)
 
     async def get_guild_infractions(self, guild_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/guilds/{guild_id}/infractions')

@@ -20,6 +20,8 @@ public class Details
 
     public class Model
     {
+        public int Id { get; set; }
+
         public ulong GuildId { get; set; }
 
         public ulong AuthorId { get; set; }
@@ -50,6 +52,7 @@ public class Details
 
             return QueryResult<Model>.Success(new Model()
             {
+                Id = infraction.Id,
                 GuildId = infraction.GuildId,
                 AuthorId = infraction.AuthorId,
                 SubjectId = infraction.SubjectId,
