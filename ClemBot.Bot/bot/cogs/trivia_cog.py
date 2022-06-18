@@ -25,7 +25,7 @@ class TriviaCog(commands.Cog):
     def __init__(self, bot):
         self.messages = {}
         self.bot = bot
-        self.session = aiohttp.ClientSession(headers={'Connection': 'keep-alive'})
+        self.session = aiohttp.ClientSession(headers={"Connection": "keep-alive"})
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
@@ -95,7 +95,7 @@ class TriviaCog(commands.Cog):
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4])  #client.wait_for event listeners are fine. They get unloaded/disposed of at unload
 
 
-    @trivia.command(aliases=['help'])
+    @trivia.command(aliases=["help"])
     @ext.long_help(
         "Lists the categories, difficulty, and type of questions. Useful for finding the index of categories!")
     @ext.short_help(
@@ -143,7 +143,7 @@ class TriviaCog(commands.Cog):
 
         dictionary_list = []  #pain
 
-        for x in new_response['results']:
+        for x in new_response["results"]:
             new_dictionary = x
             new_list_values = x.values()
             proper_values = []
@@ -174,11 +174,11 @@ class TriviaCog(commands.Cog):
 
             dictionary_list.append(new_dictionary)
 
-        dictionary_size = len(new_response['results'])
+        dictionary_size = len(new_response["results"])
        
         
         for best_loopint in range (0,dictionary_size):
-            new_response['results'][best_loopint] = dictionary_list[best_loopint]  #Sets the real dictionary to our parsed results
+            new_response["results"][best_loopint] = dictionary_list[best_loopint]  #Sets the real dictionary to our parsed results
 
         return new_response
 
@@ -188,11 +188,11 @@ class TriviaCog(commands.Cog):
         cog_embeds = []
         list_index = []
 
-        for create_lists in dictionary['results']:
+        for create_lists in dictionary["results"]:
 
-            answers_list = create_lists['incorrect_answers']
-            answers_list.append(create_lists['correct_answer'])
-            right_answer = create_lists['correct_answer']
+            answers_list = create_lists["incorrect_answers"]
+            answers_list.append(create_lists["correct_answer"])
+            right_answer = create_lists["correct_answer"]
 
             random.shuffle(answers_list)
             list_index.append(answers_list.index(right_answer))
@@ -200,8 +200,8 @@ class TriviaCog(commands.Cog):
             x += 1
             embed = discord.Embed(title=f"Question # {str(x)}:",color=Colors.ClemsonOrange)
 
-            embed.add_field(name="Question:", value=create_lists['question'])
-            embed.add_field(name="Category:", value=create_lists['category'])
+            embed.add_field(name="Question:", value=create_lists["question"])
+            embed.add_field(name="Category:", value=create_lists["category"])
 
             a = 65
             for iterative in answers_list:
@@ -250,13 +250,11 @@ class TriviaCog(commands.Cog):
             case '🇧':
                 if right_answer[page_int] == 1:  #TODO: Implement scoring/ Database system!
                     msg.score_setter+=1
-                    
 
             case '🇨':            
                 if right_answer[page_int] == 2:
                     msg.score_setter+=1
                     
-
             case '🇩':
                 if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
                    msg.score_setter+=1
@@ -281,7 +279,7 @@ class TriviaCog(commands.Cog):
         pages = [e.copy() for e in pages]
 
         if not all(isinstance(p, discord.Embed) for p in pages):
-            raise Exception('All paginate embed pages need to be of type discord.Embed')
+            raise Exception("All paginate embed pages need to be of type discord.Embed")
         pages_length = len(pages)
         footer = ''
         if not pages[0].footer.text == discord.Embed.Empty:
@@ -291,7 +289,7 @@ class TriviaCog(commands.Cog):
                           0,
                           author.id if author else None,
                           footer=footer)
-        pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)} Score: 0')
+        pages[0].set_footer(text=f"{footer}\nPage 1 of {len(pages)} Score: 0")
         # send the first initial embed
 
         msg = await channel.send(embed=pages[0])
@@ -334,12 +332,12 @@ class TriviaCog(commands.Cog):
             except:
                 pass
             finally:
-                log.info('Message: {msg_id} timed out as pageable', msg_id=msg.id)
+                log.info("Message: {msg_id} timed out as pageable", msg_id=msg.id)
         return 1
     
 
 def helper_fixer(format_this):
-    new_list = [f'#{format_this.index(x) + 1}.    {x}' for x in format_this]
+    new_list = [f"#{format_this.index(x) + 1}.    {x}" for x in format_this]
     return ['\n'.join(i) for i in chunk_list(new_list, CHUNK_SIZE)]  #Decided to implement chunking. Although useless now if the category lists expands alot it will be an easy fix.
 
 
