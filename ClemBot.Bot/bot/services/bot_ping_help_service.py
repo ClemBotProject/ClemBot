@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 import discord
 from bot.consts import Colors
@@ -37,9 +38,11 @@ class BotPingHelpService(BaseService):
             f"If you need more help, visit my website **[clembot.io]({bot_secrets.secrets.site_url})**"
 
         try:
-            await message.channel.send(embed=embed)
+            msg = await message.channel.send(embed=embed)
         except discord.Forbidden:
-            pass
+            return
 
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author)
+        
     async def load_service(self):
         pass
