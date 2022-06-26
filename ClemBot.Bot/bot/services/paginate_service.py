@@ -114,7 +114,7 @@ class PaginateService(BaseService):
         pages[0].set_footer(text=f'{footer}\nPage 1 of {len(pages)}')
         # send the first initial embed
         msg = await channel.send(embed=pages[0])
-        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
 
         # stores the message info
         self.messages[msg.id] = message
