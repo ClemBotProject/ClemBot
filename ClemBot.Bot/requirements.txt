@@ -14,6 +14,7 @@ CacheControl==0.12.11
 certifi==2021.10.8
 chardet==3.0.4
 charset-normalizer==2.0.7
+click==8.1.3
 colorama==0.4.3
 contextlib2==0.6.0
 dataclasses-json==0.5.3
@@ -34,6 +35,7 @@ iniconfig==1.0.1
 install==1.3.3
 ipaddr==2.2.0
 isort==4.3.21
+joblib==1.1.0
 lazy-object-proxy==1.4.3
 lockfile==0.12.2
 markdownify==0.9.0
@@ -46,6 +48,7 @@ msgpack==0.6.2
 multidict==6.0.2
 mypy==0.950
 mypy-extensions==0.4.3
+nltk==3.7
 numpy==1.22.1
 ordered-set==4.0.2
 packaging==20.4
@@ -69,6 +72,7 @@ python-dateutil==2.8.1
 pytoml==0.1.21
 pytz==2022.1
 PyYAML==5.4
+regex==2022.6.2
 requests==2.27.1
 retrying==1.3.3
 rope==1.0.0
@@ -81,6 +85,7 @@ stevedore==3.5.0
 stringcase==1.2.0
 toml==0.10.2
 tomli==2.0.1
+tqdm==4.64.0
 typed-ast==1.5.3
 typing-extensions==3.10.0.0
 typing-inspect==0.7.1
