@@ -341,9 +341,9 @@ class ClemBot(commands.Bot):
         if len(cmd_name) > 2 and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= .3:
             cmd = self.get_command(matcher_result.item)
 
-            log.info('Fuzzy-matched {input} to {command_name} with similarity {similarity}', input=cmd_name, command_name=cmd.name, similarity=matcher_result.similarity)
+            log.info('Fuzzy-matched {input} to {command_name} with similarity {similarity}', input=cmd_name, command_name=cmd.qualified_name, similarity=matcher_result.similarity)
 
-            return f'Did you mean **`{prefix}{cmd.name}`**?'
+            return f'Did you mean **`{prefix}{cmd.qualified_name}`**?'
 
     async def on_command_error(self, ctx: commands.Context, error: Exception):
         """

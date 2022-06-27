@@ -242,22 +242,22 @@ class TriviaCog(commands.Cog):
 
         msg = self.messages[reaction.message.id]  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
         CURRENT_PAGE = 0 #Current page will ALWAYS be 0 because it deletes each question as it goes along. page_int keeps track of the page
-        match reaction.emoji:
-            case '🇦':
-                if right_answer[page_int] == 0:  # parsing reactions with match case because it is slightly quicker
-                    msg.score_setter+=1
+        # match reaction.emoji:
+        #     case '🇦':
+        #         if right_answer[page_int] == 0:  # parsing reactions with match case because it is slightly quicker
+        #             msg.score_setter+=1
                     
-            case '🇧':
-                if right_answer[page_int] == 1:  #TODO: Implement scoring/ Database system!
-                    msg.score_setter+=1
+        #     case '🇧':
+        #         if right_answer[page_int] == 1:  #TODO: Implement scoring/ Database system!
+        #             msg.score_setter+=1
 
-            case '🇨':            
-                if right_answer[page_int] == 2:
-                    msg.score_setter+=1
+        #     case '🇨':            
+        #         if right_answer[page_int] == 2:
+        #             msg.score_setter+=1
                     
-            case '🇩':
-                if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
-                   msg.score_setter+=1
+        #     case '🇩':
+        #         if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
+        #            msg.score_setter+=1
 
         if len(msg.pages) <= 1:
             await self.scoreboard_embed(ctx, msg.score, total_questions)

@@ -1,5 +1,6 @@
 import logging
 import discord
+from bot.clem_bot import ClemBot
 import bot.extensions as ext
 import discord.ext.commands as commands
 import typing as t
@@ -23,7 +24,7 @@ DEFAULT_TAG_PREFIX = '$'
 
 class TagCog(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.group(invoke_without_command=True, aliases=['tags'], case_insensitive=True)
@@ -177,6 +178,24 @@ class TagCog(commands.Cog):
         embed.add_field(name='Uses', value=f'{tag.use_count}')
         embed.add_field(name='Creation Date', value=tag.creation_date)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+
+    @tag.command(aliases=['find'])
+    @ext.long_help('Searches for a tag in this guild using the inputted query')
+    @ext.short_help('Searches for a tag')
+    @ext.example('tag search pepepunch')
+    async def search(self, ctx: commands.Context, query: str):
+        tags = await self.bot.tag_route.search_tags(ctx.guild.id, query)
+
+        embed = discord.Embed(title=f':information_source:  Search Results', color=Colors.ClemsonOrange)
+        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+
+        if tags:
+            embed.description = '\n\n'.join([f'**{i+1}.** `{tag.name}`' for i, tag in enumerate(tags)])
+        else:
+            embed.description = "No results found... :/"
+        
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 

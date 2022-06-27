@@ -7,7 +7,7 @@ class FuzzyMatchingService(BaseService):
     def __init__(self, bot: ClemBot):
         self.bot = bot
 
-        self._cmd_name_bank = make_search_bank([cmd.name for cmd in bot.commands])
+        self._cmd_name_bank = make_search_bank([cmd.qualified_name for cmd in bot.walk_commands()])
 
     async def load_service(self) -> None:
         pass

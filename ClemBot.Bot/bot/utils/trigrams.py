@@ -20,6 +20,9 @@ class BankSearchEntry:
     def __gt__(self, other: object) -> bool:
         return self.similarity > getattr(other, 'similarity', other)
 
+    def __str__(self) -> str:
+        return f"BankSearchEntry(item={self.item!r}, similarity={self.similarity:0.2f})"
+
 
 def make_trigrams(item: str) -> TRIGRAM_SET:
     return set(nltk.trigrams(f'  {item}  '))

@@ -37,10 +37,19 @@ public class Details
     {
         public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // var tag = await _context.Tags
+            //     .Where(g => g.GuildId == request.GuildId && g.Name == request.Name)
+            //     .Include(y => y.TagUses)
+            //     .FirstOrDefaultAsync();
+
             var tag = await _context.Tags
-                .Where(g => g.GuildId == request.GuildId && g.Name == request.Name)
-                .Include(y => y.TagUses)
-                .FirstOrDefaultAsync();
+                .Where(t => t.GuildId == request.GuildId)
+                .Select(t => new {t, Similarity = EF.Functions.TrigramsSimilarity(t.Name, request.Name)})
+                .Where(t => t.Similarity > 0.4)
+                .OrderByDescending(t => t.Similarity)
+                .Select(t => t.t)
+                .Include(t => t.TagUses)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (tag is null)
             {
