@@ -194,7 +194,7 @@ class TagCog(commands.Cog):
         if tags:
             embed.description = '\n\n'.join([f'**{i+1}.** `{tag.name}`' for i, tag in enumerate(tags)])
         else:
-            embed.description = "No results found... :/"
+            embed.description = 'No results found... :/'
         
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
