@@ -7,6 +7,8 @@ namespace ClemBot.Api.Core.Features.Tags.Bot;
 
 public class Search
 {
+    private const float _minimumNameSimilarity = 0.1f;
+
     public class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -55,7 +57,7 @@ public class Search
             var tags = await _context.Tags
                 .Where(t => t.GuildId == request.GuildId)
                 .Select(t => new {t, Similarity=EF.Functions.TrigramsSimilarity(t.Name, request.Query)})
-                .Where(e => e.Similarity > 0.1)
+                .Where(e => e.Similarity > _minimumNameSimilarity)
                 .OrderByDescending(e => e.Similarity)
                 .Select(e => e.t)
                 .Take(request.Limit)
