@@ -218,7 +218,7 @@ class TriviaCog(commands.Cog):
 
     async def asyncio_publisher(self, ctx, cog_embeds):
 
-        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 3)
+        embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 10)
         return embed_list
 
     async def on_reaction(self, ctx, message, timeout: int):
