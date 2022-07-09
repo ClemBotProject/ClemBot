@@ -27,9 +27,9 @@ else:
 
 for grade in ['A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W']:
     try:
-        data[grade] = data[grade].str.rstrip('%').astype(float) / 100.0
-    except:
-        pass
+        data[grade] = data[grade].str.split('%').str[0].astype(float) / 100.0
+    except Exception as e:
+        print(e)
 
 
 #some of the Courses have floats instead of ints as a column type, handle that here

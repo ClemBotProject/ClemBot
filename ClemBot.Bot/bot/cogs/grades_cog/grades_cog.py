@@ -93,7 +93,6 @@ class GradesCog(commands.Cog):
         elif honors == 'non-honors':
             df = df[df.Honors != True]
 
-        log.info(df)
         description = df.Title.tolist()[0]
 
         A = f'{int(df.A.mean().round(2) * 100)}%'
