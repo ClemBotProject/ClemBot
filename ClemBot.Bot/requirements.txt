@@ -6,7 +6,7 @@ asgiref==3.4.1
 astroid==2.11.4
 async-timeout==3.0.1
 asynctest==0.13.0
-atomicwrites==1.4.0
+atomicwrites==1.4.1
 attrs==21.4.0
 bandit==1.7.4
 beautifulsoup4==4.9.3
