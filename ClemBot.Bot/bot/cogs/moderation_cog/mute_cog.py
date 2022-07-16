@@ -12,6 +12,8 @@ from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
 
+MAX_REASON_LENGTH = 1024
+
 
 class MuteCog(commands.Cog):
 
@@ -26,13 +28,19 @@ class MuteCog(commands.Cog):
     @ext.example(('mute @SomeUser 1d Timeout', 'mute @SomUser 2d1h5m A much longer timeout'))
     @ext.required_claims(Claims.moderation_mute)
     async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
+        if len(reason) > MAX_REASON_LENGTH:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = 'Error: Reason'
+            embed.add_field(name='Reason', value=f'Reason length is greater than max {MAX_REASON_LENGTH} characters.')
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
 
         duration_str = self._get_time_str(time)
         time = await Duration().convert(ctx, time)
 
         if ctx.author.top_role.position <= subject.top_role.position:
             embed = discord.Embed(color=Colors.Error)
-            embed.title = f'Error: Invalid Permissions'
+            embed.title = 'Error: Invalid Permissions'
             embed.add_field(name='Reason', value='Cannot moderate someone with the same rank or higher')
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
@@ -100,7 +108,6 @@ class MuteCog(commands.Cog):
                                              ctx.guild.id,
                                              embed)
 
-
     @ext.command()
     @ext.long_help(
         'Unmutes a user for a with an optional reason'
@@ -126,6 +133,10 @@ class MuteCog(commands.Cog):
             embed.title = f'Error: This user has no active mutes'
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
+
+        # since it's an optional, I have to reassign it if it exists.
+        if reason:
+            reason = reason if len(reason) <= MAX_REASON_LENGTH else reason[0:MAX_REASON_LENGTH + 1] + '...'
 
         for mute in mutes:
             await self.bot.messenger.publish(Events.on_bot_unmute,
