@@ -5,7 +5,7 @@ import random
 import typing as t
 from typing import Tuple, List, Union
 from collections import Counter
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 
 import discord
 import discord.ext.commands as commands

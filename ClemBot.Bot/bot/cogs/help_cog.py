@@ -8,7 +8,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 
 log = logging.getLogger(__name__)
 HELP_EMBED_SIZE = 15

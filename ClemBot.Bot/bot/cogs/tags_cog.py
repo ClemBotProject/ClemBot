@@ -11,7 +11,7 @@ from bot import bot_secrets
 from bot.models import Tag
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 
 log = logging.getLogger(__name__)
 

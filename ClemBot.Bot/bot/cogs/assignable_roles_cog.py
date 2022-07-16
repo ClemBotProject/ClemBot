@@ -9,7 +9,7 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 
 log = logging.getLogger(__name__)
 

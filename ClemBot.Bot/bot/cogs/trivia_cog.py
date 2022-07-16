@@ -5,7 +5,7 @@ import html
 import asyncio
 import typing as t
 from dataclasses import dataclass
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError

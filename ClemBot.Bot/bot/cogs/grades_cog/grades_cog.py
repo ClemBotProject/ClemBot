@@ -1,7 +1,7 @@
 import logging
 import os
 import typing as t
-from bot.utils.misc import chunk_sequence
+from bot.utils.helpers import chunk_sequence
 
 import discord
 import discord.ext.commands as commands
