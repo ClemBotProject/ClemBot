@@ -10,7 +10,7 @@ from bot.messaging.events import Events
 
 log = logging.getLogger(__name__)
 
-MAX_REASON_LENGTH = 1015  # 1024 - 9 (for "```REASON...```")
+MAX_REASON_LENGTH = 1024
 
 
 class BanCog(commands.Cog):
@@ -28,9 +28,16 @@ class BanCog(commands.Cog):
     @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll', 'ban @SomeOtherUser 3 Spamming messages'))
     @ext.required_claims(Claims.moderation_ban)
     async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: t.Optional[int] = 0, *, reason: str):
+        if len(reason) > MAX_REASON_LENGTH:
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = 'Error: Reason'
+            embed.add_field(name='Reason', value=f'Reason length is greater than max {MAX_REASON_LENGTH} characters.')
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
-            embed.title = f'Error: Invalid Permissions'
+            embed.title = 'Error: Invalid Permissions'
             embed.add_field(name='Reason', value='Cannot moderate someone with the same rank or higher')
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
