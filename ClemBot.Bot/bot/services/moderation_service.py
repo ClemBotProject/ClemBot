@@ -66,6 +66,12 @@ class ModerationService(BaseService):
         if not author:
             author = self.bot.user
 
+        mute = await self.bot.moderation_route.get_infraction(mute_id)
+
+        if not mute.active:
+            # This mute was manually removed, we can ignore it
+            return
+
         await self.bot.moderation_route.deactivate_mute(mute_id, raise_on_error=True)
 
         subject = guild.get_member(subject_id)

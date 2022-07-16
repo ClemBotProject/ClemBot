@@ -5,6 +5,10 @@ import sys, re
 """
 Script to normalize csv file exported via tabula from clemsons PDF grade listings
 Not a complete reference of possible invalid data
+
+Commands run: 
+java -jar target/tabula-1.0.6-SNAPSHOT-jar-with-dependencies.jar "202201.pdf" --pages all -o 2022Spring.csv -g
+bpython normalize_grade_data.py 2022Spring.csv
 """
 
 file = sys.argv[1]
@@ -12,7 +16,7 @@ file = sys.argv[1]
 if '.csv' not in file:
     exit('File must be a csv')
 
-if '2020' in file or '2021' in file:
+if '2020' in file or '2021' in file or '2022' in file:
     # Fall 2020 and spring 2021 added some course designations to account for online learning so we need to make extra columns
     columns = ['Course', 'Number', 'Section', 'Title', 'A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W', 'I', 'SCP', 'SCN', 'SCD', 'Instructor', 'Honors']
     data = pd.read_csv(file, names=columns)
@@ -23,9 +27,9 @@ else:
 
 for grade in ['A', 'B', 'C', 'D', 'F', 'P', 'F(P)', 'W']:
     try:
-        data[grade] = data[grade].str.rstrip('%').astype(float) / 100.0
-    except:
-        pass
+        data[grade] = data[grade].str.split('%').str[0].astype(float) / 100.0
+    except Exception as e:
+        print(e)
 
 
 #some of the Courses have floats instead of ints as a column type, handle that here
