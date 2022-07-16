@@ -88,4 +88,13 @@ public class TagsController : ControllerBase
             { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpGet("bot/[controller]/Search")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> SearchTags(Bot.Search.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            {Status: QueryStatus.Success} result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
 }

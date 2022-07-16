@@ -248,6 +248,9 @@ app.UseEndpoints(endpoints => endpoints.MapControllers());
 // Apply any new migrations
 context.Database.Migrate();
 
+// ensure pg_trgm is installed (needed for trigrams support)
+context.Database.ExecuteSqlRaw("CREATE EXTENSION IF NOT EXISTS pg_trgm");
+
 // Load linq2db for bulk copies
 LinqToDBForEFTools.Initialize();
 
