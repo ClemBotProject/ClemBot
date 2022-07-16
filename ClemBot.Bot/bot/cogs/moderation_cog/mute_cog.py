@@ -42,6 +42,14 @@ class MuteCog(commands.Cog):
             if not await self._create_mute_role(ctx):
                 return
 
+        mutes = await self.bot.moderation_route.get_guild_mutes_user(ctx.guild.id, subject.id)
+        if any(i.active for i in mutes):
+            embed = discord.Embed(color=Colors.Error)
+            embed.title = f'Error: Current Active Mute'
+            embed.add_field(name='Reason', value='Cannot mute someone who is already muted')
+            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+
         #Publish that a mute happened
         await self.bot.messenger.publish(Events.on_bot_mute,
                                          guild=ctx.guild,

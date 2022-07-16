@@ -329,7 +329,23 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def on_command_error(self, ctx, error):
+    async def get_command_not_found_help(self, ctx: commands.Context) -> t.Optional[str]:
+        prefix = ctx.clean_prefix or await self.current_prefix(ctx)
+        cmd_name = ctx.message.content.removeprefix(prefix).strip().split()[0]
+
+        matcher = self.active_services.get('FuzzyMatchingService')
+        if not matcher:
+            return
+
+        # attempt to fuzzy find a similar command name to suggest to them
+        if len(cmd_name) > 2 and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= .3:
+            cmd = self.get_command(matcher_result.item)
+
+            log.info('Fuzzy-matched {input} to {command_name} with similarity {similarity}', input=cmd_name, command_name=cmd.qualified_name, similarity=matcher_result.similarity)
+
+            return f'Did you mean **`{prefix}{cmd.qualified_name}`**?'
+
+    async def on_command_error(self, ctx: commands.Context, error: Exception):
         """
         Handler for cog level errors, if a command throws and isn't handled
         the exception will end up here
@@ -338,16 +354,24 @@ class ClemBot(commands.Bot):
             ctx ([type]): The context that the command that errored was sent from
             error ([type]): The unhandled exception
         """
+
         if ctx.cog:
             if commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
                 return
-        error = getattr(error, 'original', error)
 
+        error = getattr(error, 'original', error)
+        
         embed = discord.Embed(title=f'ERROR: {type(error).__name__}', color=Colors.Error)
-        embed.add_field(name='Exception:', value=error)
         embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+
+        if isinstance(error, CommandNotFound) and (help_text := await self.get_command_not_found_help(ctx)):
+            embed.add_field(name='Exception:', value=(str(error) + f'\n\n{help_text}'))
+        else:
+            embed.add_field(name='Exception:', value=error)
+
         msg = await ctx.channel.send(embed=embed)
         await self.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+
         await self.global_error_handler(error)
 
     async def global_error_handler(self, e, *, traceback: str = None):
