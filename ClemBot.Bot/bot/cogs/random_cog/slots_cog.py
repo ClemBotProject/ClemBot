@@ -5,6 +5,7 @@ import random
 import typing as t
 from typing import Tuple, List, Union
 from collections import Counter
+from bot.utils.misc import chunk_sequence
 
 import discord
 import discord.ext.commands as commands
@@ -160,7 +161,7 @@ class SlotsCog(commands.Cog):
         embed = discord.Embed(title='💎 ClemBot Slot Machine Leaderboard 💎', colour=Colors.ClemsonOrange)
 
         embed.add_field(name='Leaderboard', value=f'```{scores_str}```')
-        embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -179,7 +180,7 @@ class SlotsCog(commands.Cog):
         embed = discord.Embed(title='💩 ClemBot Slot Machine Loserboard 💩', colour=Colors.ClemsonOrange)
 
         embed.add_field(name='Loserboard', value=f'```{scores_str}```')
-        embed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -290,7 +291,7 @@ class SlotsCog(commands.Cog):
             embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
 
             embed.add_field(name=self._render_board(paylines, iter), value='Spinning!!!', inline=False)
-            embed.set_footer(text=f'{self.get_full_name(ctx.author)}\nTo view the leaderboard run {prefix}slots leaderboard\nTo view the loserboard run {prefix}slots loserboard\n' , icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=f'{ctx.author}\nTo view the leaderboard run {prefix}slots leaderboard\nTo view the loserboard run {prefix}slots loserboard\n' , icon_url=ctx.author.display_avatar.url)
             return embed
 
         msg = await ctx.send(embed=slots_rolling(0))
@@ -303,7 +304,7 @@ class SlotsCog(commands.Cog):
         winning_counts = Counter(tuple(g) for g in winning_groups)
         items = list(winning_counts.items())
         items.sort(reverse=True, key=lambda k: len(k[0]))
-        for chunk in self.chunk_list(items, 4):
+        for chunk in chunk_sequence(items, 4):
             embed.add_field(name='Winning Groups!',
                             value='\n'.join(f'{", ". join(k)} x{v}' for k, v in chunk),
                             inline=True)
@@ -341,14 +342,6 @@ class SlotsCog(commands.Cog):
         val = '\n'.join(f'` `{" | ".join(row)}` `' for row in board)
 
         return val
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
 def setup(bot):
     bot.add_cog(SlotsCog(bot))

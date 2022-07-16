@@ -8,6 +8,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
+from bot.utils.misc import chunk_sequence
 
 log = logging.getLogger(__name__)
 HELP_EMBED_SIZE = 15
@@ -118,7 +119,7 @@ class HelpCog(commands.Cog):
         cog_embeds = []
         commands_str = self.get_commands_repr(self.bot.commands, prefix, await self.bot.is_owner(ctx.author))
 
-        for command in self.chunk_list(commands_str, HELP_EMBED_SIZE):
+        for command in chunk_sequence(commands_str, HELP_EMBED_SIZE):
             embed = discord.Embed(
                 title=title,
                 description=f'for more info on a command run `{prefix}help <CommandName>`',
@@ -162,11 +163,6 @@ class HelpCog(commands.Cog):
         elif not ex:
             return None
         raise TypeError('Help example must be of type iterable or str')
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
 
 def setup(bot):

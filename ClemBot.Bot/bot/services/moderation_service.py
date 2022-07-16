@@ -80,7 +80,7 @@ class ModerationService(BaseService):
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Guild Member Unmuted'
             embed.add_field(name='Name unknown, member not in the server', value=f'Id: {subject_id}')
-            embed.set_author(name=self.get_full_name(author), icon_url=author.display_avatar.url)
+            embed.set_author(name=str(author), icon_url=author.display_avatar.url)
             embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
 
             return await self.bot.messenger.publish(Events.on_send_in_designated_channel,
@@ -94,7 +94,7 @@ class ModerationService(BaseService):
         await subject.remove_roles(mute_role)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'You have been Unmuted'
+        embed.title = 'You have been Unmuted'
         embed.set_thumbnail(url=str(guild.icon.url))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {guild.name}'
@@ -103,7 +103,7 @@ class ModerationService(BaseService):
             await subject.send(embed=embed)
         except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
-            embed.title = f'Dm Unmute to {self.get_full_name(subject)} forbidden'
+            embed.title = f'Dm Unmute to {subject} forbidden'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                              DesignatedChannels.moderation_log,
                                              guild.id,
@@ -111,8 +111,8 @@ class ModerationService(BaseService):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Unmuted'
-        embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
-        embed.set_author(name=self.get_full_name(author), icon_url=author.display_avatar.url)
+        embed.add_field(name=str(subject), value=f'Id: {subject.id}')
+        embed.set_author(name=str(author), icon_url=author.display_avatar.url)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.set_thumbnail(url=subject.display_avatar.url)
 
@@ -136,8 +136,8 @@ class ModerationService(BaseService):
             await user.add_roles(mute_role)
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Reapplied Mute'
-            embed.add_field(name=self.get_full_name(user), value=f'Id: {user.id}')
-            embed.add_field(name='Reason :page_facing_up:', value=f'```User left and rejoined```', inline=False)
+            embed.add_field(name=str(user), value=f'Id: {user.id}')
+            embed.add_field(name='Reason :page_facing_up:', value='```User left and rejoined```', inline=False)
             embed.set_thumbnail(url=user.display_avatar.url)
 
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
@@ -190,9 +190,6 @@ class ModerationService(BaseService):
 
     async def _unmute_callback(self, guild_id: int, user_id: int, mute_id) -> None:
         await self.bot.messenger.publish(Events.on_bot_unmute, guild_id, user_id, mute_id, 'Mute Time Expired')
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
     async def load_service(self):
         for guild in self.bot.guilds:

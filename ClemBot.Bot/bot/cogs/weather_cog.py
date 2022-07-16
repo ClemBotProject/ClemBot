@@ -101,9 +101,6 @@ class WeatherCog(commands.Cog):
             for i, val in enumerate(forecast):
                 page = ''
 
-                # Date
-                date = val.get('dt', {})
-
                 if req_type == 'day':
                     date_num = dt.date.today() + dt.timedelta(days=i)
                     date_str = date_num.strftime("%A")
@@ -248,7 +245,7 @@ class WeatherCog(commands.Cog):
         # Construct Title Message
         msg_title = ''
         if is_cond:
-            msg_title += f'Current Conditions'
+            msg_title += 'Current Conditions'
         if is_cond and (is_hr or is_day):
             msg_title += ' with '
 
@@ -291,7 +288,7 @@ class WeatherCog(commands.Cog):
         """
     )
     @ext.short_help('Provides location-based weather info')
-    @ext.example(('weather <location>', 'weather Clemson', 'weather 29631', 'weather Clemson, South Carolina', \
+    @ext.example(('weather <location>', 'weather Clemson', 'weather 29631', 'weather Clemson, South Carolina',
                   'weather Clemson, SC, USA', 'weather 105 Sikes Hall, Clemson, SC 29634'))
     async def weather(self, ctx, *, location):  # the * is used to "greedily" catch all text after it in the variable "loc"
         await self.weatherCode(ctx, location, 1, 0, 1)

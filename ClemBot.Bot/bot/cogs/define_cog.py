@@ -85,7 +85,7 @@ class defineCog(commands.Cog):
 
         # If the word cannot be found, the JSON returns a list of other possible suggestions.
         elif isinstance(jsonData[0], str):
-            template = f'Word not found, see also: '
+            template = 'Word not found, see also: '
             for s in enumerate(jsonData):
                 template = f'{template} {s[1]}'
                 if s[0] != len(jsonData) - 1:

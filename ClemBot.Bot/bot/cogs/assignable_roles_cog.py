@@ -9,6 +9,7 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
+from bot.utils.misc import chunk_sequence
 
 log = logging.getLogger(__name__)
 
@@ -158,7 +159,7 @@ class AssignableRolesCog(commands.Cog):
         pages = []
 
         if results:
-            for chunk in self.chunk_list([role['name'] for role in results], ROLE_LIST_CHUNK_SIZE):
+            for chunk in chunk_sequence([role['name'] for role in results], ROLE_LIST_CHUNK_SIZE):
                 embed = discord.Embed(title=title, color=Colors.ClemsonOrange) #new
                 embed.add_field(name='Available:', value='\n'.join(chunk), inline=True)
                 pages.append(embed)
@@ -189,9 +190,9 @@ class AssignableRolesCog(commands.Cog):
     async def add_role(self, ctx, role: discord.Role):
         await ctx.author.add_roles(role)
 
-        embed = discord.Embed(title=f'Role Added  :white_check_mark:', color=Colors.ClemsonOrange)
-        embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_right:')
-        embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
+        embed = discord.Embed(title='Role Added  :white_check_mark:', color=Colors.ClemsonOrange)
+        embed.add_field(name='Role: ', value=f'{role.mention} :arrow_right:')
+        embed.add_field(name='User:', value=str(ctx.author))
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
@@ -199,9 +200,9 @@ class AssignableRolesCog(commands.Cog):
     async def remove_role(self, ctx, role: discord.Role):
         await ctx.author.remove_roles(role)
 
-        embed = discord.Embed(title=f'Role Removed  :white_check_mark:', color=Colors.ClemsonOrange)
-        embed.add_field(name=f'Role: ', value=f'{role.mention} :arrow_left:')
-        embed.add_field(name='User:', value=f'{self.get_full_name(ctx.author)}')
+        embed = discord.Embed(title='Role Removed  :white_check_mark:', color=Colors.ClemsonOrange)
+        embed.add_field(name='Role: ', value=f'{role.mention} :arrow_left:')
+        embed.add_field(name='User:', value=str(ctx.author))
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
@@ -231,14 +232,6 @@ class AssignableRolesCog(commands.Cog):
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
 
         await ctx.send(embed=embed)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
 
 def setup(bot):
