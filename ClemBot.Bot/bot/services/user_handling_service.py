@@ -92,6 +92,7 @@ class UserHandlingService(BaseService):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
+        embed.add_field(name='Discord ID', value=user.id, inline=False)
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
 
@@ -104,6 +105,7 @@ class UserHandlingService(BaseService):
         embed = discord.Embed(title='Guild User Left', color=Colors.Error)
         embed.add_field(name='Username', value=self.get_full_name(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
+        embed.add_field(name='Discord ID', value=user.id, inline=False)
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
 
