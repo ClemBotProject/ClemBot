@@ -640,17 +640,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "pdf2image"
-version = "1.16.0"
-description = "A wrapper around the pdftoppm and pdftocairo command line tools to convert PDF to a PIL Image list."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-pillow = "*"
-
-[[package]]
 name = "pep517"
 version = "0.8.2"
 description = "Wrappers to build Python packages using PEP 517 hooks"
@@ -723,26 +712,6 @@ description = "passive checker of Python programs"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[[package]]
-name = "pylatex"
-version = "1.4.1"
-description = "A Python library for creating LaTeX files and snippets"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-ordered-set = "*"
-
-[package.extras]
-all = ["quantities", "coverage", "flake8-putty", "numpy", "pyflakes (==1.2.3)", "pydocstyle (==3.0.0)", "pytest (>=4.6)", "flake8_docstrings (==1.3.0)", "flake8 (<3.0.0)", "pycodestyle (==2.0.0)", "pytest-cov", "future (>=0.15.2)", "pep8-naming (==0.8.2)", "matplotlib", "sphinx"]
-convert_to_py2 = ["future (>=0.15.2)"]
-docs = ["sphinx"]
-matplotlib = ["matplotlib"]
-matrices = ["numpy"]
-quantities = ["quantities", "numpy"]
-testing = ["flake8 (<3.0.0)", "pep8-naming (==0.8.2)", "flake8_docstrings (==1.3.0)", "pycodestyle (==2.0.0)", "pydocstyle (==3.0.0)", "pyflakes (==1.2.3)", "pytest (>=4.6)", "flake8-putty", "coverage", "pytest-cov"]
 
 [[package]]
 name = "pylint"
@@ -1116,7 +1085,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "bbca9496afcb059fe530327621039b11b0c4810cbbeaa9eac1f04c0b7a22ef14"
+content-hash = "636f642ffb55483904b8e00612e15f3fdf730cd8b1712176ba178795087461f2"
 
 [metadata.files]
 aiohttp = [
@@ -1533,10 +1502,6 @@ pbr = [
     {file = "pbr-5.4.5-py2.py3-none-any.whl", hash = "sha256:579170e23f8e0c2f24b0de612f71f648eccb79fb1322c814ae6b3c07b5ba23e8"},
     {file = "pbr-5.4.5.tar.gz", hash = "sha256:07f558fece33b05caf857474a366dfcc00562bca13dd8b47b2b3e22d9f9bf55c"},
 ]
-pdf2image = [
-    {file = "pdf2image-1.16.0-py3-none-any.whl", hash = "sha256:84f79f2b8fad943e36323ea4e937fcb05f26ded0caa0a01181df66049e42fb65"},
-    {file = "pdf2image-1.16.0.tar.gz", hash = "sha256:d58ed94d978a70c73c2bb7fdf8acbaf2a7089c29ff8141be5f45433c0c4293bb"},
-]
 pep517 = [
     {file = "pep517-0.8.2-py2.py3-none-any.whl", hash = "sha256:576c480be81f3e1a70a16182c762311eb80d1f8a7b0d11971e5234967d7a342c"},
     {file = "pep517-0.8.2.tar.gz", hash = "sha256:8e6199cf1288d48a0c44057f112acf18aa5ebabbf73faa242f598fbe145ba29e"},
@@ -1600,9 +1565,6 @@ pycodestyle = [
 pyflakes = [
     {file = "pyflakes-2.1.1-py2.py3-none-any.whl", hash = "sha256:17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0"},
     {file = "pyflakes-2.1.1.tar.gz", hash = "sha256:d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"},
-]
-pylatex = [
-    {file = "PyLaTeX-1.4.1.tar.gz", hash = "sha256:d3c12efb8b260771260443dce78d1e9089c09f9d0b92e6273dfca0bf5e7302fb"},
 ]
 pylint = [
     {file = "pylint-2.13.8-py3-none-any.whl", hash = "sha256:f87e863a0b08f64b5230e7e779bcb75276346995737b2c0dc2793070487b1ff6"},
