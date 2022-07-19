@@ -34,9 +34,7 @@ jobs:
         poetry install
     - name: Lint with pylint
       run: |
-        pip install pylint
-        pylint bot -E -r y
+        poetry run python -m pylint bot -E -r y
     - name: Test with pytest
       run: |
-        pip install pytest
-        pytest
+        poetry run python -m pytest
