@@ -59,7 +59,7 @@ class CustomPrefixCog(commands.Cog):
         'resets the bot prefix to the default'
     )
     @ext.short_help('resets a custom prefix')
-    @ext.example('prefix set')
+    @ext.example('prefix reset')
     async def reset(self, ctx):
         default_prefix = bot_secrets.secrets.bot_prefix
 
