@@ -50,7 +50,7 @@ class TriviaCog(commands.Cog):
         task_1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the emojis for the reaction
         page_int = 0
 
-        while not task_1.done():  #Loops reading the user's reaction
+        while not task_1.done():  # Loops reading the user's reaction
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
 
             if new_reaction is not None:
