@@ -12,8 +12,6 @@ from bot.utils.user_choice import UserChoice
 
 log = logging.getLogger(__name__)
 
-MAX_REASON_LENGTH = 1024
-
 
 class MuteCog(commands.Cog):
 
@@ -28,9 +26,10 @@ class MuteCog(commands.Cog):
     @ext.example(('mute @SomeUser 1d Timeout', 'mute @SomUser 2d1h5m A much longer timeout'))
     @ext.required_claims(Claims.moderation_mute)
     async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
-        if reason and len(reason) > MAX_REASON_LENGTH:
+        if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Reason', value=f'Reason length is greater than max {MAX_REASON_LENGTH} characters.')
+            embed.add_field(name='Reason',
+                            value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
@@ -134,9 +133,10 @@ class MuteCog(commands.Cog):
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
-        if reason and len(reason) > MAX_REASON_LENGTH:
+        if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Reason', value=f'Reason length is greater than max {MAX_REASON_LENGTH} characters.')
+            embed.add_field(name='Reason',
+                            value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
             embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
