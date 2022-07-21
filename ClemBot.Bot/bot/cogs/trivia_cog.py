@@ -47,7 +47,7 @@ class TriviaCog(commands.Cog):
 
         # Starts the event listener for the reaction BEFORE emojis are sent
 
-        task_1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the emojis for the reaction
+        task_1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  # Sends the emojis for the reaction
         page_int = 0
 
         while not task_1.done():  # Loops reading the user's reaction
