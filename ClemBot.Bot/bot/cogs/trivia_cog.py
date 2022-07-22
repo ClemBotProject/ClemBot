@@ -329,7 +329,7 @@ QUESTION_TYPE = [
     "boolean"
 ]
 
-CATEGORY_LIST = ["General-Knowledge",  #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
+CATEGORY_LIST = ["General-Knowledge",  # Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
                 "Books",
                 "Film",
                 "Music",
