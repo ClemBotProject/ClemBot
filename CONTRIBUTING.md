@@ -89,6 +89,9 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 Installing Poetry:  
 `pip3 install poetry` windows: `py -m pip install poetry`
 
+Tell Poetry to put the venv in the project folder
+`poetry config virtualenvs.in-project true`
+
 Installing dependencies with Poetry:
 `poetry install`
 
