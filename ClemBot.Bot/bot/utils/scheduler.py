@@ -8,7 +8,6 @@ from asyncio import Task
 from datetime import datetime
 from functools import partial
 from typing import Optional
-from uuid import uuid4
 
 from discord.ext.commands.errors import BadArgument
 

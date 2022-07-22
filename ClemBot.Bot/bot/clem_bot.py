@@ -362,7 +362,7 @@ class ClemBot(commands.Bot):
         error = getattr(error, 'original', error)
         
         embed = discord.Embed(title=f'ERROR: {type(error).__name__}', color=Colors.Error)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         if isinstance(error, CommandNotFound) and (help_text := await self.get_command_not_found_help(ctx)):
             embed.add_field(name='Exception:', value=(str(error) + f'\n\n{help_text}'))
@@ -388,7 +388,7 @@ class ClemBot(commands.Bot):
         # Handle if the error is a bot only request error, this is only thrown when a request is attempted
         # In BotOnly mode so we can safely log that it happened and then ignore it
         if isinstance(e, BotOnlyRequestError):
-            log.info(f'Ignoring ClemBot.Api request error in bot_only mode')
+            log.info('Ignoring ClemBot.Api request error in bot_only mode')
             return
         elif isinstance(e, CommandNotFound):
             log.info('Invalid command attempted: {command}', command=e.args)
@@ -412,9 +412,6 @@ class ClemBot(commands.Bot):
             for channel_id in bot_secrets.secrets.error_log_channel_ids:
                 channel = await self.fetch_channel(channel_id)
                 await channel.send(embed=embed)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
     async def current_prefix(self, ctx):
         prefixes = await self.get_prefix(ctx)

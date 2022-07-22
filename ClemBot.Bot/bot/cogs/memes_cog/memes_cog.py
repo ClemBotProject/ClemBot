@@ -5,7 +5,6 @@ import logging
 import os
 import random
 import time
-import typing as t
 
 import discord
 import discord.ext.commands as commands
@@ -15,13 +14,14 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 
-log = logging.getLogger(__name__)
 MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
 CRAB_COMMAND_COOLDOWN = 3
 
+log = logging.getLogger(__name__)
 
-def pillow_process(args, lines_in_text, timestamp):
+
+def crab_pillow_process(args, lines_in_text, timestamp):
     # Open crab.gif and add our font
     with Image.open('bot/cogs/memes_cog/assets/crab.gif') as im:
         fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
@@ -74,12 +74,12 @@ class MemesCog(commands.Cog):
     @ext.short_help('Can you find him?')
     @ext.example(('waldo', 'waldo 10'))
     async def waldo(self, ctx, size=MAX_WALDO_GRID_SIZE):
-
         """
         Play Where's Waldo!
 
         Usage: <prefix>waldo [size = 100]
         """
+
         random_start_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X',
                                 'Y', 'Z']
 
@@ -115,10 +115,10 @@ class MemesCog(commands.Cog):
     @ext.short_help('sO yOu doNt KnOw wHat tHiS Is?')
     @ext.example('spongebob hello world')
     async def spongebob(self, ctx, *, args):
-
         """
         Spongebob Text
         """
+
         random.seed(time.time())
         args = args.replace('"', "'")
 
@@ -170,7 +170,7 @@ class MemesCog(commands.Cog):
         loop = self.bot.loop
         with concurrent.futures.ProcessPoolExecutor() as pool:
             pil_args = (args, lines_in_text, timestamp)
-            await loop.run_in_executor(pool, pillow_process, *pil_args)
+            await loop.run_in_executor(pool, crab_pillow_process, *pil_args)
 
         # Attach, send, and delete created gif
         attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
@@ -207,7 +207,7 @@ class MemesCog(commands.Cog):
         embed = discord.Embed(
             title='Cash to Cookout Tray Converter',
             description=f'{ctx.message.author.mention} ${money} is approximately {output} cookout trays',
-            url=f"https://www.fastfoodmenuprices.com/cookout-prices/",
+            url="https://www.fastfoodmenuprices.com/cookout-prices/",
             color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
