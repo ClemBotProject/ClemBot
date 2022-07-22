@@ -1,4 +1,3 @@
-'''
 import logging
 
 import discord
@@ -8,8 +7,10 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils import converters
+from typing import Optional
 
 log = logging.getLogger(__name__)
+
 
 class RemindCog(commands.Cog):
     def __init__(self, bot):
@@ -40,24 +41,23 @@ class RemindCog(commands.Cog):
         'remind 4y Graduation',
         'remind 3y1M4w1d5h9m2s Pi'
     ))
-    async def remind(self, ctx: commands.Context, wait: converters.Duration):
-
+    async def remind(self, ctx: commands.Context, wait: converters.Duration, *, content: Optional[str]):
         try:
-            embed = discord.Embed(title="⏰Reminder", color = Colors.ClemsonOrange)
+            embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange)
             await self.bot.messenger.publish(
                Events.on_set_reminder,
                ctx.author.id,
                wait,
                ctx.message.id,
-               ctx.message.jump_url)
-            embed.add_field(name="Status", value = "Reminder Created") 
+               ctx.message.jump_url,
+               content
+            )
+            embed.add_field(name='Status', value='Reminder Created')
         except Exception:
-
-            embed = discord.Embed(title="⏰Reminder", color = Colors.Error)
-            embed.add_field(name="Status", value = "Error")
+            embed = discord.Embed(title='⏰ Reminder', color=Colors.Error)
+            embed.add_field(name='Status', value='Error')
         await ctx.send(embed=embed)
-            
+
 
 def setup(bot):
     bot.add_cog(RemindCog(bot))
-'''

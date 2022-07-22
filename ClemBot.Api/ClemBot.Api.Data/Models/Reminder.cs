@@ -8,10 +8,12 @@ public class Reminder
 
     public string Link { get; set; }
 
+    public string? Content { get; set; }
+
     public DateTime Time { get; set; }
 
     public ulong MessageId { get; set; }
-    public Guild Message { get; set; }
+    public Message Message { get; set; }
 
     public ulong UserId { get; set; }
     public User User { get; set; }
