@@ -12,6 +12,8 @@ public class Reminder
 
     public DateTime Time { get; set; }
 
+    public bool Dispatched { get; set; } = false;
+
     public ulong MessageId { get; set; }
     public Message Message { get; set; }
 

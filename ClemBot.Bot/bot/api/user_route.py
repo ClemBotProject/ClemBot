@@ -1,6 +1,7 @@
 import typing as t
 import discord
 
+from bot.models import Reminder
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 
@@ -80,3 +81,11 @@ class UserRoute(BaseRoute):
         }
 
         await self._client.post(f'bot/users/{user_id}/updateroles', data=json, **kwargs)
+
+    async def get_reminders(self, user_id: int, **kwargs) -> t.List[Reminder]:
+        resp = await self._client.get(f'bot/users/reminders/{user_id}', **kwargs)
+
+        if not resp:
+            return []
+
+        return [Reminder.from_dict(i) for i in resp]

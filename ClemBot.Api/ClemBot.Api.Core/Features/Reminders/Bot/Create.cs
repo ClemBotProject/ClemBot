@@ -3,7 +3,7 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
 
-namespace ClemBot.Api.Core.Features.Reminders;
+namespace ClemBot.Api.Core.Features.Reminders.Bot;
 
 public class Create
 {
