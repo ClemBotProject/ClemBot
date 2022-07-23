@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import List, Optional
 
 import discord
 
@@ -8,7 +9,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
-from bot.errors import PrefixRequestError
+from bot.consts import TAG_INVOKE_REGEX
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ TAG_PREFIX_DEFAULT = '$'
 
 class TagService(BaseService):
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_guild_message_received)
@@ -32,7 +33,7 @@ class TagService(BaseService):
         tags_contents = []
         
         # find all tag matches in the message content
-        pattern = re.compile(fr'(^|\s){re.escape(tag_prefix)}(\w+)')
+        pattern = re.compile(TAG_INVOKE_REGEX.format(tag_prefix=re.escape(tag_prefix)))
         for match in set(i[1] for i in pattern.findall(message.content)):
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 
@@ -78,7 +79,7 @@ class TagService(BaseService):
                                          author=message.author,
                                          timeout=60)
 
-    async def get_tag_prefix(self, bot: ClemBot, message: discord.Message):
+    async def get_tag_prefix(self, message: discord.Message) -> Optional[List[str]]:
         tag_prefixes = []
 
         # Check if bot is in BotOnly mode, if it is we cant get custom tag prefixes
@@ -88,8 +89,8 @@ class TagService(BaseService):
             try:
                 # Try to grab the tag prefixes from the db, raise an error on failure
                 # and bailout, we cant respond to anything at the moment
-                tag_prefixes = await bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
-            except Exception as e:
+                tag_prefixes = await self.bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
+            except Exception:
                 # if the api call fails for any reason then we bail out and return nothing 
                 # so as to not spam the servers with error messages on every message. 
                 # failing silently is preferable to that
