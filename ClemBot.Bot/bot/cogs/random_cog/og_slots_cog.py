@@ -98,7 +98,7 @@ class OgSlotsCog(commands.Cog):
                                       color=Colors.ClemsonOrange,
                                       description=quote)
 
-            slotembed.set_footer(text=f'{self.get_full_name(ctx.author)}', icon_url=ctx.author.display_avatar.url)
+            slotembed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             slotembed.add_field(name=input, value=spinstatus, inline=False)
             return slotembed
 
@@ -134,9 +134,6 @@ class OgSlotsCog(commands.Cog):
             total_score += PAY_TABLE[g[0]] * len(g) * MULTIPLIERS[len(g)]
 
         return total_score
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
 
 def setup(bot):

@@ -8,7 +8,6 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
-from bot.errors import PrefixRequestError
 
 log = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ class TagService(BaseService):
                 # Try to grab the tag prefixes from the db, raise an error on failure
                 # and bailout, we cant respond to anything at the moment
                 tag_prefixes = await bot.custom_tag_prefix_route.get_custom_tag_prefixes(message.guild.id, raise_on_error=True)
-            except Exception as e:
+            except Exception:
                 # if the api call fails for any reason then we bail out and return nothing 
                 # so as to not spam the servers with error messages on every message. 
                 # failing silently is preferable to that

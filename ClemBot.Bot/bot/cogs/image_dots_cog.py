@@ -115,14 +115,14 @@ class DotCog(commands.Cog):
             width = MOBILE_WIDTH
         else:
             # return an error here
-            embed = discord.Embed(title=f'ERROR: Invalid image width', color=Colors.Error)
+            embed = discord.Embed(title='ERROR: Invalid image width', color=Colors.Error)
             embed.add_field(name='Exception:', value="Width must either be 'mobile' or 'pc'.\n Default length is 'pc' length.")
             await ctx.send(embed=embed)
             return
 
         if threshold not in range(0, 256):
             # errors
-            embed = discord.Embed(title=f'ERROR: threshold must be 0 <= threshold <= 255', color=Colors.Error)
+            embed = discord.Embed(title='ERROR: threshold must be 0 <= threshold <= 255', color=Colors.Error)
             embed.add_field(name='Exception:', value='threshold not a valid int or in range.')
             await ctx.send(embed=embed)
             return
@@ -140,8 +140,8 @@ class DotCog(commands.Cog):
                 # default asciiWidth I found online. Aparently over 500 gets laggy
                 new_img = self.parse_image(img, width, threshold, inverted)
                 await ctx.send('\n'.join(new_img))
-        except UnidentifiedImageError as e:
-            embed = discord.Embed(title=f'ERROR: unable to open message link', color=Colors.Error)
+        except UnidentifiedImageError:
+            embed = discord.Embed(title='ERROR: unable to open message link', color=Colors.Error)
             embed.add_field(name='Exception:', value=filename + ' link does not exist, or is broken!')
             await ctx.send(embed=embed)
 
@@ -186,8 +186,8 @@ class DotCog(commands.Cog):
     async def attachment(self, ctx, device=None, threshold=150, inverted: t.Optional[bool] = False) -> None:
         try:
             image = ctx.message.attachments[0].url
-        except Exception as e:
-            embed = discord.Embed(title=f'ERROR: must include an attached image', color=Colors.Error)
+        except Exception:
+            embed = discord.Embed(title='ERROR: must include an attached image', color=Colors.Error)
             embed.add_field(name='Exception:', value="upload an image when using 'attachment' specifier")
             await ctx.send(embed=embed)
             return

@@ -1,9 +1,5 @@
-import logging
-import math
-import random
 import time
 import discord
-import re
 
 import discord.ext.commands as commands
 from bot.consts import Colors
@@ -40,6 +36,7 @@ class PingPongCog(commands.Cog):
         embed.insert_field_at(1, name="Discord HTTP", value=f"{discord_http_latency : 1.2f}ms")
 
         await sent_message.edit(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(PingPongCog(bot))

@@ -86,19 +86,17 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 * `MessageApiBatchSize` (Optional: Defaults to 5) Sets the max cache size for clembots internal message catch before it is flushed to the api
 
 ## Setting up the ClemBot.Bot build environment
-Setup a virtual environment:  
-`pip3 install virtualenv` windows: `py -m pip install --user virtualenv`
+Installing Poetry:  
+`pip3 install poetry` windows: `py -m pip install poetry`
 
-`virtualenv venv`  windows: `py -m venv venv`
+Tell Poetry to put the venv in the project folder
+`poetry config virtualenvs.in-project true`
 
-Enter the virtualenv with:  
-`source venv/bin/activate` windows: `.\venv\Scripts\activate`
-
-Then allow pip to get the latest libraries:  
-`pip3 install -r requirements.txt` windows: `py -m pip install -r requirements.txt`
+Installing dependencies with Poetry:
+`poetry install`
 
 You can then test-run the bot with the command:  
-`python3 -m bot`  windows: `py -m bot`
+`poetry run python3 -m bot`  windows: `poetry run py -m bot`
 when you are in the directory `ClemBot/ClemBot.Bot`
 
 The bot should show up in the test server and respond to commands (test with `<your_prefix>hello`)

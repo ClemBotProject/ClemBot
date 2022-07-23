@@ -52,7 +52,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         embed = discord.Embed(title='Current Valid Claims',
                               color=Colors.ClemsonOrange,
                               description=f'For: {subject.mention}\n```\n{claims_str}```')
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         return embed
 
     @claims.command(aliases=['set'])
@@ -113,7 +113,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         claims_str = self.get_all_claims()
 
         embed = discord.Embed(title='Available Claims', color=Colors.ClemsonOrange, description=f'```\n{claims_str}```')
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=embed)
 
@@ -121,9 +121,6 @@ class ClaimsAuthorizationCog(commands.Cog):
         claims = [c for c, _ in Claims.__members__.items()]
         claims.sort()
         return '\n'.join(claims) if claims else 'No available claims'
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
 
 def setup(bot):

@@ -1,6 +1,7 @@
 import logging
 import typing as t
 from datetime import datetime
+from bot.utils.helpers import chunk_sequence
 
 import discord
 import discord.ext.commands as commands
@@ -44,12 +45,12 @@ class InfractionsCog(commands.Cog):
                                     f'or run the `{await ctx.bot.current_prefix(ctx.message)}help claims` command')
 
         infractions = await self.bot.moderation_route.get_guild_infractions_user(ctx.guild.id, user.id)
-        chunked_infractions = self.chunk_list(infractions, 5)
+        chunked_infractions = chunk_sequence(infractions, 5)
 
         if len(infractions) == 0:
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Current Active Infractions'
-            embed.set_author(name=self.get_full_name(user), icon_url=user.display_avatar.url)
+            embed.set_author(name=str(user), icon_url=user.display_avatar.url)
             embed.add_field(name='Infractions', value='No Active Infractions')
             return await ctx.send(embed=embed)
 
@@ -57,7 +58,7 @@ class InfractionsCog(commands.Cog):
         for chunk in chunked_infractions:
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = 'Infractions'
-            embed.set_author(name=self.get_full_name(user), icon_url=user.display_avatar.url)
+            embed.set_author(name=str(user), icon_url=user.display_avatar.url)
 
             for infraction in chunk:
                 time = datetime.strptime(infraction.time, '%Y-%m-%dT%H:%M:%S.%f')
@@ -87,23 +88,15 @@ class InfractionsCog(commands.Cog):
         if not infraction or infraction.guild_id != ctx.guild.id:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Infraction does not exist'
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         await self.bot.moderation_route.delete_infraction(infraction_id, raise_on_error=True)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'Infraction {infraction_id} deleted successfully  :white_check_mark:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         return await ctx.send(embed=embed)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
 
 def setup(bot):
