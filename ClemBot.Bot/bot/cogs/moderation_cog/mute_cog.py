@@ -30,7 +30,7 @@ class MuteCog(commands.Cog):
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.add_field(name='Reason',
                             value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         duration_str = self._get_time_str(time)
