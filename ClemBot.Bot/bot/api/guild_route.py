@@ -1,5 +1,3 @@
-import typing as t
-
 import discord
 import pandas as pd
 
@@ -39,7 +37,7 @@ class GuildRoute(BaseRoute):
         return await self._client.get(f'bot/guilds/{guild_id}')
 
     async def get_all_guilds(self):
-        return await self._client.get(f'bot/guilds')
+        return await self._client.get('bot/guilds')
 
     async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool):
         resp = await self._client.get(f'bot/Guilds/{guild_id}/SlotScores', params={'leader': str(leader), 'limit': limit})
@@ -77,7 +75,7 @@ class GuildRoute(BaseRoute):
             'UserCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'bot/guilds/update/users', data=json)
+        await self._client.patch('bot/guilds/update/users', data=json)
 
     async def update_guild_roles(self, guild: discord.Guild):
         roles = [{
@@ -94,7 +92,7 @@ class GuildRoute(BaseRoute):
             'RoleCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'bot/guilds/update/roles', data=json)
+        await self._client.patch('bot/guilds/update/roles', data=json)
 
     async def update_guild_role_user_mappings(self, guild: discord.Guild):
 
@@ -110,7 +108,7 @@ class GuildRoute(BaseRoute):
             'RoleMappingCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'bot/guilds/update/RoleUserMappings', data=json)
+        await self._client.patch('bot/guilds/update/RoleUserMappings', data=json)
 
     async def update_guild_channels(self, guild: discord.Guild):
 
@@ -127,7 +125,7 @@ class GuildRoute(BaseRoute):
             'ChannelCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'bot/guilds/update/channels', data=json)
+        await self._client.patch('bot/guilds/update/channels', data=json)
 
     async def update_guild_threads(self, guild: discord.Guild):
 
@@ -145,7 +143,7 @@ class GuildRoute(BaseRoute):
             'ThreadCsv': df.to_csv(index=False)
         }
 
-        await self._client.patch(f'bot/guilds/update/threads', data=json)
+        await self._client.patch('bot/guilds/update/threads', data=json)
 
     async def get_can_embed_link(self, guild_id: int):
         resp = await self._client.get(f'guildsettings/{guild_id}/{GuildSettings.allow_embed_links.name}')

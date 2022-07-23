@@ -148,7 +148,7 @@ class ManageClassesCog(commands.Cog):
         if not class_repr.abbv:
             embed = discord.Embed(title='**New class setup wizard started :white_check_mark:**', color=Colors.ClemsonOrange)
             avi = ctx.author.display_avatar.url
-            embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+            embed.set_footer(text=f'{ctx.author} - Time Limit: {TIMEOUT} Seconds',
                              icon_url=avi)
             embed.add_field(name='**Current values**', value=class_repr)
             embed.add_field(
@@ -174,7 +174,7 @@ class ManageClassesCog(commands.Cog):
             title=f'Class "{class_repr.abbv}-{class_repr.number}" set',
             color=Colors.ClemsonOrange)
         avi = ctx.author.display_avatar.url
-        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+        embed.set_footer(text=f'{ctx.author} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
@@ -194,7 +194,7 @@ class ManageClassesCog(commands.Cog):
 
         embed = discord.Embed(title=f'Class name: "{class_repr.name}" set', color=Colors.ClemsonOrange)
         avi = ctx.author.display_avatar.url
-        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+        embed.set_footer(text=f'{ctx.author} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
@@ -218,7 +218,7 @@ class ManageClassesCog(commands.Cog):
             title=f'Class description: "{class_repr.description}" set',
             color=Colors.ClemsonOrange)
         avi = ctx.author.display_avatar.url
-        embed.set_footer(text=f'{self.get_full_name(ctx.author)} - Time Limit: {TIMEOUT} Seconds',
+        embed.set_footer(text=f'{ctx.author} - Time Limit: {TIMEOUT} Seconds',
                          icon_url=avi)
         embed.add_field(name='**Current values**', value=class_repr)
         embed.add_field(
@@ -299,7 +299,7 @@ class ManageClassesCog(commands.Cog):
             embed.add_field(name="If you would like to hide all class channels you are not in, run:", value="```!roles cleanup```", inline=False)
             await ctx.send(embed=embed)
         
-        log.info(f'Syncing channel and role with cleanup')
+        log.info('Syncing channel and role with cleanup')
         await channel.set_permissions(role, view_channel=True)
         await channel.set_permissions(cleanup, view_channel=False)
         await role.edit(position=2)
@@ -313,10 +313,6 @@ class ManageClassesCog(commands.Cog):
 
     async def input_timeout(self, ctx):
         await ctx.send('Response timed out please redo the class wizard')
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
 
 def round_down(num, divisor):
     return num - (num % divisor)

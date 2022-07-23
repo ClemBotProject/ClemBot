@@ -1,6 +1,7 @@
 import logging
 import os
 import typing as t
+from bot.utils.helpers import chunk_sequence
 
 import discord
 import discord.ext.commands as commands
@@ -81,7 +82,7 @@ class GradesCog(commands.Cog):
         if error_title:
             embed = discord.Embed(title='Grades', color=Colors.Error)
             embed.add_field(name='ERROR: ' + error_title, value=error_message, inline=False)
-            embed.add_field(name=f'Help:', value=f'Run `{await self.bot.current_prefix(ctx)}grades list` to find what courses are available',
+            embed.add_field(name='Help:', value=f'Run `{await self.bot.current_prefix(ctx)}grades list` to find what courses are available',
                             inline=False)
             return await ctx.send(embed=embed)
 
@@ -89,9 +90,9 @@ class GradesCog(commands.Cog):
         df = self.grades_df[(self.grades_df.CourseId == course) & (self.grades_df.Year >= year)]
 
         if honors == 'honors':
-            df = df[df.Honors == True]
+            df = df[df.Honors is True]
         elif honors == 'non-honors':
-            df = df[df.Honors != True]
+            df = df[df.Honors is not True]
 
         description = df.Title.tolist()[0]
 
@@ -107,7 +108,7 @@ class GradesCog(commands.Cog):
         embeds = []
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.description = description
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df)), inline=False)
@@ -121,7 +122,7 @@ class GradesCog(commands.Cog):
         for i, row in df.groupby(['Instructor']).mean().iterrows():
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.description = description
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
             C = f'{int(row.C.round(2) * 100)}%'
@@ -167,7 +168,7 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title='Professors', color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
-            embed.add_field(name=f'Help:', value=f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available',
+            embed.add_field(name='Help:', value=f'Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available',
                             inline=False)
             return await ctx.send(embed=embed)
 
@@ -176,9 +177,9 @@ class GradesCog(commands.Cog):
 
         # Honors/Non-honors logic
         if honors == 'honors':
-            df = df[df.Honors == True]
+            df = df[df.Honors is True]
         elif honors == 'non-honors':
-            df = df[df.Honors != True]
+            df = df[df.Honors is not True]
 
         if df.empty:
             title = "Error: That professor has no available data"
@@ -189,7 +190,7 @@ class GradesCog(commands.Cog):
                 title += ' for non-honors'
 
             embed = discord.Embed(title=title, color=Colors.Error)
-            embed.add_field(name=f'Help:',
+            embed.add_field(name='Help:',
                             value=f"This professor's data might be under a different name, run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available",
                             inline=False)
             return await ctx.send(embed=embed)
@@ -212,7 +213,7 @@ class GradesCog(commands.Cog):
         embeds = []
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.add_field(name='Overall Distribution', value=f'```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```')
         embed.add_field(name='Total Number of Classes Analyzed', value=str(len(df.groupby(['CourseId']))), inline=False)
         embed.add_field(name='Explanation', value=f'Run `{await self.bot.current_prefix(ctx)}help grades` for more information on this command')
@@ -227,7 +228,7 @@ class GradesCog(commands.Cog):
 
         for i, row in df.groupby(['CourseId']).mean().iterrows():
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             A = f'{int(row.A.round(2) * 100)}%'
             B = f'{int(row.B.round(2) * 100)}%'
             C = f'{int(row.C.round(2) * 100)}%'
@@ -253,11 +254,11 @@ class GradesCog(commands.Cog):
         embeds = []
 
         # begin generating paginated columns
-        for chunk in self.chunk_list([prof.name for i, prof in grades], 51):
+        for chunk in chunk_sequence([prof.name for i, prof in grades], 51):
 
             # we need to create the columns on the page so chunk the list again
             content = ''
-            for col in self.chunk_list(chunk, 3):
+            for col in chunk_sequence(chunk, 3):
                 #the columns wont have the perfect number of elements every time, we need to append spaces if
                 #the list entries is less then the number of columns
                 while len(col) < 3:
@@ -272,7 +273,7 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title='All Known Courses', color=Colors.ClemsonOrange)
             embed.add_field(name='Listings:', value=f'```{content}```')
             embed.add_field(name='Info:',
-                            value=f'Clemson provides incomplete and mangled data so there may be different versions of the same course, as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
+                            value='Clemson provides incomplete and mangled data so there may be different versions of the same course, as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
                             inline=False)
 
             embeds.append(embed)
@@ -298,11 +299,11 @@ class GradesCog(commands.Cog):
 
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
-        for chunk in self.chunk_list([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
+        for chunk in chunk_sequence([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
 
             # we need to create the columns on the page so chunk the list again
             content = ''
-            for col in self.chunk_list(chunk, 2):
+            for col in chunk_sequence(chunk, 2):
                 #the columns wont have the perfect number of elements every time, we need to append spaces if
                 #the list entries is less then the number of columns
                 while len(col) < 3:
@@ -316,7 +317,7 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title='All Known Professors', color=Colors.ClemsonOrange)
             embed.add_field(name='Listings:', value=f'```{content}```')
             embed.add_field(name='Info:',
-                            value=f'Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
+                            value='Clemson provides incomplete and mangled data so there may be multiple different versions of the same professor as well as other mangled names. This is just a byproduct of how the data is distributed by the university',
                             inline=False)
 
             embeds.append(embed)
@@ -334,14 +335,6 @@ class GradesCog(commands.Cog):
                                          author=ctx.author,
                                          channel=ctx.channel,
                                          timeout=360)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
 
 def setup(bot):

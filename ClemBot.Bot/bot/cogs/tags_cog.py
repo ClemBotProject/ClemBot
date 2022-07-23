@@ -13,6 +13,7 @@ from bot.models import Tag
 from bot.consts import Colors, Claims, TAG_INVOKE_REGEX
 from bot.messaging.events import Events
 from bot.services.tag_service import TagService
+from bot.utils.helpers import chunk_sequence
 
 log = logging.getLogger(__name__)
 
@@ -63,9 +64,9 @@ class TagCog(commands.Cog):
 
         # check for if no tags exist in this server
         if not tags:
-            embed = discord.Embed(title=f'Available Tags', color=Colors.ClemsonOrange)
+            embed = discord.Embed(title='Available Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Available:', value='There are no currently available tags.')
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             msg = await ctx.send(embed=embed)
             await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
             return
@@ -104,7 +105,7 @@ class TagCog(commands.Cog):
         if not ownedTags:
             embed = discord.Embed(title=f'{user.display_name}\'s Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Tags', value='User does not own any tags', inline=True)
-            embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             await ctx.send(embed=embed)
             return
 
@@ -149,7 +150,7 @@ class TagCog(commands.Cog):
 
         embed = discord.Embed(title=":white_check_mark: Tag Added", color=Colors.ClemsonOrange)
         embed.add_field(name="Name", value=name, inline=True)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['remove', 'destroy'])
@@ -197,7 +198,7 @@ class TagCog(commands.Cog):
        
         embed.add_field(name='Uses', value=f'{tag.use_count}')
         embed.add_field(name='Creation Date', value=tag.creation_date)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
@@ -208,8 +209,8 @@ class TagCog(commands.Cog):
     async def search(self, ctx: commands.Context, query: str):
         tags = await self.bot.tag_route.search_tags(ctx.guild.id, query)
 
-        embed = discord.Embed(title=f':information_source:  Search Results', color=Colors.ClemsonOrange)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed = discord.Embed(title=':information_source:  Search Results', color=Colors.ClemsonOrange)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         if tags:
             embed.description = '\n\n'.join([f'**{i+1}.** `{tag.name}`' for i, tag in enumerate(tags)])
@@ -241,7 +242,7 @@ class TagCog(commands.Cog):
 
         embed = discord.Embed(title=':white_check_mark: Tag Edited', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=tag.name, inline=False)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
+        embed.set_footer(text=str(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command()
@@ -261,11 +262,10 @@ class TagCog(commands.Cog):
         # transfer tag to new owner
         author = ctx.author
         await self.bot.tag_route.edit_tag_owner(ctx.guild.id, name, author.id, raise_on_error=True)
-
-        embed = discord.Embed(title=f':white_check_mark: Tag Claimed', color=Colors.ClemsonOrange)
+        embed = discord.Embed(title=':white_check_mark: Tag Claimed', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=tag.name, inline=True)
         embed.add_field(name='Owner', value=author.mention, inline=True)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
+        embed.set_footer(text=str(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     @tag.command(aliases=['unowned'])
@@ -283,7 +283,7 @@ class TagCog(commands.Cog):
         if len(unclaimed_tags) == 0:
             embed = discord.Embed(title='Unclaimed Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Unclaimed:', value='There are currently no unclaimed tags.')
-            embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
+            embed.set_footer(text=str(author), icon_url=author.display_avatar.url)
             msg = await ctx.send(embed=embed)
             await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
             return
@@ -337,7 +337,7 @@ class TagCog(commands.Cog):
         embed.add_field(name='From', value=f'{author.mention} :arrow_right:')
         embed.add_field(name='To', value=user.mention)
         embed.add_field(name='Name', value=tag.name, inline=False)
-        embed.set_footer(text=self.get_full_name(author), icon_url=author.display_avatar.url)
+        embed.set_footer(text=str(author), icon_url=author.display_avatar.url)
         await ctx.send(embed=embed)
 
     # Tag prefix functions
@@ -409,7 +409,7 @@ class TagCog(commands.Cog):
         dictionary = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
         embed = discord.Embed(title=':white_check_mark: Tag Deleted', color=Colors.ClemsonOrange)
         embed.add_field(name='Name', value=dictionary['name'], inline=False)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     async def _check_tag_exists(self, ctx, name: str) -> Optional[Tag]:
@@ -448,22 +448,14 @@ class TagCog(commands.Cog):
     async def _error_embed(self, ctx, desc: str):
         """Short-hand for sending an error message w/ consistent formatting."""
         embed = discord.Embed(title='Error', color=Colors.Error, description=desc)
-        embed.set_footer(text=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
-    def chunk_list(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
 
     def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str, url: str):
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
-        for chunk in self.chunk_list(tags_list, n):
+        for chunk in chunk_sequence(tags_list, n):
             embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
             embed.set_footer(text=f'Use tags with "{prefix}tag <name>", or inline with "$name"')
             embed.description = f'To view all tags please visit: [clembot.io]({url})'

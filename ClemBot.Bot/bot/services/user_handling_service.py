@@ -1,9 +1,7 @@
-import datetime as datetime
 import logging
 from datetime import datetime
 import typing as t
 import dataclasses
-import asyncio
 
 import discord
 
@@ -90,7 +88,7 @@ class UserHandlingService(BaseService):
 
     async def notify_user_join(self, user: discord.Member):
         embed = discord.Embed(title='New User Joined', color=Colors.ClemsonOrange)
-        embed.add_field(name='Username', value=self.get_full_name(user))
+        embed.add_field(name='Username', value=str(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
@@ -102,7 +100,7 @@ class UserHandlingService(BaseService):
 
     async def notify_user_remove(self, user: discord.Member):
         embed = discord.Embed(title='Guild User Left', color=Colors.Error)
-        embed.add_field(name='Username', value=self.get_full_name(user))
+        embed.add_field(name='Username', value=str(user))
         embed.add_field(name='Account Creation date', value=user.created_at.date())
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_footer(text=str(datetime.now().date()))
@@ -111,9 +109,6 @@ class UserHandlingService(BaseService):
                                          DesignatedChannels.user_leave_log,
                                          user.guild.id,
                                          embed)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
     async def load_service(self) -> None:
         pass

@@ -79,7 +79,7 @@ class SourceCodeCog(commands.Cog):
         if not file:
             embed = discord.Embed(title="Here's my source repository",
                                   color=Colors.ClemsonOrange,
-                                  description=f'Feel free to contribute :grin:')
+                                  description='Feel free to contribute :grin:')
             embed.add_field(name='Link', value=f'[Source]({self.repo_url})')
             embed.set_thumbnail(url='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
             await ctx.send(embed=embed)
@@ -90,7 +90,7 @@ class SourceCodeCog(commands.Cog):
 
         embed = discord.Embed(title=f"Here's the source for {file}",
                               color=Colors.ClemsonOrange,
-                              description=f'Feel free to contribute :grin:')
+                              description='Feel free to contribute :grin:')
         embed.add_field(name='Link', value=f'[Source]({gh_url})')
         embed.set_thumbnail(url='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
         await ctx.send(embed=embed)
@@ -128,7 +128,7 @@ class SourceCodeCog(commands.Cog):
         file_type = file.split('.')[-1]
 
         if file_type == 'json' or file_type == 'env':
-            embed = discord.Embed(title=f'Error: Restricted access', color=Colors.Error)
+            embed = discord.Embed(title='Error: Restricted access', color=Colors.Error)
             await ctx.send(embed=embed)
             return
         else:
@@ -137,7 +137,7 @@ class SourceCodeCog(commands.Cog):
 
         if line_start is not None and line_stop is not None:
             if line_start >= line_stop:
-                embed = discord.Embed(title=f'Error: Line numbers are invalid', color=Colors.Error)
+                embed = discord.Embed(title='Error: Line numbers are invalid', color=Colors.Error)
                 await ctx.send(embed=embed)
                 return
 
@@ -155,7 +155,7 @@ class SourceCodeCog(commands.Cog):
                 return
 
             if line_stop is not None and len(source.splitlines()) < line_stop:
-                embed = discord.Embed(title=f'Error: End line number too high', color=Colors.Error)
+                embed = discord.Embed(title='Error: End line number too high', color=Colors.Error)
                 await ctx.send(embed=embed)
                 return
 

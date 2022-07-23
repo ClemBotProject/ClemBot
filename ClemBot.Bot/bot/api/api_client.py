@@ -144,7 +144,7 @@ class ApiClient:
                 if resp.status == HTTPStatus.FORBIDDEN:
                     log.error('JWT Auth denied, Invalid API key')
 
-        except aiohttp.ClientConnectorError as e:
+        except aiohttp.ClientConnectorError:
             log.exception('Error: ClemBot.Api not found')
             return
 
