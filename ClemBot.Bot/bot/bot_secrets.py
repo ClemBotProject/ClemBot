@@ -43,27 +43,27 @@ class BotSecrets:
         """
 
         if not self._client_token:
-            raise ConfigAccessError(f'client_token has not been initialized')
+            raise ConfigAccessError('client_token has not been initialized')
         else:
             return self._client_token
 
     @client_token.setter
     def client_token(self, value: str) -> None:
         if self._client_token:
-            raise ConfigAccessError(f'client_token has already been initialized')
+            raise ConfigAccessError('client_token has already been initialized')
         else:
             self._client_token = value
 
     @property
     def client_secret(self) -> str:
         if not self._client_secret:
-            raise ConfigAccessError(f'client_secret has not been intialized')
+            raise ConfigAccessError('client_secret has not been intialized')
         return self._client_token
 
     @client_secret.setter
     def client_secret(self, value: str) -> None:
         if self._client_secret:
-            raise ConfigAccessError(f'client_secret has already been initialized')
+            raise ConfigAccessError('client_secret has already been initialized')
         self._client_secret = value
 
     @property
@@ -78,13 +78,13 @@ class BotSecrets:
             str: The api Token
         """
         if not self._bot_token:
-            raise ConfigAccessError(f'bot_token has not been intialized')
+            raise ConfigAccessError('bot_token has not been intialized')
         return self._bot_token
 
     @bot_token.setter
     def bot_token(self, value: str) -> None:
         if self._bot_token:
-            raise ConfigAccessError(f'bot_token has already been initialized')
+            raise ConfigAccessError('bot_token has already been initialized')
         self._bot_token = value
 
     @property
@@ -96,7 +96,7 @@ class BotSecrets:
     @bot_only.setter
     def bot_only(self, value) -> None:
         if self.bot_only:
-            raise ConfigAccessError(f'bot_only has already been initialized')
+            raise ConfigAccessError('bot_only has already been initialized')
 
         if isinstance(value, str):
             self._bot_only = bool(value)
@@ -112,19 +112,19 @@ class BotSecrets:
     @bot_prefix.setter
     def bot_prefix(self, value: str) -> None:
         if self._bot_prefix:
-            raise ConfigAccessError(f'bot_prefix has already been initialized')
+            raise ConfigAccessError('bot_prefix has already been initialized')
         self._bot_prefix = value
 
     @property
     def gif_me_token(self) -> str:
         if not self._gifMe_token:
-            raise ConfigAccessError(f'gif_me has not been initialized')
+            raise ConfigAccessError('gif_me has not been initialized')
         return self._gifMe_token
 
     @gif_me_token.setter
     def gif_me_token(self, value: str) -> None:
         if self._gifMe_token:
-            raise ConfigAccessError(f'gif_me_token has already been initialized')
+            raise ConfigAccessError('gif_me_token has already been initialized')
         self._gifMe_token = value
 
     @property
@@ -136,139 +136,139 @@ class BotSecrets:
     @github_url.setter
     def github_url(self, value: str) -> None:
         if self._github_url:
-            raise ConfigAccessError(f'github_url has already been initialized')
+            raise ConfigAccessError('github_url has already been initialized')
         self._github_url = value
 
     @property
     def repl_url(self) -> str:
         if not self._repl_url:
-            raise ConfigAccessError(f'repl_url has not been intialized')
+            raise ConfigAccessError('repl_url has not been intialized')
         return self._repl_url
 
     @repl_url.setter
     def repl_url(self, value: str) -> None:
         if self._repl_url:
-            raise ConfigAccessError(f'repl_url has already been initialized')
+            raise ConfigAccessError('repl_url has already been initialized')
         self._repl_url = value
 
     @property
     def merriam_key(self) -> str:
         if not self._merriam_key:
-            raise ConfigAccessError(f'merriam_key has not been intialized')
+            raise ConfigAccessError('merriam_key has not been intialized')
         return self._merriam_key
 
     @merriam_key.setter
     def merriam_key(self, value: str) -> None:
         if self._merriam_key:
-            raise ConfigAccessError(f'merriam_key has already been initialized')
+            raise ConfigAccessError('merriam_key has already been initialized')
         self._merriam_key = value
 
     @property
     def weather_key(self) -> str:
         if not self._weather_key:
-            raise ConfigAccessError(f'weather_key has not been initialized')
+            raise ConfigAccessError('weather_key has not been initialized')
         return self._weather_key
 
     @weather_key.setter
     def weather_key(self, value: str) -> None:
         if self._weather_key:
-            raise ConfigAccessError(f'weather_key has already been initialized')
+            raise ConfigAccessError('weather_key has already been initialized')
         self._weather_key = value
 
     @property
     def startup_log_channel_ids(self) -> t.List[int]:
         if not self._startup_log_channel_ids:
-            raise ConfigAccessError(f'startup_log_channel_ids has not been initialized')
+            raise ConfigAccessError('startup_log_channel_ids has not been initialized')
         return self._startup_log_channel_ids
 
     @startup_log_channel_ids.setter
     def startup_log_channel_ids(self, value: t.List[int]):
         if self._startup_log_channel_ids:
-            raise ConfigAccessError(f'startup_log_channel_ids has already been initialized')
+            raise ConfigAccessError('startup_log_channel_ids has already been initialized')
         self._startup_log_channel_ids = value
 
     @property
     def error_log_channel_ids(self) -> t.List[int]:
         if not self._error_log_channel_ids:
-            raise ConfigAccessError(f'error_log_channel_ids has not been initialized')
+            raise ConfigAccessError('error_log_channel_ids has not been initialized')
         return self._error_log_channel_ids
 
     @error_log_channel_ids.setter
     def error_log_channel_ids(self, value: t.List[int]):
         if self._error_log_channel_ids:
-            raise ConfigAccessError(f'error_log_channel_ids has already been initialized')
+            raise ConfigAccessError('error_log_channel_ids has already been initialized')
         self._error_log_channel_ids = value
 
     @property
     def geocode_key(self) -> str:
         if not self._geocode_key:
-            raise ConfigAccessError(f'geocode_key has not been initialized')
+            raise ConfigAccessError('geocode_key has not been initialized')
         return self._geocode_key
 
     @geocode_key.setter
     def geocode_key(self, value: str) -> None:
         if self._geocode_key:
-            raise ConfigAccessError(f'geocode_key has already been initialized')
+            raise ConfigAccessError('geocode_key has already been initialized')
         self._geocode_key = value
 
     @property
     def azure_translate_key(self) -> str:
         if not self._azure_translate_key:
-            raise ConfigAccessError(f'azure_translate_key has not been initialized')
+            raise ConfigAccessError('azure_translate_key has not been initialized')
         return self._azure_translate_key
 
     @azure_translate_key.setter
     def azure_translate_key(self, value: str) -> None:
         if self._azure_translate_key:
-            raise ConfigAccessError(f'azure_translate_key has already been initialized')
+            raise ConfigAccessError('azure_translate_key has already been initialized')
         self._azure_translate_key = value
 
     @property
     def api_url(self) -> str:
         if not self._api_url:
-            raise ConfigAccessError(f'api_url has not been initialized')
+            raise ConfigAccessError('api_url has not been initialized')
         return self._api_url
 
     @api_url.setter
     def api_url(self, value: str) -> None:
         if self._api_url:
-            raise ConfigAccessError(f'api_url has already been initialized')
+            raise ConfigAccessError('api_url has already been initialized')
         self._api_url = value
 
     @property
     def api_key(self) -> str:
         if not self._api_key:
-            raise ConfigAccessError(f'api_key has not been initialized')
+            raise ConfigAccessError('api_key has not been initialized')
         return self._api_key
 
     @api_key.setter
     def api_key(self, value: str) -> None:
         if self._api_key:
-            raise ConfigAccessError(f'api_key has already been initialized')
+            raise ConfigAccessError('api_key has already been initialized')
         self._api_key = value
 
     @property
     def site_url(self) -> str:
         if not self._site_url:
-            raise ConfigAccessError(f'site_url has not been initialized')
+            raise ConfigAccessError('site_url has not been initialized')
         return self._site_url
 
     @site_url.setter
     def site_url(self, value: str) -> None:
         if self._site_url:
-            raise ConfigAccessError(f'site_url has already been initialized')
+            raise ConfigAccessError('site_url has already been initialized')
         self._site_url = value
 
     @property
     def docs_url(self) -> str:
         if not self._docs_url:
-            raise ConfigAccessError(f'docs_url has not been initialized')
+            raise ConfigAccessError('docs_url has not been initialized')
         return self._docs_url
 
     @docs_url.setter
     def docs_url(self, value: str) -> None:
         if self._docs_url:
-            raise ConfigAccessError(f'docs_url has already been initialized')
+            raise ConfigAccessError('docs_url has already been initialized')
         self._docs_url = value
 
     def load_development_secrets(self, lines: str) -> None:

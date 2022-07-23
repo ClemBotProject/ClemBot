@@ -1,3 +1,4 @@
+"""
 import logging
 from datetime import datetime
 
@@ -11,7 +12,6 @@ from bot.utils import converters
 log = logging.getLogger(__name__)
 
 
-"""
 class RemindService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)

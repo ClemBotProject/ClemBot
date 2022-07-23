@@ -1,3 +1,4 @@
+'''
 import logging
 
 import discord
@@ -10,7 +11,6 @@ from bot.utils import converters
 
 log = logging.getLogger(__name__)
 
-'''
 class RemindCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

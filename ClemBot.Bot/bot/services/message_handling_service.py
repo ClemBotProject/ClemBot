@@ -110,9 +110,9 @@ class MessageHandlingService(BaseService):
 
     @BaseService.Listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
-        embed = discord.Embed(title=f'Bot Direct Message',
+        embed = discord.Embed(title='Bot Direct Message',
                               color=Colors.ClemsonOrange,
-                              description=f'{message.content}')
+                              description=message.content)
         embed.set_footer(text=message.author, icon_url=message.author.display_avatar.url)
 
         log.info('Message from {author}: "{content}" Guild Unknown (DM)',
@@ -139,7 +139,7 @@ class MessageHandlingService(BaseService):
 
         embed = discord.Embed(title=f':repeat: **Message Edited in #{before.channel.name}**',
                               color=Colors.ClemsonOrange)
-        embed.add_field(name=f'Message Link', value=f'[Click Here]({after.jump_url})')
+        embed.add_field(name='Message Link', value=f'[Click Here]({after.jump_url})')
 
         before_chunk = self.split_string_chunks(before.content, 900)
         after_chunk = self.split_string_chunks(after.content, 900)
@@ -150,7 +150,7 @@ class MessageHandlingService(BaseService):
         for i, val in enumerate(after_chunk):
             embed.add_field(name='**After**' if i == 0 else 'Cont...', value=f'```{val}```', inline=False)
 
-        embed.set_footer(text=f'{self.get_full_name(before.author)}', icon_url=before.author.display_avatar.url)
+        embed.set_footer(text=f'{before.author}', icon_url=before.author.display_avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.message_log,
@@ -230,7 +230,7 @@ class MessageHandlingService(BaseService):
         for i, val in enumerate(message_chunk):
             embed.add_field(name='**Message**' if i == 0 else 'Cont...', value=f'```{val}```', inline=False)
 
-        embed.set_footer(text=f'{self.get_full_name(message.author)}', icon_url=message.author.display_avatar.url)
+        embed.set_footer(text=f'{message.author}', icon_url=message.author.display_avatar.url)
 
         await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                          DesignatedChannels.message_log,
@@ -292,8 +292,8 @@ class MessageHandlingService(BaseService):
 
         if len(link_message.embeds) > 0:
             embed = link_message.embeds[0]
-            full_name = f'{self.get_full_name(message.author)}'
-            embed.add_field(name=f'Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
+            full_name = str(message.author)
+            embed.add_field(name='Quoted by:', value=f'{full_name} from [Click Me]({link_message.jump_url})')
             if not has_reply and not raw_text:
                 await message.delete()
             msg = await source_channel.send(embed=embed)
@@ -301,7 +301,7 @@ class MessageHandlingService(BaseService):
             return
 
         embed = discord.Embed(title=f'Message linked from #{link_channel.name}', color=Colors.ClemsonOrange)
-        embed.set_author(name=f'Quoted by: {self.get_full_name(message.author)}', icon_url=avi)
+        embed.set_author(name=f'Quoted by: {message.author}', icon_url=avi)
 
         if link_message.content:
             if len(link_message.content) < MAX_QUOTED_CONTENT_SIZE:
@@ -319,7 +319,7 @@ class MessageHandlingService(BaseService):
 
         if image:
             embed.set_image(url=image)
-        embed.add_field(name='Author', value=f'{self.get_full_name(link_message.author)}', inline=True)
+        embed.add_field(name='Author', value=str(link_message.author), inline=True)
         embed.add_field(name='Message Link', value=f'[Click Me]({link_message.jump_url})', inline=True)
 
         reply_to = None
@@ -332,9 +332,6 @@ class MessageHandlingService(BaseService):
         if not raw_text:
             await message.delete()
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author, timeout=60)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
     def split_string_chunks(self, string: str, n: int) -> Iterable[str]:
         return (string[i: i + n] for i in range(0, len(string), n))

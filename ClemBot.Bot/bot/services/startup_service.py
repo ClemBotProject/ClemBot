@@ -48,10 +48,6 @@ class StartupService(BaseService):
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_threads(guild)
 
-    @staticmethod
-    def get_full_name(author) -> str:
-        return f'{author.name}#{author.discriminator}'
-
     async def load_service(self):
 
         # The startup load is too heavy on prod to reset state everytime we restart,
