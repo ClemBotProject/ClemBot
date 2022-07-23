@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import discord
 from bot.consts import Colors

@@ -91,7 +91,7 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def channel(self, ctx):
 
-        embed = discord.Embed(title=f'Owner Designated Channels', color=Colors.ClemsonOrange)
+        embed = discord.Embed(title='Owner Designated Channels', color=Colors.ClemsonOrange)
 
         if len(list(DesignatedChannels)) == 0:
             embed.add_field(name='No possible Owner designated channels', value='')

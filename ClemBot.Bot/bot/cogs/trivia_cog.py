@@ -1,4 +1,3 @@
-import json
 import logging
 import random
 import aiohttp
@@ -6,6 +5,7 @@ import html
 import asyncio
 import typing as t
 from dataclasses import dataclass
+from bot.utils.helpers import chunk_sequence
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
@@ -36,26 +36,24 @@ class TriviaCog(commands.Cog):
     @ext.example("trivia")
     async def trivia(self, ctx):
 
-        async with await self.session.get(DEFAULT_URL) as resp:
-            parse_text = await resp.text()
-            new_response = json.loads(parse_text)
-            parsed_response = self.html_parser(new_response)
+        async with self.session.get(DEFAULT_URL) as resp:
+            parsed_response = self.html_parser(await resp.json())
 
-            #If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
+            # If you're curious as to why this doesn't check response code: It's because it will never NOT have questions for the default. If it does the website is down and it will error out anyway.
 
         best_list = await self.dict_publisher(parsed_response)  #Publishes the dictionary
 
         new_task = await self.asyncio_publisher(ctx, best_list[1])  #This returns key values for our list
 
-          #Starts the event listener for the reaction BEFORE emojis are sent
+        # Starts the event listener for the reaction BEFORE emojis are sent
 
-        task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  #Sends the emojis for the reaction
+        task_1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4]))  # Sends the emojis for the reaction
         page_int = 0
 
-        while not task1.done():  #Loops reading the user's reaction
-
+        while not task_1.done():  # Loops reading the user's reaction
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
-            if new_reaction != None:
+
+            if new_reaction is not None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], best_list[0], page_int, new_task[4])
        
     @trivia.command(aliases=['m'])
@@ -70,10 +68,11 @@ class TriviaCog(commands.Cog):
         input_length = len(input_list)
         if input_length < 1 or 4 < input_length:
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
+
         url = trivia_cog_converter(input_length, input_list)
         
-        async with await self.session.get(url) as resp:
-            response = json.loads(await resp.text())
+        async with self.session.get(url) as resp:
+            response = await resp.json()
 
         if response["response_code"] == 1:
             raise Exception(
@@ -88,10 +87,9 @@ class TriviaCog(commands.Cog):
         task1 = asyncio.create_task(self.send_scroll_reactions(ctx, new_task[0], new_task[1], new_task[2], new_task[4])) #Same deal as above
         page_int = 0
 
-        while not task1.done():  #Loops reading the user's reaction
-
+        while not task1.done():  # Loops reading the user's reaction
             new_reaction = await self.on_reaction(ctx, new_task[3], new_task[2])
-            if new_reaction != None:
+            if new_reaction is not None:
                 page_int = await self.parse_reaction(ctx,new_task[0], new_reaction[0], new_reaction[1], big_list[0], page_int, new_task[4])  #client.wait_for event listeners are fine. They get unloaded/disposed of at unload
 
 
@@ -106,7 +104,7 @@ class TriviaCog(commands.Cog):
 
         final_page = []
 
-        category_generator = helper_fixer(CATEGORYLIST)
+        category_generator = helper_fixer(CATEGORY_LIST)
        
         for x in category_generator:
             category_embed = discord.Embed(title="Category List:", color=Colors.ClemsonOrange)
@@ -116,15 +114,13 @@ class TriviaCog(commands.Cog):
 
         difficulty_generator = helper_fixer(DIFFICULTY)
 
-      
         for y in difficulty_generator:
             difficulty_embed = discord.Embed(title="Difficulty List:", color=Colors.ClemsonOrange)
             difficulty_embed.add_field(name="Index:", value=y)
 
             final_page.append(difficulty_embed)
-            
 
-        question_generator = helper_fixer(QUESTIONTYPE)
+        question_generator = helper_fixer(QUESTION_TYPE)
         
         for z in question_generator:
             type_embed = discord.Embed(title="Question Type:", color=Colors.ClemsonOrange)
@@ -132,7 +128,6 @@ class TriviaCog(commands.Cog):
 
             final_page.append(type_embed)
           
-
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=final_page,
                                          author=ctx.author,
@@ -140,8 +135,7 @@ class TriviaCog(commands.Cog):
                                          timeout=60,)
 
     def html_parser(self, new_response):
-
-        dictionary_list = []  #pain
+        dictionary_list = []  # pain
 
         for x in new_response["results"]:
             new_dictionary = x
@@ -153,7 +147,7 @@ class TriviaCog(commands.Cog):
                     new_list = []
                     for y in b:
                         if not y.isnumeric():
-                            new_list.append(html.unescape(y))  #This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
+                            new_list.append(html.unescape(y))  # This HTML response is in a weird format where you have to navigate a list that contains dictionaries with that dictionary containing a SINGLE list
                         else:
                             new_list.append(y)
                     proper_values.append(new_list)
@@ -176,28 +170,23 @@ class TriviaCog(commands.Cog):
 
         dictionary_size = len(new_response["results"])
        
-        
         for best_loopint in range (0,dictionary_size):
-            new_response["results"][best_loopint] = dictionary_list[best_loopint]  #Sets the real dictionary to our parsed results
+            new_response["results"][best_loopint] = dictionary_list[best_loopint]  # Sets the real dictionary to our parsed results
 
         return new_response
 
     async def dict_publisher(self, dictionary):
-
-        x = 0
         cog_embeds = []
         list_index = []
 
-        for create_lists in dictionary["results"]:
-
+        for x, create_lists in enumerate(dictionary["results"], start=1):
             answers_list = create_lists["incorrect_answers"]
             answers_list.append(create_lists["correct_answer"])
             right_answer = create_lists["correct_answer"]
 
             random.shuffle(answers_list)
             list_index.append(answers_list.index(right_answer))
-      
-            x += 1
+            
             embed = discord.Embed(title=f"Question # {str(x)}:",color=Colors.ClemsonOrange)
 
             embed.add_field(name="Question:", value=create_lists["question"])
@@ -212,25 +201,24 @@ class TriviaCog(commands.Cog):
 
         mega_list = []
         mega_list.append(list_index)
-        mega_list.append(cog_embeds)  #Returns pages needed for pagination and a INDEX based value for what the answer is. e.g 0 = A 1 = B.
+        mega_list.append(cog_embeds)  # Returns pages needed for pagination and a INDEX based value for what the answer is. e.g 0 = A 1 = B.
 
         return mega_list
 
     async def asyncio_publisher(self, ctx, cog_embeds):
-
         embed_list = await self.set_embed_pageable(cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 10)
         return embed_list
 
     async def on_reaction(self, ctx, message, timeout: int):
-       
         author = ctx.author
+
         def check(reaction, user):
             return user == author and reaction.message.id == message
+
         try:
-            reaction, user = await self.bot.wait_for("reaction_add",timeout=timeout, check=check)
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=timeout, check=check)
         except:
             return None
-
 
         return_list = []
         return_list.append(reaction)  #Returning this
@@ -239,32 +227,19 @@ class TriviaCog(commands.Cog):
         return return_list
 
     async def parse_reaction(self,ctx, message, reaction, user, right_answer, page_int, total_questions):
-
-        msg = self.messages[reaction.message.id]  #If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
-        CURRENT_PAGE = 0 #Current page will ALWAYS be 0 because it deletes each question as it goes along. page_int keeps track of the page
-        match reaction.emoji:
-            case '🇦':
-                if right_answer[page_int] == 0:  # parsing reactions with match case because it is slightly quicker
-                    msg.score_setter+=1
-                    
-            case '🇧':
-                if right_answer[page_int] == 1:  #TODO: Implement scoring/ Database system!
-                    msg.score_setter+=1
-
-            case '🇨':            
-                if right_answer[page_int] == 2:
-                    msg.score_setter+=1
-                    
-            case '🇩':
-                if right_answer[page_int] == 3:  #It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
-                   msg.score_setter+=1
+        msg = self.messages[reaction.message.id]  # If you actually refrence msg.curr_page_num every time it performs a lookup -> to the class rather than a constant
+        
+        # TODO: Implement scoring/ Database system!
+        # It's not a bug that A,B,C,D also show up for boolean questions. Implementing the required logic to remove/add emojis based on the CURRENT pages fields/titles would make this already shaky embed so much slower. If the answer choices are A or B and you pick C its still wrong.
+        if right_answer[page_int] == ANSWER_KEY.index(reaction.emoji):
+            msg.score_setter += 1
 
         if len(msg.pages) <= 1:
             await self.scoreboard_embed(ctx, msg.score, total_questions)
-            await message.delete()  #Deletes embed if the page queue has runout
+            await message.delete()  # Deletes embed if the page queue has runout
             return
         else:
-            del msg.pages[CURRENT_PAGE]
+            del msg.pages[0]
             page_int+=1
             await reaction.message.edit(embed=msg.curr_content)
             await reaction.message.remove_reaction(reaction.emoji, user)
@@ -272,7 +247,6 @@ class TriviaCog(commands.Cog):
         return page_int
 
     async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int):
-
         if not isinstance(pages, t.List):
             pages = [pages]
 
@@ -280,6 +254,7 @@ class TriviaCog(commands.Cog):
 
         if not all(isinstance(p, discord.Embed) for p in pages):
             raise Exception("All paginate embed pages need to be of type discord.Embed")
+
         pages_length = len(pages)
         footer = ''
         if not pages[0].footer.text == discord.Embed.Empty:
@@ -290,33 +265,26 @@ class TriviaCog(commands.Cog):
                           author.id if author else None,
                           footer=footer)
         pages[0].set_footer(text=f"{footer}\nPage 1 of {len(pages)} Score: 0")
+        
         # send the first initial embed
-
         msg = await channel.send(embed=pages[0])
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=msg.author)
 
         self.messages[msg.id] = message
 
-        return_list = []
-        return_list.append(msg)
-        return_list.append(author)
-        return_list.append(timeout)
-        return_list.append(msg.id)
-        return_list.append(pages_length)
+        return [msg, author, timeout, msg.id, pages_length]
 
-        return return_list
     async def scoreboard_embed(self, ctx, score, total_questions):
         current_author = ctx.author
         percent_questions = round((score/total_questions)*100,2)
         score_embed = discord.Embed(title=(f"{current_author}'s score for this round is:  {score} out of {total_questions} this is {percent_questions}% correct"), color=Colors.ClemsonOrange)
         await ctx.send(embed=score_embed) 
 
-
     async def send_scroll_reactions(self,ctx, msg: discord.Message, author: discord.Member, timeout: int, total_questions):
         # add every emoji from the reaction list
        
         for reaction in ANSWER_KEY:
-            await msg.add_reaction(reaction)  #Removed arrows because I made the decision it made the embed look too clunky, took too long to add, and added unneeded complexity
+            await msg.add_reaction(reaction)  # Removed arrows because I made the decision it made the embed look too clunky, took too long to add, and added unneeded complexity
 
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
         
@@ -327,23 +295,16 @@ class TriviaCog(commands.Cog):
                 cog_message = self.messages[msg.id]
                 message_checker = await channel.fetch_message(msg.id)
                 await self.scoreboard_embed(ctx, cog_message.score, total_questions)
-                if message_checker != None:
-                    await msg.delete()  #Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
+                if message_checker is not None:
+                    await msg.delete()  # Prevents storing useless trivia questions. I might implement a scorecard embed so people have proof that they can win virtual trivia? It would publish the embed then delete the questions
             except:
                 pass
             finally:
-                log.info("Message: {msg_id} timed out as pageable", msg_id=msg.id)
-        return 1
-    
+                log.info("Message: {msg_id} timed out as pageable", msg_id=msg.id)    
 
 def helper_fixer(format_this):
     new_list = [f"#{format_this.index(x) + 1}.    {x}" for x in format_this]
-    return ['\n'.join(i) for i in chunk_list(new_list, CHUNK_SIZE)]  #Decided to implement chunking. Although useless now if the category lists expands alot it will be an easy fix.
-
-
-def chunk_list(lst, n):
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+    return ['\n'.join(i) for i in chunk_sequence(new_list, CHUNK_SIZE)]  # Decided to implement chunking. Although useless now if the category lists expands alot it will be an easy fix.
 
 
 CHUNK_SIZE = 24
@@ -353,7 +314,7 @@ ANSWER_KEY = ['🇦',
               '🇨',
               '🇩']
 
-URL_BUILDER = R"https://opentdb.com/api.php?amount="
+URL_BUILDER = "https://opentdb.com/api.php?amount="
 
 DEFAULT_URL = "https://opentdb.com/api.php?amount=10"
 
@@ -363,12 +324,12 @@ DIFFICULTY = ["Easy",
 
 DIFFICULTY_LOWER = [k.lower() for k in DIFFICULTY]
 
-QUESTIONTYPE = [
+QUESTION_TYPE = [
     "multiple",
     "boolean"
 ]
 
-CATEGORYLIST = ["General-Knowledge",  #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
+CATEGORY_LIST = ["General-Knowledge",  # Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
                 "Books",
                 "Film",
                 "Music",
@@ -393,7 +354,7 @@ CATEGORYLIST = ["General-Knowledge",  #Including this out of consistency to avoi
                 "Japanese-Anime&Manga",
                 "Cartoon&Animations"]
 
-CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]
+CATEGORY_LIST_LOWER = [k.lower() for k in CATEGORY_LIST]
 
 
 @dataclass
@@ -406,7 +367,6 @@ class Message:
     field_title: str = None
     score: int = 0
     
-
     @property
     def curr_page_num(self) -> int:
         return self._curr_page_num
@@ -414,6 +374,7 @@ class Message:
     @property
     def score_setter(self) -> int:
         return self.score
+
     @property
     def curr_score(self) -> int:
         return self.score
@@ -425,17 +386,17 @@ class Message:
     @score_setter.setter
     def score_setter(self, score: int):
         self.score = score
+
     @property
     def curr_page(self) -> t.Union[discord.Embed, str]:  #From Paginator cog
         return self.pages[self._curr_page_num]
 
     @property
     def curr_content(self) -> discord.Embed:
-
         page = self.curr_page
         score = self.curr_score
-        if isinstance(page, discord.Embed):
 
+        if isinstance(page, discord.Embed):
             page.set_footer(text=f"{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)} Score: {score}")
             return page
         elif not isinstance(page, str):

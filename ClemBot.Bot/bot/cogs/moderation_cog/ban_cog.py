@@ -28,22 +28,22 @@ class BanCog(commands.Cog):
     async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: t.Optional[int] = 0, *, reason: str):
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
-            embed.title = f'Error: Invalid Permissions'
+            embed.title = 'Error: Invalid Permissions'
             embed.add_field(name='Reason', value='Cannot moderate someone with the same rank or higher')
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         if not 0 <= purge_days <= 7:
             embed = discord.Embed(color=Colors.Error)
-            embed.title = f'Error: Invalid Purge Dates'
+            embed.title = 'Error: Invalid Purge Dates'
             embed.add_field(name='Reason', value='Message purge days must be between 0 and 7')
-            embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
         # Dm the user who was banned
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'You have been banned from Guild {ctx.guild.name}  :hammer:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
@@ -52,7 +52,7 @@ class BanCog(commands.Cog):
             await subject.send(embed=embed)
         except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
-            embed.title = f'Dm Ban to {self.get_full_name(subject)} forbidden'
+            embed.title = f'Dm Ban to {subject} forbidden'
             await self.bot.messenger.publish(Events.on_send_in_designated_channel,
                                              DesignatedChannels.moderation_log,
                                              ctx.guild.id,
@@ -67,8 +67,8 @@ class BanCog(commands.Cog):
                                          purge_days=purge_days)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = f'{self.get_full_name(subject)} Banned  :hammer:'
-        embed.set_author(name=self.get_full_name(ctx.author), icon_url=ctx.author.display_avatar.url)
+        embed.title = f'{subject} Banned  :hammer:'
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=subject.display_avatar.url)
         embed.description = reason
 
@@ -76,8 +76,8 @@ class BanCog(commands.Cog):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = 'Guild Member Banned  :hammer:'
-        embed.set_author(name=f'{self.get_full_name(ctx.author)}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
-        embed.add_field(name=self.get_full_name(subject), value=f'Id: {subject.id}')
+        embed.set_author(name=f'{ctx.author}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
+        embed.add_field(name=str(subject), value=f'Id: {subject.id}')
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         if purge_days != 0:
@@ -88,9 +88,6 @@ class BanCog(commands.Cog):
                                          DesignatedChannels.moderation_log,
                                          ctx.guild.id,
                                          embed)
-
-    def get_full_name(self, author) -> str:
-        return f'{author.name}#{author.discriminator}'
 
 
 def setup(bot):
