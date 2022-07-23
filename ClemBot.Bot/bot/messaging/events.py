@@ -419,11 +419,20 @@ class EventsMeta(type):
         """
             Published when a person sets a reminder 
             Args:
-                userId (int)
-                wait (converters.Duration)
-                message (str)
+                ctx (discord.ext.commands.Context)
+                time (datetime)
+                content (typing.Optional[str])
         """
         return 'on_reminder_set'
+
+    @property
+    def on_delete_reminder(self):
+        """
+            Published when a person deletes a reminder
+            Args:
+                reminder_id (int)
+        """
+        return 'on_reminder_delete'
 
     @property
     def on_bot_mute(self):

@@ -4,6 +4,7 @@ from datetime import datetime
 import discord
 
 from bot.clem_bot import ClemBot
+from bot.utils.helpers import parse_datetime, format_datetime
 from bot.consts import Colors, DesignatedChannels, Moderation, Infractions
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -45,7 +46,7 @@ class ModerationService(BaseService):
         mute_id = await self.bot.moderation_route.insert_mute(guild_id=guild.id,
                                                               author_id=author.id,
                                                               subject_id=subject.id,
-                                                              duration=duration.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                                                              duration=format_datetime(duration),
                                                               reason=reason,
                                                               raise_on_error=True)
 
@@ -175,7 +176,7 @@ class ModerationService(BaseService):
         embed.title = 'Guild Member Banned'
         embed.set_author(name=log.user, icon_url=log.user.display_avatar.url)
 
-        #Dont send anything if clembot did the banning, we handled that case elsewhere
+        # Don't send anything if clembot did the banning, we handled that case elsewhere
         if log.user == self.bot.user:
             return
 
@@ -196,7 +197,7 @@ class ModerationService(BaseService):
             mutes = await self.bot.moderation_route.get_guild_infractions(guild.id)
 
             for mute in (m for m in mutes if m.type == Infractions.mute and m.active):
-                wait: datetime = datetime.strptime(mute.duration, '%Y-%m-%dT%H:%M:%S.%f')
+                wait: datetime = parse_datetime(mute.duration)
 
                 if (wait - datetime.utcnow()).total_seconds() <= 0:
                     await self._unmute_callback(guild.id, mute.subject_id, mute.id)

@@ -16,7 +16,16 @@ public class RemindersController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("bot/[controller]")]
+    [HttpGet("bot/[controller]")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> FetchAll([FromBody] FetchAll.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpPost("bot/[controller]/create")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Create(Create.Model model) =>
         await _mediator.Send(model) switch
@@ -43,6 +52,15 @@ public class RemindersController : ControllerBase
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpPatch("bot/[controller]/edit")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Edit(Edit.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => throw new InvalidOperationException()
         };
 }

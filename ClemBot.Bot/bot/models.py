@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass
@@ -33,6 +34,7 @@ class Infraction(DataClassJsonMixin):
 @dataclass
 class Reminder(DataClassJsonMixin):
     id: int
+    task_id: uuid.UUID
     link: str
     content: Optional[str]
     time: datetime
