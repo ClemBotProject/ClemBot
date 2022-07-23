@@ -6,8 +6,6 @@ import bot.extensions as ext
 import discord.ext.commands as commands
 import typing as t
 
-from typing import Optional
-
 from bot import bot_secrets
 from bot.models import Tag
 from bot.consts import Colors, Claims, TAG_INVOKE_REGEX
@@ -43,7 +41,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Supports custom tag functionality')
     @ext.example(('tag', 'tag mytag'))
-    async def tag(self, ctx: commands.Context, tag_name: Optional[str] = None):
+    async def tag(self, ctx: commands.Context, tag_name: t.Optional[str] = None):
         # check if a tag name was given
         if tag_name:
             tag_name = tag_name.lower()
@@ -91,18 +89,18 @@ class TagCog(commands.Cog):
     @ext.short_help('Lists owned tags')
     @ext.example(['tag owned', 'tag owned @user'])
     # returns a list of all tags owned by the calling user or given user returned in pages
-    async def owned(self, ctx: commands.Context, user: Optional[discord.Member] = None):
+    async def owned(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
         if not user:
             user = ctx.author
 
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
 
-        ownedTags = []
+        owned_tags = []
         for tag in tags:
             if tag.user_id == user.id:
-                ownedTags.append(tag)
+                owned_tags.append(tag)
 
-        if not ownedTags:
+        if not owned_tags:
             embed = discord.Embed(title=f'{user.display_name}\'s Tags', color=Colors.ClemsonOrange)
             embed.add_field(name='Tags', value='User does not own any tags', inline=True)
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
@@ -110,7 +108,7 @@ class TagCog(commands.Cog):
             return
 
         tags_url = f'{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags'
-        pages = self.chunked_tags(ownedTags, TAG_CHUNK_SIZE, ctx.prefix, f"{user.name}'s Available Tags", tags_url)
+        pages = self.chunked_tags(owned_tags, TAG_CHUNK_SIZE, ctx.prefix, f"{user.name}'s Available Tags", tags_url)
         
         await self.bot.messenger.publish(Events.on_set_pageable_embed,
                                          pages=pages,
@@ -125,7 +123,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Creates a tag')
     @ext.example('tag add mytagname mytagcontent')
-    async def add(self, ctx, name: str, *, content: str):
+    async def add(self, ctx: commands.Context, name: str, *, content: str):
         name = name.lower()
 
         if len(name) > MAX_TAG_NAME_SIZE:
@@ -182,7 +180,7 @@ class TagCog(commands.Cog):
     @ext.long_help('Provides info about a given tag including creation date, usage stats and tag owner')
     @ext.short_help('Provides info about tag')
     @ext.example('tag info mytagname')
-    async def info(self, ctx, name: str):
+    async def info(self, ctx: commands.Context, name: str):
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
 
@@ -225,7 +223,7 @@ class TagCog(commands.Cog):
     @ext.short_help('Edits a tag')
     @ext.long_help('Edits the content of a tag')
     @ext.example('tag edit mytagname mynewtagcontent')
-    async def edit(self, ctx, name: str, *, content: str):
+    async def edit(self, ctx: commands.Context, name: str, *, content: str):
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
 
@@ -250,7 +248,7 @@ class TagCog(commands.Cog):
     @ext.short_help('Claims a tag')
     @ext.long_help('Claims a tag with the given name as your own')
     @ext.example('tag claim mytagname')
-    async def claim(self, ctx, name: str):
+    async def claim(self, ctx: commands.Context, name: str):
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
 
@@ -272,7 +270,7 @@ class TagCog(commands.Cog):
     @ext.short_help('Lists all unclaimed tags')
     @ext.long_help('Gets a list of all unowned tags available to be claimed')
     @ext.example(['tag unclaimed', 'tag unowned'])
-    async def unclaimed(self, ctx):
+    async def unclaimed(self, ctx: commands.Context):
         guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
         unclaimed_tags = []
         for tag in guild_tags:
@@ -303,7 +301,7 @@ class TagCog(commands.Cog):
     @ext.short_help('Gives your tag to someone else.')
     @ext.long_help('Transfers the tag to the given user')
     @ext.example(['tag transfer tagname @user', 'tag give tagname @user'])
-    async def transfer(self, ctx, name: str, user: discord.User):
+    async def transfer(self, ctx: commands.Context, name: str, user: discord.User):
         # check if user is a bot
         if user.bot:
             await self._error_embed(ctx, f'Cannot transfer tag `{name}` to a bot.')
@@ -347,12 +345,12 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Configure a custom command tag prefix')
     @ext.example(('tag prefix', 'tag prefix ?', 'tag prefix >>'))
-    async def prefix(self, ctx, *, tagprefix: t.Optional[str] = None):
+    async def prefix(self, ctx: commands.Context, *, new_tag_prefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global so we dont care about them
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
         
-        if not tagprefix:
+        if not new_tag_prefix:
             if not tag_prefixes:
                 tag_prefixes = [DEFAULT_TAG_PREFIX]
             embed = discord.Embed(title='Current Active Tag Prefixes',
@@ -361,22 +359,22 @@ class TagCog(commands.Cog):
 
             return await ctx.send(embed=embed)
 
-        if tagprefix in tag_prefixes:
+        if new_tag_prefix in tag_prefixes:
             embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Invalid tag prefix', value=f'"{tagprefix}" is already the tag prefix for this guild')
+            embed.add_field(name='Invalid tag prefix', value=f'"{new_tag_prefix}" is already the tag prefix for this guild')
             await ctx.send(embed=embed)
             return
 
-        if '`' in tagprefix:
+        if '`' in new_tag_prefix:
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.add_field(name='Invalid tag prefix', value='Tag Prefix can not contain " ` "')
             await ctx.send(embed=embed)
             return
 
-        await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(ctx.guild.id, tagprefix)
+        await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(ctx.guild.id, new_tag_prefix)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.add_field(name='Tag Prefix changed   :white_check_mark:', value=f'New Tag Prefix: ```{tagprefix}```')
+        embed.add_field(name='Tag Prefix changed   :white_check_mark:', value=f'New Tag Prefix: ```{new_tag_prefix}```')
         await ctx.send(embed=embed)
 
     @prefix.command(pass_context=True, aliases=['revert'])
@@ -386,7 +384,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('resets a custom tag prefix')
     @ext.example('tag prefix set')
-    async def reset(self, ctx):
+    async def reset(self, ctx: commands.Context):
         default_tag_prefix = DEFAULT_TAG_PREFIX
 
         if default_tag_prefix in await self.bot.get_tag_prefix(ctx.message):
@@ -404,7 +402,7 @@ class TagCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def _delete_tag(self, name, ctx):
+    async def _delete_tag(self, name: str, ctx: commands.Context):
         name = name.lower()
         dictionary = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
         embed = discord.Embed(title=':white_check_mark: Tag Deleted', color=Colors.ClemsonOrange)
@@ -412,7 +410,7 @@ class TagCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx, name: str) -> Optional[Tag]:
+    async def _check_tag_exists(self, ctx: commands.Context, name: str) -> t.Optional[Tag]:
         """
         Checks if the given tag exists.
         If so, returns the tag.
@@ -426,7 +424,7 @@ class TagCog(commands.Cog):
 
         return tag
 
-    async def _check_tag_content(self, ctx: commands.Context, content: str) -> Optional[str]:
+    async def _check_tag_content(self, ctx: commands.Context, content: str) -> t.Optional[str]:
         """
         Checks if the given tag content meets max length and content size.
         If so, returns the content with escaped mentions.
@@ -445,7 +443,7 @@ class TagCog(commands.Cog):
 
         return discord.utils.escape_mentions(content)
 
-    async def _error_embed(self, ctx, desc: str):
+    async def _error_embed(self, ctx: commands.Context, desc: str):
         """Short-hand for sending an error message w/ consistent formatting."""
         embed = discord.Embed(title='Error', color=Colors.Error, description=desc)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)

@@ -7,6 +7,7 @@ import discord
 from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.helpers import chunk_sequence
 import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
 from bot.consts import TAG_INVOKE_REGEX
@@ -34,7 +35,7 @@ class TagService(BaseService):
         
         # find all tag matches in the message content
         pattern = re.compile(TAG_INVOKE_REGEX.format(tag_prefix=re.escape(tag_prefix)))
-        for match in set(i[1] for i in pattern.findall(message.content)):
+        for match in {i[1] for i in pattern.findall(message.content)}:
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 
             if not tag:
@@ -58,7 +59,7 @@ class TagService(BaseService):
         # if there is more than one tag invoked, check if we should paginate
         if len(tags_contents) > 1:
             # check if there's more than one page of tags, if there is we should paginate them
-            if len(pages := list(self.chunk_iterable(tags_str, TAG_PAGINATE_THRESHOLD))) > 1:
+            if len(pages := list(chunk_sequence(tags_str, TAG_PAGINATE_THRESHOLD))) > 1:
                 await self.bot.messenger.publish(Events.on_set_pageable_text,
                                                 embed_name='Tags Contents',
                                                 field_title='Contents',
@@ -100,11 +101,6 @@ class TagService(BaseService):
             tag_prefixes = [TAG_PREFIX_DEFAULT]
 
         return tag_prefixes
-
-    @staticmethod
-    def chunk_iterable(iterable, chunk_size):
-        for i in range(0, len(iterable), chunk_size):
-            yield iterable[i:i + chunk_size]
 
     async def load_service(self):
         pass
