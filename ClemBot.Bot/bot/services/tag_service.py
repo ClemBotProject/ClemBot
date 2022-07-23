@@ -25,7 +25,7 @@ class TagService(BaseService):
 
     @BaseService.Listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
-        tag_prefix = await self.get_tag_prefix(self.bot, message=message)
+        tag_prefix = await self.get_tag_prefix(message)
         if tag_prefix is None:
             return
             
@@ -35,7 +35,7 @@ class TagService(BaseService):
         
         # find all tag matches in the message content
         pattern = re.compile(TAG_INVOKE_REGEX.format(tag_prefix=re.escape(tag_prefix)))
-        for match in {i[1] for i in pattern.findall(message.content)}:
+        for match in set(pattern.findall(message.content)):
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 
             if not tag:

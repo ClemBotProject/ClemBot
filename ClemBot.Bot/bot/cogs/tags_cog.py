@@ -131,7 +131,7 @@ class TagCog(commands.Cog):
             return
 
         # make sure tag invoke regex can match the name properly
-        tag_prefix = await self.tag_service.get_tag_prefix(ctx.message)
+        tag_prefix = (await self.tag_service.get_tag_prefix(ctx.message))[0]
         ex_tag_invoke = f'{tag_prefix}{content}'
         if ex_tag_invoke != re.match(TAG_INVOKE_REGEX.format(tag_prefix=re.escape(tag_prefix)), ex_tag_invoke).string:
             await self._error_embed(ctx, 'Tag name is invalid because it can\'t be properly matched by our regex.')
