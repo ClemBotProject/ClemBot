@@ -27,7 +27,7 @@ class DesignatedChannelsCog(commands.Cog):
         Sends a formatted embed of the possible designated channels and their listeners to 
         the context of the command
         """
-        embed = discord.Embed(title=f'Designated Channels', color=Colors.ClemsonOrange)
+        embed = discord.Embed(title='Designated Channels', color=Colors.ClemsonOrange)
 
         if len(list(DesignatedChannels)) == 0:
             embed.add_field(name='No possible designated channels', value='')

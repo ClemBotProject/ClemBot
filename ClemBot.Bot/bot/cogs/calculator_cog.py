@@ -173,7 +173,8 @@ class CalculatorCog(commands.Cog):
         tokens = re.findall(r"-?\d*\.?\d*|[+^/*()-]", expression)
 
         if self.validateExpression(tokens) is False:
-            raise ParserError(f"Equation not properly balanced")
+            raise ParserError("Equation not properly balanced")
+            
         output_queue = []
 
         operator_stack = []

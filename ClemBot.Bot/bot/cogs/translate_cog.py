@@ -9,6 +9,7 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.helpers import chunk_sequence
 
 log = logging.getLogger(__name__)
 
@@ -135,15 +136,8 @@ async def get_lang_code(language: str):
 
 
 def get_language_list():
-
     langs = [f'{name} ({short})' for name, short in LANGUAGE_NAME_TO_SHORT_CODE.items()]
-    return ['\n'.join(i) for i in chunk_list(langs, CHUNK_SIZE)]
-
-
-def chunk_list(lst, n):
-
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+    return ['\n'.join(i) for i in chunk_sequence(langs, CHUNK_SIZE)]
         
 
 LANGUAGE_NAME_TO_SHORT_CODE = {
