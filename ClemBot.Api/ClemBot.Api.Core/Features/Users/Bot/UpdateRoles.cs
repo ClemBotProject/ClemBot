@@ -4,9 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 
 namespace ClemBot.Api.Core.Features.Users.Bot;
 
@@ -31,24 +33,32 @@ public class UpdateRoles
     {
         public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var roles = await _context.Roles
-                .Where(x => request.Roles.Contains(x.Id))
+            var roleMappings = await _context.RoleUser
+                .Select(ru => new { ru, ru.Role.GuildId })
+                .Where(ru => ru.ru.UserId == request.Id)
                 .ToListAsync();
 
-            var user = await _context.Users
-                .Include(y => y.Roles)
-                .FirstOrDefaultAsync(x => x.Id == request.Id);
-
-            if (roles is null || !roles.Any() || user is null)
+            if (!roleMappings.Any())
             {
                 return QueryResult<IEnumerable<ulong>>.NotFound();
             }
 
-            user.Roles.RemoveAll(x => x.GuildId == roles.First().GuildId);
-            user.Roles.AddRange(roles);
+            var guildId = roleMappings.First(ru => request.Roles.Contains(ru.ru.RoleId)).GuildId;
+
+            var oldRoleMappings = roleMappings
+                .Where(ru => ru.GuildId == guildId && !request.Roles.Contains(ru.ru.RoleId))
+                .Select(ru => ru.ru);
+
+            var newRoleMappings = request.Roles
+                .Where(r => roleMappings.All(ru => ru.ru.RoleId != r))
+                .Select(r => new RoleUser() {RoleId = r, UserId = request.Id});
+
+            _context.RoleUser.RemoveRange(oldRoleMappings);
+            _context.RoleUser.AddRange(newRoleMappings);
+
             await _context.SaveChangesAsync();
 
-            return QueryResult<IEnumerable<ulong>>.Success(roles.Select(x => x.Id));
+            return QueryResult<IEnumerable<ulong>>.Success(request.Roles);
         }
     }
 }

@@ -7,6 +7,7 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
+from bot.consts import Moderation
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +27,13 @@ class BanCog(commands.Cog):
     @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll', 'ban @SomeOtherUser 3 Spamming messages'))
     @ext.required_claims(Claims.moderation_ban)
     async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: t.Optional[int] = 0, *, reason: str):
+        if reason and len(reason) > Moderation.max_reason_length:
+            embed = discord.Embed(title='Error', color=Colors.Error)
+            embed.add_field(name='Reason',
+                            value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Invalid Permissions'
