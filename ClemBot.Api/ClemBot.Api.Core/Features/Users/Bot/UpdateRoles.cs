@@ -43,12 +43,18 @@ public class UpdateRoles
                 return QueryResult<IEnumerable<ulong>>.NotFound();
             }
 
-            // guild id the request originated from
             var guildId = roleMappings.First(ru => request.Roles.Contains(ru.ru.RoleId)).GuildId;
 
-            _context.RoleUser.RemoveRange(roleMappings.Where(ru => ru.GuildId == guildId && !request.Roles.Contains(ru.ru.RoleId)).Select(ru => ru.ru));
-            _context.RoleUser.AddRange(request.Roles.Where(r => roleMappings.All(ru => ru.ru.RoleId != r))
-                .Select(r => new RoleUser() {RoleId = r, UserId = request.Id}));
+            var oldRoleMappings = roleMappings
+                .Where(ru => ru.GuildId == guildId && !request.Roles.Contains(ru.ru.RoleId))
+                .Select(ru => ru.ru);
+
+            var newRoleMappings = request.Roles
+                .Where(r => roleMappings.All(ru => ru.ru.RoleId != r))
+                .Select(r => new RoleUser() {RoleId = r, UserId = request.Id});
+
+            _context.RoleUser.RemoveRange(oldRoleMappings);
+            _context.RoleUser.AddRange(newRoleMappings);
 
             await _context.SaveChangesAsync();
 
