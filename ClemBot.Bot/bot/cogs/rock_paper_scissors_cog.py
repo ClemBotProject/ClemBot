@@ -1,5 +1,6 @@
 import asyncio
 import enum
+from typing import Optional
 
 from discord.ext import commands
 import discord
@@ -66,23 +67,30 @@ class RockPaperScissorsCog(commands.Cog):
     @ext.long_help("Play rock paper scissors in Discord!")
     @ext.short_help("Play rock paper scissors in Discord!")
     @ext.example("rps @bozo")
-    async def rock_paper_scissors(self, ctx: commands.Context, user_2: discord.Member):
+    async def rock_paper_scissors(self, ctx: commands.Context, user_2: Optional[discord.Member] = None):
         user_1 = ctx.author
 
         if user_1 == user_2:
             await ctx.send("You can't play rock paper scissors with yourself.")
             return
 
-        embed = discord.Embed(color=Colors.ClemsonOrange, title="Rock Paper Scissors!", description=f"*React with {FIRE_EMOJI} to accept the challenge, {user_2.mention}*")
+        embed = discord.Embed(color=Colors.ClemsonOrange, title="Rock Paper Scissors!", description=f"*React with {FIRE_EMOJI} to accept the challenge*")
+
+        if user_2:
+            embed.description = f"*React with {FIRE_EMOJI} to accept the challenge, {user_2.mention}*"
+
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)
         await msg.add_reaction(FIRE_EMOJI)
 
-        # wait for challenge accept reaction from user_2
+        # wait for challenge accept reaction from user_2 or anyone if user_2 is None
         try:
-            await self.bot.wait_for("reaction_add", check=(lambda r, u: str(r.emoji) == FIRE_EMOJI and u == user_2 and r.message == msg), timeout=120)
+            _, user_2 = await self.bot.wait_for("reaction_add", check=(lambda r, u: str(r.emoji) == FIRE_EMOJI and r.message == msg and (u == user_2 or user_2 is None)), timeout=120)
         except asyncio.TimeoutError:
-            msg: discord.Message = await msg.edit(f"Timed-out while waiting for {user_2.mention} to accept...", embed=None)
+            msg: discord.Message = await msg.edit(
+                (f"Timed-out while waiting for {user_2.mention} to accept..." if user_2 else f"Timed-out while waiting for someone to accept..."),
+                embed=None
+            )
 
             try:
                 await msg.remove_reaction(FIRE_EMOJI, ctx.me)
