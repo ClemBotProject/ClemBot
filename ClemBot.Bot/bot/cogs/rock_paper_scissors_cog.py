@@ -7,6 +7,7 @@ import discord
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
+import bot.extensions as ext
 
 
 class RpsChoice(enum.Enum):
@@ -61,7 +62,10 @@ class RockPaperScissorsCog(commands.Cog):
 
         return EMOJI_TO_CHOICE[str(r.emoji)]
 
-    @commands.command(name="rockpaperscissors", aliases=["rps"])
+    @ext.command(name="rps")
+    @ext.long_help("Play rock paper scissors in Discord!")
+    @ext.short_help("Play rock paper scissors in Discord!")
+    @ext.example("rps @bozo")
     async def rock_paper_scissors(self, ctx: commands.Context, user_2: discord.Member):
         user_1 = ctx.author
 
@@ -136,6 +140,7 @@ class RockPaperScissorsCog(commands.Cog):
             # tie
             embed = discord.Embed(color=Colors.ClemsonOrange, title="It's a tie!", description=user_choices_str)
 
+        await msg.delete()
         await ctx.send(f"{user_1.mention} {user_2.mention}", embed=embed)
 
 
