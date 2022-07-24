@@ -26,6 +26,12 @@ class MuteCog(commands.Cog):
     @ext.example(('mute @SomeUser 1d Timeout', 'mute @SomUser 2d1h5m A much longer timeout'))
     @ext.required_claims(Claims.moderation_mute)
     async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
+        if reason and len(reason) > Moderation.max_reason_length:
+            embed = discord.Embed(title='Error', color=Colors.Error)
+            embed.add_field(name='Reason',
+                            value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
 
         duration_str = self._get_time_str(time)
         time = await Duration().convert(ctx, time)
@@ -124,6 +130,13 @@ class MuteCog(commands.Cog):
         if not mutes:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: This user has no active mutes'
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+
+        if reason and len(reason) > Moderation.max_reason_length:
+            embed = discord.Embed(title='Error', color=Colors.Error)
+            embed.add_field(name='Reason',
+                            value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 

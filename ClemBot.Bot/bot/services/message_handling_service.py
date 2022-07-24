@@ -284,7 +284,13 @@ class MessageHandlingService(BaseService):
         avi = message.author.display_avatar.url
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(matches['channel_id'])
-        link_message = await link_channel.fetch_message(matches['message_id'])
+
+        try:
+            link_message = await link_channel.fetch_message(matches['message_id'])
+        except:
+            log.warning('Failed to embed a message link with ids: {ids}', ids=matches)
+            return
+
         has_reply = message.reference is not None
         # result.group(1) and result.group(8) can return None, so we check both != None and len()
         raw_text = (bool(result.group(1)) and len(result.group(1)) != 0) or \
