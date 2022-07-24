@@ -4,10 +4,11 @@ sidebar_position: 3
 # Warn
 
 ## Overview
-Warnings are a way to create formal record of wrongdoing and serve as a way to keep track of long standing or historic bad behavior. You can view the reasons and the dates for any warning given.
+Warnings are a way to create formal record of wrongdoing and serve as a way to keep track of long-standing or historic bad behavior. 
+You can view the reasons and the dates for any warning given.
 
 :::info
-You can find the infraction id by running the `!infractions` command on the user you warned
+You can find the infraction id by running the `!infractions` command on the user you warned.
 :::
 
 ## Commands
