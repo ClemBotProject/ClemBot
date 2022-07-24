@@ -197,7 +197,7 @@ class ModerationService(BaseService):
             mutes = await self.bot.moderation_route.get_guild_infractions(guild.id)
 
             for mute in (m for m in mutes if m.type == Infractions.mute and m.active):
-                wait: datetime = parse_datetime(mute.duration)
+                wait = parse_datetime(mute.duration)
 
                 if (wait - datetime.utcnow()).total_seconds() <= 0:
                     await self._unmute_callback(guild.id, mute.subject_id, mute.id)

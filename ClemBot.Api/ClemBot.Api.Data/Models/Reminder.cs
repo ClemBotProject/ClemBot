@@ -6,8 +6,6 @@ public class Reminder
 {
     public int Id { get; set; }
 
-    public Guid TaskId { get; set; }
-
     public string Link { get; set; }
 
     public string? Content { get; set; }

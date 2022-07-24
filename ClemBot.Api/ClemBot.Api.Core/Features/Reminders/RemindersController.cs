@@ -54,13 +54,4 @@ public class RemindersController : ControllerBase
             { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
-
-    [HttpPatch("bot/[controller]/edit")]
-    [BotMasterAuthorize]
-    public async Task<IActionResult> Edit(Edit.Query query) =>
-        await _mediator.Send(query) switch
-        {
-            { Status: QueryStatus.Success } result => Ok(result.Value),
-            _ => throw new InvalidOperationException()
-        };
 }

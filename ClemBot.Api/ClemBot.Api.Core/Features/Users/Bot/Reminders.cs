@@ -35,8 +35,16 @@ public class Reminders
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<List<ReminderDto>>>
+    public class Handler : IRequestHandler<Query, IQueryResult<List<ReminderDto>>>
     {
+
+        private readonly ClemBotContext _context;
+
+        public Handler(ClemBotContext context)
+        {
+            _context = context;
+        }
+
         public async Task<IQueryResult<List<ReminderDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var reminders = await _context.Reminders

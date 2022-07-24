@@ -1,11 +1,10 @@
 import typing as t
-import uuid
 
 from datetime import datetime
 from bot.models import Reminder
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.utils.helpers import parse_datetime
+from bot.utils.helpers import parse_datetime, format_datetime
 
 
 class ReminderRoute(BaseRoute):
@@ -22,7 +21,7 @@ class ReminderRoute(BaseRoute):
                               **kwargs) -> t.Optional[int]:
         json = {
             'UserId': user_id,
-            'Time': time,
+            'Time': format_datetime(time),
             'MessageId': message_id,
             'Link': message_url,
             'Content': content
@@ -35,10 +34,10 @@ class ReminderRoute(BaseRoute):
 
         return resp['Id']
 
-    async def dispatch_reminder(self, reminder_id: int, **kwargs) -> t.Optional[uuid.UUID]:
+    async def dispatch_reminder(self, reminder_id: int, **kwargs) -> t.Optional[int]:
         """
             Tells the API to mark the reminder with the given reminder_id as dispatched.
-            Returns: the task uuid stored in the DB
+            Returns: the reminder id stored in the DB
         """
         return await self._client.patch(f'bot/reminders/{reminder_id}/dispatch', **kwargs)
 
@@ -48,7 +47,9 @@ class ReminderRoute(BaseRoute):
         if not resp:
             return None
 
-        return Reminder.from_dict(resp)
+        reminder = Reminder.from_dict(resp)
+        reminder.time = parse_datetime(resp['Time'])
+        return reminder
 
     async def fetch_all_reminders(self, **kwargs) -> t.List[t.Tuple[int, datetime]]:
         resp = await self._client.get('bot/reminders', **kwargs)
@@ -57,9 +58,3 @@ class ReminderRoute(BaseRoute):
             return []
 
         return [(i['Id'], parse_datetime(i['Time'])) for i in resp]
-
-    async def update_reminders(self, reminders: t.Dict[int, uuid.UUID], **kwargs):
-        json = {
-            'ReminderTaskIds': reminders
-        }
-        await self._client.patch('bot/reminders/edit', data=json, **kwargs)

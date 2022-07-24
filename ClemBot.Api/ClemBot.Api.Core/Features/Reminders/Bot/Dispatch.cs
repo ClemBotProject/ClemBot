@@ -15,32 +15,40 @@ public class Dispatch
         }
     }
 
-    public class Query : IRequest<IQueryResult<Guid>>
+    public class Query : IRequest<IQueryResult<int>>
     {
         public int Id { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Guid>>
+    public class Handler : IRequestHandler<Query, IQueryResult<int>>
     {
-        public async Task<IQueryResult<Guid>> Handle(Query request, CancellationToken cancellationToken)
+
+        private readonly ClemBotContext _context;
+
+        public Handler(ClemBotContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IQueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
         {
             var reminder = await _context.Reminders
                 .FirstOrDefaultAsync(r => r.Id == request.Id);
 
             if (reminder is null)
             {
-                return QueryResult<Guid>.NotFound();
+                return QueryResult<int>.NotFound();
             }
 
             if (reminder.Dispatched)
             {
-                return QueryResult<Guid>.Conflict();
+                return QueryResult<int>.Conflict();
             }
 
             reminder.Dispatched = true;
             await _context.SaveChangesAsync();
 
-            return QueryResult<Guid>.Success(reminder.TaskId);
+            return QueryResult<int>.Success(reminder.Id);
         }
     }
 }

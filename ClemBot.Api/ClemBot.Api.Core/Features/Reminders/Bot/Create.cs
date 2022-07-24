@@ -29,8 +29,6 @@ public class Create
 
     public class Model : IRequest<IQueryResult<ReminderDto>>
     {
-        public int Id { get; set; }
-
         public string Link { get; set; } = null!;
 
         public string? Content { get; set; }
@@ -42,8 +40,15 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Model, IQueryResult<ReminderDto>>
+    public class Handler : IRequestHandler<Model, IQueryResult<ReminderDto>>
     {
+        private readonly ClemBotContext _context;
+
+        public Handler(ClemBotContext context)
+        {
+            _context = context;
+        }
+
         public async Task<IQueryResult<ReminderDto>> Handle(Model request, CancellationToken cancellationToken)
         {
             var reminder = new Reminder

@@ -21,8 +21,16 @@ public class Details
         public int Id { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Reminder>>
+    public class Handler : IRequestHandler<Query, IQueryResult<Reminder>>
     {
+
+        private readonly ClemBotContext _context;
+
+        public Handler(ClemBotContext context)
+        {
+            _context = context;
+        }
+
         public async Task<IQueryResult<Reminder>> Handle(Query request, CancellationToken cancellationToken)
         {
             var reminder = await _context.Reminders

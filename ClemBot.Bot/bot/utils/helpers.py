@@ -12,8 +12,16 @@ def chunk_sequence(sequence: Sequence[T], chunk_size: int) -> Generator[Sequence
 
 
 def parse_datetime(time: str) -> datetime:
+    """
+        Parses the given string to a datetime.
+        Used for converting C#'s DateTime to Python's datetime.
+    """
     return datetime.strptime(time, '%Y-%m-%dT%H:%M:%S.%f')
 
 
 def format_datetime(time: datetime) -> str:
+    """
+        Formats the given datetime to a string.
+        Used for converting Python's datetime to C#'s DateTime.
+    """
     return time.strftime('%Y-%m-%dT%H:%M:%S.%f')
