@@ -1,3 +1,5 @@
+using System.Text.Json;
+using ClemBot.Api.Common;
 
 namespace ClemBot.Api.Core.Behaviors;
 
@@ -14,9 +16,19 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
-        _logger.LogInformation("{Request} Request Data: {@Data}", request.GetType(), request);
+        _logger.LogInformation("{Request} Request Data: {@Data}", typeof(TRequest), request);
         var response = await next();
-        _logger.LogInformation("Response Data: {@Body}", response);
+
+        var bodyJson = JsonSerializer.Serialize(response);
+
+        if (sizeof(char) * bodyJson.Length < Constants.SeqBodySizeMax)
+        {
+            _logger.LogInformation("{Response} Response Data: {Body}", typeof(TRequest), bodyJson);
+        }
+        else
+        {
+            _logger.LogInformation("Response Data with type {Type} exceeded max logging body size", typeof(TResponse));
+        }
 
         return response;
     }
