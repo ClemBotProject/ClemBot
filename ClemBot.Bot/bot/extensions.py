@@ -212,3 +212,15 @@ class ClemBotGroup(discord.ext.commands.Group, ExtBase):
             return result
 
         return decorator
+
+    def group(self, name=None, **attrs):
+        """A shortcut decorator that invokes :func:`.command` and adds it to
+        the internal command list via :meth:`~.GroupMixin.add_command`.
+        Returns
+        --------
+        Callable[..., :class:`Command`]
+            A decorator that converts the provided method into a Command, adds it to the bot, then returns it.
+        """
+        attrs.setdefault('cls', ClemBotGroup)
+        return self.command(name=name, **attrs)
+

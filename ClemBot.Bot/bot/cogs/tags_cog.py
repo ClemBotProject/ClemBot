@@ -22,7 +22,6 @@ MAX_NON_ADMIN_LINE_LENGTH = 10
 DEFAULT_TAG_PREFIX = '$'
 
 
-
 class TagCog(commands.Cog):
 
     def __init__(self, bot: ClemBot):
@@ -343,63 +342,50 @@ class TagCog(commands.Cog):
     @ext.long_help(
         'Lists the current tag prefix or configures the command prefix that the bot will respond too'
     )
+    @ext.required_claims(Claims.custom_tag_prefix_set)
+    @ext.ignore_claims_pre_invoke()
     @ext.short_help('Configure a custom command tag prefix')
     @ext.example(('tag prefix', 'tag prefix ?', 'tag prefix >>'))
     async def prefix(self, ctx: commands.Context, *, new_tag_prefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
-        # those are global so we dont care about them
+        # those are global, so we don't care about them
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
-        
+
+        if not tag_prefixes:
+            tag_prefixes = [DEFAULT_TAG_PREFIX]
+
         if not new_tag_prefix:
-            if not tag_prefixes:
-                tag_prefixes = [DEFAULT_TAG_PREFIX]
-            embed = discord.Embed(title='Current Active Tag Prefixes',
+            embed = discord.Embed(title='Current Tag Prefix',
                                   description=f'```{", ".join(tag_prefixes)}```',
                                   color=Colors.ClemsonOrange)
-
             return await ctx.send(embed=embed)
 
+        if not await self.bot.claims_check(ctx):
+            return await self._error_embed(ctx, 'Could not set prefix: missing `custom_tag_prefix_set` claim.')
+
         if new_tag_prefix in tag_prefixes:
-            embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Invalid tag prefix', value=f'"{new_tag_prefix}" is already the tag prefix for this guild')
-            await ctx.send(embed=embed)
-            return
+            return await self._error_embed(ctx, f'`{new_tag_prefix}` is already the tag prefix.')
 
         if '`' in new_tag_prefix:
-            embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Invalid tag prefix', value='Tag Prefix can not contain " ` "')
-            await ctx.send(embed=embed)
-            return
+            return await self._error_embed(ctx, "Tag prefix cannot contain the character '`'.")
 
         await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(ctx.guild.id, new_tag_prefix)
-
-        embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.add_field(name='Tag Prefix changed   :white_check_mark:', value=f'New Tag Prefix: ```{new_tag_prefix}```')
+        embed = discord.Embed(title=':white_check_mark: Tag Prefix Changed', color=Colors.ClemsonOrange)
+        embed.add_field(name='New Tag Prefix', value=f'```{new_tag_prefix}```')
         await ctx.send(embed=embed)
 
     @prefix.command(pass_context=True, aliases=['revert'])
     @ext.required_claims(Claims.custom_tag_prefix_set)
-    @ext.long_help(
-        'resets the bot tag prefix to the default'
-    )
-    @ext.short_help('resets a custom tag prefix')
-    @ext.example('tag prefix set')
-    async def reset(self, ctx: commands.Context):
-        default_tag_prefix = DEFAULT_TAG_PREFIX
+    @ext.long_help('Resets the bot tag prefix to the default')
+    @ext.short_help('Resets the custom tag prefix')
+    @ext.example('tag prefix reset')
+    async def reset(self, ctx):
+        if DEFAULT_TAG_PREFIX in await self.bot.get_tag_prefix(ctx.message):
+            return await self._error_embed(ctx, f'{DEFAULT_TAG_PREFIX} is already the tag prefix.')
 
-        if default_tag_prefix in await self.bot.get_tag_prefix(ctx.message):
-            embed = discord.Embed(title='Error', color=Colors.Error)
-            embed.add_field(name='Invalid tag prefix', value=f'"{default_tag_prefix}" Tag Prefix is already the default')
-            await ctx.send(embed=embed)
-            return
-
-        await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(ctx.guild.id, default_tag_prefix)
-
-        embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.add_field(
-            name='Tag Prefix reset   :white_check_mark:',
-            value=f'New Tag Prefix: ```{default_tag_prefix}```')
-
+        await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(ctx.guild.id, DEFAULT_TAG_PREFIX)
+        embed = discord.Embed(title=':white_check_mark: Tag Prefix Reset', color=Colors.ClemsonOrange)
+        embed.add_field(name='New Tag Prefix', value=f'```{DEFAULT_TAG_PREFIX}```')
         await ctx.send(embed=embed)
 
     async def _delete_tag(self, name: str, ctx: commands.Context):
