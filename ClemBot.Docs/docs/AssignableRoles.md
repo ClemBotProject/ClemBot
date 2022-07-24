@@ -5,12 +5,13 @@ sidebar_position: 5
 
 ## Overview
 
-Servers often have many roles that regular users can have, but might not want to give all users access to all roles; however, it can be annoying to manually give people the roles they want. ClemBot provides a way to mark roles as assignable so that normal users can add and remove them as they please with a simple command.
+Servers often have many roles that regular users can have, but might not want to give all users access to all roles; however, it can be annoying to manually give people the roles they want. 
+ClemBot provides a way to mark roles as assignable so that normal users can add and remove them as they please with a simple command.
 
 ## Commands
 
 ### Roles
-Shows all currently assignable roles roles in the server, or adds an assignable role to yourself if one is specified.
+Shows all currently assignable roles in the server, or adds an assignable role to yourself if one is specified.
 
 #### Aliases
 * `role`
@@ -39,7 +40,8 @@ Shows all currently assignable roles roles in the server, or adds an assignable 
 Mark a server role as assignable
 
 :::note
-Note: This is the admin command to **MARK** a role as assignable. If you would like to give yourself a role please see the above section on adding an assignable role to yourself
+Note: This is the admin command to **MARK** a role as assignable. 
+If you would like to give yourself a role please see the above section on adding an assignable role to yourself.
 :::
 
 #### Aliases
@@ -63,7 +65,8 @@ Note: This is the admin command to **MARK** a role as assignable. If you would l
 Remove a server role as assignable
 
 :::note
-This is the admin command to **REMOVE** a role as assignable. If you would like to remove a role from yourself please see the above section on removing an assignable role from yourself
+This is the admin command to **REMOVE** a role as assignable. 
+If you would like to remove a role from yourself please see the above section on removing an assignable role from yourself.
 :::
 
 #### Aliases

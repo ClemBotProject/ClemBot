@@ -3,9 +3,11 @@ sidebar_position: 1
 ---
 # Overview
 
-ClemBot provides powerful moderation tools to help you run your server. Every moderation action is logged and categorized and can be searched through at any time. With support for all the standard commands and more coming soon!!
+ClemBot provides powerful moderation tools to help you run your server. 
+Every moderation action is logged and categorized and can be searched through at any time. 
+With support for all the standard commands and more coming soon!
 
-You have a complete history of every Infraction every committed in your server, to view them run these comands.
+You have a complete history of every Infraction every committed in your server, to view them run these commands.
 
 ## Logging
 
@@ -21,7 +23,7 @@ ClemBot will log all moderation actions into a given channel if configured. See 
 * `moderation_infraction_view_self`
 
 :::info
-The `moderation_infraction_view_self` only gives a user permissiont to view their **OWN** infractions, and no one elses
+The `moderation_infraction_view_self` only gives a user permission to view their **OWN** infractions, and no one else's.
 :::
 
 #### Format
@@ -49,7 +51,7 @@ Deletes a given infraction
 ```
 
 :::tip
-You can find the infraction id by running the `!infractions` command on the user you wish to remove the infraction from
+You can find the infraction ID by running the `!infractions` command on the user you wish to remove the infraction from.
 :::
 
 #### Example

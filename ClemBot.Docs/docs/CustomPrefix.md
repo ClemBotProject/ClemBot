@@ -11,16 +11,18 @@ A command prefix is the character or phrase that notifies ClemBot that you wish 
 ```txt title="Discord Message"
 !about
 ```
-"!" is the command prefix and about is the name of the command that you wish to invoke.
+`!` is the command prefix and `about` is the name of the command that you wish to invoke.
 
 :::tip
-Clembots mention serves as a universal prefix, it can always be used to invoke the bots commands
+ClemBot's mention serves as a universal prefix.
+It can always be used to invoke the bots commands.
 
-use `@ClemBot prefix` to find what prefix the bot has been set to in your server
+Use `@ClemBot prefix` to find what prefix the bot has been set to in your server.
 :::
 
 ## Dashboard
-Changes a servers prefix to a given value. If no value is provided the current in use prefix is shown.
+Changes a server's prefix to a given value. 
+If no value is provided, the current in-use prefix is shown.
 
 ## Commands
 
