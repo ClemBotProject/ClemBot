@@ -98,7 +98,7 @@ Delete a tag from the server.
 * `tag_delete`
 
 :::note
-You do not need the `tag_delete` claim to delete a tag that you own
+You do not need the `tag_delete` claim to delete a tag that you own.
 :::
 
 #### Format
@@ -186,18 +186,18 @@ A group of commands used to preview, set, or reset the prefix for tags.
 !tag prefix [<prefix> | reset]
 ```
 
-#### Examples
+#### Tag Prefix
 
-##### View Tag
+Gets the current tag prefix.
 
-```
+##### Example
+
+```txt title="Display the current tag prefix"
 !tag prefix
 ```
 
-##### Set Tag
-
-```
-!tag prefix @
+```txt title="Set a custom tag prefix"
+!tag prefix #
 ```
 :::note
 Custom tag prefixes can have more than one character.
@@ -206,12 +206,29 @@ Custom tag prefixes can have more than one character.
 Custom tag prefixes cannot contain the character <code>`</code>.
 :::
 
-##### Reset Tag
-
-```
-!tag reset
-```
+##### Required [Claims](./Claims)
+- `custom_tag_prefix_set`
 
 :::note
-When running `!tag reset`, the prefix will be reverted back to `$`.
+The command `!tag prefix` does not require the claim, but `!tag prefix <new prefix>` does.
+:::
+
+#### Tag Reset
+
+Resets the tag prefix.
+
+##### Aliases
+- `revert`
+
+##### Example
+
+```txt title="Reset the tag prefix"
+!tag prefix reset
+```
+
+##### Required [Claims](./Claims)
+- `custom_tag_prefix_set`
+
+:::note
+When running the command `!tag prefix reset`, the tag prefix will be reverted to `$`.
 :::
