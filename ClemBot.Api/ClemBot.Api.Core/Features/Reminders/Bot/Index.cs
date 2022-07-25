@@ -1,16 +1,17 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace ClemBot.Api.Core.Features.Reminders.Bot;
 
-public class FetchAll
+public class Index
 {
     public class ReminderDto : IResponseModel
     {
         public int Id { get; set; }
 
-        public DateTime Time { get; set; }
+        public LocalDateTime Time { get; set; }
     }
 
     public class Query : IRequest<IQueryResult<List<ReminderDto>>>

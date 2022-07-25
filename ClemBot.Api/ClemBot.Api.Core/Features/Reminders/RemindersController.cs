@@ -1,6 +1,7 @@
 ﻿using ClemBot.Api.Common.Security.Policies.BotMaster;
 using ClemBot.Api.Core.Features.Reminders.Bot;
 using Microsoft.AspNetCore.Mvc;
+using Index = ClemBot.Api.Core.Features.Reminders.Bot.Index;
 
 namespace ClemBot.Api.Core.Features.Reminders;
 
@@ -18,8 +19,8 @@ public class RemindersController : ControllerBase
 
     [HttpGet("bot/[controller]")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> FetchAll([FromBody] FetchAll.Query query) =>
-        await _mediator.Send(query) switch
+    public async Task<IActionResult> Index() =>
+        await _mediator.Send(new Index.Query()) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => throw new InvalidOperationException()

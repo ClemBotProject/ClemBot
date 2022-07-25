@@ -2,6 +2,7 @@
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace ClemBot.Api.Core.Features.Users.Bot;
 
@@ -23,9 +24,7 @@ public class Reminders
 
         public string? Content { get; set; }
 
-        public DateTime Time { get; set; }
-
-        public ulong MessageId { get; set; }
+        public LocalDateTime Time { get; set; }
 
         public ulong UserId { get; set; }
     }
@@ -55,7 +54,6 @@ public class Reminders
                     Link = item.Link,
                     Content = item.Content,
                     Time = item.Time,
-                    MessageId = item.MessageId,
                     UserId = item.UserId
                 })
                 .ToListAsync();

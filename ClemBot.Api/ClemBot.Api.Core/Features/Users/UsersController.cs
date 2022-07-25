@@ -108,9 +108,9 @@ public class UsersController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/reminders/{UserId}")]
+    [HttpGet("bot/[controller]/{UserId}/reminders")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Reminders([FromBody] Bot.Reminders.Query query) =>
+    public async Task<IActionResult> Reminders([FromRoute] Bot.Reminders.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),

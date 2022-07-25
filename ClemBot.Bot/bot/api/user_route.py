@@ -83,7 +83,7 @@ class UserRoute(BaseRoute):
         await self._client.post(f'bot/users/{user_id}/updateroles', data=json, **kwargs)
 
     async def get_reminders(self, user_id: int, **kwargs) -> t.List[Reminder]:
-        resp = await self._client.get(f'bot/users/reminders/{user_id}', **kwargs)
+        resp = await self._client.get(f'bot/users/{user_id}/reminders', **kwargs)
 
         if not resp:
             return []

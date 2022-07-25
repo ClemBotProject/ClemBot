@@ -15,14 +15,12 @@ class ReminderRoute(BaseRoute):
     async def create_reminder(self,
                               user_id: int,
                               time: datetime,
-                              message_id: int,
                               message_url: str,
                               content: t.Optional[str],
                               **kwargs) -> t.Optional[int]:
         json = {
             'UserId': user_id,
             'Time': format_datetime(time),
-            'MessageId': message_id,
             'Link': message_url,
             'Content': content
         }
@@ -32,7 +30,7 @@ class ReminderRoute(BaseRoute):
         if not resp:
             return None
 
-        return resp['Id']
+        return resp['id']
 
     async def dispatch_reminder(self, reminder_id: int, **kwargs) -> t.Optional[int]:
         """
@@ -47,9 +45,7 @@ class ReminderRoute(BaseRoute):
         if not resp:
             return None
 
-        reminder = Reminder.from_dict(resp)
-        reminder.time = parse_datetime(resp['Time'])
-        return reminder
+        return Reminder.from_dict(resp)
 
     async def fetch_all_reminders(self, **kwargs) -> t.List[t.Tuple[int, datetime]]:
         resp = await self._client.get('bot/reminders', **kwargs)
@@ -57,4 +53,4 @@ class ReminderRoute(BaseRoute):
         if not resp:
             return []
 
-        return [(i['Id'], parse_datetime(i['Time'])) for i in resp]
+        return [(i['id'], parse_datetime(i['time'])) for i in resp]

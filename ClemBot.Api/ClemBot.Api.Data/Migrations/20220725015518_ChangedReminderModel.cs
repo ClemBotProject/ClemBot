@@ -1,16 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using NodaTime;
 
 #nullable disable
 
 namespace ClemBot.Api.Data.Migrations
 {
-    public partial class AddReminderContentDispatched : Migration
+    public partial class ChangedReminderModel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Reminders_Guilds_MessageId",
                 table: "Reminders");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Reminders_MessageId",
+                table: "Reminders");
+
+            migrationBuilder.DropColumn(
+                name: "MessageId",
+                table: "Reminders");
+
+            migrationBuilder.AlterColumn<LocalDateTime>(
+                name: "Time",
+                table: "Reminders",
+                type: "timestamp without time zone",
+                nullable: false,
+                oldClrType: typeof(DateTime),
+                oldType: "timestamp with time zone");
 
             migrationBuilder.AddColumn<string>(
                 name: "Content",
@@ -42,24 +60,12 @@ namespace ClemBot.Api.Data.Migrations
                 column: "GuildId",
                 principalTable: "Guilds",
                 principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Reminders_Messages_MessageId",
-                table: "Reminders",
-                column: "MessageId",
-                principalTable: "Messages",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Reminders_Guilds_GuildId",
-                table: "Reminders");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Reminders_Messages_MessageId",
                 table: "Reminders");
 
             migrationBuilder.DropIndex(
@@ -77,6 +83,26 @@ namespace ClemBot.Api.Data.Migrations
             migrationBuilder.DropColumn(
                 name: "GuildId",
                 table: "Reminders");
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Time",
+                table: "Reminders",
+                type: "timestamp with time zone",
+                nullable: false,
+                oldClrType: typeof(LocalDateTime),
+                oldType: "timestamp without time zone");
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "MessageId",
+                table: "Reminders",
+                type: "numeric(20,0)",
+                nullable: false,
+                defaultValue: 0m);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reminders_MessageId",
+                table: "Reminders",
+                column: "MessageId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Reminders_Guilds_MessageId",

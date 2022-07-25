@@ -34,9 +34,7 @@ class Infraction(DataClassJsonMixin):
 @dataclass
 class Reminder(DataClassJsonMixin):
     id: int
-    task_id: uuid.UUID
     link: str
     content: Optional[str]
-    time: datetime
-    message_id: int
+    time: str
     user_id: int

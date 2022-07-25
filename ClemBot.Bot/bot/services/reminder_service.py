@@ -27,8 +27,10 @@ class ReminderService(BaseService):
             return
         user = self.bot.get_user(reminder.user_id)
         embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange,
-                              description=f'This is your reminder to **{reminder.content}**!')
+                              description="Time's up!")
         embed.add_field(name='Original Message', value=f'[Link]({reminder.link})')
+        embed.add_field(name='Message', value=reminder.content)
+        embed.set_footer(text=str(user), icon_url=user.display_avatar.url)
         await self.bot.reminder_route.dispatch_reminder(reminder_id, raise_on_error=True)
         await user.send(embed=embed)
 
@@ -36,7 +38,6 @@ class ReminderService(BaseService):
     async def on_set_reminder(self, ctx: commands.Context, time: datetime, content: t.Optional[str]):
         reminder_id = await self.bot.reminder_route.create_reminder(ctx.author.id,
                                                                     time,
-                                                                    ctx.message.id,
                                                                     ctx.message.jump_url,
                                                                     content,
                                                                     raise_on_error=True)

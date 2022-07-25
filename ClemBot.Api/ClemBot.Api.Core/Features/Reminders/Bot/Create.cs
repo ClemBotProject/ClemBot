@@ -2,6 +2,7 @@
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using FluentValidation;
+using NodaTime;
 
 namespace ClemBot.Api.Core.Features.Reminders.Bot;
 
@@ -13,7 +14,6 @@ public class Create
         public Validator()
         {
             RuleFor(p => p.Time).NotNull();
-            RuleFor(p => p.MessageId).NotNull();
             RuleFor(p => p.UserId).NotNull();
         }
     }
@@ -24,7 +24,7 @@ public class Create
 
         public string? Content { get; set; }
 
-        public DateTime Time { get; set; }
+        public LocalDateTime Time { get; set; }
     }
 
     public class Model : IRequest<IQueryResult<ReminderDto>>
@@ -33,9 +33,7 @@ public class Create
 
         public string? Content { get; set; }
 
-        public DateTime Time { get; set; }
-
-        public ulong MessageId { get; set; }
+        public LocalDateTime Time { get; set; }
 
         public ulong UserId { get; set; }
     }
@@ -56,7 +54,6 @@ public class Create
                 Link = request.Link,
                 Content = request.Content,
                 Time = request.Time,
-                MessageId = request.MessageId,
                 UserId = request.UserId
             };
 

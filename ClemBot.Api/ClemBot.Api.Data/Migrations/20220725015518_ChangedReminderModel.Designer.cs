@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClemBot.Api.Data.Migrations
 {
     [DbContext(typeof(ClemBotContext))]
-    [Migration("20220724055619_AddReminderContentDispatched")]
-    partial class AddReminderContentDispatched
+    [Migration("20220725015518_ChangedReminderModel")]
+    partial class ChangedReminderModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -343,11 +343,8 @@ namespace ClemBot.Api.Data.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("MessageId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<LocalDateTime>("Time")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<decimal>("UserId")
                         .HasColumnType("numeric(20,0)");
@@ -355,8 +352,6 @@ namespace ClemBot.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId");
-
-                    b.HasIndex("MessageId");
 
                     b.HasIndex("UserId");
 
@@ -673,19 +668,11 @@ namespace ClemBot.Api.Data.Migrations
                         .WithMany("Reminders")
                         .HasForeignKey("GuildId");
 
-                    b.HasOne("ClemBot.Api.Data.Models.Message", "Message")
-                        .WithMany()
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ClemBot.Api.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Message");
 
                     b.Navigation("User");
                 });

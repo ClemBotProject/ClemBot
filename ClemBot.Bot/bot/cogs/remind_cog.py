@@ -1,22 +1,28 @@
 import logging
+import typing as t
 
 import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.models import Reminder
 from bot.utils import converters
-from typing import Optional
+from bot.utils.helpers import parse_datetime
+
+from bot.utils.converters import Duration
 
 log = logging.getLogger(__name__)
 
 
 class RemindCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
-    @ext.command()
+    @ext.group(aliases=['remindme'], case_insensitive=True)
     @ext.long_help(
         """
         This command will direct message the user with their message at specified time in the future.
@@ -41,22 +47,79 @@ class RemindCog(commands.Cog):
         'remind 4y Graduation',
         'remind 3y1M4w1d5h9m2s Pi'
     ))
-    async def remind(self, ctx: commands.Context, wait: converters.Duration, *, content: Optional[str]):
+    async def reminder(self, ctx: commands.Context):
+        pass
+
+    @reminder.command(case_insensitive=True)
+    @ext.long_help('Add a reminder.')
+    @ext.short_help('Add a reminder.')
+    async def add(self, ctx: commands.Context, wait: converters.DurationDelta, *, content: t.Optional[str]):
+        wait = Duration(ctx, wait)
+        time = await wait.as_future()
         try:
-            embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange)
-            await self.bot.messenger.publish(
-               Events.on_set_reminder,
-               ctx.author.id,
-               wait,
-               ctx.message.id,
-               ctx.message.jump_url,
-               content
-            )
-            embed.add_field(name='Status', value='Reminder Created')
+            await self.bot.messenger.publish(Events.on_set_reminder, ctx, time, content)
         except Exception:
-            embed = discord.Embed(title='⏰ Reminder', color=Colors.Error)
-            embed.add_field(name='Status', value='Error')
+            return await self._error_embed(ctx, 'Failed to create reminder.')
+        embed = discord.Embed(title='⏰ Reminder Created', color=Colors.ClemsonOrange)
+        embed.add_field(name='Time', value=f'{str(wait)}')
+        embed.add_field(name='Message', value=f'{content if content else "None"}')
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
+
+    @reminder.command(case_insensitive=True)
+    @ext.long_help('List all of your reminders that have not gone off.')
+    @ext.short_help('List all of your reminders.')
+    async def list(self, ctx: commands.Context):
+        reminders = await self.bot.user_route.get_reminders(ctx.author.id)
+        if len(reminders) == 0:
+            embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange,
+                                  description='You have no existing reminders.')
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            return await ctx.send(embed=embed)
+        reminder_pages = await self._reminder_pages(ctx, reminders)
+        await self.bot.messenger.publish(Events.on_set_pageable_embed,
+                                         pages=reminder_pages,
+                                         author=ctx.author,
+                                         channel=ctx.channel,
+                                         timeout=360)
+
+    @reminder.command(aliases=['remove'], case_insensitive=True)
+    @ext.long_help('Delete a specific reminder.')
+    @ext.short_help('Delete a reminder.')
+    async def delete(self, ctx: commands.Context, reminder_id: int):
+        reminder = await self.bot.reminder_route.get_reminder(reminder_id)
+        if not reminder:
+            return await self._error_embed(ctx, f'A reminder with the ID `{reminder_id}` does not exist.')
+        if reminder.user_id != ctx.author.id:
+            return await self._error_embed(ctx, 'You do not own this reminder!')
+        try:
+            await self.bot.messenger.publish(Events.on_delete_reminder, reminder_id)
+        except Exception:
+            return await self._error_embed(ctx, 'Failed to delete the reminder.')
+        embed = discord.Embed(title='⏰ Reminder Deleted', color=Colors.ClemsonOrange)
+        embed.description = f'Successfully deleted reminder #{reminder_id}.'
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+        await ctx.send(embed=embed)
+
+    async def _reminder_pages(self, ctx: commands.Context, reminders: t.List[Reminder]) -> t.List[discord.Embed]:
+        pages = []
+        for reminder in reminders:
+            time = parse_datetime(reminder.time)
+            embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange)
+            embed.add_field(name='Reminder ID', value=reminder.id)
+            embed.add_field(name='Original Message', value=f'[Link]({reminder.link})')
+            embed.add_field(name='Alarm Time', value=time.strftime('%x at %X %Z'), inline=False)
+            embed.add_field(name='Message', value=reminder.content)
+            embed.set_footer(text=f'To delete this reminder, type "{ctx.prefix}reminder delete {reminder.id}".')
+            pages.append(embed)
+        return pages
+
+    async def _error_embed(self, ctx: commands.Context, description: str):
+        """Shorthand for sending an error message w/ consistent formatting."""
+        embed = discord.Embed(title='Error', color=Colors.Error, description=description)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+        msg = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60)
 
 
 def setup(bot):
