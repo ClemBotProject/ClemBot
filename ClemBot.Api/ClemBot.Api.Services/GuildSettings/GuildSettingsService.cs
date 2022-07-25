@@ -24,12 +24,6 @@ public class GuildSettingsService : IGuildSettingsService
         _logger = logger;
     }
 
-    public async Task<bool> GetCanEmbedLink(ulong guildId)
-        => await GetPropertyAsync<bool>(ConfigSettings.allow_embed_links, guildId);
-
-    public async Task<bool> SetCanEmbedLink(ulong guildId, bool val)
-        => await SetPropertyAsync(ConfigSettings.allow_embed_links, guildId, val);
-
     public async Task<Dictionary<ConfigSettings, object>> GetAllSettingsAsync(ulong guildId)
     {
         var values = new Dictionary<ConfigSettings, object>();
@@ -40,34 +34,42 @@ public class GuildSettingsService : IGuildSettingsService
         return values;
     }
 
-    private async Task<T> GetPropertyAsync<T>(ConfigSettings configSetting, ulong guildId)
+    public async Task<T> GetPropertyAsync<T>(ConfigSettings configSetting, ulong guildId)
     {
         _logger.LogInformation("Getting Guild: {Id} Config {Setting}", guildId, configSetting);
         var val = await _context.GuildSettings
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.GuildId == guildId && x.Setting == configSetting);
 
-        if (val?.Value is not null)
+        if (val?.Value is null)
         {
-            return (T)GuildConfig.TypeMappings[ConfigSettings.allow_embed_links].Deserialize(val.Value);
+            return (T)GuildConfig.TypeMappings[configSetting].Default;
         }
 
-        return (T)GuildConfig.TypeMappings[configSetting].Default;
+        return (T)GuildConfig.TypeMappings[ConfigSettings.allow_embed_links].Deserialize(val.Value);
+
     }
 
-    private async Task<bool> SetPropertyAsync<T>(ConfigSettings configSetting, ulong guildId, T value)
+    public Task<object> GetPropertyAsync(ConfigSettings configSetting, ulong guildId)
+        => GetPropertyAsync<object>(configSetting, guildId);
+
+    public async Task<bool> SetPropertyAsync(ConfigSettings configSetting, ulong guildId, string value)
     {
-        _logger.LogInformation("Setting Guild: {Id} Config {Setting} with {Value}", guildId, configSetting, value);
-        var stringVal = JsonSerializer.Serialize(value);
+        _logger.LogInformation("Setting Guild: {Id} Config {Setting} with Value: {Value}", guildId, configSetting, value);
 
-        var type = GuildConfig.TypeMappings[configSetting].Type;
+        var config = GuildConfig.TypeMappings[configSetting];
 
-        if (typeof(T) != type)
+        try
         {
-            _logger.LogError("Failed to convert {Type} to Guild Setting {Setting} with type of {SettingType}",
-                value.GetType(),
+            // Call the deserialize method on the string representation so that we can be sure its valid with a given serializer
+            _ = config.Deserialize(value);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Expected {Type} for Guild Setting {Setting}; Found {SettingType}",
+                config.Type,
                 configSetting,
-                value.GetType());
+                value);
             return false;
         }
 
@@ -76,7 +78,7 @@ public class GuildSettingsService : IGuildSettingsService
 
         if (settingEntity is not null)
         {
-            settingEntity.Value = GuildConfig.TypeMappings[configSetting].Serialize(value);
+            settingEntity.Value = value;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -84,7 +86,7 @@ public class GuildSettingsService : IGuildSettingsService
         _context.GuildSettings.Add(new GuildSetting
         {
             Setting = configSetting,
-            Value = stringVal,
+            Value = value,
             GuildId = guildId
         });
         await _context.SaveChangesAsync();

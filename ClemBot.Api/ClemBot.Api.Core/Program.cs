@@ -213,12 +213,12 @@ builder.Services.AddScoped<IGuildSandboxAuthorizeService, GuildSandboxAuthorizeS
 builder.Services.AddScoped<IGuildSettingsService, GuildSettingsService>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
+GuildConfig.Initialize();
 // ******
 
 
 // ****** Build and configure the WebApplication ******
 var app = builder.Build();
-
 
 // ****** Create the EF Context scope and inject ClemBotContext
 using var scope = app.Services.CreateScope();
