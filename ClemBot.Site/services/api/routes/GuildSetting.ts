@@ -20,8 +20,7 @@ export default class GuildSetting {
     return setting.value
   }
 
-  async setCanEmbedLink(id: string, val: boolean): Promise<boolean> {
-    let resp = await this.$axios.$post<{status: boolean}>(`guildsettings/${id}/${GuildSettings.allowEmbedLinks}?value=${val}`)
-    return resp.status
+  async setCanEmbedLink(id: string, val: boolean): Promise<void> {
+    let resp = await this.$axios.$post(`guildsettings/${id}/${GuildSettings.allowEmbedLinks}`, val)
   }
 }
