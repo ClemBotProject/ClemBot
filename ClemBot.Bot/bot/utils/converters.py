@@ -2,6 +2,7 @@ import re
 import typing as t
 from datetime import datetime
 
+import arrow
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import ConversionError
@@ -66,7 +67,7 @@ class Duration(DurationDelta):
             duration_dict = {unit: int(amount) for unit, amount in match.groupdict(default=0).items()}
             self.delta = relativedelta(**duration_dict)
 
-    async def as_future(self) -> datetime:
+    def as_future(self) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` is in the future.
         The converter supports the same symbols for each unit of time as its parent class.
@@ -77,7 +78,7 @@ class Duration(DurationDelta):
         except ValueError:
             raise ConversionError(f'`{self.duration}` results in a datetime outside of the supported range.')
 
-    async def as_past(self) -> datetime:
+    def as_past(self) -> datetime:
         """
         Converts a `duration` string to a datetime object that's `duration` is in the past.
         The converter supports the same symbols for each unit of time as its parent class.
@@ -89,22 +90,7 @@ class Duration(DurationDelta):
             raise ConversionError(f'`{self.duration}` results in a datetime outside of the supported range.')
 
     def __str__(self):
-        s = ''
-        if self.delta.years > 0:
-            s += f'{self.delta.years} Year{"s" if self.delta.years > 1 else ""} '
-        if self.delta.months > 0:
-            s += f'{self.delta.months} Month{"s" if self.delta.months > 1 else ""} '
-        if self.delta.weeks > 0:
-            s += f'{self.delta.weeks} Week{"s" if self.delta.weeks > 1 else ""}'
-        if self.delta.days > 0:
-            s += f'{self.delta.days} Day{"s" if self.delta.days > 1 else ""} '
-        if self.delta.hours > 0:
-            s += f'{self.delta.hours} Hour{"s" if self.delta.hours > 1 else ""} '
-        if self.delta.minutes > 0:
-            s += f'{self.delta.minutes} Minute{"s" if self.delta.minutes > 1 else ""} '
-        if self.delta.seconds > 0:
-            s += f'{self.delta.seconds} Second{"s" if self.delta.seconds > 1 else ""}'
-        return s
+        return arrow.get(datetime.utcnow() + self.delta).humanize(only_distance=True)
 
 
 class ClaimsConverter(Converter):

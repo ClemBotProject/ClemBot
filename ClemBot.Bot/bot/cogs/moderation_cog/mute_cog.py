@@ -34,7 +34,7 @@ class MuteCog(commands.Cog):
             return await ctx.send(embed=embed)
 
         duration = Duration(ctx, duration)
-        time = await duration.as_future()
+        time = duration.as_future()
 
         if ctx.author.top_role.position <= subject.top_role.position:
             embed = discord.Embed(color=Colors.Error)
@@ -68,7 +68,7 @@ class MuteCog(commands.Cog):
         embed.title = f'{subject} Muted :mute:'
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=subject.display_avatar.url)
-        embed.description = f'**{str(duration)}** \n{reason}'
+        embed.description = f'**{duration}** \n{reason}'
 
         await ctx.send(embed=embed)
 
@@ -77,7 +77,7 @@ class MuteCog(commands.Cog):
         embed.title = 'Guild Member Muted :mute:'
         embed.set_author(name=f'{ctx.author}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=str(subject), value=f'Id: {subject.id}')
-        embed.add_field(name='Duration :timer:', value=str(duration))
+        embed.add_field(name='Duration :timer:', value=duration)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         embed.set_thumbnail(url=subject.display_avatar.url)
@@ -92,7 +92,7 @@ class MuteCog(commands.Cog):
         embed.title = 'You have been muted  :mute:'
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
-        embed.add_field(name='Duration :timer:', value=str(duration))
+        embed.add_field(name='Duration :timer:', value=duration)
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
 

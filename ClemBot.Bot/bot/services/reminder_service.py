@@ -23,7 +23,7 @@ class ReminderService(BaseService):
     async def _reminder_callback(self, reminder_id: int):
         reminder = await self.bot.reminder_route.get_reminder(reminder_id, raise_on_error=True)
         if not reminder:
-            log.warning(f'Reminder with id {reminder_id} returned None from API call.')
+            log.warning('Reminder with id {reminder_id} returned None from API call.', reminder_id=reminder_id)
             return
         user = self.bot.get_user(reminder.user_id)
         embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange,
