@@ -21,6 +21,9 @@ export default class GuildSetting {
   }
 
   async setCanEmbedLink(id: string, val: boolean): Promise<void> {
-    let resp = await this.$axios.$post(`guildsettings/${id}/${GuildSettings.allowEmbedLinks}`, val)
+    let resp = await this.$axios.$post(`guildsettings/${id}/${GuildSettings.allowEmbedLinks}`, `${val}`,  headers: {
+    // Overwrite Axios's automatically set Content-Type
+    'Content-Type': 'application/json'
+  })
   }
 }
