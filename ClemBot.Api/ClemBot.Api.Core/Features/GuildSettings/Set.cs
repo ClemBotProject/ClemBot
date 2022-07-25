@@ -5,6 +5,7 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.GuildSettings;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.GuildSettings;
@@ -22,16 +23,19 @@ public class Set
 
     public record Command : IGuildSandboxModel, IRequest<IQueryResult<Model>>
     {
+        [FromRoute]
         public ulong GuildId { get; init; }
 
+        [FromRoute]
         public ConfigSettings Setting { get; init; }
 
-        public object? Value { get; init; }
+        [FromBody]
+        public string? Value { get; init; }
     }
 
     public class Model : IResponseModel
     {
-        public bool Status { get; set; }
+        public object? Value { get; init; }
     }
 
     public class Handler : IRequestHandler<Command, IQueryResult<Model>>
@@ -43,15 +47,11 @@ public class Set
             _settingsService = settingsService;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
-        {
-            var status = request.Setting switch
+        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken) =>
+            await _settingsService.SetPropertyAsync(request.Setting, request.GuildId, request.Value) switch
             {
-                ConfigSettings.allow_embed_links => await _settingsService.SetCanEmbedLink(request.GuildId, (bool)request.Value!),
-                _ => throw new ArgumentOutOfRangeException()
+                true => QueryResult<Model>.Success(new Model{Value = request.Value}),
+                false => QueryResult<Model>.Invalid()
             };
-
-            return QueryResult<Model>.Success(new Model{ Status = status });
-        }
     }
 }
