@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import typing as t
 import dataclasses
+import seqlog
 
 import discord
 
@@ -10,21 +11,21 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME = 0.5
 
 @dataclasses.dataclass
 class UpdateEvent:
     user_id: int
-    user_roles_ids: t.List[int]
+    user_roles_ids: list[int]
 
 
 class UserHandlingService(BaseService):
 
     def __init__(self, *, bot):
         # UserId cache so that we don't hit the database on subsequent user updates
-        self.user_id_cache: t.List[int] = []
+        self.user_id_cache: list[int] = []
 
         super().__init__(bot)
 

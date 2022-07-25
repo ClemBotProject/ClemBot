@@ -100,7 +100,7 @@ class TagRoute(BaseRoute):
 
         return [Tag.from_dict(i) for i in resp['tags']]
 
-    async def search_tags(self, guild_id: int, query: str, limit: int = 5) -> t.List[Tag]:
+    async def search_tags(self, guild_id: int, query: str, limit: int = 5) -> list[Tag]:
         resp = await self._client.get('bot/tags/search', data={'query': query, 'guildId': guild_id, 'limit': limit})
 
         if not resp:

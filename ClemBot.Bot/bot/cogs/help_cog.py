@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Iterable
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -10,7 +11,8 @@ from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
 from bot.utils.helpers import chunk_sequence
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+
 HELP_EMBED_SIZE = 15
 
 

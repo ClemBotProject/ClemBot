@@ -2,6 +2,7 @@ import logging
 import typing as t
 from datetime import datetime
 from bot.utils.helpers import chunk_sequence
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -12,7 +13,7 @@ from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 INFRACTION_EMOJI_MAP = {
     'warn': ':warning:',

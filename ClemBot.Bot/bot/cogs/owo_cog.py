@@ -2,12 +2,13 @@ import logging
 import math
 import random
 import re
+import seqlog
 
 import discord.ext.commands as commands
 
 import bot.extensions as ext
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class OwoCog(commands.Cog):

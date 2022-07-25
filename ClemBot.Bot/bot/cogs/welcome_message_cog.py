@@ -1,4 +1,5 @@
 import logging
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -6,7 +7,7 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Colors, Claims
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class WelcomeMessageCog(commands.Cog):

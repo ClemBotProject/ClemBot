@@ -8,10 +8,11 @@ from asyncio import Task
 from datetime import datetime
 from functools import partial
 from typing import Optional
+import seqlog
 
 from discord.ext.commands.errors import BadArgument
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class Scheduler:

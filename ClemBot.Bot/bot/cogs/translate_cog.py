@@ -10,8 +10,9 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
+import seqlog
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 class TranslateCog(commands.Cog):
 

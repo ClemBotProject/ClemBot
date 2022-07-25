@@ -5,6 +5,7 @@ import random
 import time
 import typing
 from datetime import datetime
+import seqlog
 
 import aiohttp
 import discord
@@ -15,7 +16,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import Duration
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 SLOTS_COMMAND_COOLDOWN = 30
 
 DICE_LIMIT = 20

@@ -2,6 +2,7 @@ import logging
 import os
 from dataclasses import dataclass
 from typing import List
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -12,7 +13,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.displayable_path import DisplayablePath
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 @dataclass

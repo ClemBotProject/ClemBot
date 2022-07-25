@@ -2,6 +2,7 @@ import logging
 import os
 import typing as t
 from bot.utils.helpers import chunk_sequence
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -12,7 +13,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import HonorsConverter
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 MIN_YEAR = 2014
 TAG_CHUNK_SIZE = 12 * 3

@@ -1,7 +1,7 @@
 import importlib
 import logging
 import pkgutil
-import sys
+import seqlog
 import traceback
 import typing as t
 import datetime
@@ -26,7 +26,7 @@ from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 import bot.utils.log_serializers as serializers
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class ClemBot(commands.Bot):

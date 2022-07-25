@@ -5,10 +5,12 @@ import logging
 import os
 import random
 import time
+import seqlog
 
 import discord
 import discord.ext.commands as commands
 from PIL import Image, ImageDraw, ImageSequence, ImageFont
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
@@ -18,10 +20,12 @@ MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
 CRAB_COMMAND_COOLDOWN = 3
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
-def crab_pillow_process(args, lines_in_text, timestamp):
+def crab_pillow_process(args: str, lines_in_text: int, timestamp: int) -> None:
+    """Creates the crab gif and saves it to a file"""
+
     # Open crab.gif and add our font
     with Image.open('bot/cogs/memes_cog/assets/crab.gif') as im:
         fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
@@ -42,12 +46,13 @@ def crab_pillow_process(args, lines_in_text, timestamp):
             frame.save(b, format='GIF')
             frame = Image.open(b)
             frames.append(frame)
+
         frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
 
 
 class MemesCog(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -56,8 +61,7 @@ class MemesCog(commands.Cog):
     )
     @ext.short_help('Creates bubblewrap!')
     @ext.example('bubblewrap')
-    async def bubblewrap(self, ctx):
-
+    async def bubblewrap(self, ctx: commands.Context[ClemBot]):
         msg = ''
         for _ in range(0, 5):
             for _ in range(0, 10):
@@ -73,7 +77,7 @@ class MemesCog(commands.Cog):
     )
     @ext.short_help('Can you find him?')
     @ext.example(('waldo', 'waldo 10'))
-    async def waldo(self, ctx, size=MAX_WALDO_GRID_SIZE):
+    async def waldo(self, ctx: commands.Context[ClemBot], size: int = MAX_WALDO_GRID_SIZE):
         """
         Play Where's Waldo!
 
@@ -114,7 +118,7 @@ class MemesCog(commands.Cog):
     )
     @ext.short_help('sO yOu doNt KnOw wHat tHiS Is?')
     @ext.example('spongebob hello world')
-    async def spongebob(self, ctx, *, args):
+    async def spongebob(self, ctx: commands.Context, *, args: str):
         """
         Spongebob Text
         """
@@ -141,7 +145,7 @@ class MemesCog(commands.Cog):
     @ext.short_help('Generates a crab rave gif')
     @ext.chainable_input()
     @ext.example('crab hello from crab world')
-    async def crab(self, ctx, *, args='Bottom text\n is dead'):
+    async def crab(self, ctx: commands.Context[ClemBot], *, args: str = 'Bottom text\n is dead'):
         """
         Create your own crab rave.
         Usage: <prefix>crab [text=Bottom text\\n is dead]
@@ -180,7 +184,7 @@ class MemesCog(commands.Cog):
         os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
 
     @ext.command(hidden=True, aliases=['ctray', 'trayforjay'])
-    async def cookouttray(self, ctx, input):
+    async def cookouttray(self, ctx: commands.Context[ClemBot], input: str):
         """
         For those who do finances with cookout trays, we proudly present the command for you
             Simply type one of the following:
@@ -201,6 +205,7 @@ class MemesCog(commands.Cog):
 
         Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
         """
+        
         money = round(float(input), 2)
         output = money / 5
 

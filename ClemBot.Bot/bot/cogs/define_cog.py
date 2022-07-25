@@ -4,6 +4,7 @@
 import logging
 import re
 import unicodedata
+import seqlog
 
 import aiohttp
 import discord
@@ -14,7 +15,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 API_URL = 'https://www.dictionaryapi.com/api/v3/references/collegiate/json/'
 
 

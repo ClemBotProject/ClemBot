@@ -2,6 +2,7 @@ import asyncio
 import logging
 import typing as t
 from dataclasses import dataclass
+import seqlog
 
 import discord
 from discord.ext.commands.errors import BadArgument
@@ -10,12 +11,12 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 @dataclass
 class Message:
-    pages: t.Union[t.List[discord.Embed], t.List[str]]
+    pages: t.Union[list[discord.Embed], list[str]]
     _curr_page_num: int
     author: int
     footer: str = None
@@ -65,7 +66,7 @@ class PaginateService(BaseService):
     async def set_text_pageable(self, *,
                                 embed_name: str,
                                 field_title: str,
-                                pages: t.List[str],
+                                pages: list[str],
                                 author: discord.Member = None,
                                 channel: discord.TextChannel,
                                 timeout: int = 60):
@@ -89,7 +90,7 @@ class PaginateService(BaseService):
 
     @BaseService.Listener(Events.on_set_pageable_embed)
     async def set_embed_pageable(self, *,
-                                 pages: t.List[discord.Embed],
+                                 pages: list[discord.Embed],
                                  author: discord.Member = None,
                                  channel: discord.TextChannel,
                                  timeout: int = 60):

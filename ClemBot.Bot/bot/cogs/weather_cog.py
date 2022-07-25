@@ -3,6 +3,7 @@
 
 import datetime as dt
 import logging
+import seqlog
 import re
 
 import aiohttp
@@ -14,7 +15,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 URL_WEATHER = "https://api.openweathermap.org/data/2.5/onecall"
 URL_GEO = "https://geocode.xyz/"
 

@@ -2,8 +2,9 @@ import logging
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+import seqlog
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class AssignableRolesService(BaseService):

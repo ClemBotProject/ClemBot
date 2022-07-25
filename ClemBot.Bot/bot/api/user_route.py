@@ -66,7 +66,7 @@ class UserRoute(BaseRoute):
 
         await self._client.patch('bot/users/edit', data=json)
 
-    async def get_users_ids(self) -> t.Optional[t.List[int]]:
+    async def get_users_ids(self) -> t.Optional[list[int]]:
         users = await self._client.get('users')
 
         if not users:

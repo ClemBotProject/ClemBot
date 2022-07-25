@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -11,7 +12,7 @@ from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 ROLE_LIST_CHUNK_SIZE = 15
 

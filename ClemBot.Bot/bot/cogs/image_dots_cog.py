@@ -1,6 +1,7 @@
 import logging
 import math
 import typing as t
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -10,7 +11,7 @@ from PIL import Image, UnidentifiedImageError
 import bot.extensions as ext
 from bot.consts import Colors
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 ASCIIYDOTS = 4
 ASCIIXDOTS = 2
 PC_WIDTH = 59

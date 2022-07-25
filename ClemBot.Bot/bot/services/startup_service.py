@@ -1,11 +1,12 @@
 import asyncio
 import logging
 import os
+import seqlog
 
 from bot.services.base_service import BaseService
 import bot.bot_secrets as bot_secrets
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class StartupService(BaseService):

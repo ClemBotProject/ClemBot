@@ -6,6 +6,7 @@ import typing as t
 from typing import Tuple, List, Union
 from collections import Counter
 from bot.utils.helpers import chunk_sequence
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -116,7 +117,7 @@ COLUMN_MULTIPLIERS = [
 
 PHRASES_PATH = 'bot/cogs/random_cog/assets/phrases.txt'
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 SLOTS_COMMAND_COOLDOWN = 60
 
 
@@ -224,10 +225,10 @@ class SlotsCog(commands.Cog):
         return winning_groups, horizontal_score + vertical_score + diagonal_score
 
     def _calculate_line_score(self, *,
-                              results: t.List[str],
+                              results: list[str],
                               count_singles: bool,
                               consecutive_multipliers: t.Dict[int, int],
-                              payline_multiplier: int = 1) -> t.Tuple[t.List[t.Union[str, t.List[str]]], int]:
+                              payline_multiplier: int = 1) -> t.Tuple[list[t.Union[str, list[str]]], int]:
 
         groups = []
         curr_group = []
@@ -265,7 +266,7 @@ class SlotsCog(commands.Cog):
         # so it prints what you requested.
         return [n.tolist() for n in diags]
 
-    def _generate_paylines(self) -> t.List[t.List[str]]:
+    def _generate_paylines(self) -> list[list[str]]:
         results = []
         for i, val in enumerate(PAYLINE_VALUES):
             generated = random.choices(''.join(PAY_TABLE.keys()),
@@ -276,8 +277,8 @@ class SlotsCog(commands.Cog):
 
     async def _render_slots_embed(self,
                                   ctx: commands.Context,
-                                  paylines: t.List[t.List[str]],
-                                  winning_groups: t.List[t.List[str]]
+                                  paylines: list[list[str]],
+                                  winning_groups: list[list[str]]
                                   ) -> t.Tuple[discord.Embed, discord.Message]:
 
         slots_title = '💎 ClemBot Slot Machine 💎'
@@ -314,7 +315,7 @@ class SlotsCog(commands.Cog):
 
         return embed, msg
 
-    def _render_board(self, paylines: t.List[t.List[str]], iter_num=3):
+    def _render_board(self, paylines: list[list[str]], iter_num=3):
 
         # Generate empty game-board
         game_board = [['◻️' for _ in range(NUM_COLUMNS)] for _ in range(NUM_ROWS)]

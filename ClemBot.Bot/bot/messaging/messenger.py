@@ -5,8 +5,9 @@ import logging
 import traceback
 import typing as t
 import weakref as wr
+import seqlog
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 @dataclasses.dataclass
@@ -28,7 +29,7 @@ class Messenger:
     def __init__(self, name=None) -> None:
         log.info('New messenger created with name: {name}', name=name)
         self.name = name
-        self._events: t.Dict[str, t.List[t.Awaitable]] = {}
+        self._events: t.Dict[str, list[t.Awaitable]] = {}
 
         # Error callback to report exceptions in queued events back to
         self.error_callback: t.Callable = None

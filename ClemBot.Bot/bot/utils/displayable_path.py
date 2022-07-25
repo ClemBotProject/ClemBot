@@ -1,4 +1,5 @@
 from pathlib import Path
+import typing as t
 
 
 class DisplayablePath(object):
@@ -7,7 +8,7 @@ class DisplayablePath(object):
     display_parent_prefix_middle = '    '
     display_parent_prefix_last = '│   '
 
-    def __init__(self, path, parent_path, is_last):
+    def __init__(self, path: t.Any, parent_path, is_last):
         self.path = Path(str(path))
         self.parent = parent_path
         self.is_last = is_last

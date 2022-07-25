@@ -41,7 +41,7 @@ class RoleRoute(BaseRoute):
     async def remove_role(self, role_id: int, **kwargs):
         await self._client.delete(f'bot/roles/{role_id}', **kwargs)
 
-    async def get_guilds_roles(self, guild_id: int) -> t.Optional[t.List[int]]:
+    async def get_guilds_roles(self, guild_id: int) -> t.Optional[list[int]]:
         return await self._client.get(f'bot/guilds/{guild_id}/roles')
 
     async def get_guilds_assignable_roles(self, guild_id: int) -> t.Optional[t.List]:

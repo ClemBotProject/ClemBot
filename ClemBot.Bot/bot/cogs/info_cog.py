@@ -4,10 +4,11 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
+import seqlog
 
 DEFAULT_MESSAGE_RANGE = 30
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class InfoCog(commands.Cog):

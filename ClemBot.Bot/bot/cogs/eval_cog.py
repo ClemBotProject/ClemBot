@@ -1,6 +1,7 @@
 import json
 import logging
 import typing as t
+import seqlog
 
 import aiohttp
 import discord.ext.commands as commands
@@ -9,7 +10,7 @@ import discord.utils as utils
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 HEADERS = {
     'Content-type': 'application/json',

@@ -1,5 +1,6 @@
 import logging
 import re
+import seqlog
 
 import discord
 
@@ -9,7 +10,7 @@ from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 TAG_PAGINATE_THRESHOLD = 500
 TAG_PREFIX_DEFAULT = '$'

@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import re
+import seqlog
 from typing import Iterable
 
 import discord
@@ -12,7 +13,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 MESSAGE_BATCH_SIZE = 20
 MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')

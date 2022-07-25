@@ -5,6 +5,7 @@ import queue
 import typing as t
 from http import HTTPStatus
 from urllib.parse import quote
+import seqlog
 
 import aiohttp
 
@@ -12,7 +13,7 @@ import bot.bot_secrets as bot_secrets
 from bot.consts import Urls
 from bot.errors import ApiClientRequestError, BotOnlyRequestError
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 RECONNECT_TIMEOUT = 10
 

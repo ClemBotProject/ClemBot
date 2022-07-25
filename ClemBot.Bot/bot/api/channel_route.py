@@ -31,5 +31,5 @@ class ChannelRoute(BaseRoute):
     async def remove_channel(self, channel_id: int, **kwargs):
         return await self._client.delete(f'bot/channels/{channel_id}', **kwargs)
 
-    async def get_guilds_channels(self, guild_id: int) -> t.Optional[t.List[int]]:
+    async def get_guilds_channels(self, guild_id: int) -> t.Optional[list[int]]:
         return await self._client.get(f'bot/guilds/{guild_id}/channels')

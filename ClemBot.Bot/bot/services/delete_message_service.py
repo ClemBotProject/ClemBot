@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import typing as t
+import seqlog
 
 import discord
 
@@ -8,7 +9,7 @@ from bot.consts import Claims
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class DeleteMessageService(BaseService):
@@ -24,8 +25,8 @@ class DeleteMessageService(BaseService):
     # Called When a cog would like to be able to delete a message or messages
     @BaseService.Listener(Events.on_set_deletable)
     async def set_message_deletable(self, *,
-                                    msg: t.List[discord.Message],
-                                    roles: t.List[discord.Role] = [],
+                                    msg: list[discord.Message],
+                                    roles: list[discord.Role] = [],
                                     author: discord.Member = None,
                                     timeout: int = None):
 

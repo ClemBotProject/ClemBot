@@ -37,5 +37,5 @@ class ThreadRoute(BaseRoute):
     async def remove_thread(self, thread_id: int, **kwargs):
         return await self._client.delete(f'bot/threads/{thread_id}', **kwargs)
 
-    async def get_guilds_threads(self, guild_id: int) -> t.Optional[t.List[int]]:
+    async def get_guilds_threads(self, guild_id: int) -> t.Optional[list[int]]:
         return await self._client.get(f'bot/guilds/{guild_id}/threads')

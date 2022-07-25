@@ -3,6 +3,7 @@ import logging
 import math
 import typing as t
 import uuid
+import seqlog
 
 import discord
 
@@ -10,7 +11,7 @@ from bot.consts import Colors, DesignatedChannels, DiscordLimits
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 # minimum reactions required to get on the starboard
 # TODO: implement to where user-editable
@@ -29,7 +30,7 @@ RANKINGS = {
 
 @dataclasses.dataclass
 class StarboardPost:
-    star_posts: t.List[discord.Message]
+    star_posts: list[discord.Message]
     star_num: int
     star_users: t.Set[int] = dataclasses.field(default_factory=set)
 

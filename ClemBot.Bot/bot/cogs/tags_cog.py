@@ -3,6 +3,7 @@ import discord
 from bot.clem_bot import ClemBot
 import bot.extensions as ext
 import discord.ext.commands as commands
+import seqlog
 
 from typing import Optional
 
@@ -12,7 +13,7 @@ from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20

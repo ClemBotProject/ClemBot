@@ -1,4 +1,5 @@
 import logging
+import seqlog
 
 from discord.ext import commands
 
@@ -6,7 +7,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class CommandMetricsService(BaseService):

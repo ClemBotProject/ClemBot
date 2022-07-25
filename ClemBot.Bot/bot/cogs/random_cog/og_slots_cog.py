@@ -2,6 +2,7 @@ import asyncio
 import logging
 import random
 import typing as t
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -67,7 +68,7 @@ PHRASES = [
     'High score incoming!'
 ]
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 SLOTS_COMMAND_COOLDOWN = 30
 
 
@@ -114,7 +115,7 @@ class OgSlotsCog(commands.Cog):
 
         await msg.edit(embed=final)
 
-    def calculate_score(self, results: t.List[str]) -> int:
+    def calculate_score(self, results: list[str]) -> int:
         groups = []
         curr_group = []
 

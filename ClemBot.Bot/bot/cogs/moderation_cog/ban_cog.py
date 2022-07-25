@@ -1,20 +1,22 @@
 import logging
 import typing as t
+import seqlog
 
 import discord
 import discord.ext.commands as commands
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.consts import Moderation
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class BanCog(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -26,7 +28,10 @@ class BanCog(commands.Cog):
     @ext.short_help('Bans a user')
     @ext.example(('ban @SomeUser Troll', 'ban 123456789 Another troll', 'ban @SomeOtherUser 3 Spamming messages'))
     @ext.required_claims(Claims.moderation_ban)
-    async def ban(self, ctx: commands.Context, subject: discord.Member, purge_days: t.Optional[int] = 0, *, reason: str):
+    async def ban(self, ctx: commands.Context[ClemBot], subject: discord.Member, purge_days: int = 0, *, reason: str):
+        ctx.author: discord.Member
+        ctx.guild: discord.Guild
+
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.add_field(name='Reason',

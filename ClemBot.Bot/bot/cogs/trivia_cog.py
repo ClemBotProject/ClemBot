@@ -13,8 +13,9 @@ from bot.utils.converters import trivia_cog_converter
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+import seqlog
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class TriviaCog(commands.Cog):
@@ -246,7 +247,7 @@ class TriviaCog(commands.Cog):
 
         return page_int
 
-    async def set_embed_pageable(self, pages: t.List[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int):
+    async def set_embed_pageable(self, pages: list[discord.Embed], author: discord.Member, channel: discord.TextChannel, timeout: int):
         if not isinstance(pages, t.List):
             pages = [pages]
 
@@ -359,7 +360,7 @@ CATEGORY_LIST_LOWER = [k.lower() for k in CATEGORY_LIST]
 
 @dataclass
 class Message:
-    pages: t.Union[t.List[discord.Embed], t.List[str]]
+    pages: t.Union[list[discord.Embed], list[str]]
     _curr_page_num: int
     author: int
     footer: str = None

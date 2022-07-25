@@ -1,5 +1,6 @@
 import logging
 from typing import Union, List
+import seqlog
 
 import discord
 
@@ -7,7 +8,7 @@ from bot.consts import DesignatedChannels, DesignatedChannelBase
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class DesignatedChannelService(BaseService):

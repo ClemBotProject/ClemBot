@@ -1,5 +1,6 @@
 import logging
 import typing as t
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -8,7 +9,7 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Claims, Colors
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class CustomPrefixCog(commands.Cog):

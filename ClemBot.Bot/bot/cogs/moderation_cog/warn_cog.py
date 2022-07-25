@@ -2,17 +2,19 @@ import logging
 
 import discord
 import discord.ext.commands as commands
+import seqlog
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
+from bot.clem_bot import ClemBot
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class WarnCog(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -23,7 +25,9 @@ class WarnCog(commands.Cog):
     @ext.example('warn @SomeUser an example warning')
     @ext.required_claims(Claims.moderation_mute)
     @ext.required_claims(Claims.moderation_warn)
-    async def warn(self, ctx: commands.Context, subject: discord.Member, *, reason: str):
+    async def warn(self, ctx: commands.Context[ClemBot], subject: discord.Member, *, reason: str):
+        ctx.author: discord.Member
+
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
             embed.title = 'Error: Invalid Permissions'

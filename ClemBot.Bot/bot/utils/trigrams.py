@@ -1,7 +1,6 @@
-from typing import List, Set, Tuple
 import nltk
 
-TRIGRAM_SET = Set[Tuple[str]]
+TRIGRAM_SET = set[tuple[str]]
 
 
 class BankSearchEntry:
@@ -12,13 +11,22 @@ class BankSearchEntry:
         self.similarity = similarity
 
     def __eq__(self, other: object) -> bool:
-        return self.similarity == getattr(other, 'similarity', other)
+        if not isinstance(other, BankSearchEntry):
+            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
+        
+        return self.similarity == other.similarity
 
     def __lt__(self, other: object) -> bool:
-        return self.similarity < getattr(other, 'similarity', other)
+        if not isinstance(other, BankSearchEntry):
+            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
+
+        return self.similarity < other.similarity
 
     def __gt__(self, other: object) -> bool:
-        return self.similarity > getattr(other, 'similarity', other)
+        if not isinstance(other, BankSearchEntry):
+            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
+
+        return self.similarity > other.similarity
 
     def __str__(self) -> str:
         return f"BankSearchEntry(item={self.item!r}, similarity={self.similarity:0.2f})"
@@ -36,11 +44,11 @@ def similarity(a: TRIGRAM_SET, b: TRIGRAM_SET) -> float:
     return (compare(a, b) + compare(b, a)) / 2
 
 
-def make_search_bank(items: List[str]) -> List[Tuple[str, TRIGRAM_SET]]:
+def make_search_bank(items: list[str]) -> list[tuple[str, TRIGRAM_SET]]:
     return [(item, make_trigrams(item)) for item in items]
 
 
-def find_best_match(bank: List[Tuple[str, TRIGRAM_SET]], query: str) -> BankSearchEntry:
+def find_best_match(bank: list[tuple[str, TRIGRAM_SET]], query: str) -> BankSearchEntry:
     query_trgrms = make_trigrams(query)
 
     return max(

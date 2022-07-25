@@ -1,5 +1,6 @@
 import logging
 import typing as t
+import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -10,7 +11,7 @@ from bot.messaging.events import Events
 from bot.utils.converters import Duration, DurationDelta
 from bot.utils.user_choice import UserChoice
 
-log = logging.getLogger(__name__)
+log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
 
 
 class MuteCog(commands.Cog):
