@@ -1,59 +1,66 @@
-from _typeshed import Incomplete
+import sys
+from _typeshed import StrOrBytesPath
+from collections.abc import Callable, Sequence
+from configparser import RawConfigParser
+from re import Pattern
+from threading import Thread
+from typing import IO, Any
+
+from . import _Level
+
+if sys.version_info >= (3, 8):
+    from typing import Literal, TypedDict
+else:
+    from typing_extensions import Literal, TypedDict
 
 DEFAULT_LOGGING_CONFIG_PORT: int
-RESET_ERROR: Incomplete
+RESET_ERROR: int  # undocumented
+IDENTIFIER: Pattern[str]  # undocumented
 
-def fileConfig(fname, defaults: Incomplete | None = ..., disable_existing_loggers: bool = ..., encoding: Incomplete | None = ...) -> None: ...
+class _RootLoggerConfiguration(TypedDict, total=False):
+    level: _Level
+    filters: Sequence[str]
+    handlers: Sequence[str]
 
-IDENTIFIER: Incomplete
+class _LoggerConfiguration(_RootLoggerConfiguration, TypedDict, total=False):
+    propagate: bool
 
-def valid_ident(s): ...
+class _OptionalDictConfigArgs(TypedDict, total=False):
+    # these two can have custom factories (key: `()`) which can have extra keys
+    formatters: dict[str, dict[str, Any]]
+    filters: dict[str, dict[str, Any]]
+    # type checkers would warn about extra keys if this was a TypedDict
+    handlers: dict[str, dict[str, Any]]
+    loggers: dict[str, _LoggerConfiguration]
+    root: _RootLoggerConfiguration | None
+    incremental: bool
+    disable_existing_loggers: bool
 
-class ConvertingMixin:
-    def convert_with_key(self, key, value, replace: bool = ...): ...
-    def convert(self, value): ...
+class _DictConfigArgs(_OptionalDictConfigArgs, TypedDict):
+    version: Literal[1]
 
-class ConvertingDict(dict, ConvertingMixin):
-    def __getitem__(self, key): ...
-    def get(self, key, default: Incomplete | None = ...): ...
-    def pop(self, key, default: Incomplete | None = ...): ...
+# Accept dict[str, Any] to avoid false positives if called with a dict
+# type, since dict types are not compatible with TypedDicts.
+#
+# Also accept a TypedDict type, to allow callers to use TypedDict
+# types, and for somewhat stricter type checking of dict literals.
+def dictConfig(config: _DictConfigArgs | dict[str, Any]) -> None: ...
 
-class ConvertingList(list, ConvertingMixin):
-    def __getitem__(self, key): ...
-    def pop(self, idx: int = ...): ...
+if sys.version_info >= (3, 10):
+    def fileConfig(
+        fname: StrOrBytesPath | IO[str] | RawConfigParser,
+        defaults: dict[str, str] | None = ...,
+        disable_existing_loggers: bool = ...,
+        encoding: str | None = ...,
+    ) -> None: ...
 
-class ConvertingTuple(tuple, ConvertingMixin):
-    def __getitem__(self, key): ...
+else:
+    def fileConfig(
+        fname: StrOrBytesPath | IO[str] | RawConfigParser,
+        defaults: dict[str, str] | None = ...,
+        disable_existing_loggers: bool = ...,
+    ) -> None: ...
 
-class BaseConfigurator:
-    CONVERT_PATTERN: Incomplete
-    WORD_PATTERN: Incomplete
-    DOT_PATTERN: Incomplete
-    INDEX_PATTERN: Incomplete
-    DIGIT_PATTERN: Incomplete
-    value_converters: Incomplete
-    importer: Incomplete
-    config: Incomplete
-    def __init__(self, config) -> None: ...
-    def resolve(self, s): ...
-    def ext_convert(self, value): ...
-    def cfg_convert(self, value): ...
-    def convert(self, value): ...
-    def configure_custom(self, config): ...
-    def as_tuple(self, value): ...
-
-class DictConfigurator(BaseConfigurator):
-    def configure(self) -> None: ...
-    def configure_formatter(self, config): ...
-    def configure_filter(self, config): ...
-    def add_filters(self, filterer, filters) -> None: ...
-    def configure_handler(self, config): ...
-    def add_handlers(self, logger, handlers) -> None: ...
-    def common_logger_config(self, logger, config, incremental: bool = ...) -> None: ...
-    def configure_logger(self, name, config, incremental: bool = ...) -> None: ...
-    def configure_root(self, config, incremental: bool = ...) -> None: ...
-dictConfigClass = DictConfigurator
-
-def dictConfig(config) -> None: ...
-def listen(port=..., verify: Incomplete | None = ...): ...
+def valid_ident(s: str) -> Literal[True]: ...  # undocumented
+def listen(port: int = ..., verify: Callable[[bytes], bytes | None] | None = ...) -> Thread: ...
 def stopListening() -> None: ...

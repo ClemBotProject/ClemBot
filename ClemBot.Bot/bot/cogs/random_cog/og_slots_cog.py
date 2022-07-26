@@ -6,6 +6,7 @@ import seqlog
 
 import discord
 import discord.ext.commands as commands
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
@@ -74,7 +75,7 @@ SLOTS_COMMAND_COOLDOWN = 30
 
 class OgSlotsCog(commands.Cog):
 
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()

@@ -1,6 +1,7 @@
+from typing import TypeAlias
 import nltk
 
-TRIGRAM_SET = set[tuple[str]]
+TRIGRAM_SET: TypeAlias = set[tuple[str, ...]]
 
 
 class BankSearchEntry:

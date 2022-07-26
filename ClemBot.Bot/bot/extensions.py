@@ -39,8 +39,8 @@ def command(name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]
 Decorator that enables the chaining of multiple commands
 """
 
-T_EXTBASE = "ExtBase" | t.Any
-T_EXTBASE_DECO_WRAP = t.Callable[[T_EXTBASE], T_EXTBASE]
+T_EXTBASE: t.TypeAlias = "ExtBase" | t.Any
+T_EXTBASE_DECO_WRAP: t.TypeAlias = t.Callable[[T_EXTBASE], T_EXTBASE]
 
 
 def chainable(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
