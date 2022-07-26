@@ -15,7 +15,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 URL_WEATHER = "https://api.openweathermap.org/data/2.5/onecall"
 URL_GEO = "https://geocode.xyz/"
 

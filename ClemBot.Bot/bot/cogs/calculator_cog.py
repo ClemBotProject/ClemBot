@@ -9,7 +9,7 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.errors import ParserError
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class CalculatorCog(commands.Cog):

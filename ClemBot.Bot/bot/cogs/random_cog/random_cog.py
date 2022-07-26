@@ -16,7 +16,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import Duration
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 SLOTS_COMMAND_COOLDOWN = 30
 
 DICE_LIMIT = 20

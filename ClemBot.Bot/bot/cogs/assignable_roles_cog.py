@@ -12,7 +12,7 @@ from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 ROLE_LIST_CHUNK_SIZE = 15
 

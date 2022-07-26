@@ -11,7 +11,7 @@ from PIL import Image, UnidentifiedImageError
 import bot.extensions as ext
 from bot.consts import Colors
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 ASCIIYDOTS = 4
 ASCIIXDOTS = 2
 PC_WIDTH = 59

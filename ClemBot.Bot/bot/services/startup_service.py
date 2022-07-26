@@ -6,7 +6,7 @@ import seqlog
 from bot.services.base_service import BaseService
 import bot.bot_secrets as bot_secrets
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class StartupService(BaseService):

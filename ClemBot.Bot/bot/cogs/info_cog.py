@@ -8,7 +8,7 @@ import seqlog
 
 DEFAULT_MESSAGE_RANGE = 30
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class InfoCog(commands.Cog):

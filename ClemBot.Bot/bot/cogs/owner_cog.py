@@ -11,7 +11,7 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 MAX_MESSAGE_SIZE = 1900
 

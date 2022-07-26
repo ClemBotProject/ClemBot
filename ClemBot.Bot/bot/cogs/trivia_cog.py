@@ -15,7 +15,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 import seqlog
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class TriviaCog(commands.Cog):

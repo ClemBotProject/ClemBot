@@ -8,7 +8,7 @@ class EventsMeta(type):
     """Class that defines what events are exposed at the bot level"""
 
     @property
-    def on_example(self):
+    def on_example(self) -> str:
         """
         This is an example event for the Example Service, this should not be
         used under any circumstances
@@ -20,7 +20,7 @@ class EventsMeta(type):
         return 'on_example'
 
     @property
-    def on_guild_message_received(self):
+    def on_guild_message_received(self) -> str:
         """
         Published whenever a message is sent in a server
         
@@ -30,7 +30,7 @@ class EventsMeta(type):
         return 'on_guild_message_received'
 
     @property
-    def on_dm_message_received(self):
+    def on_dm_message_received(self) -> str:
         """
         Published whenever a direct message is sent to ClemBot
         
@@ -40,7 +40,7 @@ class EventsMeta(type):
         return 'on_dm_message_received'
 
     @property
-    def on_raw_message_edit(self):
+    def on_raw_message_edit(self) -> str:
         """
         Published when a Message receives an update event and is not in the cache
 
@@ -51,7 +51,7 @@ class EventsMeta(type):
         return 'on_raw_message_edit'
 
     @property
-    def on_message_edit(self):
+    def on_message_edit(self) -> str:
         """
         Published when a Message receives an update event and is in the cache
 
@@ -63,7 +63,7 @@ class EventsMeta(type):
         return 'on_message_edit'
 
     @property
-    def on_raw_message_delete(self):
+    def on_raw_message_delete(self) -> str:
         """
         Published when a Message receives an update event and is not in the cache
 
@@ -74,7 +74,7 @@ class EventsMeta(type):
         return 'on_raw_message_delete'
 
     @property
-    def on_message_delete(self):
+    def on_message_delete(self) -> str:
         """
         Published whenever a message is deleted while it exists in the cache
 
@@ -85,7 +85,7 @@ class EventsMeta(type):
         return 'on_message_delete'
 
     @property
-    def on_reaction_add(self):
+    def on_reaction_add(self) -> str:
         """
         Published whenever a reaction is sent in a server, and that message is stored
         in d.pys internal cache
@@ -98,7 +98,7 @@ class EventsMeta(type):
         return 'on_reaction_add'
 
     @property
-    def on_raw_reaction_add(self):
+    def on_raw_reaction_add(self) -> str:
         """
         Called when a message has a reaction added. regardless of cache state
 
@@ -109,7 +109,7 @@ class EventsMeta(type):
         return 'on_raw_reaction_add'
 
     @property
-    def on_reaction_remove(self):
+    def on_reaction_remove(self) -> str:
         """
         Published whenever a reaction is removed in a server, and that message is stored
         in d.pys internal cache
@@ -122,7 +122,7 @@ class EventsMeta(type):
         return 'on_reaction_remove'
 
     @property
-    def on_raw_reaction_remove(self):
+    def on_raw_reaction_remove(self) -> str:
         """
         Called when a message has a reaction removeed. regardless of cache state
 
@@ -133,7 +133,7 @@ class EventsMeta(type):
         return 'on_raw_reaction_remove'
 
     @property
-    def on_guild_joined(self):
+    def on_guild_joined(self) -> str:
         """
         Published whenever the bot joins new guild
 
@@ -144,7 +144,7 @@ class EventsMeta(type):
         return 'on_guild_joined'
 
     @property
-    def on_guild_update(self):
+    def on_guild_update(self) -> str:
         """
         Published whenever the bot joins new guild
 
@@ -156,7 +156,7 @@ class EventsMeta(type):
         return 'on_guild_update'
 
     @property
-    def on_guild_leave(self):
+    def on_guild_leave(self) -> str:
         """
         Published whenever the bot leaves a guild
 
@@ -167,7 +167,7 @@ class EventsMeta(type):
         return 'on_guild_leave'
 
     @property
-    def on_new_guild_initialized(self):
+    def on_new_guild_initialized(self) -> str:
         """
         Published whenever the bot joins a new guild and that guild has been created
         in the bots database. This is the event that should be used for all new guild
@@ -180,7 +180,7 @@ class EventsMeta(type):
         return 'on_new_guild_initialized'
 
     @property
-    def on_guild_role_create(self):
+    def on_guild_role_create(self) -> str:
         """
         published whenever a guild role is created in a guild
         
@@ -191,7 +191,7 @@ class EventsMeta(type):
         return 'on_guild_role_create'
 
     @property
-    def on_guild_role_update(self):
+    def on_guild_role_update(self) -> str:
         """
         published whenever a guild role is updated in a guild
         
@@ -203,7 +203,7 @@ class EventsMeta(type):
         return 'on_guild_role_update'
 
     @property
-    def on_guild_role_delete(self):
+    def on_guild_role_delete(self) -> str:
         """
         published whenever a guild role is deleted in a guild
         
@@ -214,7 +214,7 @@ class EventsMeta(type):
         return 'on_guild_role_delete'
 
     @property
-    def on_user_joined(self):
+    def on_user_joined(self) -> str:
         """
         Published whenever a new user joins a guild
         
@@ -225,7 +225,7 @@ class EventsMeta(type):
         return 'on_user_joined'
 
     @property
-    def on_user_removed(self):
+    def on_user_removed(self) -> str:
         """
         Published whenever a user leaves a guild
         
@@ -236,7 +236,7 @@ class EventsMeta(type):
         return 'on_user_removed'
 
     @property
-    def on_user_update(self):
+    def on_user_update(self) -> str:
         """
         Published whenever a user updates themselves
         
@@ -248,7 +248,7 @@ class EventsMeta(type):
         return 'on_user_update'
 
     @property
-    def on_add_designated_channel(self):
+    def on_add_designated_channel(self) -> str:
         """
         Published whenever a designated channel id is added to a designated channel slot
 
@@ -259,7 +259,7 @@ class EventsMeta(type):
         return 'on_add_designated_channel'
 
     @property
-    def on_send_in_designated_channel(self):
+    def on_send_in_designated_channel(self) -> str:
         """
         Published when a reqeust to send a message in a designated channel is sent
 
@@ -273,7 +273,7 @@ class EventsMeta(type):
         return 'on_send_in_designated_channel'
 
     @property
-    def on_designated_message_sent(self):
+    def on_designated_message_sent(self) -> str:
         """
         Published when an on_send_in_designate_channel event is published with an optional id parameter, 
         this serves as a callback for that event to maintain seperation of concerns
@@ -286,7 +286,7 @@ class EventsMeta(type):
         return 'on_designated_message_sent'
 
     @property
-    def on_broadcast_designated_channel(self):
+    def on_broadcast_designated_channel(self) -> str:
         """
         Published when a request to broadcast a message to all registered channels
         in all servers is sent
@@ -299,7 +299,7 @@ class EventsMeta(type):
         return 'on_broadcast_designated_channel'
 
     @property
-    def on_set_custom_prefix(self):
+    def on_set_custom_prefix(self) -> str:
         """
         Published when a new custom prefix is added in a guild
 
@@ -311,7 +311,7 @@ class EventsMeta(type):
         return 'on_set_custom_prefix'
 
     @property
-    def on_assignable_role_add(self):
+    def on_assignable_role_add(self) -> str:
         """
         Pulbished when a new role is marked as set to be marked as assignable
 
@@ -321,9 +321,9 @@ class EventsMeta(type):
         return 'on_assignable_role_add'
 
     @property
-    def on_assignable_role_remove(self):
+    def on_assignable_role_remove(self) -> str:
         """
-        Pulbished when a role is marked as set to be removed as assignable
+        Published when a role is marked as set to be removed as assignable
 
         Args:
             role (discord.Role) The role to remove as assignable
@@ -331,7 +331,7 @@ class EventsMeta(type):
         return 'on_assignable_role_remove'
 
     @property
-    def on_set_deletable(self):
+    def on_set_deletable(self) -> str:
         """
         Published when a bot message is needed to be able to be deleted
         
@@ -343,7 +343,7 @@ class EventsMeta(type):
         return 'on_set_deletable'
 
     @property
-    def on_guild_channel_create(self):
+    def on_guild_channel_create(self) -> str:
         """
         Published when a new text channel is created in a guild
 
@@ -353,7 +353,7 @@ class EventsMeta(type):
         return 'on_guild_channel_create'
 
     @property
-    def on_guild_channel_delete(self):
+    def on_guild_channel_delete(self) -> str:
         """
         Published when a new text channel is deleted in a guild
 
@@ -363,7 +363,7 @@ class EventsMeta(type):
         return 'on_guild_channel_delete'
 
     @property
-    def on_guild_channel_update(self):
+    def on_guild_channel_update(self) -> str:
         """
         Published when a text channel is edited
 
@@ -374,7 +374,7 @@ class EventsMeta(type):
         return 'on_guild_channel_update'
 
     @property
-    def on_set_pageable_text(self):
+    def on_set_pageable_text(self) -> str:
         """
         Published when a bot message is needed to be able to be paginate
         
@@ -389,7 +389,7 @@ class EventsMeta(type):
         return 'on_set_pageable_text'
 
     @property
-    def on_set_pageable_embed(self):
+    def on_set_pageable_embed(self) -> str:
         """
         Published when a list of embeds is needed to be able to paginate
         
@@ -402,7 +402,7 @@ class EventsMeta(type):
         return 'on_set_pageable_embed'
 
     @property
-    def on_member_update(self):
+    def on_member_update(self) -> str:
         """
         This is called when one or more of the following things change:
 
@@ -415,7 +415,7 @@ class EventsMeta(type):
         return 'on_member_update'
 
     @property
-    def on_set_reminder(self):
+    def on_set_reminder(self) -> str:
         """
             Published when a person sets a reminder 
             Args:
@@ -426,7 +426,7 @@ class EventsMeta(type):
         return 'on_reminder_set'
 
     @property
-    def on_bot_mute(self):
+    def on_bot_mute(self) -> str:
         """
         Published when a user is warned with clembot
 
@@ -439,7 +439,7 @@ class EventsMeta(type):
         return 'on_bot_mute'
 
     @property
-    def on_bot_unmute(self):
+    def on_bot_unmute(self) -> str:
         """
         Published when a user is unmuted by clembot
 
@@ -452,7 +452,7 @@ class EventsMeta(type):
         return 'on_bot_unmute'
 
     @property
-    def on_bot_warn(self):
+    def on_bot_warn(self) -> str:
         """
         Published when a user is warned with clembot
 
@@ -465,7 +465,7 @@ class EventsMeta(type):
         return 'on_bot_warn'
 
     @property
-    def on_bot_ban(self):
+    def on_bot_ban(self) -> str:
         """
         Published when a user is banned with clembot
 
@@ -478,7 +478,7 @@ class EventsMeta(type):
         return 'on_bot_ban'
 
     @property
-    def on_member_ban(self):
+    def on_member_ban(self) -> str:
         """
         Published when a user is banned with clembot
 
@@ -489,7 +489,7 @@ class EventsMeta(type):
         return 'on_member_ban'
 
     @property
-    def on_after_command_invoke(self):
+    def on_after_command_invoke(self) -> str:
         """
         Published when after a command has successfully completed
 
@@ -499,7 +499,7 @@ class EventsMeta(type):
         return 'on_after_command_invoke'
 
     @property
-    def on_guild_thread_join(self):
+    def on_guild_thread_join(self) -> str:
         """
         Published when a new thread channel is joined in a guild
 
@@ -509,7 +509,7 @@ class EventsMeta(type):
         return 'on_guild_thread_join'
 
     @property
-    def on_guild_thread_update(self):
+    def on_guild_thread_update(self) -> str:
         """
         Published when a text channel is edited
 

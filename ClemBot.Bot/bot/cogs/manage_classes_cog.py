@@ -11,7 +11,7 @@ from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.user_choice import UserChoice
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 TIMEOUT = 60
 

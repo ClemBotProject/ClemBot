@@ -12,7 +12,7 @@ from bot.services.base_service import BaseService
 
 # get a module level logger using the __name__ of the module as the root,
 # this will link it with the base logger bot. and all out put will be through that
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 # Services are postfixed with "Service" by convention

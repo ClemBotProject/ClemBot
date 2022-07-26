@@ -68,7 +68,7 @@ PHRASES = [
     'High score incoming!'
 ]
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 SLOTS_COMMAND_COOLDOWN = 30
 
 

@@ -6,7 +6,7 @@ from discord.ext.commands.errors import BadArgument
 from bot.consts import Claims
 
 
-def command(name: t.Optional[str] = None, cls: t.Optional[t.Type["ClemBotCommand"]] = None, **attrs: t.Dict[str, t.Any]) -> t.Callable[..., "ClemBotCommand"]:
+def command(name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]] = None, **attrs: t.Any) -> t.Callable[..., "ClemBotCommand"]:
     """
     -----------
     name: :class:`str`
@@ -26,7 +26,7 @@ def command(name: t.Optional[str] = None, cls: t.Optional[t.Type["ClemBotCommand
     
     cls_ = cls or ClemBotCommand
 
-    def wrapper(func: t.Union[ClemBotCommand, t.Union[t.Callable[..., t.Any], discord.ext.commands.Command[t.Any, t.Any, t.Any]]]) -> ClemBotCommand:
+    def wrapper(func: (ClemBotCommand | t.Callable[..., t.Any] | discord.ext.commands.Command[t.Any, t.Any, t.Any])) -> ClemBotCommand:
         if isinstance(func, ClemBotCommand):
             raise TypeError('Callback is already a command.')
 
@@ -39,12 +39,12 @@ def command(name: t.Optional[str] = None, cls: t.Optional[t.Type["ClemBotCommand
 Decorator that enables the chaining of multiple commands
 """
 
-T_EXTBASE = t.Union["ExtBase", t.Any]
+T_EXTBASE = "ExtBase" | t.Any
 T_EXTBASE_DECO_WRAP = t.Callable[[T_EXTBASE], T_EXTBASE]
 
 
 def chainable(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
-    def wrapper(func: t.Union["ExtBase", t.Any]) -> T_EXTBASE:
+    def wrapper(func: "ExtBase" | t.Any) -> T_EXTBASE:
         if isinstance(func, ExtBase):
             func.chainable_output = chainable
         else:
@@ -56,7 +56,7 @@ def chainable(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
 
 
 def chainable_input(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
-    def wrapper(func: t.Union["ExtBase", t.Any]) -> T_EXTBASE:
+    def wrapper(func: "ExtBase" | t.Any) -> T_EXTBASE:
         if isinstance(func, ExtBase):
             func.chainable_output = chainable
         else:
@@ -97,7 +97,7 @@ def short_help(help_str: str) -> T_EXTBASE_DECO_WRAP:
     return wrapper
 
 
-def example(help_str: t.Union[str, t.Iterable[str]]) -> T_EXTBASE_DECO_WRAP:
+def example(help_str: str | t.Iterable[str]) -> T_EXTBASE_DECO_WRAP:
     def wrapper(func: T_EXTBASE) -> T_EXTBASE:
         if isinstance(func, ExtBase):
             func.example = help_str

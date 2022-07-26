@@ -12,7 +12,7 @@ import seqlog
 
 from discord.ext.commands.errors import BadArgument
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class Scheduler:

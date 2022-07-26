@@ -12,7 +12,7 @@ from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 import seqlog
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 class TranslateCog(commands.Cog):
 

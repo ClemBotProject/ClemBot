@@ -4,7 +4,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import seqlog
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class AssignableRolesService(BaseService):

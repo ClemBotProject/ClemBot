@@ -117,7 +117,7 @@ COLUMN_MULTIPLIERS = [
 
 PHRASES_PATH = 'bot/cogs/random_cog/assets/phrases.txt'
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 SLOTS_COMMAND_COOLDOWN = 60
 
 

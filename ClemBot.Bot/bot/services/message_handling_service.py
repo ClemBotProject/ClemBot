@@ -13,7 +13,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 MESSAGE_BATCH_SIZE = 20
 MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')

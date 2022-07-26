@@ -13,7 +13,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import HonorsConverter
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 MIN_YEAR = 2014
 TAG_CHUNK_SIZE = 12 * 3

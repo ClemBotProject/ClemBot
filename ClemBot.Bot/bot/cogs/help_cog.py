@@ -11,7 +11,7 @@ from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
 from bot.utils.helpers import chunk_sequence
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 HELP_EMBED_SIZE = 15
 

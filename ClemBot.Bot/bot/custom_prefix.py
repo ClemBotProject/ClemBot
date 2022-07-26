@@ -8,7 +8,7 @@ import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
 from bot.errors import PrefixRequestError
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class CustomPrefix:

@@ -20,7 +20,7 @@ MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
 CRAB_COMMAND_COOLDOWN = 3
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 def crab_pillow_process(args: str, lines_in_text: int, timestamp: int) -> None:

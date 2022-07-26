@@ -26,7 +26,7 @@ from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 import bot.utils.log_serializers as serializers
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class ClemBot(commands.Bot):

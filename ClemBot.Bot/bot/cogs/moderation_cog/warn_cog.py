@@ -9,7 +9,7 @@ from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.clem_bot import ClemBot
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 
 class WarnCog(commands.Cog):

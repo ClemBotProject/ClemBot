@@ -13,7 +13,7 @@ from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 
-log: seqlog.StructuredLogger = logging.getLogger(__name__)  # type: ignore
+log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
