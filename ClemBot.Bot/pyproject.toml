@@ -114,16 +114,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 include = '\.pyi?$'
-extend-exclude = '''
-(
-    .venv/
-)
-'''
 
 [tool.isort]
 profile = "black"
 line_length = 100
-exclude = [".venv/"]
 
 [tool.mypy]
 mypy_path = "stubs"
