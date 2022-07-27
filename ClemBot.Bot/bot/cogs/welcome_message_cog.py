@@ -4,12 +4,13 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Claims, Colors
 from bot.utils.logging_utils import get_logger
+from bot.clem_bot import ClemBot
 
 log = get_logger(__name__)
 
 
 class WelcomeMessageCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.group(case_insensitive=True, invoke_without_command=True)
@@ -19,7 +20,7 @@ class WelcomeMessageCog(commands.Cog):
     )
     @ext.short_help("Set a server welcome dm message")
     @ext.example("welcome")
-    async def welcome(self, ctx):
+    async def welcome(self, ctx: commands.Context[ClemBot]) -> None:
         message = await self.bot.welcome_message_route.get_welcome_message(ctx.guild.id)
 
         if not message:
@@ -36,7 +37,7 @@ class WelcomeMessageCog(commands.Cog):
     @ext.long_help("Sets a welcome message to be dmd to every new member")
     @ext.short_help("Sets the welcome message")
     @ext.example("welcome set welcome to our amazing server")
-    async def set(self, ctx, *, content):
+    async def set(self, ctx: commands.Context[ClemBot], *, content: str) -> None:
         await self.bot.welcome_message_route.set_welcome_message(
             ctx.guild.id, content, raise_on_error=True
         )
@@ -51,7 +52,7 @@ class WelcomeMessageCog(commands.Cog):
     @ext.long_help("Allows for server admins to remove a welcome message from their server")
     @ext.short_help("Removes the welcome message")
     @ext.example("welcome delete")
-    async def delete(self, ctx):
+    async def delete(self, ctx: commands.Context[ClemBot]) -> None:
         message = await self.bot.welcome_message_route.get_welcome_message(ctx.guild.id)
         if not message:
             embed = discord.Embed(
@@ -69,5 +70,5 @@ class WelcomeMessageCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: ClemBot):
     bot.add_cog(WelcomeMessageCog(bot))

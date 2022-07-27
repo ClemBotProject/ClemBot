@@ -1,11 +1,13 @@
 import json
 import re
+import typing as t
 from urllib.parse import unquote_plus, urlencode
 
 import aiohttp
 import discord
 import discord.ext.commands as commands
 from markdownify import markdownify
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
@@ -13,6 +15,7 @@ from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
+
 MAX_RELATED_TOPICS = 5
 IMAGE_URL = "https://duckduckgo.com"
 SEARCH_URL = "https://api.duckduckgo.com/"
@@ -22,25 +25,25 @@ CATEGORIES = {"A": "Article", "C": "Category", "D": "Disambiguation", "N": "Name
 
 
 class SearchResult:
-    def __init__(self, json_response):
+    def __init__(self, json_response: dict[str, t.Any]):
         self.json_response = json_response
 
-    def has_result(self):
+    def has_result(self) -> bool:
         return len(self.json_response["Heading"]) > 0
 
-    def title(self):
+    def title(self) -> str:
         return self.json_response["Heading"]
 
-    def abstract(self):
+    def abstract(self) -> str:
         return markdownify(self.json_response["Abstract"])
 
-    def category(self):
+    def category(self) -> str:
         return category_from_code(self.json_response["Type"])
 
-    def has_thumbnail(self):
+    def has_thumbnail(self) -> bool:
         return len(self.json_response["Image"]) > 0
 
-    def thumbnail(self):
+    def thumbnail(self) -> str:
         # surprisingly 'Image' in the JSON returns the latter half of the URL,
         # so we need to concat the other half, i.e., https://duckduckgo.com
         return IMAGE_URL + self.json_response["Image"]
@@ -56,10 +59,10 @@ class SearchResult:
             topics.append(topic)
         return topics
 
-    def has_related_topics(self):
+    def has_related_topics(self) -> bool:
         return len(self.related_topics()) > 0
 
-    def related_topics_formatted(self):
+    def related_topics_formatted(self) -> str:
         related_topics = self.related_topics()
         related_topics_formatted = list()
         # maximum related topics can be changed in the global vars
@@ -67,21 +70,23 @@ class SearchResult:
         for i, val in enumerate(related_topics):
             if i >= max_topics:
                 break
+            
             url = val["FirstURL"]
             title = RELATED_TOPICS_PATTERN.match(url).group(3).replace("_", " ")
             title = unquote_plus(title)
             related_topics_formatted.append(f"[{title}]({url})")
+
         return "\n".join(related_topics_formatted)
 
-    def url(self):
+    def url(self) -> str:
         return self.json_response["AbstractURL"]
 
-    def source(self):
+    def source(self) -> str:
         return self.json_response["AbstractSource"]
 
 
 class SearchCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -90,7 +95,7 @@ class SearchCog(commands.Cog):
         "Searches via DuckDuckGo's instant web API to bring up results from Wikipedia, wikiHow, and more."
     )
     @ext.example(["search clemson", "search computer science", "search how to tie a tie"])
-    async def search(self, ctx, *, query: str):
+    async def search(self, ctx: commands.Context[ClemBot], *, query: str) -> None:
         result = await self.duck_search(query)
         msg = (
             await self.results(ctx, result)
@@ -106,29 +111,35 @@ class SearchCog(commands.Cog):
             {"q": query, "format": "json", "pretty": 1, "skip_disambig": 1, "t": "ClemBot"}
         )
         log.debug(f"Search URL: {SEARCH_URL}?{data}")
+
         async with aiohttp.ClientSession() as session:
             # redirects should never happen so it's gonna be off by default just in case
             async with session.get(url=f"{SEARCH_URL}?{data}", allow_redirects=False) as resp:
                 response = json.loads(await resp.text())
+
         log.debug(response)
+
         return SearchResult(response)
 
-    async def results(self, ctx, result: SearchResult) -> discord.Message:
+    async def results(self, ctx: commands.Context[ClemBot], result: SearchResult) -> discord.Message:
         embed = discord.Embed(
             title=f"[{result.category()}] {result.title()} - {result.source()}",
             color=Colors.ClemsonOrange,
             description=f"{result.abstract()}\n\n**Link**: [{result.title()}]({result.url()})",
         )
         embed.set_footer(text="Result provided by DuckDuckGo.", icon_url=ICON_URL)
+
         if result.has_related_topics():
             embed.add_field(
                 name="Related Topics", value=result.related_topics_formatted(), inline=False
             )
+
         if result.has_thumbnail():
             embed.set_thumbnail(url=result.thumbnail())
+            
         return await ctx.send(embed=embed)
 
-    async def no_results(self, ctx, query: str) -> discord.Message:
+    async def no_results(self, ctx: commands.Context[ClemBot], query: str) -> discord.Message:
         embed = discord.Embed(
             title="No Results",
             color=Colors.Error,
@@ -138,13 +149,15 @@ class SearchCog(commands.Cog):
         return await ctx.send(embed=embed)
 
 
-def category_from_code(code: str):
+def category_from_code(code: str) -> str:
     # going to capitalize it just in case
     code = code.upper()
+
     if code not in CATEGORIES:
         return "None"
+
     return CATEGORIES[code]
 
 
-def setup(bot):
+def setup(bot: ClemBot):
     bot.add_cog(SearchCog(bot))

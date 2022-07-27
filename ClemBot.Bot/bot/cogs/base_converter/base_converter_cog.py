@@ -1,12 +1,13 @@
 import discord
 import discord.ext.commands as commands
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
 
 
 class BaseConverterCog(commands.Cog):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.group(pass_context=True, invoke_without_command=True, aliases=["convert", "baseconvert"])
@@ -16,7 +17,7 @@ class BaseConverterCog(commands.Cog):
     )
     @ext.short_help("Mathematic base converter")
     @ext.example(("bconvert bin 11", "bconvert hex 0xff"))
-    async def bconvert(self, ctx) -> None:
+    async def bconvert(self, ctx: commands.Context[ClemBot]) -> None:
         """
         A simple base converter that takes in a base number an a value, then displays the value in binary, octal, decimal, and hexadecimal
 
@@ -32,7 +33,7 @@ class BaseConverterCog(commands.Cog):
         embed = discord.Embed(title="Available Bases", description=desc, color=Colors.ClemsonOrange)
         await ctx.send(embed=embed)
 
-    async def result(self, ctx, number) -> None:
+    async def result(self, ctx: commands.Context[ClemBot], number: int) -> None:
         b = bin(number)
         d = int(number)
         h = hex(number)
@@ -54,37 +55,33 @@ class BaseConverterCog(commands.Cog):
         await ctx.send(embed=embed, file=attachment)
 
     @bconvert.command(pass_context=True, aliases=["binary"])
-    async def bin(self, ctx, *, number) -> None:
+    async def bin(self, ctx: commands.Context[ClemBot], *, number: str) -> None:
         """
         Example: bconvert [bin / binary] [11 / 0b11]
         """
-        number = int(number, 2)
-        await self.result(ctx, number)
+        await self.result(ctx, int(number, 2))
 
     @bconvert.command(pass_context=True, aliases=["decimal"])
-    async def dec(self, ctx, *, number) -> None:
+    async def dec(self, ctx: commands.Context[ClemBot], *, number: str) -> None:
         """
         Example: bconvert [dec / decimal] [99]
         """
-        number = int(number)
-        await self.result(ctx, number)
+        await self.result(ctx, int(number))
 
     @bconvert.command(pass_context=True, aliases=["hexadecimal"])
-    async def hex(self, ctx, *, number) -> None:
+    async def hex(self, ctx: commands.Context[ClemBot], *, number: str) -> None:
         """
         Example: bconvert [hex / hexadecimal] [FF / 0xFF]
         """
-        number = int(number, 16)
-        await self.result(ctx, number)
+        await self.result(ctx, int(number, 16))
 
     @bconvert.command(pass_context=True, aliases=["octal"])
-    async def oct(self, ctx, *, number) -> None:
+    async def oct(self, ctx: commands.Context[ClemBot], *, number: str) -> None:
         """
         Example: bconvert [oct / octal] [77 / 0o77]
         """
-        number = int(number, 8)
-        await self.result(ctx, number)
+        await self.result(ctx, int(number, 8))
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(BaseConverterCog(bot))

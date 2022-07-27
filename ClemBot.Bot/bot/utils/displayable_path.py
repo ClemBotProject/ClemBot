@@ -1,30 +1,33 @@
 import typing as t
 from pathlib import Path
 
+T_CRITERIA: t.TypeAlias = t.Callable[[str], bool]
 
-class DisplayablePath(object):
+
+class DisplayablePath:
     display_filename_prefix_middle = "├──"
     display_filename_prefix_last = "└──"
     display_parent_prefix_middle = "    "
     display_parent_prefix_last = "│   "
 
-    def __init__(self, path: t.Any, parent_path, is_last):
+    def __init__(self, path: (str | t.Any), parent_path: t.Optional["DisplayablePath"], is_last: bool):
         self.path = Path(str(path))
         self.parent = parent_path
         self.is_last = is_last
+
         if self.parent:
             self.depth = self.parent.depth + 1
         else:
             self.depth = 0
 
     @property
-    def displayname(self):
+    def displayname(self) -> str:
         if self.path.is_dir():
             return self.path.name + "/"
         return self.path.name
 
     @classmethod
-    def make_tree(cls, root, parent=None, is_last=False, criteria=None):
+    def make_tree(cls, root: (str | t.Any), parent: t.Optional["DisplayablePath"] = None, is_last: bool = False, criteria=None):
         root = Path(str(root))
         criteria = criteria or cls._default_criteria
 

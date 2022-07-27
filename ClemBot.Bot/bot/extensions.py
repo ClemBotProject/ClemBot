@@ -47,7 +47,7 @@ def command(
 Decorator that enables the chaining of multiple commands
 """
 
-T_EXTBASE: t.TypeAlias = "ExtBase" | t.Any
+T_EXTBASE: t.TypeAlias = t.Union[t.Any, "ExtBase"]
 T_EXTBASE_DECO_WRAP: t.TypeAlias = t.Callable[[T_EXTBASE], T_EXTBASE]
 
 

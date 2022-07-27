@@ -119,6 +119,7 @@ profile = "black"
 line_length = 100
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 mypy_path = "stubs"
 files = ["bot/**/*.py"]
 python_version = "3.10"

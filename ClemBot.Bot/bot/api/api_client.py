@@ -39,10 +39,10 @@ class HttpRequestType:
 class ApiClient:
     def __init__(self, *, connect_callback=None, disconnect_callback=None, bot_only: bool = False):
 
-        self.auth_token: t.Optional[str]
-        self.session: t.Optional[aiohttp.ClientSession]
+        self.auth_token: t.Optional[str] = None
+        self.session: t.Optional[aiohttp.ClientSession] = None
         self.connected: bool = False
-        self.headers: dict[str, str]
+        self.headers = dict[str, str]()
 
         self._is_reconnecting: bool = False
 

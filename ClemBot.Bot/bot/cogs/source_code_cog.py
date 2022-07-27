@@ -11,6 +11,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.displayable_path import DisplayablePath
 from bot.utils.logging_utils import get_logger
+from bot.utils.helpers import chunk_sequence
 
 log = get_logger(__name__)
 
@@ -124,7 +125,7 @@ class SourceCodeCog(commands.Cog):
         file_tree = self.list_files(os.getcwd(), self.ignored)
 
         sent_messages = []
-        for chunk in self.chunk_iterable(file_tree, 1980):
+        for chunk in chunk_sequence(file_tree, 1980):
             sent_messages.append(await ctx.send(f"```yaml\n{chunk}```"))
 
         await self.bot.messenger.publish(
@@ -220,10 +221,6 @@ class SourceCodeCog(commands.Cog):
                 Events.on_set_deletable, msg=sent_messages, author=ctx.author
             )
 
-    def chunk_iterable(self, iterable, chunk_size):
-        for i in range(0, len(iterable), chunk_size):
-            yield iterable[i : i + chunk_size]
-
     def process_source(self, source: str, line_start: int = None, line_stop: int = None):
         split_source = [f"{i + 1:03d} |  {value}" for i, value in enumerate(source.splitlines())]
 
@@ -236,7 +233,7 @@ class SourceCodeCog(commands.Cog):
 
         return filtered_source
 
-    def list_files(self, startpath, to_ignore: List[str]) -> str:
+    def list_files(self, startpath: str, to_ignore: List[str]) -> str:
         paths = DisplayablePath.get_tree(
             startpath, criteria=lambda s: not any(i in s.parts for i in to_ignore)
         )
