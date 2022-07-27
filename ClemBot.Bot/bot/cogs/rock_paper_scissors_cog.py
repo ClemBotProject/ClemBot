@@ -28,7 +28,7 @@ EMOJI_TO_CHOICE = {
     SCISSORS_EMOJI: RpsChoice.SCISSORS,
 }
 
-CHOICE_TO_EMOJI = dict(map(reversed, EMOJI_TO_CHOICE.items()))
+CHOICE_TO_EMOJI = {v: k for k, v in EMOJI_TO_CHOICE.items()}
 
 WIN_MAP = [RpsChoice.ROCK, RpsChoice.SCISSORS, RpsChoice.PAPER]
 

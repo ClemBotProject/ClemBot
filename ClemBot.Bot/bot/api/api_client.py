@@ -44,14 +44,14 @@ class ApiClient:
                  disconnect_callback=None,
                  bot_only: bool = False):
 
-        self.auth_token: str
-        self.session: t.Optional[aiohttp.ClientSession] = None
+        self.auth_token: t.Optional[str]
+        self.session: t.Optional[aiohttp.ClientSession]
         self.connected: bool = False
-        self.headers: t.Dict[str, str] = None
+        self.headers: dict[str, str]
 
         self._is_reconnecting: bool = False
 
-        self.request_queue: queue.Queue = None
+        self.request_queue: queue.Queue
 
         self.bot_only = bot_only
 
@@ -73,6 +73,7 @@ class ApiClient:
 
     async def close(self) -> None:
         """Close the aiohttp session."""
+        assert self.session is not None
         await self.session.close()
 
     async def connect(self):
@@ -126,7 +127,6 @@ class ApiClient:
         await self._reconnect()
 
     async def _get_auth_token(self) -> t.Optional[str]:
-
         auth_args = {
             'method': HttpRequestType.get,
             'ssl': False,
@@ -134,6 +134,8 @@ class ApiClient:
             'headers': {'Accept': '*/*'},
             'params': {'key': bot_secrets.secrets.api_key}
         }
+
+        assert self.session is not None
 
         try:
             async with self.session.request(**auth_args) as resp:
@@ -147,7 +149,8 @@ class ApiClient:
 
         except aiohttp.ClientConnectorError:
             log.exception('Error: ClemBot.Api not found')
-            return
+
+        return None
 
     async def _authorize(self) -> bool:
         log.info('Requesting ClemBot.Api Access token')
@@ -181,6 +184,8 @@ class ApiClient:
 
         if body:
             req_args['json'] = body
+
+        assert self.session is not None
 
         async with self.session.request(**req_args) as resp:
             if resp.status == HTTPStatus.OK:
