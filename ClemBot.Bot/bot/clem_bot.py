@@ -294,6 +294,7 @@ class ClemBot(commands.Bot):
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
         if user.id != self.user.id:
+            assert reaction.message.guild is not None
             await self.publish_to_queue_with_error(Events.on_reaction_add, reaction.message.guild.id, reaction, user)
 
     async def on_raw_reaction_add(self, reaction) -> None:
@@ -301,6 +302,7 @@ class ClemBot(commands.Bot):
 
     async def on_reaction_remove(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
         if user.id != self.user.id:
+            assert reaction.message.guild is not None
             await self.publish_to_queue_with_error(Events.on_reaction_remove, reaction.message.guild.id, reaction, user)
 
     async def on_raw_reaction_remove(self, reaction) -> None:
@@ -334,7 +336,7 @@ class ClemBot(commands.Bot):
 
         matcher = self.active_services.get('FuzzyMatchingService')
         if not matcher:
-            return
+            return None
 
         # attempt to fuzzy find a similar command name to suggest to them
         if len(cmd_name) > 2 and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= .3:
@@ -343,6 +345,8 @@ class ClemBot(commands.Bot):
             log.info('Fuzzy-matched {input} to {command_name} with similarity {similarity}', input=cmd_name, command_name=cmd.qualified_name, similarity=matcher_result.similarity)
 
             return f'Did you mean **`{prefix}{cmd.qualified_name}`**?'
+
+        return None
 
     async def on_command_error(self, ctx: commands.Context, error: Exception):
         """
