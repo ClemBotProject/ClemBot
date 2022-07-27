@@ -34,9 +34,9 @@ jobs:
       with:
         python-version: "3.10"
         cache: 'poetry'
-        
-    - name: Install dependencies
-      run: poetry install
+
+    # install dependencies
+    - run: poetry install
 
     - name: Check if Black would make any changes
       run: poetry run black --check .
