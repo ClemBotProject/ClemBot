@@ -5,7 +5,7 @@ name: ClemBot.Bot Master integration
 
 on:
   push:
-    branches: [ master, hoover-max-extract-60-pressure-pro-2 ]
+    branches: [ master ]
     paths: 
       - "ClemBot.Bot/**"
   pull_request:
@@ -36,10 +36,12 @@ jobs:
         poetry install
 
     - name: Check if Black would make any changes
-      run: poetry run black --check --config pyproject.toml .
+      run: poetry run black --check .
+      continue-on-error: true
 
     - name: Check if isort would make any changes
       run: poetry isort --check-only .
+      continue-on-error: true
 
     - name: Lint with pylint
       run: |
