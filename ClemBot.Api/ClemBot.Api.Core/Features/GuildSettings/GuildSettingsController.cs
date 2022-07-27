@@ -19,13 +19,14 @@ public class GuildSettingsController : ControllerBase
 
     [HttpGet("[controller]/{GuildId}")]
     [GuildSandboxAuthorize(BotAuthClaims.guild_settings_view)]
-    public async Task<IActionResult> Index() =>
-        await _mediator.Send(new Index.Query()) switch
+    public async Task<IActionResult> Index([FromRoute] Index.Query command) =>
+        await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.Forbidden } => Forbid(),
             _ => Ok(new List<ulong>())
         };
+
     [HttpGet("[controller]/{GuildId}/{Setting}")]
     [GuildSandboxAuthorize(BotAuthClaims.guild_settings_view)]
     public async Task<IActionResult> Details([FromRoute] Details.Query command) =>
@@ -38,11 +39,12 @@ public class GuildSettingsController : ControllerBase
 
     [HttpPost("[controller]/{GuildId}/{Setting}")]
     [GuildSandboxAuthorize(BotAuthClaims.guild_settings_edit)]
-    public async Task<IActionResult> Set([FromRoute] Set.Command command, [FromQuery] bool value) =>
-        await _mediator.Send(command with { Value = value }) switch
+    public async Task<IActionResult> Set([FromQuery] Set.Command command) =>
+        await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
             { Status: QueryStatus.Forbidden } => Forbid(),
+            { Status: QueryStatus.Invalid} => BadRequest(),
             _ => throw new InvalidOperationException()
         };
 }

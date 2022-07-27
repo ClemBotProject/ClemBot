@@ -16,10 +16,10 @@ public class QueryResult<T> : IQueryResult<T>
         Status = status;
     }
 
-    public static IQueryResult<T> Success(T? val)
+    public static IQueryResult<T> Success(T? val = default)
         => new QueryResult<T>(val, QueryStatus.Success);
 
-    public static IQueryResult<T> Invalid(T? val)
+    public static IQueryResult<T> Invalid(T? val = default)
         => new QueryResult<T>(val, QueryStatus.Invalid);
 
     public static IQueryResult<T> NotFound()

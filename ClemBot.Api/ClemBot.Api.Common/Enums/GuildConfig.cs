@@ -14,9 +14,16 @@ public enum ConfigSettings
 public static class GuildConfig
 {
     /// <summary>
+    /// C# doesnt load a static value until the first time its accessed
+    /// This method allows for api startup to initialize the config type mappings immediately
+    /// so that we fail on startup if invalid configs are passed
+    /// </summary>
+    public static void Initialize() => _ = TypeMappings;
+
+    /// <summary>
     /// Metadata type for defining how a config value can be manipulated
     /// </summary>
-    public record ConfigMetaData
+    public class ConfigMetaData
     {
         public Func<string, object> Deserialize { get; }
 
@@ -40,8 +47,13 @@ public static class GuildConfig
         /// <param name="type"></param>
         /// <param name="default"></param>
         /// <exception cref="JsonException"></exception>
-        public ConfigMetaData(Type type, object @default)
+        public ConfigMetaData(Type type, object? @default)
         {
+            if (@default?.GetType() != type)
+            {
+                throw new InvalidCastException("The default specified is not a valid type");
+            }
+
             Type = type;
             Default = @default;
             Deserialize = s => JsonSerializer.Deserialize(s, Type)
@@ -59,6 +71,10 @@ public static class GuildConfig
         /// <param name="default"></param>
         public ConfigMetaData(Type type, Func<object, string> serialize, Func<string, object> deserialize, object @default)
         {
+            if (@default.GetType() != type)
+            {
+                throw new InvalidCastException("The default specified is not a valid type");
+            }
             Serialize = serialize;
             Deserialize = deserialize;
             Type = type;
