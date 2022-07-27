@@ -1,5 +1,6 @@
 import abc
 import inspect
+import typing as t
 
 from bot.clem_bot import ClemBot
 
@@ -11,7 +12,7 @@ class BaseService(abc.ABC):
     this class as a base class
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot) -> None:
         self.bot: ClemBot = bot
         self.messenger = bot.messenger
 
@@ -31,7 +32,7 @@ class BaseService(abc.ABC):
         pass
 
     @classmethod
-    def listener(cls, event: str | None = None) -> None:
+    def listener(cls, event: str | None = None) -> t.Callable[[t.Any], t.Any]:
         """
         The method decorator to allow for service methods to be marked as a callback
         for application level events
@@ -41,7 +42,7 @@ class BaseService(abc.ABC):
             Defaults to None.
         """
 
-        def wrapper(func):
+        def wrapper(func: t.Any) -> t.Any:
             actual = func
             if isinstance(actual, staticmethod):
                 actual = actual.__func__
