@@ -42,7 +42,7 @@ jobs:
       run: poetry run black --check .
 
     - name: Check if isort would make any changes
-      run: poetry isort --check-only .
+      run: poetry run isort --check-only .
 
     - name: Lint with pylint
       run: |
