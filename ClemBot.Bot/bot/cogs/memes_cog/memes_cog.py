@@ -7,10 +7,10 @@ import time
 
 import discord
 import discord.ext.commands as commands
-from PIL import Image, ImageDraw, ImageSequence, ImageFont
-from bot.clem_bot import ClemBot
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger

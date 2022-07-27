@@ -4,7 +4,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
-from bot.consts import Colors, Claims
+from bot.consts import Claims, Colors
 from bot.utils.converters import ClaimsConverter
 
 

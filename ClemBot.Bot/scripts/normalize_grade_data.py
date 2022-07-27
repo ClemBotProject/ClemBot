@@ -1,6 +1,8 @@
-import pandas as pd
+import re
+import sys
+
 import numpy as np
-import sys, re
+import pandas as pd
 
 """
 Script to normalize csv file exported via tabula from clemsons PDF grade listings

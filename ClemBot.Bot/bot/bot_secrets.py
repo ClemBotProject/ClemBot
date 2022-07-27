@@ -1,6 +1,6 @@
 import json
-import typing as t
 import os
+import typing as t
 
 from bot.errors import ConfigAccessError
 from bot.utils.logging_utils import get_logger

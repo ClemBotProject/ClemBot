@@ -1,7 +1,8 @@
-from discord.ext.commands.errors import BadArgument
-import pytest
 import asyncio
 from datetime import datetime
+
+import pytest
+from discord.ext.commands.errors import BadArgument
 
 from bot.utils.scheduler import Scheduler
 

@@ -1,14 +1,14 @@
-import discord
-from bot.clem_bot import ClemBot
-import bot.extensions as ext
-import discord.ext.commands as commands
-
 import typing as t
 
+import discord
+import discord.ext.commands as commands
+
+import bot.extensions as ext
 from bot import bot_secrets
-from bot.models import Tag
-from bot.consts import Colors, Claims
+from bot.clem_bot import ClemBot
+from bot.consts import Claims, Colors
 from bot.messaging.events import Events
+from bot.models import Tag
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 

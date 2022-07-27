@@ -3,9 +3,9 @@ import random
 
 import discord
 import discord.ext.commands as commands
-from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.utils.logging_utils import get_logger
 

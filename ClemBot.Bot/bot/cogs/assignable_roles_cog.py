@@ -6,7 +6,7 @@ from discord.ext.commands.errors import BadArgument
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Colors, Claims
+from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger

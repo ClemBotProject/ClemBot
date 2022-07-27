@@ -1,11 +1,11 @@
 import asyncio
 import typing as t
-from discord.ext import commands
 
 import discord
+from discord.ext import commands
 
-from bot.consts import Colors
 from bot.clem_bot import ClemBot
+from bot.consts import Colors
 
 
 class UserChoice:

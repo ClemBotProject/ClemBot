@@ -1,8 +1,8 @@
 import asyncio
 import os
 
-from bot.services.base_service import BaseService
 import bot.bot_secrets as bot_secrets
+from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

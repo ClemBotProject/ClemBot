@@ -1,11 +1,10 @@
 import discord
 import discord.ext.commands as commands
-from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
-from bot.consts import Claims, Colors, DesignatedChannels
+from bot.clem_bot import ClemBot
+from bot.consts import Claims, Colors, DesignatedChannels, Moderation
 from bot.messaging.events import Events
-from bot.consts import Moderation
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

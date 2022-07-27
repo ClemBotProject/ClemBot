@@ -1,13 +1,13 @@
 import asyncio
-from collections import deque
 import json
+from collections import deque
 
 import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
+from bot.consts import Colors, DesignatedChannels, Moderation, OwnerDesignatedChannels
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

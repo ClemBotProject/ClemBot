@@ -1,8 +1,10 @@
 import logging
-from types import TracebackType
 import typing as tp
-from .consumer import QueueConsumer as QueueConsumer
+from types import TracebackType
+
 from _typeshed import Incomplete
+
+from .consumer import QueueConsumer as QueueConsumer
 
 _SysExcInfoType: tp.TypeAlias = tp.Union[
     tuple[type[BaseException], BaseException, TracebackType | None], tuple[None, None, None]

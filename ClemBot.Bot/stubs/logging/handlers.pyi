@@ -2,13 +2,14 @@ import datetime
 import http.client
 import ssl
 import sys
-from _typeshed import StrPath
 from collections.abc import Callable
 from logging import FileHandler, Handler, LogRecord
 from queue import Queue, SimpleQueue
 from re import Pattern
 from socket import SocketKind, socket
 from typing import Any, ClassVar
+
+from _typeshed import StrPath
 
 DEFAULT_TCP_LOGGING_PORT: int
 DEFAULT_UDP_LOGGING_PORT: int

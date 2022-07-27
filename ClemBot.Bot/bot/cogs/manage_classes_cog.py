@@ -5,7 +5,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
-from bot.consts import Colors, Claims
+from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
 from bot.utils.user_choice import UserChoice

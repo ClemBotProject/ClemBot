@@ -1,8 +1,8 @@
-import os
 import logging
+import os
 
 import seqlog
-from seqlog import StructuredRootLogger, StructuredLogger, ConsoleStructuredLogHandler
+from seqlog import ConsoleStructuredLogHandler, StructuredLogger, StructuredRootLogger
 
 if bool(os.environ.get("PROD")):
 

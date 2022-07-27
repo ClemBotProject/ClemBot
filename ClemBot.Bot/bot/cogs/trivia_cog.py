@@ -1,17 +1,19 @@
-import random
-import aiohttp
-import html
 import asyncio
+import html
+import random
 import typing as t
 from dataclasses import dataclass
-from bot.utils.helpers import chunk_sequence
+
+import aiohttp
 import discord
 import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
-from bot.utils.converters import trivia_cog_converter
+
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.converters import trivia_cog_converter
+from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

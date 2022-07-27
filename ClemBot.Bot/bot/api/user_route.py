@@ -1,4 +1,5 @@
 import typing as t
+
 import discord
 
 from bot.api.api_client import ApiClient

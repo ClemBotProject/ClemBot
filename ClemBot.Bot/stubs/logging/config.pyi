@@ -1,10 +1,11 @@
 import sys
-from _typeshed import StrOrBytesPath
 from collections.abc import Callable, Sequence
 from configparser import RawConfigParser
 from re import Pattern
 from threading import Thread
 from typing import IO, Any
+
+from _typeshed import StrOrBytesPath
 
 from . import _Level
 

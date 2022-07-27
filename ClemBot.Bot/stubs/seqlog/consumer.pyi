@@ -1,5 +1,6 @@
-from _typeshed import Incomplete
 from typing import Any
+
+from _typeshed import Incomplete
 
 class QueueConsumer:
     is_running: bool

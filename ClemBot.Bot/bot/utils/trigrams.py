@@ -1,4 +1,5 @@
 from typing import TypeAlias
+
 import nltk
 
 TRIGRAM_SET: TypeAlias = set[tuple[str, ...]]

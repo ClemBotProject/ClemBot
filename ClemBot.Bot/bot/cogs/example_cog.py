@@ -1,13 +1,12 @@
 # import a method to allow us to easily setup a logger instance with mypy not
 # screaming at us (thanks seqlog)
-from bot.utils.logging_utils import get_logger
-
 # import the discord specific libraries we will use
 import discord
 import discord.ext.commands as commands
 
 # import the internal command extension libraries to mark methods as commands
 import bot.extensions as ext
+from bot.utils.logging_utils import get_logger
 
 # get a module level logger using the __name__ of the module as the root,
 # this will link it with the base logger bot. and all out put will be through that

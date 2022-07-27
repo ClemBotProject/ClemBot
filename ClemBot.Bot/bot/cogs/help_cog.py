@@ -3,10 +3,10 @@ from collections.abc import Iterable
 import discord
 import discord.ext.commands as commands
 
+import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-import bot.bot_secrets as bot_secrets
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 

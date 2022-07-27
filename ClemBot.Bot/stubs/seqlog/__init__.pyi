@@ -1,12 +1,11 @@
-from _typeshed import Incomplete
 from typing import Any
-from seqlog.structured_logging import (
-    ConsoleStructuredLogHandler as ConsoleStructuredLogHandler,
-    SeqLogHandler as SeqLogHandler,
-    StructuredLogger as StructuredLogger,
-    StructuredRootLogger as StructuredRootLogger,
-    set_callback_on_failure as set_callback_on_failure,
-)
+
+from _typeshed import Incomplete
+from seqlog.structured_logging import ConsoleStructuredLogHandler as ConsoleStructuredLogHandler
+from seqlog.structured_logging import SeqLogHandler as SeqLogHandler
+from seqlog.structured_logging import StructuredLogger as StructuredLogger
+from seqlog.structured_logging import StructuredRootLogger as StructuredRootLogger
+from seqlog.structured_logging import set_callback_on_failure as set_callback_on_failure
 
 def configure_from_file(
     file_name: Any, override_root_logger: bool = ..., use_structured_logger: bool = ...

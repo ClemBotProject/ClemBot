@@ -1,15 +1,15 @@
 import typing as t
 from datetime import datetime
-from bot.utils.helpers import chunk_sequence
 
 import discord
 import discord.ext.commands as commands
 
+import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Claims, Colors
 from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
-import bot.bot_secrets as bot_secrets
+from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

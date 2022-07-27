@@ -2,11 +2,11 @@ import re
 
 import discord
 
+import bot.bot_secrets as bot_secrets
+import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-import bot.utils.log_serializers as serializers
-import bot.bot_secrets as bot_secrets
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

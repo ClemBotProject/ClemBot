@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from humps import camel
+from pydantic import BaseModel
 
 
 class ClemBotModel(BaseModel):

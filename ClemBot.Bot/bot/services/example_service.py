@@ -1,7 +1,5 @@
 # import a method to allow us to easily setup a logger instance with mypy not
 # screaming at us (thanks seqlog)
-from bot.utils.logging_utils import get_logger
-
 # Import the events class so that we have all the possible events
 # in the messenger defined for us clearly
 from bot.messaging.events import Events
@@ -9,6 +7,7 @@ from bot.messaging.events import Events
 # Import the base service class so we can subclass it
 # this allows the bot to load this service instance dynamically
 from bot.services.base_service import BaseService
+from bot.utils.logging_utils import get_logger
 
 # get a module level logger using the __name__ of the module as the root,
 # this will link it with the base logger bot. and all out put will be through that

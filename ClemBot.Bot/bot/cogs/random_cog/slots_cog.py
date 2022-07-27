@@ -2,9 +2,8 @@ import asyncio
 import dataclasses
 import random
 import typing as t
-from typing import Tuple, List, Union
 from collections import Counter
-from bot.utils.helpers import chunk_sequence
+from typing import List, Tuple, Union
 
 import discord
 import discord.ext.commands as commands
@@ -13,6 +12,7 @@ import numpy as np
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
+from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
 

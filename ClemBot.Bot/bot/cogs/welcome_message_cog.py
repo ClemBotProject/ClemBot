@@ -2,7 +2,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
-from bot.consts import Colors, Claims
+from bot.consts import Claims, Colors
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)

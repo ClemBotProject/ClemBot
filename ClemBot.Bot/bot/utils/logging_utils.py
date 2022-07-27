@@ -1,6 +1,7 @@
-import seqlog
 import logging
 import typing as t
+
+import seqlog
 
 
 def get_logger(name: str) -> seqlog.StructuredLogger:

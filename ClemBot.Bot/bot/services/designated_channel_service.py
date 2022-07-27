@@ -1,8 +1,8 @@
-from typing import Union, List
+from typing import List, Union
 
 import discord
 
-from bot.consts import DesignatedChannels, DesignatedChannelBase
+from bot.consts import DesignatedChannelBase, DesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger

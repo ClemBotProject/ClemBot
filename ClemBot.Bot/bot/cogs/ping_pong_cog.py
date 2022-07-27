@@ -1,10 +1,10 @@
 import time
-import discord
 
+import discord
 import discord.ext.commands as commands
-from bot.consts import Colors
 
 import bot.extensions as ext
+from bot.consts import Colors
 
 
 class PingPongCog(commands.Cog):
