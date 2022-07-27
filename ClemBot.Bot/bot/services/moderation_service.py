@@ -16,7 +16,7 @@ class ModerationService(BaseService):
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_bot_warn)
+    @BaseService.listener(Events.on_bot_warn)
     async def on_bot_warn(self, guild, author: discord.Member, subject: discord.Member, reason):
         await self.bot.moderation_route.insert_warn(
             guild_id=guild.id,
@@ -26,7 +26,7 @@ class ModerationService(BaseService):
             raise_on_error=True,
         )
 
-    @BaseService.Listener(Events.on_bot_ban)
+    @BaseService.listener(Events.on_bot_ban)
     async def on_bot_ban(
         self, guild, author: discord.Member, purge_days: int, subject: discord.Member, reason
     ):
@@ -41,7 +41,7 @@ class ModerationService(BaseService):
             raise_on_error=True,
         )
 
-    @BaseService.Listener(Events.on_bot_mute)
+    @BaseService.listener(Events.on_bot_mute)
     async def on_bot_mute(
         self,
         guild: discord.Guild,
@@ -67,7 +67,7 @@ class ModerationService(BaseService):
             self._unmute_callback(guild.id, subject.id, mute_id), time=duration
         )
 
-    @BaseService.Listener(Events.on_bot_unmute)
+    @BaseService.listener(Events.on_bot_unmute)
     async def on_bot_unmute(
         self,
         guild_id: int,
@@ -144,7 +144,7 @@ class ModerationService(BaseService):
             Events.on_send_in_designated_channel, DesignatedChannels.moderation_log, guild.id, embed
         )
 
-    @BaseService.Listener(Events.on_user_joined)
+    @BaseService.listener(Events.on_user_joined)
     async def on_joined(self, user: discord.Member):
         mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
 
@@ -172,7 +172,7 @@ class ModerationService(BaseService):
                 embed,
             )
 
-    @BaseService.Listener(Events.on_guild_channel_create)
+    @BaseService.listener(Events.on_guild_channel_create)
     async def on_channel_create(self, channel: discord.TextChannel):
         mute_role = discord.utils.get(channel.guild.roles, name=Moderation.mute_role_name)
 
@@ -199,7 +199,7 @@ class ModerationService(BaseService):
             add_reactions=False,
         )
 
-    @BaseService.Listener(Events.on_member_ban)
+    @BaseService.listener(Events.on_member_ban)
     async def on_member_ban(self, guild, user):
         log = (await guild.audit_logs(limit=1, action=discord.AuditLogAction.ban).flatten())[0]
         embed = discord.Embed(color=Colors.ClemsonOrange)

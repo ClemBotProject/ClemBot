@@ -86,7 +86,7 @@ class MessageHandlingService(BaseService):
 
         self.message_edit_batch.append(MessageEditDto(id, content, datetime.datetime.utcnow()))
 
-    @BaseService.Listener(Events.on_guild_message_received)
+    @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
 
         log.info(
@@ -109,7 +109,7 @@ class MessageHandlingService(BaseService):
 
         await self.batch_send_message(message)
 
-    @BaseService.Listener(Events.on_dm_message_received)
+    @BaseService.listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
         embed = discord.Embed(
             title="Bot Direct Message", color=Colors.ClemsonOrange, description=message.content
@@ -129,7 +129,7 @@ class MessageHandlingService(BaseService):
             "Hello there, I dont currently support DM commands. Please run my commands in a server"
         )  # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
-    @BaseService.Listener(Events.on_message_edit)
+    @BaseService.listener(Events.on_message_edit)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         # We do not want to track messages that have embeds inserted via links
         if before.content == after.content:
@@ -174,7 +174,7 @@ class MessageHandlingService(BaseService):
         )
 
     # noinspection PyArgumentList
-    @BaseService.Listener(Events.on_raw_message_edit)
+    @BaseService.listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload):
 
         message = await self.bot.message_route.get_message(payload.message_id)
@@ -261,7 +261,7 @@ class MessageHandlingService(BaseService):
         except KeyError as e:
             log.error("raw_message_edit Error: {e} \n", e=e)
 
-    @BaseService.Listener(Events.on_message_delete)
+    @BaseService.listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message):
         log.info(
             "Uncached message deleted in #{channel} by {author}: {content}",
@@ -290,7 +290,7 @@ class MessageHandlingService(BaseService):
             embed,
         )
 
-    @BaseService.Listener(Events.on_raw_message_delete)
+    @BaseService.listener(Events.on_raw_message_delete)
     async def on_raw_message_delete(self, payload):
 
         message = await self.bot.message_route.get_message(payload.message_id)

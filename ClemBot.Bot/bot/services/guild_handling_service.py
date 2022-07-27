@@ -13,7 +13,7 @@ class GuildHandlingService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_guild_joined)
+    @BaseService.listener(Events.on_guild_joined)
     async def on_guild_joined(self, guild: discord.Guild) -> None:
         log.info(f"Loading guild {guild.name}: {guild.id}")
 
@@ -43,12 +43,12 @@ class GuildHandlingService(BaseService):
             f"{guild.name}: {guild.id} initialization successful",
         )
 
-    @BaseService.Listener(Events.on_guild_update)
+    @BaseService.listener(Events.on_guild_update)
     async def on_guild_edit(self, before: discord.Guild, after: discord.Guild):
         if before.name != after.name or before.owner.id != after.owner.id:
             await self.bot.guild_route.edit_guild(after.id, after.name, after.owner.id)
 
-    @BaseService.Listener(Events.on_guild_leave)
+    @BaseService.listener(Events.on_guild_leave)
     async def on_guild_leave(self, guild) -> None:
         log.info("Bot removed from {guild}", guild=serializers.log_guild(guild))
 

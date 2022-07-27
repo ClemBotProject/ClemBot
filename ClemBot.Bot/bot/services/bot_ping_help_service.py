@@ -22,7 +22,7 @@ class BotPingHelpService(BaseService):
         # <@!...> is still used sometimes for some reason?
         self.mention_strs = {f"<@{bot.user.id}>", f"<@!{bot.user.id}>"}
 
-    @BaseService.Listener(Events.on_guild_message_received)
+    @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
         # we only want to respond if the message is ONLY a ping to ClemBot
         if message.content not in self.mention_strs:

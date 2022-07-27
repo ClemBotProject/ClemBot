@@ -27,7 +27,7 @@ class UserHandlingService(BaseService):
 
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_user_joined)
+    @BaseService.listener(Events.on_user_joined)
     async def on_user_joined(self, user: discord.Member) -> None:
         log.info(
             '"{member}" has joined guild "{guild}"',
@@ -45,7 +45,7 @@ class UserHandlingService(BaseService):
 
         await self.notify_user_join(user)
 
-    @BaseService.Listener(Events.on_user_removed)
+    @BaseService.listener(Events.on_user_removed)
     async def on_user_removed(self, user) -> None:
         log.info(
             '"{user}" has left guild "{guild}"',
@@ -69,7 +69,7 @@ class UserHandlingService(BaseService):
 
         await self.notify_user_remove(user)
 
-    @BaseService.Listener(Events.on_member_update)
+    @BaseService.listener(Events.on_member_update)
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         # only update roles if they have changed
         if set(r.id for r in before.roles) == set(r.id for r in after.roles):

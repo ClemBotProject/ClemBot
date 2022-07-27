@@ -12,7 +12,7 @@ class CommandMetricsService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_after_command_invoke)
+    @BaseService.listener(Events.on_after_command_invoke)
     async def log_invoked_commands(self, ctx: commands.Context):
 
         log.info(

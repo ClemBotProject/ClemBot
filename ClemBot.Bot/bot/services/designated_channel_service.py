@@ -14,7 +14,7 @@ class DesignatedChannelService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_send_in_designated_channel)
+    @BaseService.listener(Events.on_send_in_designated_channel)
     async def send_designated_message(
         self,
         designated_name: DesignatedChannelBase,
@@ -46,7 +46,7 @@ class DesignatedChannelService(BaseService):
         if dc_id:
             await self.messenger.publish(Events.on_designated_message_sent, dc_id, sent_messages)
 
-    @BaseService.Listener(Events.on_broadcast_designated_channel)
+    @BaseService.listener(Events.on_broadcast_designated_channel)
     async def broadcast_designated_message(
         self, designated_name: DesignatedChannels, content: Union[str, discord.Embed]
     ):

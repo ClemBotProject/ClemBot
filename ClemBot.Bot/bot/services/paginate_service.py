@@ -65,7 +65,7 @@ class PaginateService(BaseService):
         self.reactions = ["⏮️", "⬅️", "➡️", "⏭️"]
 
     # Called When a cog would like to be able to paginate a message
-    @BaseService.Listener(Events.on_set_pageable_text)
+    @BaseService.listener(Events.on_set_pageable_text)
     async def set_text_pageable(
         self,
         *,
@@ -96,7 +96,7 @@ class PaginateService(BaseService):
         self.messages[msg.id] = message
         await self.send_scroll_reactions(msg, author, timeout)
 
-    @BaseService.Listener(Events.on_set_pageable_embed)
+    @BaseService.listener(Events.on_set_pageable_embed)
     async def set_embed_pageable(
         self,
         *,
@@ -149,7 +149,7 @@ class PaginateService(BaseService):
             finally:
                 log.info("Message: {msg_id} timed out as pageable", msg_id=msg.id)
 
-    @BaseService.Listener(Events.on_reaction_add)
+    @BaseService.listener(Events.on_reaction_add)
     async def change_page(
         self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
     ):

@@ -108,7 +108,7 @@ class StarboardService(BaseService):
             callback_id,
         )
 
-    @BaseService.Listener(Events.on_designated_message_sent)
+    @BaseService.listener(Events.on_designated_message_sent)
     async def get_starboard_post(self, dc_id, messages):
         pass
         if dc_id in self.call_back_ids:
@@ -134,7 +134,7 @@ class StarboardService(BaseService):
         for post in curr_post.star_posts:
             await post.edit(embed=edit)
 
-    @BaseService.Listener(Events.on_reaction_add)
+    @BaseService.listener(Events.on_reaction_add)
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User) -> None:
         # check to see if the message is worthy
         if self.update_check(user, reaction):

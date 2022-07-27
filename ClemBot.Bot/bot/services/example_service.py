@@ -33,7 +33,7 @@ class ExampleService(BaseService):
 
     # This is the decorator for the messenger that marks a given message as a callback for an event,
     # if an event is not supplied it will default to the name of the method as the event
-    @BaseService.Listener(Events.on_example)
+    @BaseService.listener(Events.on_example)
     async def on_guild_message_received(self, message) -> None:
         pass
 

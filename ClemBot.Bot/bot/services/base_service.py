@@ -23,7 +23,7 @@ class BaseService(abc.ABC):
                 self.bot.messenger.subscribe(event, value)
 
     @abc.abstractmethod
-    async def load_service(self):
+    async def load_service(self) -> None:
         """
         The abstract base method to enforce that all child services must
         implement a load_service method to handle on startup tasks
@@ -31,7 +31,7 @@ class BaseService(abc.ABC):
         pass
 
     @classmethod
-    def Listener(cls, event=None):
+    def listener(cls, event: str | None = None) -> None:
         """
         The method decorator to allow for service methods to be marked as a callback
         for application level events

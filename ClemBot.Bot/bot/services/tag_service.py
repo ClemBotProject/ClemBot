@@ -19,7 +19,7 @@ class TagService(BaseService):
     def __init__(self, *, bot):
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_guild_message_received)
+    @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
         tag_prefix = await self.get_tag_prefix(self.bot, message=message)
         if tag_prefix is None:
