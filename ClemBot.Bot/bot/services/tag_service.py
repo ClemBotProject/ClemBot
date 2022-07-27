@@ -1,6 +1,4 @@
-import logging
 import re
-import seqlog
 
 import discord
 
@@ -9,8 +7,9 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 TAG_PAGINATE_THRESHOLD = 500
 TAG_PREFIX_DEFAULT = '$'

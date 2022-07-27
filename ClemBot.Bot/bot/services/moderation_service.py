@@ -1,6 +1,4 @@
-import logging
 from datetime import datetime
-import seqlog
 
 import discord
 
@@ -9,8 +7,9 @@ from bot.consts import Colors, DesignatedChannels, Moderation, Infractions
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class ModerationService(BaseService):

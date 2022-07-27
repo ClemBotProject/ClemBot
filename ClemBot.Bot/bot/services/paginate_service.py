@@ -1,8 +1,6 @@
 import asyncio
-import logging
 import typing as t
 from dataclasses import dataclass
-import seqlog
 
 import discord
 from discord.ext.commands.errors import BadArgument
@@ -10,8 +8,9 @@ from discord.ext.commands.errors import BadArgument
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 @dataclass

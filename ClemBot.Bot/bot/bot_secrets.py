@@ -1,12 +1,11 @@
 import json
-import logging
 import typing as t
 import os
-import seqlog
 
 from bot.errors import ConfigAccessError
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class BotSecrets:

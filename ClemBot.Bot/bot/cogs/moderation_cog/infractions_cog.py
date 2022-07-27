@@ -1,8 +1,6 @@
-import logging
 import typing as t
 from datetime import datetime
 from bot.utils.helpers import chunk_sequence
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -12,8 +10,9 @@ from bot.consts import Claims, Colors
 from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 INFRACTION_EMOJI_MAP = {
     'warn': ':warning:',

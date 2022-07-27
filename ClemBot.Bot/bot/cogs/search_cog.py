@@ -1,5 +1,3 @@
-import logging
-import seqlog
 import re
 import json
 import aiohttp
@@ -11,8 +9,9 @@ from urllib.parse import urlencode
 from urllib.parse import unquote_plus
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 MAX_RELATED_TOPICS = 5
 IMAGE_URL = 'https://duckduckgo.com'
 SEARCH_URL = 'https://api.duckduckgo.com/'

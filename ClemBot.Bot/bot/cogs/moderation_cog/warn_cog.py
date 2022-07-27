@@ -1,15 +1,13 @@
-import logging
-
 import discord
 import discord.ext.commands as commands
-import seqlog
 
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.clem_bot import ClemBot
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class WarnCog(commands.Cog):

@@ -1,12 +1,11 @@
 import asyncio
-import logging
 import os
-import seqlog
 
 from bot.services.base_service import BaseService
 import bot.bot_secrets as bot_secrets
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class StartupService(BaseService):

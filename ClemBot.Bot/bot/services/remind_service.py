@@ -9,7 +9,7 @@ from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils import converters
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class RemindService(BaseService):

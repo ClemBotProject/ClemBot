@@ -1,8 +1,6 @@
-import logging
 import os
 from dataclasses import dataclass
 from typing import List
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -12,8 +10,9 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.displayable_path import DisplayablePath
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 @dataclass

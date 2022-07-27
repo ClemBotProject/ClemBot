@@ -1,5 +1,4 @@
 import json
-import logging
 import uuid
 import aiohttp
 import discord
@@ -10,9 +9,9 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
-import seqlog
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 class TranslateCog(commands.Cog):
 

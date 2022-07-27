@@ -1,13 +1,11 @@
-import logging
-import seqlog
-
 import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels, Claims
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class DesignatedChannelsCog(commands.Cog):

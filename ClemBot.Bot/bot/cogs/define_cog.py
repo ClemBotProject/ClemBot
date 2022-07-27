@@ -1,10 +1,8 @@
 # This contribution was made by: Rajat Sethi
 # Date: 12/15/2020
 
-import logging
 import re
 import unicodedata
-import seqlog
 
 import aiohttp
 import discord
@@ -14,8 +12,9 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 API_URL = 'https://www.dictionaryapi.com/api/v3/references/collegiate/json/'
 
 

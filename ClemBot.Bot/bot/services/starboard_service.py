@@ -1,17 +1,16 @@
 import dataclasses
-import logging
 import math
 import typing as t
 import uuid
-import seqlog
 
 import discord
 
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 # minimum reactions required to get on the starboard
 # TODO: implement to where user-editable

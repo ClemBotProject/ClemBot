@@ -1,7 +1,3 @@
-import logging
-import typing as t
-import seqlog
-
 import discord
 import discord.ext.commands as commands
 from bot.clem_bot import ClemBot
@@ -10,8 +6,9 @@ import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.consts import Moderation
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class BanCog(commands.Cog):

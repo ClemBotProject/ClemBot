@@ -1,6 +1,4 @@
 import asyncio
-import logging
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -11,8 +9,9 @@ from bot.clem_bot import ClemBot
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 ROLE_LIST_CHUNK_SIZE = 15
 

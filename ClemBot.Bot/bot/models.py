@@ -1,10 +1,7 @@
-from dataclasses import dataclass
-from dataclasses_json import LetterCase, DataClassJsonMixin, dataclass_json
+from bot.utils.clem_bot_model import ClemBotModel
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Tag(DataClassJsonMixin):
+class Tag(ClemBotModel):
     name: str
     content: str
     creation_date: str
@@ -13,9 +10,7 @@ class Tag(DataClassJsonMixin):
     use_count: int = 0
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Infraction(DataClassJsonMixin):
+class Infraction(ClemBotModel):
     id: int
     guild_id: int
     author_id: int

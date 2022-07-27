@@ -1,7 +1,6 @@
-# import the logging framework to allow us to log internally
-# what the bot does
-import logging
-import seqlog
+# import a method to allow us to easily setup a logger instance with mypy not
+# screaming at us (thanks seqlog)
+from bot.utils.logging_utils import get_logger
 
 # Import the events class so that we have all the possible events
 # in the messenger defined for us clearly
@@ -12,7 +11,7 @@ from bot.services.base_service import BaseService
 
 # get a module level logger using the __name__ of the module as the root,
 # this will link it with the base logger bot. and all out put will be through that
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 # Services are postfixed with "Service" by convention

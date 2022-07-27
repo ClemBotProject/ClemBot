@@ -1,32 +1,31 @@
+import datetime
 import importlib
-import logging
 import pkgutil
-import seqlog
 import traceback
 import typing as t
-import datetime
 from types import ModuleType
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
-from bot.api import *
 import bot.api as api
-from bot.api import health_check_route
+import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
 import bot.extensions as ext
 import bot.services as services
-import bot.bot_secrets as bot_secrets
+import bot.utils.log_serializers as serializers
+from bot.api import *
+from bot.api import health_check_route
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
-from bot.errors import ClaimsAccessError, BotOnlyRequestError
+from bot.errors import BotOnlyRequestError, ClaimsAccessError
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
+from bot.utils.logging_utils import get_logger
 from bot.utils.scheduler import Scheduler
-import bot.utils.log_serializers as serializers
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class ClemBot(commands.Bot):

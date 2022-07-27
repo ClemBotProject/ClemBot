@@ -85,7 +85,7 @@ class ModerationRoute(BaseRoute):
 
     async def get_infraction(self, infraction_id: int) -> t.Optional[Infraction]:
         dict = await self._client.get(f'bot/infractions/{infraction_id}')
-        return Infraction.from_dict(dict)
+        return Infraction(**dict)
 
     async def get_guild_infractions(self, guild_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/guilds/{guild_id}/infractions')
@@ -93,7 +93,7 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp]
+        return [Infraction(**i) for i in resp]
 
     async def get_guild_infractions_user(self, guild_id: int, user_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/users/infractions/{user_id}/{guild_id}')
@@ -101,7 +101,7 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp]
+        return [Infraction(**i) for i in resp]
 
     async def get_guild_warns_user(self, guild_id: int, user_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/users/infractions/{user_id}/{guild_id}/warn')
@@ -109,7 +109,7 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp]
+        return [Infraction(**i) for i in resp]
 
     async def get_guild_mutes_user(self, guild_id: int, user_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/users/infractions/{user_id}/{guild_id}/mute')
@@ -117,7 +117,7 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp]
+        return [Infraction(**i) for i in resp]
 
     async def get_guild_bans_user(self, guild_id: int, user_id: int) -> t.Iterator[Infraction]:
         resp = await self._client.get(f'bot/users/infractions/{user_id}/{guild_id}/ban')
@@ -125,4 +125,4 @@ class ModerationRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Infraction.from_dict(i) for i in resp]
+        return [Infraction(**i) for i in resp]

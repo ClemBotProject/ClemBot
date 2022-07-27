@@ -72,7 +72,7 @@ class Claims(Enum):
     custom_tag_prefix_set = auto()
 
     @staticmethod
-    def get_claims_str():
+    def get_claims_str() -> str:
         return '\n'.join(name for name, _ in Claims.__members__.items())
 
 

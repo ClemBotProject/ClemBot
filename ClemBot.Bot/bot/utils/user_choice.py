@@ -1,19 +1,20 @@
 import asyncio
 import typing as t
+from discord.ext import commands
 
 import discord
 
 from bot.consts import Colors
+from bot.clem_bot import ClemBot
 
 
 class UserChoice:
 
-    def __init__(self, ctx, *, timeout: float) -> None:
+    def __init__(self, ctx: commands.Context[ClemBot], *, timeout: float):
         self.ctx = ctx
         self.timeout = timeout
 
-    async def send_confirmation(self, *, content: str = None, embed=None, is_error=False) -> bool:
-
+    async def send_confirmation(self, *, content: t.Optional[str] = None, embed: t.Optional[discord.Embed] = None, is_error: bool = False) -> bool:
         if embed and content:
             raise TypeError('Only specify the embed or the content, not both')
 
@@ -42,7 +43,7 @@ class UserChoice:
         for e in choices.values():
             await msg.add_reaction(e)
 
-        def check(reaction, user) -> bool:
+        def check(reaction: discord.Reaction, user: discord.User) -> bool:
             return (
                     reaction.message.id == msg.id
                     and user == self.ctx.author
@@ -50,6 +51,7 @@ class UserChoice:
             )
 
         try:
+            reaction: discord.Reaction
             reaction, _ = await self.ctx.cog.bot.wait_for('reaction_add', timeout=self.timeout, check=check)
             return ret_dict[reaction.emoji]
         except asyncio.TimeoutError:

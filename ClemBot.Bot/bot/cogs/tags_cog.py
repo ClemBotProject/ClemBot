@@ -1,19 +1,18 @@
-import logging
 import discord
 from bot.clem_bot import ClemBot
 import bot.extensions as ext
 import discord.ext.commands as commands
-import seqlog
 
-from typing import Optional
+import typing as t
 
 from bot import bot_secrets
 from bot.models import Tag
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 MAX_TAG_CONTENT_SIZE = 1000
 MAX_TAG_NAME_SIZE = 20
@@ -36,7 +35,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help('Supports custom tag functionality')
     @ext.example(('tag', 'tag mytag'))
-    async def tag(self, ctx: commands.Context, tag_name: Optional[str] = None):
+    async def tag(self, ctx: commands.Context, tag_name: t.Optional[str] = None):
         # check if a tag name was given
         if tag_name:
             tag_name = tag_name.lower()
@@ -83,7 +82,7 @@ class TagCog(commands.Cog):
     @ext.short_help('Lists owned tags')
     @ext.example(['tag owned', 'tag owned @user'])
     # returns a list of all tags owned by the calling user or given user returned in pages
-    async def owned(self, ctx: commands.Context, user: Optional[discord.Member] = None):
+    async def owned(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
         if not user:
             user = ctx.author
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
@@ -316,7 +315,7 @@ class TagCog(commands.Cog):
     @ext.ignore_claims_pre_invoke()
     @ext.short_help('Configure a custom command tag prefix')
     @ext.example(('tag prefix', 'tag prefix ?', 'tag prefix >>'))
-    async def prefix(self, ctx, *, tag_prefix: Optional[str] = None):
+    async def prefix(self, ctx, *, tag_prefix: t.Optional[str] = None):
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
         tag_prefixes = (await self.bot.get_tag_prefix(ctx.message))
@@ -366,7 +365,7 @@ class TagCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx, name: str) -> Optional[Tag]:
+    async def _check_tag_exists(self, ctx, name: str) -> t.Optional[Tag]:
         """
         Checks if the given tag exists.
         If so, returns the tag.
@@ -378,7 +377,7 @@ class TagCog(commands.Cog):
             return
         return tag
 
-    async def _check_tag_content(self, ctx, content: str) -> Optional[str]:
+    async def _check_tag_content(self, ctx, content: str) -> t.Optional[str]:
         """
         Checks if the given tag content meets max length & content size.
         If so, returns the content formatted.

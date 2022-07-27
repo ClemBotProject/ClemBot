@@ -1,4 +1,3 @@
-import logging
 import random
 import aiohttp
 import html
@@ -13,9 +12,9 @@ from bot.utils.converters import trivia_cog_converter
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-import seqlog
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class TriviaCog(commands.Cog):

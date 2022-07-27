@@ -1,14 +1,13 @@
-import logging
 import discord
 import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
-import seqlog
+from bot.utils.logging_utils import get_logger
 
 DEFAULT_MESSAGE_RANGE = 30
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class InfoCog(commands.Cog):

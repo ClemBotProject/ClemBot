@@ -1,11 +1,9 @@
 import asyncio
 import json
-import logging
 import random
 import time
 import typing
 from datetime import datetime
-import seqlog
 
 import aiohttp
 import discord
@@ -15,8 +13,9 @@ import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import Duration
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
 
 DICE_LIMIT = 20

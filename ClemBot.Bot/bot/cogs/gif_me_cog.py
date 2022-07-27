@@ -1,6 +1,4 @@
 import json
-import logging
-import seqlog
 
 import aiohttp
 import discord
@@ -10,8 +8,9 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class GifMeCog(commands.Cog):

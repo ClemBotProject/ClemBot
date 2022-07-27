@@ -1,14 +1,13 @@
-import logging
 from typing import Union, List
-import seqlog
 
 import discord
 
 from bot.consts import DesignatedChannels, DesignatedChannelBase
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class DesignatedChannelService(BaseService):

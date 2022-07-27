@@ -1,18 +1,18 @@
 import asyncio
 import contextlib
 import inspect
-import logging
 import typing as t
 import uuid
 from asyncio import Task
 from datetime import datetime
 from functools import partial
 from typing import Optional
-import seqlog
 
 from discord.ext.commands.errors import BadArgument
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+from bot.utils.logging_utils import get_logger
+
+log = get_logger(__name__)
 
 
 class Scheduler:

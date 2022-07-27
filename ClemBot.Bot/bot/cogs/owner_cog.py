@@ -1,7 +1,5 @@
 import asyncio
-import logging
 from collections import deque
-import seqlog
 import json
 
 import discord
@@ -10,8 +8,9 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, OwnerDesignatedChannels, DesignatedChannels, Moderation
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 MAX_MESSAGE_SIZE = 1900
 

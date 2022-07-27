@@ -1,12 +1,10 @@
 import asyncio
 import dataclasses
-import logging
 import random
 import typing as t
 from typing import Tuple, List, Union
 from collections import Counter
 from bot.utils.helpers import chunk_sequence
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -15,6 +13,7 @@ import numpy as np
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
+from bot.utils.logging_utils import get_logger
 
 
 class Symbols:
@@ -117,7 +116,7 @@ COLUMN_MULTIPLIERS = [
 
 PHRASES_PATH = 'bot/cogs/random_cog/assets/phrases.txt'
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 SLOTS_COMMAND_COOLDOWN = 60
 
 

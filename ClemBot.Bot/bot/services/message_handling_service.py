@@ -1,9 +1,7 @@
 import dataclasses
 import datetime
 import json
-import logging
 import re
-import seqlog
 from typing import Iterable
 
 import discord
@@ -12,8 +10,9 @@ from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 MESSAGE_BATCH_SIZE = 20
 MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')

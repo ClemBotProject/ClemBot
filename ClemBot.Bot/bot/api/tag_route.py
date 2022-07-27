@@ -20,7 +20,7 @@ class TagRoute(BaseRoute):
         tag_dict = await self._client.post('tags', data=json, **kwargs)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict)
+        return Tag(**tag_dict)
 
     async def edit_tag_content(self, guild_id: int, name: str, content: str, **kwargs) -> t.Optional[Tag]:
         json = {
@@ -31,7 +31,7 @@ class TagRoute(BaseRoute):
         tag_dict = await self._client.patch('bot/tags', data=json, **kwargs)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict)
+        return Tag(**tag_dict)
 
     async def edit_tag_owner(self, guild_id: int, name: str, user_id: int, **kwargs) -> t.Optional[Tag]:
         json = {
@@ -42,7 +42,7 @@ class TagRoute(BaseRoute):
         tag_dict = await self._client.patch('bot/tags', data=json, **kwargs)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict)
+        return Tag(**tag_dict)
 
     async def get_tag(self, guild_id: int, name: str) -> t.Optional[Tag]:
         json = {
@@ -52,7 +52,7 @@ class TagRoute(BaseRoute):
         tag_dict = await self._client.get('bot/tags', data=json)
         if not tag_dict:
             return None
-        return Tag.from_dict(tag_dict)
+        return Tag(**tag_dict)
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
         json = {
@@ -98,7 +98,7 @@ class TagRoute(BaseRoute):
         if not resp:
             return []
 
-        return [Tag.from_dict(i) for i in resp['tags']]
+        return [Tag(**i) for i in resp['tags']]
 
     async def search_tags(self, guild_id: int, query: str, limit: int = 5) -> list[Tag]:
         resp = await self._client.get('bot/tags/search', data={'query': query, 'guildId': guild_id, 'limit': limit})
@@ -106,4 +106,4 @@ class TagRoute(BaseRoute):
         if not resp:
             return []
 
-        return list(map(Tag.from_dict, resp['tags']))
+        return [Tag(**i) for i in resp['tags']]

@@ -1,14 +1,12 @@
-import logging
-import seqlog
-
 import discord
 from bot.consts import Colors
 
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.bot_secrets as bot_secrets
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class BotPingHelpService(BaseService):

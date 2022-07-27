@@ -1,11 +1,9 @@
 import concurrent.futures
 import datetime
 import io
-import logging
 import os
 import random
 import time
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -15,12 +13,13 @@ from bot.clem_bot import ClemBot
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 
 MAX_WALDO_GRID_SIZE = 100
 CRAB_LINE_LENGTH = 58
 CRAB_COMMAND_COOLDOWN = 3
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 def crab_pillow_process(args: str, lines_in_text: int, timestamp: int) -> None:

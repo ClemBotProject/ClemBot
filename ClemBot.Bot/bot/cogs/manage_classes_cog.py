@@ -1,7 +1,5 @@
 import asyncio
-import logging
 from dataclasses import dataclass
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -9,9 +7,10 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Colors, Claims
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 from bot.utils.user_choice import UserChoice
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 TIMEOUT = 60
 

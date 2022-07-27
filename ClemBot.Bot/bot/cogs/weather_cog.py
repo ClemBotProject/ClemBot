@@ -2,8 +2,6 @@
 # 12-16-2020
 
 import datetime as dt
-import logging
-import seqlog
 import re
 
 import aiohttp
@@ -14,8 +12,9 @@ import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 URL_WEATHER = "https://api.openweathermap.org/data/2.5/onecall"
 URL_GEO = "https://geocode.xyz/"
 

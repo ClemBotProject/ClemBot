@@ -1,6 +1,4 @@
-import logging
 from collections.abc import Iterable
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -10,8 +8,9 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 import bot.bot_secrets as bot_secrets
 from bot.utils.helpers import chunk_sequence
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 HELP_EMBED_SIZE = 15
 

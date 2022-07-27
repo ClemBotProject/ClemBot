@@ -1,14 +1,12 @@
-import logging
-import seqlog
-
 import discord
 from discord.ext import commands
 
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
 from bot.errors import PrefixRequestError
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class CustomPrefix:

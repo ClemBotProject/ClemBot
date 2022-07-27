@@ -89,6 +89,8 @@ webencodings = "0.5.1"
 wrapt = "1.14.1"
 yarl = "1.7.2"
 zipp = "3.8.0"
+pydantic = "^1.9.1"
+humps = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
@@ -111,12 +113,17 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 100
-target-version = ['py38']
 include = '\.pyi?$'
+extend-exclude = '''
+(
+    .venv/
+)
+'''
 
 [tool.isort]
 profile = "black"
 line_length = 100
+exclude = [".venv/"]
 
 [tool.mypy]
 mypy_path = "stubs"

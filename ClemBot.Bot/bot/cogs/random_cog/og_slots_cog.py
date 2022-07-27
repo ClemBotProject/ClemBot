@@ -1,8 +1,5 @@
 import asyncio
-import logging
 import random
-import typing as t
-import seqlog
 
 import discord
 import discord.ext.commands as commands
@@ -10,6 +7,7 @@ from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
+from bot.utils.logging_utils import get_logger
 
 
 class Symbols:
@@ -69,7 +67,7 @@ PHRASES = [
     'High score incoming!'
 ]
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
 
 

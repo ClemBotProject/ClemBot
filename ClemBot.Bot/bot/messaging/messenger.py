@@ -1,13 +1,13 @@
 import asyncio
 import dataclasses
 import inspect
-import logging
 import traceback
 import typing as t
 import weakref as wr
-import seqlog
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+from bot.utils.logging_utils import get_logger
+
+log = get_logger(__name__)
 
 
 @dataclasses.dataclass

@@ -1,7 +1,5 @@
 # type: ignore
 
-import logging
-import seqlog
 import re
 import typing as t
 from copy import copy
@@ -10,8 +8,9 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 
 class ChainCog(commands.Cog):

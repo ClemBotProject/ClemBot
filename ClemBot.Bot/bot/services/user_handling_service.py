@@ -1,8 +1,5 @@
-import logging
 from datetime import datetime
-import typing as t
 import dataclasses
-import seqlog
 
 import discord
 
@@ -10,8 +7,9 @@ from bot.consts import Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 import bot.utils.log_serializers as serializers
+from bot.utils.logging_utils import get_logger
 
-log = t.cast(seqlog.StructuredLogger, logging.getLogger(__name__))
+log = get_logger(__name__)
 
 UPDATE_EVENT_EMPTY_QUEUE_WAIT_TIME = 0.5
 
