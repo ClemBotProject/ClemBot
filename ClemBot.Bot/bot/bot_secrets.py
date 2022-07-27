@@ -9,26 +9,25 @@ log = get_logger(__name__)
 
 
 class BotSecrets:
-    def __init__(self):
-        self._client_token = None
-        self._client_secret = None
-        self._bot_token = None
-        self._bot_prefix = None
-        self._gifMe_token = None
-        self._repl_url = None
-        self._github_url = None
-        self._merriam_key = None
-        self._weather_key = None
-        self._geocode_key = None
-        self._merriam_key = None
-        self._azure_translate_key = None
-        self._api_url = None
-        self._api_key = None
-        self._bot_only = None
-        self._startup_log_channel_ids = None
-        self._error_log_channel_ids = None
-        self._site_url = None
-        self._docs_url = None
+    def __init__(self) -> None:
+        self._client_token: str | None = None
+        self._client_secret: str | None = None
+        self._bot_token: str | None = None
+        self._bot_prefix: str | None = None
+        self._gifMe_token: str | None = None
+        self._repl_url: str | None = None
+        self._github_url: str | None = None
+        self._merriam_key: str | None = None
+        self._weather_key: str | None = None
+        self._geocode_key: str | None = None
+        self._azure_translate_key: str | None = None
+        self._api_url: str | None = None
+        self._api_key: str | None = None
+        self._bot_only: bool | None = None
+        self._startup_log_channel_ids: list[int] | None = None
+        self._error_log_channel_ids: list[int] | None = None
+        self._site_url: str | None = None
+        self._docs_url: str | None = None
 
     @property
     def client_token(self) -> str:
@@ -57,8 +56,8 @@ class BotSecrets:
     @property
     def client_secret(self) -> str:
         if not self._client_secret:
-            raise ConfigAccessError("client_secret has not been intialized")
-        return self._client_token
+            raise ConfigAccessError("client_secret has not been initialized")
+        return self._client_secret
 
     @client_secret.setter
     def client_secret(self, value: t.Optional[str]) -> None:
@@ -94,7 +93,7 @@ class BotSecrets:
         return self._bot_only
 
     @bot_only.setter
-    def bot_only(self, value) -> None:
+    def bot_only(self, value: bool) -> None:
         if self.bot_only:
             raise ConfigAccessError("bot_only has already been initialized")
 
@@ -182,7 +181,7 @@ class BotSecrets:
         return self._startup_log_channel_ids
 
     @startup_log_channel_ids.setter
-    def startup_log_channel_ids(self, value: list[int]):
+    def startup_log_channel_ids(self, value: list[int]) -> None:
         if self._startup_log_channel_ids:
             raise ConfigAccessError("startup_log_channel_ids has already been initialized")
         self._startup_log_channel_ids = value
@@ -194,7 +193,7 @@ class BotSecrets:
         return self._error_log_channel_ids
 
     @error_log_channel_ids.setter
-    def error_log_channel_ids(self, value: list[int]):
+    def error_log_channel_ids(self, value: list[int]) -> None:
         if self._error_log_channel_ids:
             raise ConfigAccessError("error_log_channel_ids has already been initialized")
         self._error_log_channel_ids = value
