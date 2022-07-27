@@ -25,23 +25,19 @@ class Result:
         self.value = value
 
     def __str__(self):
-        return f'Result Status: {self.status}\nValue:\n{json.dumps(self.value, indent=2)}'
+        return f"Result Status: {self.status}\nValue:\n{json.dumps(self.value, indent=2)}"
 
 
 class HttpRequestType:
-    get = 'GET'
-    put = 'PUT'
-    post = 'POST'
-    delete = 'DELETE'
-    patch = 'PATCH'
+    get = "GET"
+    put = "PUT"
+    post = "POST"
+    delete = "DELETE"
+    patch = "PATCH"
 
 
 class ApiClient:
-
-    def __init__(self, *,
-                 connect_callback=None,
-                 disconnect_callback=None,
-                 bot_only: bool = False):
+    def __init__(self, *, connect_callback=None, disconnect_callback=None, bot_only: bool = False):
 
         self.auth_token: t.Optional[str]
         self.session: t.Optional[aiohttp.ClientSession]
@@ -66,8 +62,8 @@ class ApiClient:
 
     @staticmethod
     def _build_url(url: str):
-        url = f'{bot_secrets.secrets.api_url}{Urls.base_api_url}{quote(url)}'
-        log.info('Building URL: {url}', url=url)
+        url = f"{bot_secrets.secrets.api_url}{Urls.base_api_url}{quote(url)}"
+        log.info("Building URL: {url}", url=url)
         return url
 
     async def close(self) -> None:
@@ -96,11 +92,11 @@ class ApiClient:
         # to reach this point
         await self.disconnect_callback()
 
-        log.info('Beginning ClemBot.Api reconnect request')
+        log.info("Beginning ClemBot.Api reconnect request")
         await self._internal_connect()
 
     async def _internal_connect(self):
-        log.info('Connecting to ClemBot.Api at URL: {url}', url=bot_secrets.secrets.api_url)
+        log.info("Connecting to ClemBot.Api at URL: {url}", url=bot_secrets.secrets.api_url)
 
         # Check if we have an active session, this means we are trying to reconnect
         # if we are, do nothing
@@ -113,25 +109,27 @@ class ApiClient:
             self.connected = await self._authorize()
 
             if self.connected:
-                log.info('Connecting to ClemBot.Api succeeded')
+                log.info("Connecting to ClemBot.Api succeeded")
                 await self.connect_callback()
                 break
 
-            log.error('Connecting to ClemBot.Api failed, retrying in {reconnect_timeout} seconds',
-                      reconnect_timeout=RECONNECT_TIMEOUT)
+            log.error(
+                "Connecting to ClemBot.Api failed, retrying in {reconnect_timeout} seconds",
+                reconnect_timeout=RECONNECT_TIMEOUT,
+            )
             await asyncio.sleep(RECONNECT_TIMEOUT)
 
     async def _disconnected(self):
-        log.warning('ClemBot.Api disconnected')
+        log.warning("ClemBot.Api disconnected")
         await self._reconnect()
 
     async def _get_auth_token(self) -> t.Optional[str]:
         auth_args = {
-            'method': HttpRequestType.get,
-            'ssl': False,
-            'url': self._build_url('bot/authorize'),
-            'headers': {'Accept': '*/*'},
-            'params': {'key': bot_secrets.secrets.api_key}
+            "method": HttpRequestType.get,
+            "ssl": False,
+            "url": self._build_url("bot/authorize"),
+            "headers": {"Accept": "*/*"},
+            "params": {"key": bot_secrets.secrets.api_key},
         }
 
         assert self.session is not None
@@ -140,19 +138,19 @@ class ApiClient:
             async with self.session.request(**auth_args) as resp:
 
                 if resp.status == HTTPStatus.OK:
-                    log.info('JWT Bearer token received')
-                    return (await resp.json())['token']
+                    log.info("JWT Bearer token received")
+                    return (await resp.json())["token"]
 
                 if resp.status == HTTPStatus.FORBIDDEN:
-                    log.error('JWT Auth denied, Invalid API key')
+                    log.error("JWT Auth denied, Invalid API key")
 
         except aiohttp.ClientConnectorError:
-            log.exception('Error: ClemBot.Api not found')
+            log.exception("Error: ClemBot.Api not found")
 
         return None
 
     async def _authorize(self) -> bool:
-        log.info('Requesting ClemBot.Api Access token')
+        log.info("Requesting ClemBot.Api Access token")
 
         self.auth_token = await self._get_auth_token()
 
@@ -160,59 +158,69 @@ class ApiClient:
             return False
 
         self.headers = {
-            'Authorization': f'BEARER {self.auth_token}',
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
+            "Authorization": f"BEARER {self.auth_token}",
+            "Content-type": "application/json",
+            "Accept": "application/json",
         }
 
-        log.info('Initialized JWT BEARER token Auth Headers')
+        log.info("Initialized JWT BEARER token Auth Headers")
         return True
 
     async def _request(self, http_type: str, endpoint: str, raise_on_error, params=None, body=None):
 
-        log.info('HTTP {http_type} Request initializing to route: {endpoint}', http_type=http_type, endpoint=endpoint)
+        log.info(
+            "HTTP {http_type} Request initializing to route: {endpoint}",
+            http_type=http_type,
+            endpoint=endpoint,
+        )
 
         req_args = {
-            'method': http_type,
-            'ssl': False,
-            'url': self._build_url(endpoint),
-            'raise_for_status': raise_on_error,
-            'headers': self.headers,
-            'params': params
+            "method": http_type,
+            "ssl": False,
+            "url": self._build_url(endpoint),
+            "raise_for_status": raise_on_error,
+            "headers": self.headers,
+            "params": params,
         }
 
         if body:
-            req_args['json'] = body
+            req_args["json"] = body
 
         assert self.session is not None
 
         async with self.session.request(**req_args) as resp:
             if resp.status == HTTPStatus.OK:
                 data = await resp.json()
-                log.info('{type} Request at endpoint "{endpoint}" with request data:{body}  Succeeded with response data:{data}',
-                         type=http_type,
-                         endpoint=endpoint,
-                         body=body,
-                         data=data)
+                log.info(
+                    '{type} Request at endpoint "{endpoint}" with request data:{body}  Succeeded with response data:{data}',
+                    type=http_type,
+                    endpoint=endpoint,
+                    body=body,
+                    data=data,
+                )
 
                 return Result(resp.status, data)
 
             if not 200 <= resp.status < 300:
-                log.error('Request at endpoint "{endpoint}" returned non 2xx error code {status}',
-                          endpoint=endpoint,
-                          status=resp.status)
+                log.error(
+                    'Request at endpoint "{endpoint}" returned non 2xx error code {status}',
+                    endpoint=endpoint,
+                    status=resp.status,
+                )
             else:
-                log.info('Request at endpoint "{endpoint}" returned 2xx success status code {status}',
-                         endpoint=endpoint,
-                         status=resp.status)
+                log.info(
+                    'Request at endpoint "{endpoint}" returned 2xx success status code {status}',
+                    endpoint=endpoint,
+                    status=resp.status,
+                )
 
             return Result(resp.status, None)
 
     async def _request_or_reconnect(self, http_type: str, endpoint: str, **kwargs):
 
-        raise_on_error = kwargs.get('raise_on_error', False)
-        body = kwargs.get('data', None)
-        params = kwargs.get('params', None)
+        raise_on_error = kwargs.get("raise_on_error", False)
+        body = kwargs.get("data", None)
+        params = kwargs.get("params", None)
 
         # If we are in bot_only mode stop the request and report that
         if self.bot_only:
@@ -220,14 +228,12 @@ class ApiClient:
 
         # Throw if we aren't connected to notify commands or services the request failed
         if not self.connected:
-            raise ApiClientRequestError('ClemBot.Api not connected')
+            raise ApiClientRequestError("ClemBot.Api not connected")
 
         try:
-            resp = await self._request(http_type,
-                                       endpoint,
-                                       raise_on_error=raise_on_error,
-                                       body=body,
-                                       params=params)
+            resp = await self._request(
+                http_type, endpoint, raise_on_error=raise_on_error, body=body, params=params
+            )
 
         # The request errored out and had raise_for_status enabled
         except aiohttp.ClientResponseError as e:
@@ -243,14 +249,14 @@ class ApiClient:
         # put the client in reconnect mode and raise an error
         except aiohttp.ClientConnectorError:
             asyncio.create_task(self._disconnected())
-            raise ConnectionError('Request to ClemBot.Api failed')
+            raise ConnectionError("Request to ClemBot.Api failed")
 
         # Check if the response returned an HTTP 401 Unauthorized or 403 Forbidden
         # with raise_for_status set to False We still need to handle that case
         # and put the client in reconnect mode
         if resp.status == HTTPStatus.UNAUTHORIZED or resp.status == HTTPStatus.FORBIDDEN:
             asyncio.create_task(self._disconnected())
-            raise ConnectionError('Request to ClemBot.Api failed')
+            raise ConnectionError("Request to ClemBot.Api failed")
 
         return resp.value
 

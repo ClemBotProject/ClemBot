@@ -48,24 +48,20 @@ class ClaimsAccessError(CommandError):
 
 
 class ConversionError(CommandError):
-
     def __init__(self, message):
         self.message = message
 
 
 class ApiClientRequestError(Exception):
-
     def __init__(self, message):
         self.message = message
 
 
 class BotOnlyRequestError(Exception):
-
     def __init__(self, message):
         self.message = message
 
 
 class PrefixRequestError(Exception):
-
     def __init__(self, message):
         self.message = message

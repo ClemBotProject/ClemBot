@@ -22,8 +22,12 @@ class StartupService(BaseService):
         tasks = []
         for guild in self.bot.guilds:
             if not await self.bot.guild_route.get_guild(guild.id):
-                log.info(f'Loading guild {guild.name}: {guild.id}')
-                tasks.append(asyncio.create_task(self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)))
+                log.info(f"Loading guild {guild.name}: {guild.id}")
+                tasks.append(
+                    asyncio.create_task(
+                        self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)
+                    )
+                )
         await asyncio.gather(*tasks)
 
     async def load_users(self):
@@ -54,37 +58,37 @@ class StartupService(BaseService):
         # So we should only do this on dev bots. We rely on the 24/7 uptime of the bot to
         # Keep the database in sync. Future solutions to this problem
         # Should be heavily researched
-        if bool(os.environ.get('PROD')):
-            log.warning('Skipping internal state reset on prod deployment')
+        if bool(os.environ.get("PROD")):
+            log.warning("Skipping internal state reset on prod deployment")
             self.bot.is_starting_up = False
             return
 
         if bot_secrets.secrets.bot_only:
-            log.warning('Skipping internal state reset in bot_only deployment')
+            log.warning("Skipping internal state reset in bot_only deployment")
             self.bot.is_starting_up = False
             return
 
-        log.info('Starting development bot startup internal state reset')
+        log.info("Starting development bot startup internal state reset")
 
         # First load any new guilds so that we can reference them
-        log.info('Resetting Guilds')
+        log.info("Resetting Guilds")
         await self.load_guilds()
 
         # Load user guild relationships, takes every guild and sends a complete list of users to the backend
         # to replace the current known state
-        log.info('Resetting User_Guilds state')
+        log.info("Resetting User_Guilds state")
         await self.load_users_guilds()
 
         # Reset active roles, send all roles to the backend and delete any not present and add any that are new
-        log.info('Resetting Guild Roles state')
+        log.info("Resetting Guild Roles state")
         await self.load_roles()
 
         # Reset active channels, send all channels to the backend and delete any not present and add any that are new
-        log.info('Resetting Guild Channels state')
+        log.info("Resetting Guild Channels state")
         await self.load_channels()
 
         # Reset active threads, send all channels to the backend and delete any not present and add any that are new
-        log.info('Resetting Guild Threads state')
+        log.info("Resetting Guild Threads state")
         await self.load_threads()
 
         self.bot.is_starting_up = False

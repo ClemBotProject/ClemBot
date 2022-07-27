@@ -5,6 +5,7 @@ from bot.utils.logging_utils import get_logger
 # Import the events class so that we have all the possible events
 # in the messenger defined for us clearly
 from bot.messaging.events import Events
+
 # Import the base service class so we can subclass it
 # this allows the bot to load this service instance dynamically
 from bot.services.base_service import BaseService
@@ -22,7 +23,7 @@ log = get_logger(__name__)
 class ExampleService(BaseService):
     """
     This is an example service to demonstrate the expected layout
-    A service is defined as any functionality that doesnt directly interact with a discord user 
+    A service is defined as any functionality that doesnt directly interact with a discord user
     or command, it handles background tasks and startup functionality
     """
 

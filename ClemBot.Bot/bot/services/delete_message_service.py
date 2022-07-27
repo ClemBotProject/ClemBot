@@ -23,11 +23,14 @@ class DeleteMessageService(BaseService):
 
     # Called When a cog would like to be able to delete a message or messages
     @BaseService.Listener(Events.on_set_deletable)
-    async def set_message_deletable(self, *,
-                                    msg: list[discord.Message],
-                                    roles: list[discord.Role] = [],
-                                    author: discord.Member = None,
-                                    timeout: int = None):
+    async def set_message_deletable(
+        self,
+        *,
+        msg: list[discord.Message],
+        roles: list[discord.Role] = [],
+        author: discord.Member = None,
+        timeout: int = None
+    ):
 
         if not isinstance(msg, t.List):
             msg = [msg]
@@ -38,7 +41,7 @@ class DeleteMessageService(BaseService):
         self.messages[msg[-1].id] = {
             "MessagesToDelete": msg,
             "Roles": roles,
-            "Author": author.id if author else None
+            "Author": author.id if author else None,
         }
 
         # the emoji is placed on the last message in the list
@@ -51,27 +54,31 @@ class DeleteMessageService(BaseService):
             except:
                 pass
             finally:
-                log.info('Message: {message} timed out as deletable', message=msg[-1].id)
+                log.info("Message: {message} timed out as deletable", message=msg[-1].id)
 
     @BaseService.Listener(Events.on_reaction_add)
-    async def delete_message(self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]):
+    async def delete_message(
+        self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
+    ):
         role_ids = [role.id for role in user.roles]
         delete = False
 
-        if reaction.emoji != '🗑️' or reaction.message.id not in self.messages:
+        if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
             return
         elif await self.bot.claim_route.check_claim_user(Claims.delete_message, user):
             delete = True
         elif user.guild_permissions.administrator:
             delete = True
-        elif user.id == self.messages[reaction.message.id]['Author']:
+        elif user.id == self.messages[reaction.message.id]["Author"]:
             delete = True
-        elif any(True for role in self.messages[reaction.message.id]['Roles'] if role.id in role_ids):
+        elif any(
+            True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids
+        ):
             delete = True
 
         if delete:
-            for msg in self.messages[reaction.message.id]['MessagesToDelete']:
-                log.info('Message {message} deleted by delete message service', message=msg.id)
+            for msg in self.messages[reaction.message.id]["MessagesToDelete"]:
+                log.info("Message {message} deleted by delete message service", message=msg.id)
                 await msg.delete()
             del self.messages[reaction.message.id]
 

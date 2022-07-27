@@ -2,7 +2,7 @@ from bot.clem_bot import ClemBot
 from bot.services.base_service import BaseService
 from bot.utils.trigrams import find_best_match, make_search_bank, BankSearchEntry
 
-    
+
 class FuzzyMatchingService(BaseService):
     def __init__(self, bot: ClemBot):
         self.bot = bot

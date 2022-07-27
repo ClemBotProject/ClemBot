@@ -9,7 +9,6 @@ log = get_logger(__name__)
 
 
 class ThreadHandlingService(BaseService):
-
     def __init__(self, *, bot):
         super().__init__(bot)
 
@@ -21,16 +20,16 @@ class ThreadHandlingService(BaseService):
         if await self.bot.thread_route.get_thread(thread.id):
             return
 
-        log.info('New thread joined {thread_name}:{thread_id} in guild: {guild}',
-                 thread_name=thread.name,
-                 thread_id=thread.id,
-                 guild=serializers.log_guild(thread.guild))
+        log.info(
+            "New thread joined {thread_name}:{thread_id} in guild: {guild}",
+            thread_name=thread.name,
+            thread_id=thread.id,
+            guild=serializers.log_guild(thread.guild),
+        )
 
-        await self.bot.thread_route.create_thread(thread.id,
-                                                  thread.name,
-                                                  thread.guild.id,
-                                                  thread.parent_id,
-                                                  raise_on_error=True)
+        await self.bot.thread_route.create_thread(
+            thread.id, thread.name, thread.guild.id, thread.parent_id, raise_on_error=True
+        )
 
     @BaseService.Listener(Events.on_new_guild_initialized)
     async def on_new_guild_init(self, guild: discord.Guild):

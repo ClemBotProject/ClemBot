@@ -27,7 +27,7 @@ class Messenger:
     """The global message bus that handles all application level events"""
 
     def __init__(self, name: t.Optional[str] = None):
-        log.info('New messenger created with name: {name}', name=name)
+        log.info("New messenger created with name: {name}", name=name)
         self.name = name
         self._events = dict[str, list[wr.ReferenceType[t.Any]]]()
 
@@ -40,21 +40,27 @@ class Messenger:
         self._queue_dispatch_tasks = dict[int, DispatchQueue]()
 
     def subscribe(self, event: str, callback: t.Callable[..., t.Awaitable[t.Any]]) -> None:
-        """Subscribes a method as a callback listener to a given event """
+        """Subscribes a method as a callback listener to a given event"""
         if not asyncio.iscoroutinefunction(callback):
-            raise TypeError('A given messenger callback must be awaitable')
+            raise TypeError("A given messenger callback must be awaitable")
 
         weak_ref = self.__get_weak_ref(callback)
         if event in self._events.keys():
             self._events[event].append(weak_ref)
         else:
-            log.info('Registering new event: {event} to Messenger: {name}', event=str(event), name=self.name)
+            log.info(
+                "Registering new event: {event} to Messenger: {name}",
+                event=str(event),
+                name=self.name,
+            )
             self._events[event] = [weak_ref]
 
-        log.info('Registering listener {callback} to event: {event} in Messenger: {name}',
-                 callback=str(weak_ref.__callback__),
-                 event=str(event),
-                 name=self.name)
+        log.info(
+            "Registering listener {callback} to event: {event} in Messenger: {name}",
+            callback=str(weak_ref.__callback__),
+            event=str(event),
+            name=self.name,
+        )
 
     async def publish(self, event: str, *args: t.Any, **kwargs: t.Any) -> None:
         """
@@ -64,24 +70,29 @@ class Messenger:
         Args:
             event (str): The event invoke the listeners on
         """
-        log.info('Received published event: {event}', event=str(event))
+        log.info("Received published event: {event}", event=str(event))
         await self.__publish(event, *args, **kwargs)
 
-    async def publish_to_queue(self, event: str, guild_id: int, *args: t.Any, **kwargs: t.Any) -> None:
+    async def publish_to_queue(
+        self, event: str, guild_id: int, *args: t.Any, **kwargs: t.Any
+    ) -> None:
         """
         Publishes an event to listeners with given args onto the guild message queue
 
         Args:
             event (str): The event invoke the listeners on
         """
-        log.info('Received published to queue event: {event}', event=str(event))
+        log.info("Received published to queue event: {event}", event=str(event))
         await self.__add_to_queue(event, guild_id, *args, **kwargs)
 
     async def close(self) -> None:
         """
         Sets all dispatch tasks to a cancellation state and clears the task dictionary
         """
-        log.info('Gracefully closing all dispatch tasks with ids: {tasks}', tasks=list(self._queue_dispatch_tasks.keys()))
+        log.info(
+            "Gracefully closing all dispatch tasks with ids: {tasks}",
+            tasks=list(self._queue_dispatch_tasks.keys()),
+        )
 
         for guild_id, dispatch_task in self._queue_dispatch_tasks.items():
 
@@ -98,27 +109,35 @@ class Messenger:
 
         self._queue_dispatch_tasks.clear()
 
-        log.info('All messenger tasks cancelled successfully')
+        log.info("All messenger tasks cancelled successfully")
 
     async def __publish(self, event: str, *args: t.Any, **kwargs: t.Any) -> None:
         if event in self._events.keys():
             listeners = self._events[event]
             for i, sub in enumerate(listeners):
                 if sub._alive:  # type: ignore
-                    log.info('Invoking listener: {sub} on event {event} in Messenger: {name}',
-                             sub=str(sub),
-                             event=str(event),
-                             name=self.name)
+                    log.info(
+                        "Invoking listener: {sub} on event {event} in Messenger: {name}",
+                        sub=str(sub),
+                        event=str(event),
+                        name=self.name,
+                    )
                     await sub()(*args, **kwargs)  # type: ignore
                 else:
-                    log.info('Deleting dead reference in Event: {event} function: {sub}', event=str(event), sub=str(sub))
+                    log.info(
+                        "Deleting dead reference in Event: {event} function: {sub}",
+                        event=str(event),
+                        sub=str(sub),
+                    )
                     del listeners[i]
 
-    async def __add_to_queue(self, event: str, guild_id: int, *args: t.Any, **kwargs: t.Any) -> None:
+    async def __add_to_queue(
+        self, event: str, guild_id: int, *args: t.Any, **kwargs: t.Any
+    ) -> None:
 
         # Check if the guild_id is the in the queue dict, if it's not we need to create the queue first
         if guild_id not in self._guild_event_queue:
-            log.info('Creating guild event queue for guild {guild}', guild=guild_id)
+            log.info("Creating guild event queue for guild {guild}", guild=guild_id)
             self._guild_event_queue[guild_id] = asyncio.Queue[QueuedEvent]()
 
             # Create the polling task to dispatch events
@@ -128,10 +147,12 @@ class Messenger:
             self._queue_dispatch_tasks[guild_id] = DispatchQueue(task=task)
 
         size = self._guild_event_queue[guild_id].qsize()
-        log.info('Added event {event} to queue {queue} with new size {size}',
-                 event=event,
-                 queue=guild_id,
-                 size=size + 1)
+        log.info(
+            "Added event {event} to queue {queue} with new size {size}",
+            event=event,
+            queue=guild_id,
+            size=size + 1,
+        )
 
         complete_event = QueuedEvent(event, args, kwargs)
 
@@ -144,10 +165,12 @@ class Messenger:
             event = await self._guild_event_queue[guild_id].get()
             size = self._guild_event_queue[guild_id].qsize()
 
-            log.info('Dispatching queued event: {event} on queue: {queue} new queue size: {size}',
-                     event=event.name,
-                     queue=guild_id,
-                     size=size)
+            log.info(
+                "Dispatching queued event: {event} on queue: {queue} new queue size: {size}",
+                event=event.name,
+                queue=guild_id,
+                size=size,
+            )
             try:
                 await self.__publish(event.name, *event.args, **event.kwargs)
             except Exception as e:
@@ -160,13 +183,18 @@ class Messenger:
                     # pylint: disable=E1102
                     await self.error_callback(e, traceback=tb)
                 else:
-                    log.exception('No error callback set in messenger {messenger} for error {error}',
-                                  messenger=self.name,
-                                  error=e)
+                    log.exception(
+                        "No error callback set in messenger {messenger} for error {error}",
+                        messenger=self.name,
+                        error=e,
+                    )
 
             # Check if the task has been cancelled AFTER we have attempted to dispatch all events
             # This is important for the tests to be deterministic
-            if self._queue_dispatch_tasks[guild_id].cancelled and self._guild_event_queue[guild_id].qsize() == 0:
+            if (
+                self._queue_dispatch_tasks[guild_id].cancelled
+                and self._guild_event_queue[guild_id].qsize() == 0
+            ):
                 return
 
     def __get_weak_ref(self, obj: t.Any) -> (wr.WeakMethod[t.Any] | wr.ReferenceType[t.Any]):

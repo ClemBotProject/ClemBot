@@ -9,23 +9,28 @@ log = get_logger(__name__)
 
 
 class ChannelHandlingService(BaseService):
-
     def __init__(self, *, bot):
         super().__init__(bot)
 
     @BaseService.Listener(Events.on_guild_channel_create)
     async def channel_create(self, channel):
-        log.info('Channel created {channel} in guild: {guild}',
-                 channel=serializers.log_channel(channel),
-                 guild=serializers.log_guild(channel.guild))
+        log.info(
+            "Channel created {channel} in guild: {guild}",
+            channel=serializers.log_channel(channel),
+            guild=serializers.log_guild(channel.guild),
+        )
 
-        await self.bot.channel_route.create_channel(channel.id, channel.name, channel.guild.id, raise_on_error=True)
+        await self.bot.channel_route.create_channel(
+            channel.id, channel.name, channel.guild.id, raise_on_error=True
+        )
 
     @BaseService.Listener(Events.on_guild_channel_delete)
     async def channel_delete(self, channel):
-        log.info('Channel deleted {channel} in guild: {guild}',
-                 channel=serializers.log_channel(channel),
-                 guild=serializers.log_guild(channel.guild))
+        log.info(
+            "Channel deleted {channel} in guild: {guild}",
+            channel=serializers.log_channel(channel),
+            guild=serializers.log_guild(channel.guild),
+        )
 
         await self.bot.channel_route.remove_channel(channel.id, raise_on_error=True)
 

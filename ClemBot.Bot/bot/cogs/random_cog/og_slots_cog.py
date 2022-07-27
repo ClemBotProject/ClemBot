@@ -11,16 +11,16 @@ from bot.utils.logging_utils import get_logger
 
 
 class Symbols:
-    combined = '🍎🍐🍇🍊🍋🍓🍒💎'
+    combined = "🍎🍐🍇🍊🍋🍓🍒💎"
 
-    apple = '🍎'
-    pear = '🍐'
-    grape = '🍇'
-    orange = '🍊'
-    lemon = '🍋'
-    cherry = '🍒'
-    strawberry = '🍓'
-    jackpot = '💎'
+    apple = "🍎"
+    pear = "🍐"
+    grape = "🍇"
+    orange = "🍊"
+    lemon = "🍋"
+    cherry = "🍒"
+    strawberry = "🍓"
+    jackpot = "💎"
 
 
 PAY_TABLE = {
@@ -31,40 +31,25 @@ PAY_TABLE = {
     Symbols.lemon: 20,
     Symbols.cherry: 50,
     Symbols.strawberry: 100,
-    Symbols.jackpot: 500
+    Symbols.jackpot: 500,
 }
 
-MULTIPLIERS = {
-    1: 1,
-    2: 2,
-    3: 5,
-    4: 20,
-    5: 50
-}
+MULTIPLIERS = {1: 1, 2: 2, 3: 5, 4: 20, 5: 50}
 
-WEIGHTS = [
-    100,
-    75,
-    65,
-    50,
-    25,
-    10,
-    5,
-    2
-]
+WEIGHTS = [100, 75, 65, 50, 25, 10, 5, 2]
 
 PHRASES = [
-    'Will you get lucky?',
+    "Will you get lucky?",
     "You're feeling lucky I see",
     "You're on a roll",
-    'Keep going hotshot',
-    'Good fortune in your future',
+    "Keep going hotshot",
+    "Good fortune in your future",
     "Dang you're good",
-    'Ohh come on, one more try!',
-    'Absolutely Stupendous!',
-    'This is the start of something great',
-    'Right on!',
-    'High score incoming!'
+    "Ohh come on, one more try!",
+    "Absolutely Stupendous!",
+    "This is the start of something great",
+    "Right on!",
+    "High score incoming!",
 ]
 
 log = get_logger(__name__)
@@ -72,45 +57,42 @@ SLOTS_COMMAND_COOLDOWN = 30
 
 
 class OgSlotsCog(commands.Cog):
-
     def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
     @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
-    @ext.long_help(
-        'A slot machine inside discord with a chance to win fame and fortune'
-    )
-    @ext.short_help('How lucky are you?')
-    @ext.example('slots')
+    @ext.long_help("A slot machine inside discord with a chance to win fame and fortune")
+    @ext.short_help("How lucky are you?")
+    @ext.example("slots")
     async def ogslots(self, ctx):
         results = random.choices(Symbols.combined, weights=WEIGHTS, k=5)
         score = self.calculate_score(results)
 
-        output = list('⬜' * len(results))
+        output = list("⬜" * len(results))
 
         quote = random.choice(PHRASES)
 
-        slotstitle = '💎 ClemBot Slot Machine 💎'
+        slotstitle = "💎 ClemBot Slot Machine 💎"
 
         def slots_rolling(input, spinstatus):
-            slotembed = discord.Embed(title=f'{slotstitle}',
-                                      color=Colors.ClemsonOrange,
-                                      description=quote)
+            slotembed = discord.Embed(
+                title=f"{slotstitle}", color=Colors.ClemsonOrange, description=quote
+            )
 
             slotembed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             slotembed.add_field(name=input, value=spinstatus, inline=False)
             return slotembed
 
-        msg = await ctx.send(embed=slots_rolling(' | '.join(output), 'Spinning!!'))
+        msg = await ctx.send(embed=slots_rolling(" | ".join(output), "Spinning!!"))
 
         for i in range(len(results)):
             output[i] = results[i]
-            await msg.edit(embed=slots_rolling(' | '.join(output), 'Spinning!!'))
+            await msg.edit(embed=slots_rolling(" | ".join(output), "Spinning!!"))
             await asyncio.sleep(1)
 
-        final = slots_rolling(' | '.join(output), 'Spin Complete')
-        final.add_field(name='SCORE!!', value=score)
+        final = slots_rolling(" | ".join(output), "Spin Complete")
+        final.add_field(name="SCORE!!", value=score)
 
         await msg.edit(embed=final)
 

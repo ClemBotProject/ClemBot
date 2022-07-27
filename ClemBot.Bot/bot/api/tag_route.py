@@ -6,61 +6,58 @@ from bot.models import Tag
 
 
 class TagRoute(BaseRoute):
-
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def create_tag(self, name: str, content: str, guild_id: int, user_id: int, **kwargs) -> t.Optional[Tag]:
+    async def create_tag(
+        self, name: str, content: str, guild_id: int, user_id: int, **kwargs
+    ) -> t.Optional[Tag]:
         json = {
-            'Name': name,
-            'Content': content,
-            'GuildId': guild_id,
-            'UserId': user_id,
+            "Name": name,
+            "Content": content,
+            "GuildId": guild_id,
+            "UserId": user_id,
         }
-        tag_dict = await self._client.post('tags', data=json, **kwargs)
+        tag_dict = await self._client.post("tags", data=json, **kwargs)
         if not tag_dict:
             return None
         return Tag(**tag_dict)
 
-    async def edit_tag_content(self, guild_id: int, name: str, content: str, **kwargs) -> t.Optional[Tag]:
-        json = {
-            'GuildId': guild_id,
-            'Name': name,
-            'Content': content
-        }
-        tag_dict = await self._client.patch('bot/tags', data=json, **kwargs)
+    async def edit_tag_content(
+        self, guild_id: int, name: str, content: str, **kwargs
+    ) -> t.Optional[Tag]:
+        json = {"GuildId": guild_id, "Name": name, "Content": content}
+        tag_dict = await self._client.patch("bot/tags", data=json, **kwargs)
         if not tag_dict:
             return None
         return Tag(**tag_dict)
 
-    async def edit_tag_owner(self, guild_id: int, name: str, user_id: int, **kwargs) -> t.Optional[Tag]:
-        json = {
-            'GuildId': guild_id,
-            'Name': name,
-            'UserId': user_id
-        }
-        tag_dict = await self._client.patch('bot/tags', data=json, **kwargs)
+    async def edit_tag_owner(
+        self, guild_id: int, name: str, user_id: int, **kwargs
+    ) -> t.Optional[Tag]:
+        json = {"GuildId": guild_id, "Name": name, "UserId": user_id}
+        tag_dict = await self._client.patch("bot/tags", data=json, **kwargs)
         if not tag_dict:
             return None
         return Tag(**tag_dict)
 
     async def get_tag(self, guild_id: int, name: str) -> t.Optional[Tag]:
         json = {
-            'GuildId': guild_id,
-            'Name': name,
+            "GuildId": guild_id,
+            "Name": name,
         }
-        tag_dict = await self._client.get('bot/tags', data=json)
+        tag_dict = await self._client.get("bot/tags", data=json)
         if not tag_dict:
             return None
         return Tag(**tag_dict)
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
         json = {
-            'GuildId': guild_id,
-            'Name': name,
+            "GuildId": guild_id,
+            "Name": name,
         }
-        resp = await self._client.get('bot/tags', data=json)
-        return None if resp is None else resp['content']
+        resp = await self._client.get("bot/tags", data=json)
+        return None if resp is None else resp["content"]
 
     async def delete_tag(self, guild_id: int, name: str, **kwargs):
         """
@@ -71,10 +68,10 @@ class TagRoute(BaseRoute):
         - guildId   The guild id the tag was in.
         """
         json = {
-            'GuildId': guild_id,
-            'Name': name,
+            "GuildId": guild_id,
+            "Name": name,
         }
-        return await self._client.delete('bot/tags', data=json, **kwargs)
+        return await self._client.delete("bot/tags", data=json, **kwargs)
 
     async def add_tag_use(self, guild_id: int, name: str, channel_id: int, user_id: int):
         """
@@ -83,27 +80,24 @@ class TagRoute(BaseRoute):
         - name      The name of the tag.
         - guildId   The guild id the tag is in.
         """
-        json = {
-            'GuildId': guild_id,
-            'Name': name,
-            'ChannelId': channel_id,
-            'UserId': user_id
-        }
+        json = {"GuildId": guild_id, "Name": name, "ChannelId": channel_id, "UserId": user_id}
 
-        return await self._client.post('bot/tags/invoke', data=json)
+        return await self._client.post("bot/tags/invoke", data=json)
 
     async def get_guilds_tags(self, guild_id: int) -> t.Iterator[Tag]:
-        resp = await self._client.get(f'guilds/{guild_id}/tags')
+        resp = await self._client.get(f"guilds/{guild_id}/tags")
 
         if not resp:
             return []
 
-        return [Tag(**i) for i in resp['tags']]
+        return [Tag(**i) for i in resp["tags"]]
 
     async def search_tags(self, guild_id: int, query: str, limit: int = 5) -> list[Tag]:
-        resp = await self._client.get('bot/tags/search', data={'query': query, 'guildId': guild_id, 'limit': limit})
+        resp = await self._client.get(
+            "bot/tags/search", data={"query": query, "guildId": guild_id, "limit": limit}
+        )
 
         if not resp:
             return []
 
-        return [Tag(**i) for i in resp['tags']]
+        return [Tag(**i) for i in resp["tags"]]

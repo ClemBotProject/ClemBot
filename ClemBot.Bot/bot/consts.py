@@ -2,11 +2,12 @@ from enum import Enum, auto
 
 
 class Urls:
-    base_api_url = 'api/'
+    base_api_url = "api/"
 
 
 class Colors:
     """Hex Color values"""
+
     Error = 0xE20000
     ClemsonOrange = 0xF56600
 
@@ -73,7 +74,7 @@ class Claims(Enum):
 
     @staticmethod
     def get_claims_str() -> str:
-        return '\n'.join(name for name, _ in Claims.__members__.items())
+        return "\n".join(name for name, _ in Claims.__members__.items())
 
 
 class DiscordLimits:
@@ -82,11 +83,11 @@ class DiscordLimits:
 
 
 class Infractions:
-    mute = 'Mute'
-    ban = 'Ban'
-    warn = 'Warn'
+    mute = "Mute"
+    ban = "Ban"
+    warn = "Warn"
 
 
 class Moderation:
-    mute_role_name = 'ClemBot Mute'
+    mute_role_name = "ClemBot Mute"
     max_reason_length = 1018  # 1024 - 6 ("```reason```")

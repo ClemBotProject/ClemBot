@@ -26,56 +26,67 @@ def crab_pillow_process(args: str, lines_in_text: int, timestamp: int) -> None:
     """Creates the crab gif and saves it to a file"""
 
     # Open crab.gif and add our font
-    with Image.open('bot/cogs/memes_cog/assets/crab.gif') as im:
-        fnt = ImageFont.truetype('bot/cogs/memes_cog/assets/LemonMilk.otf', 11)
+    with Image.open("bot/cogs/memes_cog/assets/crab.gif") as im:
+        fnt = ImageFont.truetype("bot/cogs/memes_cog/assets/LemonMilk.otf", 11)
 
         # Draw text on each frame of the gif
         # Gonna be honest I don't quite understand how it works but I got it from the Pillow docs/issues
         frames = []
         for frame in ImageSequence.Iterator(im):
-            frame = frame.quantize(colors=254) # quantize to make color palette size 254, leaving room for white and ClemsonOrange
+            frame = frame.quantize(
+                colors=254
+            )  # quantize to make color palette size 254, leaving room for white and ClemsonOrange
             d = ImageDraw.Draw(frame)
             w, h = d.textsize(args, fnt)
             # draws the text on to the frame. Tries to center horizontally and tries to go as close to the bottom as possible
-            d.text((im.size[0] / 2 - w / 2, im.size[1] - h - (7 * lines_in_text)), args, font=fnt, align='center',
-                   fill="#ffffff", stroke_width=2, stroke_fill=f'#{hex(Colors.ClemsonOrange)[2:]}', spacing=6)
+            d.text(
+                (im.size[0] / 2 - w / 2, im.size[1] - h - (7 * lines_in_text)),
+                args,
+                font=fnt,
+                align="center",
+                fill="#ffffff",
+                stroke_width=2,
+                stroke_fill=f"#{hex(Colors.ClemsonOrange)[2:]}",
+                spacing=6,
+            )
             del d
 
             b = io.BytesIO()
-            frame.save(b, format='GIF')
+            frame.save(b, format="GIF")
             frame = Image.open(b)
             frames.append(frame)
 
-        frames[0].save(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif', save_all=True, append_images=frames[1:])
+        frames[0].save(
+            f"bot/cogs/memes_cog/assets/out_{timestamp}.gif",
+            save_all=True,
+            append_images=frames[1:],
+        )
 
 
 class MemesCog(commands.Cog):
-
     def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
-    @ext.long_help(
-        'A fun command to generate a pseudo bubblewrap effect in discord'
-    )
-    @ext.short_help('Creates bubblewrap!')
-    @ext.example('bubblewrap')
+    @ext.long_help("A fun command to generate a pseudo bubblewrap effect in discord")
+    @ext.short_help("Creates bubblewrap!")
+    @ext.example("bubblewrap")
     async def bubblewrap(self, ctx: commands.Context[ClemBot]):
-        msg = ''
+        msg = ""
         for _ in range(0, 5):
             for _ in range(0, 10):
-                msg += '||pop!|| '
-            msg += '\n'
+                msg += "||pop!|| "
+            msg += "\n"
 
         await ctx.send(msg)
 
     @commands.command()
     @ext.long_help(
-        'A fun command to generate a wheres waldo effect in discord, see if you can find him first!'
-        'Optionally takes a size parameter to make it easier or harder'
+        "A fun command to generate a wheres waldo effect in discord, see if you can find him first!"
+        "Optionally takes a size parameter to make it easier or harder"
     )
-    @ext.short_help('Can you find him?')
-    @ext.example(('waldo', 'waldo 10'))
+    @ext.short_help("Can you find him?")
+    @ext.example(("waldo", "waldo 10"))
     async def waldo(self, ctx: commands.Context[ClemBot], size: int = MAX_WALDO_GRID_SIZE):
         """
         Play Where's Waldo!
@@ -83,40 +94,63 @@ class MemesCog(commands.Cog):
         Usage: <prefix>waldo [size = 100]
         """
 
-        random_start_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X',
-                                'Y', 'Z']
+        random_start_letters = [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "X",
+            "Y",
+            "Z",
+        ]
 
         max_waldo_line_size = 6
         new_line_waldo_chance = 10
-        msg = ''
+        msg = ""
         count = 0
         place = random.randint(0, size)
 
         for i in range(size + 1):
             if i == place:
-                msg += '||`WALDO`|| '
+                msg += "||`WALDO`|| "
                 count += 1
             else:
                 helper = random.randint(0, len(random_start_letters) - 1)
                 letter = random_start_letters[helper]
-                msg += f'||`{letter}ALDO`|| '
+                msg += f"||`{letter}ALDO`|| "
                 count += 1
 
             new_line = random.randint(0, 100)
 
             if new_line < new_line_waldo_chance or count > max_waldo_line_size:
-                msg += '\n'
+                msg += "\n"
                 count = 0
 
         await ctx.send(msg)
 
     @ext.command()
     @ext.chainable()
-    @ext.long_help(
-        'A fun command to spongebob meme text in discord'
-    )
-    @ext.short_help('sO yOu doNt KnOw wHat tHiS Is?')
-    @ext.example('spongebob hello world')
+    @ext.long_help("A fun command to spongebob meme text in discord")
+    @ext.short_help("sO yOu doNt KnOw wHat tHiS Is?")
+    @ext.example("spongebob hello world")
     async def spongebob(self, ctx: commands.Context, *, args: str):
         """
         Spongebob Text
@@ -125,7 +159,7 @@ class MemesCog(commands.Cog):
         random.seed(time.time())
         args = args.replace('"', "'")
 
-        result = ''
+        result = ""
         for i in args:
             helper = random.randint(0, 100)
 
@@ -136,15 +170,13 @@ class MemesCog(commands.Cog):
 
         await ctx.send(result)
 
-    @ext.command(aliases=['rave', '🦀'])
+    @ext.command(aliases=["rave", "🦀"])
     @commands.cooldown(1, CRAB_COMMAND_COOLDOWN, commands.BucketType.guild)
-    @ext.long_help(
-        'A fun command to generate a crab rave gif with specified text overlay'
-    )
-    @ext.short_help('Generates a crab rave gif')
+    @ext.long_help("A fun command to generate a crab rave gif with specified text overlay")
+    @ext.short_help("Generates a crab rave gif")
     @ext.chainable_input()
-    @ext.example('crab hello from crab world')
-    async def crab(self, ctx: commands.Context[ClemBot], *, args: str = 'Bottom text\n is dead'):
+    @ext.example("crab hello from crab world")
+    async def crab(self, ctx: commands.Context[ClemBot], *, args: str = "Bottom text\n is dead"):
         """
         Create your own crab rave.
         Usage: <prefix>crab [text=Bottom text\\n is dead]
@@ -153,8 +185,8 @@ class MemesCog(commands.Cog):
         # crab.gif dimensions - 352 by 200
         # Immediately grab the timestamp incase of multiple calls in a row
         timestamp = datetime.datetime.utcnow().microsecond
-        wait_msg = await ctx.send('Generating your gif')
-        args = args.replace('\\', '')
+        wait_msg = await ctx.send("Generating your gif")
+        args = args.replace("\\", "")
 
         # Add new lines for when the text would go out of bounds
         lines_in_text = 1
@@ -167,7 +199,7 @@ class MemesCog(commands.Cog):
                     newline_loc = CRAB_LINE_LENGTH * lines_in_text
                     break
 
-            args = f'{args[:newline_loc]} \n{args[newline_loc:]}'
+            args = f"{args[:newline_loc]} \n{args[newline_loc:]}"
             lines_in_text += 1
 
         loop = self.bot.loop
@@ -176,13 +208,15 @@ class MemesCog(commands.Cog):
             await loop.run_in_executor(pool, crab_pillow_process, *pil_args)
 
         # Attach, send, and delete created gif
-        attachment = discord.File(filename=f'out_{timestamp}.gif', fp=f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
+        attachment = discord.File(
+            filename=f"out_{timestamp}.gif", fp=f"bot/cogs/memes_cog/assets/out_{timestamp}.gif"
+        )
         msg = await ctx.send(file=attachment)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
         await wait_msg.delete()
-        os.remove(f'bot/cogs/memes_cog/assets/out_{timestamp}.gif')
+        os.remove(f"bot/cogs/memes_cog/assets/out_{timestamp}.gif")
 
-    @ext.command(hidden=True, aliases=['ctray', 'trayforjay'])
+    @ext.command(hidden=True, aliases=["ctray", "trayforjay"])
     async def cookouttray(self, ctx: commands.Context[ClemBot], input: str):
         """
         For those who do finances with cookout trays, we proudly present the command for you
@@ -204,15 +238,16 @@ class MemesCog(commands.Cog):
 
         Clicking the link "Cash to Cookout Tray Converter" in the output will also take you to cookout's website
         """
-        
+
         money = round(float(input), 2)
         output = money / 5
 
         embed = discord.Embed(
-            title='Cash to Cookout Tray Converter',
-            description=f'{ctx.message.author.mention} ${money} is approximately {output} cookout trays',
+            title="Cash to Cookout Tray Converter",
+            description=f"{ctx.message.author.mention} ${money} is approximately {output} cookout trays",
             url="https://www.fastfoodmenuprices.com/cookout-prices/",
-            color=Colors.ClemsonOrange)
+            color=Colors.ClemsonOrange,
+        )
         await ctx.send(embed=embed)
 
 

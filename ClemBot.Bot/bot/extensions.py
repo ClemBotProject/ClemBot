@@ -6,7 +6,9 @@ from discord.ext.commands.errors import BadArgument
 from bot.consts import Claims
 
 
-def command(name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]] = None, **attrs: t.Any) -> t.Callable[..., "ClemBotCommand"]:
+def command(
+    name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]] = None, **attrs: t.Any
+) -> t.Callable[..., "ClemBotCommand"]:
     """
     -----------
     name: :class:`str`
@@ -23,12 +25,18 @@ def command(name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]
     TypeError
         If the function is not a coroutine or is already a command.
     """
-    
+
     cls_ = cls or ClemBotCommand
 
-    def wrapper(func: (ClemBotCommand | t.Callable[..., t.Any] | discord.ext.commands.Command[t.Any, t.Any, t.Any])) -> ClemBotCommand:
+    def wrapper(
+        func: (
+            ClemBotCommand
+            | t.Callable[..., t.Any]
+            | discord.ext.commands.Command[t.Any, t.Any, t.Any]
+        )
+    ) -> ClemBotCommand:
         if isinstance(func, ClemBotCommand):
-            raise TypeError('Callback is already a command.')
+            raise TypeError("Callback is already a command.")
 
         return cls_(func, name=name, **attrs)
 
@@ -48,7 +56,7 @@ def chainable(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.chainable_output = chainable
         else:
-            setattr(func, 'chainable_output', chainable)
+            setattr(func, "chainable_output", chainable)
 
         return func
 
@@ -60,7 +68,7 @@ def chainable_input(chainable: bool = True) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.chainable_output = chainable
         else:
-            setattr(func, 'chainable_input', chainable)
+            setattr(func, "chainable_input", chainable)
 
         return func
 
@@ -78,7 +86,7 @@ def long_help(help_str: str) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.long_help = help_str
         else:
-            setattr(func, 'long_help', help_str)
+            setattr(func, "long_help", help_str)
 
         return func
 
@@ -90,7 +98,7 @@ def short_help(help_str: str) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.short_help = help_str
         else:
-            setattr(func, 'short_help', help_str)
+            setattr(func, "short_help", help_str)
 
         return func
 
@@ -102,7 +110,7 @@ def example(help_str: str | t.Iterable[str]) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.example = help_str
         else:
-            setattr(func, 'example', help_str)
+            setattr(func, "example", help_str)
 
         return func
 
@@ -111,7 +119,7 @@ def example(help_str: str | t.Iterable[str]) -> T_EXTBASE_DECO_WRAP:
 
 def ignore_claims_pre_invoke() -> T_EXTBASE_DECO_WRAP:
     """
-    Tells the bot to not do a claim check before the command is invoked, allowing you to defer the check 
+    Tells the bot to not do a claim check before the command is invoked, allowing you to defer the check
     to inside the command
     """
 
@@ -119,7 +127,7 @@ def ignore_claims_pre_invoke() -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.ignore_claims_pre_invoke = True
         else:
-            setattr(func, 'ignore_claims_pre_invoke', True)
+            setattr(func, "ignore_claims_pre_invoke", True)
 
         return func
 
@@ -136,7 +144,7 @@ def required_claims(*claims: Claims) -> T_EXTBASE_DECO_WRAP:
         if isinstance(func, ExtBase):
             func.claims.update(set_claims)
         else:
-            setattr(func, 'claims', set_claims)
+            setattr(func, "claims", set_claims)
 
         return func
 
@@ -145,13 +153,17 @@ def required_claims(*claims: Claims) -> T_EXTBASE_DECO_WRAP:
 
 class ExtBase:
     def __init__(self, func: t.Any, **kwargs: t.Any) -> None:
-        self.chainable_output = kwargs.get('chainable_output', False) or getattr(func, 'chainable_output', False)
-        self.chainable_input = kwargs.get('chainable_input', False) or getattr(func, 'chainable_input', False)
-        self.long_help = kwargs.get('long_help') or getattr(func, 'long_help', None)
-        self.short_help = kwargs.get('short_help') or getattr(func, 'short_help', None)
-        self.example = kwargs.get('example') or getattr(func, 'example', None)
-        self.claims: set[str] = kwargs.get('claims') or getattr(func, 'claims', None) or set()
-        self.ignore_claims_pre_invoke = getattr(func, 'ignore_claims_pre_invoke', False)
+        self.chainable_output = kwargs.get("chainable_output", False) or getattr(
+            func, "chainable_output", False
+        )
+        self.chainable_input = kwargs.get("chainable_input", False) or getattr(
+            func, "chainable_input", False
+        )
+        self.long_help = kwargs.get("long_help") or getattr(func, "long_help", None)
+        self.short_help = kwargs.get("short_help") or getattr(func, "short_help", None)
+        self.example = kwargs.get("example") or getattr(func, "example", None)
+        self.claims: set[str] = kwargs.get("claims") or getattr(func, "claims", None) or set()
+        self.ignore_claims_pre_invoke = getattr(func, "ignore_claims_pre_invoke", False)
 
     def claims_check(self, claims: list[str]) -> bool:
         """
@@ -173,7 +185,6 @@ class ExtBase:
 
 
 class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase):
-
     def __init__(self, func: t.Callable[..., t.Coroutine[None, None, t.Any]], **kwargs: t.Any):
         discord.ext.commands.Command.__init__(self, func, **kwargs)
 
@@ -190,7 +201,7 @@ class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase)
         """
 
         def decorator(func: t.Any) -> ClemBotCommand:
-            kwargs.setdefault('parent', self)
+            kwargs.setdefault("parent", self)
             result: ClemBotCommand = super.command(*args, **kwargs)(func)  # type: ignore
             super.add_command(result)  # type: ignore
             return result
@@ -206,13 +217,14 @@ def group(name: t.Optional[str] = None, **attrs: t.Any) -> t.Callable[..., "Clem
         The ``cls`` parameter can now be passed.
     """
 
-    attrs.setdefault('cls', ClemBotGroup)
+    attrs.setdefault("cls", ClemBotGroup)
     return t.cast(t.Callable[..., ClemBotGroup], command(name=name, **attrs))
 
 
 class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
-
-    def __init__(self, func: t.Callable[..., t.Coroutine[None, None, t.Any]], **kwargs: t.Any) -> None:
+    def __init__(
+        self, func: t.Callable[..., t.Coroutine[None, None, t.Any]], **kwargs: t.Any
+    ) -> None:
         discord.ext.commands.Group.__init__(self, func, **kwargs)
         ExtBase.__init__(self, func, **kwargs)
 
@@ -226,13 +238,13 @@ class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
         """
 
         def decorator(func: t.Any) -> ClemBotCommand:
-            kwargs.setdefault('parent', self)
+            kwargs.setdefault("parent", self)
             result = command(*args, **kwargs)(func)
             self.add_command(result)
             return result
 
         return decorator
-    
+
     def group(self, name=None, **attrs) -> t.Callable[..., "ClemBotGroup"]:  # type: ignore
         """A shortcut decorator that invokes :func:`.command` and adds it to
         the internal command list via :meth:`~.GroupMixin.add_command`.
@@ -241,6 +253,5 @@ class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
         Callable[..., :class:`Command`]
             A decorator that converts the provided method into a Command, adds it to the bot, then returns it.
         """
-        attrs.setdefault('cls', ClemBotGroup)
+        attrs.setdefault("cls", ClemBotGroup)
         return t.cast(t.Callable[..., ClemBotGroup], self.command(name=name, **attrs))
-

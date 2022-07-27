@@ -10,7 +10,6 @@ log = get_logger(__name__)
 
 
 class CustomPrefix:
-
     def __init__(self, *, default: str):
         log.info(f'Setting default prefix too: "{default}""')
         self.default = default
@@ -26,10 +25,12 @@ class CustomPrefix:
             try:
                 # Try to grab the prefixes from the db, raise an error on failure
                 # and bailout, we cant respond to anything at the moment
-                prefixes = await bot.custom_prefix_route.get_custom_prefixes(message.guild.id, raise_on_error=True)
+                prefixes = await bot.custom_prefix_route.get_custom_prefixes(
+                    message.guild.id, raise_on_error=True
+                )
             except Exception as e:
-                log.error('Custom prefix request failed with error: {error}', error=e)
-                raise PrefixRequestError('Requesting custom prefix from the api failed')
+                log.error("Custom prefix request failed with error: {error}", error=e)
+                raise PrefixRequestError("Requesting custom prefix from the api failed")
 
         if len(prefixes) == 0:
             prefixes = [self.default]

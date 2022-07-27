@@ -18,12 +18,12 @@ MIN_REACTIONS = 4
 
 # dictionary of rankings
 RANKINGS = {
-    0: '⭐ POPULAR',
-    1: '🌟 QUALITY',
-    2: '🥉 *THE PEOPLE HAVE SPOKEN*',
-    3: '🥈 *INCREDIBLE*',
-    4: '🥇 **LEGENDARY**',
-    5: '🏆 ***GOD-TIER***',
+    0: "⭐ POPULAR",
+    1: "🌟 QUALITY",
+    2: "🥉 *THE PEOPLE HAVE SPOKEN*",
+    3: "🥈 *INCREDIBLE*",
+    4: "🥇 **LEGENDARY**",
+    5: "🏆 ***GOD-TIER***",
 }
 
 
@@ -35,7 +35,6 @@ class StarboardPost:
 
 
 class StarboardService(BaseService):
-
     def __init__(self, *, bot):
         super().__init__(bot)
         self.curr_posts = {}
@@ -45,7 +44,7 @@ class StarboardService(BaseService):
     def update_check(self, user: discord.User, reaction: discord.Reaction) -> bool:
 
         # emote verification - stars only
-        if str(reaction) != '⭐':
+        if str(reaction) != "⭐":
             return False
 
         # orignal poster reactions don't count
@@ -70,20 +69,22 @@ class StarboardService(BaseService):
         embed = discord.Embed(
             title=title,
             color=Colors.ClemsonOrange,
-            description=f'_Posted in {message.channel.mention}_ by {message.author.mention}'
+            description=f"_Posted in {message.channel.mention}_ by {message.author.mention}",
         )
 
         embed.set_thumbnail(url=message.author.display_avatar.url)
         embed.set_footer(text=f'Sent on {message.created_at.strftime("%m/%d/%Y")}')
 
         if len(message.content) > 0:
-            for i, chunk in enumerate(self.chunk_iterable(message.content, DiscordLimits.EmbedFieldLength)):
-                embed.add_field(name='Message' if i < 1 else 'Continued', value=chunk, inline=False)
+            for i, chunk in enumerate(
+                self.chunk_iterable(message.content, DiscordLimits.EmbedFieldLength)
+            ):
+                embed.add_field(name="Message" if i < 1 else "Continued", value=chunk, inline=False)
 
         if len(message.attachments) > 0:
             embed.set_image(url=message.attachments[0].url)
 
-        embed.add_field(name='Link', value=f'[Click Me!]({message.jump_url})')
+        embed.add_field(name="Link", value=f"[Click Me!]({message.jump_url})")
         return embed
 
     # function to add an entry from the starboard
@@ -104,7 +105,7 @@ class StarboardService(BaseService):
             DesignatedChannels.starboard,
             reaction.message.guild.id,
             starboard_message,
-            callback_id
+            callback_id,
         )
 
     @BaseService.Listener(Events.on_designated_message_sent)
@@ -144,7 +145,7 @@ class StarboardService(BaseService):
 
     def chunk_iterable(self, iterable, chunk_size):
         for i in range(0, len(iterable), chunk_size):
-            yield iterable[i:i + chunk_size]
+            yield iterable[i : i + chunk_size]
 
     async def load_service(self):
         pass

@@ -6,7 +6,6 @@ log = get_logger(__name__)
 
 
 class AssignableRolesService(BaseService):
-
     def __init__(self, *, bot):
         super().__init__(bot)
 

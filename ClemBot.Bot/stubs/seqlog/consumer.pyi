@@ -12,7 +12,14 @@ class QueueConsumer:
     callback: Incomplete
     batch_size: Incomplete
     auto_flush_timeout: Incomplete
-    def __init__(self, name: Any, queue: Any, callback: Any, batch_size: Any, auto_flush_timeout: Incomplete | None = ...) -> None: ...
+    def __init__(
+        self,
+        name: Any,
+        queue: Any,
+        callback: Any,
+        batch_size: Any,
+        auto_flush_timeout: Incomplete | None = ...,
+    ) -> None: ...
     @property
     def current_batch_size(self) -> Any: ...
     def flush(self) -> None: ...

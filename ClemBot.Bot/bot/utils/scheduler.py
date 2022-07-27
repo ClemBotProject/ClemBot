@@ -16,7 +16,6 @@ log = get_logger(__name__)
 
 
 class Scheduler:
-
     def __init__(self) -> None:
         self._scheduled_tasks: t.Dict[t.Hashable, asyncio.Task] = {}
 
@@ -36,15 +35,15 @@ class Scheduler:
 
         Returns:
 
-            uuid: Unique Identifier for the scheduled task 
+            uuid: Unique Identifier for the scheduled task
         """
 
         delay_time = (time - datetime.utcnow()).total_seconds()
         if delay_time < 0:
-            raise BadArgument('Scheduled task contained invalid negative time')
+            raise BadArgument("Scheduled task contained invalid negative time")
 
         if callback is None:
-            raise BadArgument('Scheduled callback was none')
+            raise BadArgument("Scheduled callback was none")
 
         return self._schedule(delay_time, callback)
 
@@ -64,14 +63,14 @@ class Scheduler:
 
         Returns:
 
-            uuid: Unique Identifier for the scheduled task 
+            uuid: Unique Identifier for the scheduled task
         """
 
         if callback is None:
-            raise BadArgument('Scheduled callback was none')
+            raise BadArgument("Scheduled callback was none")
 
         if time < 0:
-            raise BadArgument('Scheduled task contained invalid negative time')
+            raise BadArgument("Scheduled task contained invalid negative time")
 
         return self._schedule(time, callback)
 
@@ -88,7 +87,7 @@ class Scheduler:
         try:
             self._scheduled_tasks[task_id].cancel()
         except KeyError:
-            log.error('Tried to cancel non existent task - Id: {task_id}', task_id=str(task_id))
+            log.error("Tried to cancel non existent task - Id: {task_id}", task_id=str(task_id))
             raise
 
         del self._scheduled_tasks[task_id]
@@ -97,7 +96,11 @@ class Scheduler:
 
         task_id = uuid.uuid4()
 
-        log.info('Scheduling coroutine - Id: {task_id} for execution in {time} seconds', task_id=str(task_id), time=time)
+        log.info(
+            "Scheduling coroutine - Id: {task_id} for execution in {time} seconds",
+            task_id=str(task_id),
+            time=time,
+        )
 
         del_coro = self._delayed_coro(time, coro, task_id)
         # creates a non-blocking task that elides the await
@@ -109,22 +112,30 @@ class Scheduler:
         self._scheduled_tasks[task_id] = task
         return task_id
 
-    async def _delayed_coro(self, delay: t.Union[float, int], coro: t.Awaitable, task_id: uuid.UUID):
+    async def _delayed_coro(
+        self, delay: t.Union[float, int], coro: t.Awaitable, task_id: uuid.UUID
+    ):
         try:
             # await the timed delay
-            log.info('Waiting {delay} seconds before executing coroutine with Id: {task_id}', delay=delay, task_id=str(task_id))
+            log.info(
+                "Waiting {delay} seconds before executing coroutine with Id: {task_id}",
+                delay=delay,
+                task_id=str(task_id),
+            )
             await asyncio.sleep(delay)
 
             # time is up, execute the callback
-            log.info('Delay complete for coroutine {task_id}; executing coroutine', task_id=str(task_id))
+            log.info(
+                "Delay complete for coroutine {task_id}; executing coroutine", task_id=str(task_id)
+            )
             await asyncio.shield(coro)
         # use a finally so that the coro is closed even if it throws
         finally:
-            if inspect.getcoroutinestate(coro) == 'CORO_CREATED':
-                log.info('Explicitly closing the coroutine for #{task_id}.', task_id=str(task_id))
+            if inspect.getcoroutinestate(coro) == "CORO_CREATED":
+                log.info("Explicitly closing the coroutine for #{task_id}.", task_id=str(task_id))
                 coro.close()
             else:
-                log.info('Finally block reached for #{task_id}', task_id=str(task_id))
+                log.info("Finally block reached for #{task_id}", task_id=str(task_id))
 
     def _end_scheduled_task(self, task_id, coro):
         finished_task = self._scheduled_tasks.get(task_id)

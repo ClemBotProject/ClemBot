@@ -18,22 +18,21 @@ log = get_logger(__name__)
 
 
 class CalculatorCog(commands.Cog):
-
     def __init__(self, bot: ClemBot):
         self.operators = [
-            {'symbol': "+", 'precedence': 0, 'assoc': "L"},
-            {'symbol': "-", 'precedence': 0, 'assoc': "L"},
-            {'symbol': "*", 'precedence': 1, 'assoc': "L"},
-            {'symbol': "/", 'precedence': 1, 'assoc': "L"},
-            {'symbol': "^", 'precedence': 2, 'assoc': "R"},
+            {"symbol": "+", "precedence": 0, "assoc": "L"},
+            {"symbol": "-", "precedence": 0, "assoc": "L"},
+            {"symbol": "*", "precedence": 1, "assoc": "L"},
+            {"symbol": "/", "precedence": 1, "assoc": "L"},
+            {"symbol": "^", "precedence": 2, "assoc": "R"},
         ]
 
     @ext.command()
     @ext.long_help(
-        'Native calculator in discord to evaluate any arbitrary mathematical expressions'
+        "Native calculator in discord to evaluate any arbitrary mathematical expressions"
     )
-    @ext.short_help('Does your math for you')
-    @ext.example(('calc 1+1', 'calc 10/20'))
+    @ext.short_help("Does your math for you")
+    @ext.example(("calc 1+1", "calc 10/20"))
     async def calc(self, ctx: commands.Context[ClemBot], *args: str):
         """
         A simple calculator that supports pemdas.
@@ -45,7 +44,7 @@ class CalculatorCog(commands.Cog):
 
         expression = " ".join(args)
         # issue parsing ,'s. Better to remove them
-        expression = expression.replace(',', '')
+        expression = expression.replace(",", "")
         try:
             result = self.parse_postfix(self.parse_expression(expression))
 
@@ -66,18 +65,18 @@ class CalculatorCog(commands.Cog):
         assert op1 is not None
         assert op2 is not None
 
-        return op1['precedence'] <= op2['precedence']
+        return op1["precedence"] <= op2["precedence"]
 
     # searches through a list operators and return its information
     def search_operators_symbol(self, symbol: str) -> t.Optional[dict[str, t.Any]]:
         for operator in self.operators:
-            if symbol == operator['symbol']:
+            if symbol == operator["symbol"]:
                 return operator
 
     # checks if symbol is an operator
     def is_operator(self, symbol: str) -> bool:
         for op in self.operators:
-            if symbol == op['symbol']:
+            if symbol == op["symbol"]:
                 return True
 
         return False
@@ -109,7 +108,7 @@ class CalculatorCog(commands.Cog):
 
         if numbers <= operators:
             return False
-            
+
         return True
 
     def preprocess(self, expression: str) -> str:
@@ -126,7 +125,10 @@ class CalculatorCog(commands.Cog):
                     processed += f"{currentToken} * "
                     index += 1
                 # Checks for implicit negative conversions
-                elif currentToken == "-" and (index == 0 or (self.is_op(expression[index - 1]) and expression[index - 1] != ")")):
+                elif currentToken == "-" and (
+                    index == 0
+                    or (self.is_op(expression[index - 1]) and expression[index - 1] != ")")
+                ):
                     processed += "-1 * "
                     index += 1
                 else:
@@ -173,7 +175,7 @@ class CalculatorCog(commands.Cog):
 
         if self.validate_expression(tokens) is False:
             raise ParserError("Equation not properly balanced")
-            
+
         output_queue = []
 
         operator_stack = []
@@ -194,16 +196,19 @@ class CalculatorCog(commands.Cog):
 
             elif token == ")":
                 # Ensures that proper precedence is followed with parentheses
-                while self.get_top_stack(operator_stack) != '(':
+                while self.get_top_stack(operator_stack) != "(":
                     output_queue.append(self.get_top_stack(operator_stack))
                     operator_stack.pop()
 
                 operator_stack.pop()
             elif self.is_operator(token):
                 # Makes sure precedence is followed for operators
-                while (len(operator_stack) != 0 and (self.get_top_stack(operator_stack) not in "()")
-                       and self.compare_precedence(token, self.get_top_stack(operator_stack))
-                       and self.search_operators_symbol(token)['assoc'] == "L"):
+                while (
+                    len(operator_stack) != 0
+                    and (self.get_top_stack(operator_stack) not in "()")
+                    and self.compare_precedence(token, self.get_top_stack(operator_stack))
+                    and self.search_operators_symbol(token)["assoc"] == "L"
+                ):
                     output_queue.append(self.get_top_stack(operator_stack))
                     operator_stack.pop()
                 operator_stack.append(token)
@@ -222,7 +227,7 @@ class CalculatorCog(commands.Cog):
         elif sign == "*":
             result = num1 * num2
         elif sign == "^":
-            result = num1 ** num2
+            result = num1**num2
         else:
             result = num1 / num2
 

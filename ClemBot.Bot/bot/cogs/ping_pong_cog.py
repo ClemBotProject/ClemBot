@@ -11,10 +11,12 @@ class PingPongCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @ext.command(name='ping', aliases=['pong'])
-    @ext.long_help('Shows the latency between the bot\'s internal components and Discord as well as ClemBot\'s API')
-    @ext.short_help('shows bot latency')
-    @ext.example('ping')
+    @ext.command(name="ping", aliases=["pong"])
+    @ext.long_help(
+        "Shows the latency between the bot's internal components and Discord as well as ClemBot's API"
+    )
+    @ext.short_help("shows bot latency")
+    @ext.example("ping")
     async def ping(self, ctx: commands.Context) -> None:
         start = time.perf_counter()
         await self.bot.health_check_route.ping()

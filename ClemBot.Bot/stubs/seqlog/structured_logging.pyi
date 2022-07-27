@@ -4,7 +4,9 @@ import typing as tp
 from .consumer import QueueConsumer as QueueConsumer
 from _typeshed import Incomplete
 
-_SysExcInfoType: tp.TypeAlias = tp.Union[tuple[type[BaseException], BaseException, TracebackType | None], tuple[None, None, None]]
+_SysExcInfoType: tp.TypeAlias = tp.Union[
+    tuple[type[BaseException], BaseException, TracebackType | None], tuple[None, None, None]
+]
 _ExcInfoType: tp.TypeAlias = None | bool | _SysExcInfoType | BaseException
 
 def get_global_log_properties(logger_name: Incomplete | None = ...) -> tp.Any: ...
@@ -15,12 +17,37 @@ def set_callback_on_failure(callback: tp.Callable[[Exception], None]) -> None: .
 
 class StructuredLogRecord(logging.LogRecord):
     log_props: Incomplete
-    def __init__(self, name: tp.Any, level: tp.Any, pathname: tp.Any, lineno: tp.Any, msg: tp.Any, args: tp.Any, exc_info: tp.Any, func: Incomplete | None = ..., sinfo: Incomplete | None = ..., log_props: Incomplete | None = ..., **kwargs: tp.Any) -> None: ...
+    def __init__(
+        self,
+        name: tp.Any,
+        level: tp.Any,
+        pathname: tp.Any,
+        lineno: tp.Any,
+        msg: tp.Any,
+        args: tp.Any,
+        exc_info: tp.Any,
+        func: Incomplete | None = ...,
+        sinfo: Incomplete | None = ...,
+        log_props: Incomplete | None = ...,
+        **kwargs: tp.Any,
+    ) -> None: ...
     def getMessage(self) -> tp.Any: ...
 
 class StructuredLogger(logging.Logger):
     def __init__(self, name: tp.Any, level: tp.Any = ...) -> None: ...
-    def makeRecord(self, name: tp.Any, level: tp.Any, fn: tp.Any, lno: tp.Any, msg: tp.Any, args: tp.Any, exc_info: tp.Any, func: Incomplete | None = ..., extra: Incomplete | None = ..., sinfo: Incomplete | None = ...) -> tp.Any: ...
+    def makeRecord(
+        self,
+        name: tp.Any,
+        level: tp.Any,
+        fn: tp.Any,
+        lno: tp.Any,
+        msg: tp.Any,
+        args: tp.Any,
+        exc_info: tp.Any,
+        func: Incomplete | None = ...,
+        extra: Incomplete | None = ...,
+        sinfo: Incomplete | None = ...,
+    ) -> tp.Any: ...
     def debug(
         self,
         msg: object,
@@ -94,7 +121,19 @@ class StructuredLogger(logging.Logger):
 
 class StructuredRootLogger(logging.RootLogger):
     def __init__(self, level: tp.Any = ...) -> None: ...
-    def makeRecord(self, name: tp.Any, level: tp.Any, fn: tp.Any, lno: tp.Any, msg: tp.Any, args: tp.Any, exc_info: tp.Any, func: Incomplete | None = ..., extra: Incomplete | None = ..., sinfo: Incomplete | None = ...) -> tp.Any: ...
+    def makeRecord(
+        self,
+        name: tp.Any,
+        level: tp.Any,
+        fn: tp.Any,
+        lno: tp.Any,
+        msg: tp.Any,
+        args: tp.Any,
+        exc_info: tp.Any,
+        func: Incomplete | None = ...,
+        extra: Incomplete | None = ...,
+        sinfo: Incomplete | None = ...,
+    ) -> tp.Any: ...
 
 class ConsoleStructuredLogHandler(logging.Handler):
     def __init__(self) -> None: ...
@@ -106,9 +145,15 @@ class SeqLogHandler(logging.Handler):
     json_encoder_class: Incomplete
     log_queue: Incomplete
     consumer: Incomplete
-    def __init__(self, server_url: tp.Any, api_key: Incomplete | None = ..., batch_size: int = ..., auto_flush_timeout: Incomplete | None = ..., json_encoder_class: Incomplete | None = ...) -> None: ...
+    def __init__(
+        self,
+        server_url: tp.Any,
+        api_key: Incomplete | None = ...,
+        batch_size: int = ...,
+        auto_flush_timeout: Incomplete | None = ...,
+        json_encoder_class: Incomplete | None = ...,
+    ) -> None: ...
     def flush(self) -> None: ...
     def emit(self, record: tp.Any) -> None: ...
     def close(self) -> None: ...
     def publish_log_batch(self, batch: tp.Iterable[StructuredLogRecord]) -> None: ...
-

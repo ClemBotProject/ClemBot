@@ -17,27 +17,27 @@ class EventsMeta(type):
 
             None
         """
-        return 'on_example'
+        return "on_example"
 
     @property
     def on_guild_message_received(self) -> str:
         """
         Published whenever a message is sent in a server
-        
+
         Args:
             message (Message) – The deleted message.
         """
-        return 'on_guild_message_received'
+        return "on_guild_message_received"
 
     @property
     def on_dm_message_received(self) -> str:
         """
         Published whenever a direct message is sent to ClemBot
-        
+
         Args:
             message (Message) – The deleted message.
         """
-        return 'on_dm_message_received'
+        return "on_dm_message_received"
 
     @property
     def on_raw_message_edit(self) -> str:
@@ -48,7 +48,7 @@ class EventsMeta(type):
 
             payload (Edit Object) – The edit payload with the id of the edited message
         """
-        return 'on_raw_message_edit'
+        return "on_raw_message_edit"
 
     @property
     def on_message_edit(self) -> str:
@@ -60,7 +60,7 @@ class EventsMeta(type):
             before (Message) – The previous version of the message.
             after (Message) – The current version of the message.
         """
-        return 'on_message_edit'
+        return "on_message_edit"
 
     @property
     def on_raw_message_delete(self) -> str:
@@ -71,7 +71,7 @@ class EventsMeta(type):
 
             payload (Edit Object) – The delete payload with the id of the edited message
         """
-        return 'on_raw_message_delete'
+        return "on_raw_message_delete"
 
     @property
     def on_message_delete(self) -> str:
@@ -82,7 +82,7 @@ class EventsMeta(type):
 
             message (Message) – The message that was deleted
         """
-        return 'on_message_delete'
+        return "on_message_delete"
 
     @property
     def on_reaction_add(self) -> str:
@@ -91,11 +91,11 @@ class EventsMeta(type):
         in d.pys internal cache
 
         Args:
-            
+
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who added the reaction.
         """
-        return 'on_reaction_add'
+        return "on_reaction_add"
 
     @property
     def on_raw_reaction_add(self) -> str:
@@ -106,7 +106,7 @@ class EventsMeta(type):
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return 'on_raw_reaction_add'
+        return "on_raw_reaction_add"
 
     @property
     def on_reaction_remove(self) -> str:
@@ -119,7 +119,7 @@ class EventsMeta(type):
             reaction (Reaction) – The current state of the reaction.
             user (Union[Member, User]) – The user who removed the reaction.
         """
-        return 'on_reaction_remove'
+        return "on_reaction_remove"
 
     @property
     def on_raw_reaction_remove(self) -> str:
@@ -130,7 +130,7 @@ class EventsMeta(type):
 
             payload (RawReactionActionEvent) – The raw event payload data.
         """
-        return 'on_raw_reaction_remove'
+        return "on_raw_reaction_remove"
 
     @property
     def on_guild_joined(self) -> str:
@@ -139,9 +139,9 @@ class EventsMeta(type):
 
         Args:
 
-            guild (Guild) – The guild that was joined.    
+            guild (Guild) – The guild that was joined.
         """
-        return 'on_guild_joined'
+        return "on_guild_joined"
 
     @property
     def on_guild_update(self) -> str:
@@ -153,7 +153,7 @@ class EventsMeta(type):
             before (Guild) – The guild object that was before.
             after (Guild) - The Guild object after
         """
-        return 'on_guild_update'
+        return "on_guild_update"
 
     @property
     def on_guild_leave(self) -> str:
@@ -162,9 +162,9 @@ class EventsMeta(type):
 
         Args:
 
-            guild (Guild) – The guild that was left.    
+            guild (Guild) – The guild that was left.
         """
-        return 'on_guild_leave'
+        return "on_guild_leave"
 
     @property
     def on_new_guild_initialized(self) -> str:
@@ -175,77 +175,77 @@ class EventsMeta(type):
 
         Args:
 
-            guild (Guild) – The guild that was joined.    
+            guild (Guild) – The guild that was joined.
         """
-        return 'on_new_guild_initialized'
+        return "on_new_guild_initialized"
 
     @property
     def on_guild_role_create(self) -> str:
         """
         published whenever a guild role is created in a guild
-        
+
         Args:
 
             role (Role) – The role that was created or deleted.
         """
-        return 'on_guild_role_create'
+        return "on_guild_role_create"
 
     @property
     def on_guild_role_update(self) -> str:
         """
         published whenever a guild role is updated in a guild
-        
+
         Args:
 
             before (Role) – The updated role’s old info.
             after (Role) – The updated role’s updated info.
         """
-        return 'on_guild_role_update'
+        return "on_guild_role_update"
 
     @property
     def on_guild_role_delete(self) -> str:
         """
         published whenever a guild role is deleted in a guild
-        
+
         Args:
 
             role (Role) – The role that was created or deleted.
         """
-        return 'on_guild_role_delete'
+        return "on_guild_role_delete"
 
     @property
     def on_user_joined(self) -> str:
         """
         Published whenever a new user joins a guild
-        
+
         Args:
 
             user (User) – The user who joined or left.
         """
-        return 'on_user_joined'
+        return "on_user_joined"
 
     @property
     def on_user_removed(self) -> str:
         """
         Published whenever a user leaves a guild
-        
+
         Args:
 
             user (User) – The user who was removed or left.
         """
-        return 'on_user_removed'
+        return "on_user_removed"
 
     @property
     def on_user_update(self) -> str:
         """
         Published whenever a user updates themselves
-        
+
         Args:
 
-            before (User) – The updated user’s old info. 
+            before (User) – The updated user’s old info.
             after (User) – The updated user’s updated info.
         """
-        return 'on_user_update'
+        return "on_user_update"
 
     @property
     def on_add_designated_channel(self) -> str:
@@ -256,7 +256,7 @@ class EventsMeta(type):
 
             channel (Channel) the channel object that was added
         """
-        return 'on_add_designated_channel'
+        return "on_add_designated_channel"
 
     @property
     def on_send_in_designated_channel(self) -> str:
@@ -270,12 +270,12 @@ class EventsMeta(type):
             message (union[embed, str]) the message to be sent to the channel
             id [Optional] (int) Id to associate a sent dc message with sent message ids at the publish site
         """
-        return 'on_send_in_designated_channel'
+        return "on_send_in_designated_channel"
 
     @property
     def on_designated_message_sent(self) -> str:
         """
-        Published when an on_send_in_designate_channel event is published with an optional id parameter, 
+        Published when an on_send_in_designate_channel event is published with an optional id parameter,
         this serves as a callback for that event to maintain seperation of concerns
 
         Args:
@@ -283,7 +283,7 @@ class EventsMeta(type):
             dc_id (int) The id of the dc send event that was given to the dc service
             message (Union[discord.Message, list[discord.Message]]) the message or the list of The messages sent in dc channels
         """
-        return 'on_designated_message_sent'
+        return "on_designated_message_sent"
 
     @property
     def on_broadcast_designated_channel(self) -> str:
@@ -296,7 +296,7 @@ class EventsMeta(type):
             channel_type (str) The designated channel to broadcast the message to
             message (union[embed, str]) the message to be sent to the channels
         """
-        return 'on_broadcast_designated_channel'
+        return "on_broadcast_designated_channel"
 
     @property
     def on_set_custom_prefix(self) -> str:
@@ -308,7 +308,7 @@ class EventsMeta(type):
             guild (discord.Guild): The guild object of the added prefix
             prefix (str): The prefix to be added
         """
-        return 'on_set_custom_prefix'
+        return "on_set_custom_prefix"
 
     @property
     def on_assignable_role_add(self) -> str:
@@ -318,7 +318,7 @@ class EventsMeta(type):
         Args:
             role (discord.Role) The role to mark as assignable
         """
-        return 'on_assignable_role_add'
+        return "on_assignable_role_add"
 
     @property
     def on_assignable_role_remove(self) -> str:
@@ -328,19 +328,19 @@ class EventsMeta(type):
         Args:
             role (discord.Role) The role to remove as assignable
         """
-        return 'on_assignable_role_remove'
+        return "on_assignable_role_remove"
 
     @property
     def on_set_deletable(self) -> str:
         """
         Published when a bot message is needed to be able to be deleted
-        
+
         Args:
             messagesToDelete (List[discord.Message]) Messages to be deleted
-            author (discord.Member) member who called the bot 
+            author (discord.Member) member who called the bot
             roles (str) Stores the roles needed to delete the message
         """
-        return 'on_set_deletable'
+        return "on_set_deletable"
 
     @property
     def on_guild_channel_create(self) -> str:
@@ -350,7 +350,7 @@ class EventsMeta(type):
         Args:
             channel (discord.TextChannel): The new channel
         """
-        return 'on_guild_channel_create'
+        return "on_guild_channel_create"
 
     @property
     def on_guild_channel_delete(self) -> str:
@@ -360,7 +360,7 @@ class EventsMeta(type):
         Args:
             channel (discord.TextChannel): The deleted channel
         """
-        return 'on_guild_channel_delete'
+        return "on_guild_channel_delete"
 
     @property
     def on_guild_channel_update(self) -> str:
@@ -371,35 +371,35 @@ class EventsMeta(type):
             before (discord.TextChannel): The before of the channel
             after (discord.TextChannel): The after of the channel
         """
-        return 'on_guild_channel_update'
+        return "on_guild_channel_update"
 
     @property
     def on_set_pageable_text(self) -> str:
         """
         Published when a bot message is needed to be able to be paginate
-        
+
         Args:
             embed_name (str): name of the embed
-            field_title (str): name for the field/page 
+            field_title (str): name for the field/page
             pages (list[str]): a list of every page/field for the embed
-            author (discord.Member): member who called the bot 
+            author (discord.Member): member who called the bot
             channel (discord.TextChannel): the channel to send the embed
-            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s 
+            timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s
         """
-        return 'on_set_pageable_text'
+        return "on_set_pageable_text"
 
     @property
     def on_set_pageable_embed(self) -> str:
         """
         Published when a list of embeds is needed to be able to paginate
-        
+
         Args:
             pages (list[discord.Embed]): a list of embeds to scroll through
             author (discord.Member): member who called the bot
             channel (discord.TextChannel): the channel to send the embed
             timeout (int): optional arg, time(seconds) for paginate to timeout, default is 60s
         """
-        return 'on_set_pageable_embed'
+        return "on_set_pageable_embed"
 
     @property
     def on_member_update(self) -> str:
@@ -412,18 +412,18 @@ class EventsMeta(type):
             roles
             pending
         """
-        return 'on_member_update'
+        return "on_member_update"
 
     @property
     def on_set_reminder(self) -> str:
         """
-            Published when a person sets a reminder 
-            Args:
-                userId (int)
-                wait (converters.Duration)
-                message (str)
+        Published when a person sets a reminder
+        Args:
+            userId (int)
+            wait (converters.Duration)
+            message (str)
         """
-        return 'on_reminder_set'
+        return "on_reminder_set"
 
     @property
     def on_bot_mute(self) -> str:
@@ -436,7 +436,7 @@ class EventsMeta(type):
             subject (discord.Member): The moderated user
             reason (Optional[str]): The reason for the mute
         """
-        return 'on_bot_mute'
+        return "on_bot_mute"
 
     @property
     def on_bot_unmute(self) -> str:
@@ -449,7 +449,7 @@ class EventsMeta(type):
             mute_id (int): The id of a pardoned mute
             reason (Optional[str]): The reason for the unmute
         """
-        return 'on_bot_unmute'
+        return "on_bot_unmute"
 
     @property
     def on_bot_warn(self) -> str:
@@ -462,7 +462,7 @@ class EventsMeta(type):
             subject (discord.Member): The moderated user
             reason (Optional[str]): The reason for the warn
         """
-        return 'on_bot_warn'
+        return "on_bot_warn"
 
     @property
     def on_bot_ban(self) -> str:
@@ -475,7 +475,7 @@ class EventsMeta(type):
             subject (discord.Member): The moderated user
             reason (Optional[str]): The reason for the ban
         """
-        return 'on_bot_ban'
+        return "on_bot_ban"
 
     @property
     def on_member_ban(self) -> str:
@@ -486,7 +486,7 @@ class EventsMeta(type):
             guild (discord.Guild): Guild id where the ban happened
             user (discord.Member): member who was banned
         """
-        return 'on_member_ban'
+        return "on_member_ban"
 
     @property
     def on_after_command_invoke(self) -> str:
@@ -496,7 +496,7 @@ class EventsMeta(type):
         Args:
             context (commands.Context): context of the command that was invoked
         """
-        return 'on_after_command_invoke'
+        return "on_after_command_invoke"
 
     @property
     def on_guild_thread_join(self) -> str:
@@ -506,7 +506,7 @@ class EventsMeta(type):
         Args:
             thread (discord.Thread): The new thread
         """
-        return 'on_guild_thread_join'
+        return "on_guild_thread_join"
 
     @property
     def on_guild_thread_update(self) -> str:
@@ -517,7 +517,7 @@ class EventsMeta(type):
             before (discord.Thread): The before of the thread
             after (discord.Thread): The after of the thread
         """
-        return 'on_guild_thread_update'
+        return "on_guild_thread_update"
 
 
 class Events(metaclass=EventsMeta):

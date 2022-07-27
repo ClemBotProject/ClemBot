@@ -5,7 +5,7 @@ TRIGRAM_SET: TypeAlias = set[tuple[str, ...]]
 
 
 class BankSearchEntry:
-    __slots__ = ('item', 'similarity')
+    __slots__ = ("item", "similarity")
 
     def __init__(self, item: str, similarity: float):
         self.item = item
@@ -13,19 +13,25 @@ class BankSearchEntry:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BankSearchEntry):
-            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
-        
+            raise TypeError(
+                f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}"
+            )
+
         return self.similarity == other.similarity
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, BankSearchEntry):
-            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
+            raise TypeError(
+                f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}"
+            )
 
         return self.similarity < other.similarity
 
     def __gt__(self, other: object) -> bool:
         if not isinstance(other, BankSearchEntry):
-            raise TypeError(f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}")
+            raise TypeError(
+                f"Unsupported comparison between {BankSearchEntry.__qualname__} and {type(other).__qualname__}"
+            )
 
         return self.similarity > other.similarity
 
@@ -34,7 +40,7 @@ class BankSearchEntry:
 
 
 def make_trigrams(item: str) -> TRIGRAM_SET:
-    return set(nltk.trigrams(f'  {item}  '))
+    return set(nltk.trigrams(f"  {item}  "))
 
 
 def compare(a: TRIGRAM_SET, b: TRIGRAM_SET) -> float:
