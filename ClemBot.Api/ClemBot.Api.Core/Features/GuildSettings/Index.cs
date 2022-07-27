@@ -12,13 +12,6 @@ public class Index
         public ConfigSettings Setting { get; init; }
     }
 
-    public class Config
-    {
-        public ConfigSettings Setting { get; init; }
-
-        public object? Value { get; init; }
-    }
-
     public class Model : IResponseModel
     {
         public Dictionary<ConfigSettings, object> Settings { get; init; } = null!;

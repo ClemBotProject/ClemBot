@@ -90,3 +90,6 @@ class Infractions:
 class Moderation:
     mute_role_name = 'ClemBot Mute'
     max_reason_length = 1018  # 1024 - 6 ("```reason```")
+
+
+TAG_INVOKE_REGEX = r'{tag_prefix}([^\s]+)'

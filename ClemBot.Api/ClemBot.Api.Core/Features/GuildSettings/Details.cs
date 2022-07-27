@@ -31,11 +31,7 @@ public class Details
 
         public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var setting = request.Setting switch
-            {
-                ConfigSettings.allow_embed_links => await _settingsService.GetCanEmbedLink(request.GuildId),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            var setting = await _settingsService.GetPropertyAsync(request.Setting, request.GuildId);
 
             return QueryResult<Model>.Success(
                 new Model
