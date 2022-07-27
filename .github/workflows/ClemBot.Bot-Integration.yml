@@ -5,7 +5,7 @@ name: ClemBot.Bot Master integration
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, hoover-max-extract-60-pressure-pro-2 ]
     paths: 
       - "ClemBot.Bot/**"
   pull_request:
