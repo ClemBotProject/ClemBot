@@ -12,7 +12,7 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Colors
 from bot.messaging.events import Events
-from bot.utils.converters import DurationDelta, Duration
+from bot.utils.converters import FutureDuration
 
 log = logging.getLogger(__name__)
 SLOTS_COMMAND_COOLDOWN = 30
@@ -121,9 +121,8 @@ class RandomCog(commands.Cog):
     )
     @ext.short_help('Create giveaways!')
     @ext.example(('raffle 1h this is fun', 'raffle 1d a whole day raffle!'))
-    async def raffle(self, ctx, time: DurationDelta, *, reason):
-        time = Duration(ctx, time)
-        wait = (time.as_future() - datetime.utcnow()).total_seconds()
+    async def raffle(self, ctx, time: FutureDuration, *, reason):
+        wait = (time - datetime.utcnow()).total_seconds()
 
         description = f'Raffle for {reason}\nReact with :tickets: to enter the raffle'
         embed = discord.Embed(title='RAFFLE', color=Colors.ClemsonOrange, description=description)

@@ -114,6 +114,7 @@ public class UsersController : ControllerBase
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
 }

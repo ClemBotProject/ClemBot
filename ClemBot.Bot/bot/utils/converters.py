@@ -2,11 +2,11 @@ import re
 import typing as t
 from datetime import datetime
 
-import arrow
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import ConversionError
 from discord.ext.commands.errors import UserInputError
+
 from bot.consts import Claims
 from bot.errors import ConversionError
 
@@ -52,45 +52,28 @@ class DurationDelta(Converter):
         return delta
 
 
-class Duration(DurationDelta):
-    """Convert duration strings into UTC datetime.datetime objects."""
+class FutureDuration(DurationDelta):
+    """Convert duration strings into UTC datetime.datetime objects represented in the future."""
 
-    def __init__(self, ctx: Context, duration: t.Union[str, relativedelta]):
-        self.ctx = ctx
-        self.duration = duration
-        if isinstance(duration, relativedelta):
-            self.delta = duration
-        else:  # super.convert() is an async method - this is not
-            match = self.duration_parser.fullmatch(duration)
-            if not match:
-                raise ConversionError(f'`{duration}` is not a valid duration string.')
-            duration_dict = {unit: int(amount) for unit, amount in match.groupdict(default=0).items()}
-            self.delta = relativedelta(**duration_dict)
-
-    def as_future(self) -> datetime:
-        """
-        Converts a `duration` string to a datetime object that's `duration` is in the future.
-        The converter supports the same symbols for each unit of time as its parent class.
-        """
+    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
         try:
-            return now + self.delta
+            return now + delta
         except ValueError:
-            raise ConversionError(f'`{self.duration}` results in a datetime outside of the supported range.')
+            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
 
-    def as_past(self) -> datetime:
-        """
-        Converts a `duration` string to a datetime object that's `duration` is in the past.
-        The converter supports the same symbols for each unit of time as its parent class.
-        """
+
+class PastDuration(DurationDelta):
+    """Converts duration strings into UTC datetime.datetime objects represented in the past."""
+
+    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
         try:
-            return now - self.delta
+            return now - delta
         except ValueError:
-            raise ConversionError(f'`{self.duration}` results in a datetime outside of the supported range.')
-
-    def __str__(self):
-        return arrow.get(datetime.utcnow() + self.delta).humanize(only_distance=True)
+            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
 
 
 class ClaimsConverter(Converter):

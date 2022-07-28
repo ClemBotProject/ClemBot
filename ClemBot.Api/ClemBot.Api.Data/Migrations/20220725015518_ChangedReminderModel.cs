@@ -42,46 +42,16 @@ namespace ClemBot.Api.Data.Migrations
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "GuildId",
-                table: "Reminders",
-                type: "numeric(20,0)",
-                nullable: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reminders_GuildId",
-                table: "Reminders",
-                column: "GuildId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Reminders_Guilds_GuildId",
-                table: "Reminders",
-                column: "GuildId",
-                principalTable: "Guilds",
-                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Reminders_Guilds_GuildId",
-                table: "Reminders");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Reminders_GuildId",
-                table: "Reminders");
-
             migrationBuilder.DropColumn(
                 name: "Content",
                 table: "Reminders");
 
             migrationBuilder.DropColumn(
                 name: "Dispatched",
-                table: "Reminders");
-
-            migrationBuilder.DropColumn(
-                name: "GuildId",
                 table: "Reminders");
 
             migrationBuilder.AlterColumn<DateTime>(

@@ -12,8 +12,6 @@ from bot.models import Reminder
 from bot.utils import converters
 from bot.utils.helpers import parse_datetime
 
-from bot.utils.converters import Duration
-
 log = logging.getLogger(__name__)
 
 
@@ -53,11 +51,9 @@ class RemindCog(commands.Cog):
     @reminder.command()
     @ext.long_help('Add a reminder.')
     @ext.short_help('Add a reminder.')
-    async def add(self, ctx: commands.Context, wait: converters.DurationDelta, *, content: t.Optional[str]):
-        wait = Duration(ctx, wait)
-        time = wait.as_future()
+    async def add(self, ctx: commands.Context, wait: converters.FutureDuration, *, content: t.Optional[str]):
         try:
-            await self.bot.messenger.publish(Events.on_set_reminder, ctx, time, content)
+            await self.bot.messenger.publish(Events.on_set_reminder, ctx, wait, content)
         except Exception as e:
             log.error('Failed to create reminder.', exc_info=e)
             return await self._error_embed(ctx, 'Failed to create reminder.')

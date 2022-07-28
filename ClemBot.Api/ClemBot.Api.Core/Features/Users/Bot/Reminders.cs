@@ -46,6 +46,11 @@ public class Reminders
 
         public async Task<IQueryResult<List<ReminderDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
+            if (!await _context.Users.AnyAsync(u => u.Id == request.UserId))
+            {
+                return QueryResult<List<ReminderDto>>.NotFound();
+            }
+
             var reminders = await _context.Reminders
                 .Where(r => r.UserId == request.UserId && !r.Dispatched)
                 .Select(item => new ReminderDto
