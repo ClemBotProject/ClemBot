@@ -16,7 +16,9 @@ log = get_logger(__name__)
 
 
 class CalculatorCog(commands.Cog):
+
     def __init__(self, bot: ClemBot):
+        self.bot = bot
         self.operators = [
             {"symbol": "+", "precedence": 0, "assoc": "L"},
             {"symbol": "-", "precedence": 0, "assoc": "L"},
@@ -31,7 +33,7 @@ class CalculatorCog(commands.Cog):
     )
     @ext.short_help("Does your math for you")
     @ext.example(("calc 1+1", "calc 10/20"))
-    async def calc(self, ctx: commands.Context[ClemBot], *args: str):
+    async def calc(self, ctx: commands.Context[ClemBot], *args: str) -> None:
         """
         A simple calculator that supports pemdas.
         Examples:
@@ -56,20 +58,21 @@ class CalculatorCog(commands.Cog):
         await ctx.send(embed=embed)
 
     # compares the precedence of two operators
-    def compare_precedence(self, operator1: str, operator2: str):
+    def compare_precedence(self, operator1: str, operator2: str) -> bool:
         op1 = self.search_operators_symbol(operator1)
         op2 = self.search_operators_symbol(operator2)
 
         assert op1 is not None
         assert op2 is not None
 
-        return op1["precedence"] <= op2["precedence"]
+        return bool(op1["precedence"] <= op2["precedence"])
 
     # searches through a list operators and return its information
     def search_operators_symbol(self, symbol: str) -> t.Optional[dict[str, t.Any]]:
         for operator in self.operators:
             if symbol == operator["symbol"]:
                 return operator
+        return None
 
     # checks if symbol is an operator
     def is_operator(self, symbol: str) -> bool:
@@ -165,7 +168,7 @@ class CalculatorCog(commands.Cog):
 
         return processed
 
-    def parse_expression(self, expression: str):
+    def parse_expression(self, expression: str) -> list[str]:
         expression = self.preprocess(expression)
 
         # parse expression into a list of numbers and symbols
@@ -205,8 +208,9 @@ class CalculatorCog(commands.Cog):
                     len(operator_stack) != 0
                     and (self.get_top_stack(operator_stack) not in "()")
                     and self.compare_precedence(token, self.get_top_stack(operator_stack))
-                    and self.search_operators_symbol(token)["assoc"] == "L"
+                    and (self.search_operators_symbol(token) or {}).get("accoc") == "L"
                 ):
+
                     output_queue.append(self.get_top_stack(operator_stack))
                     operator_stack.pop()
                 operator_stack.append(token)
@@ -235,7 +239,7 @@ class CalculatorCog(commands.Cog):
         # stores numbers to calculated
         num_stack = []
 
-        result = 0
+        result: float = 0
 
         for token in expression:
             int_flag = 1
@@ -266,5 +270,5 @@ class CalculatorCog(commands.Cog):
         return result
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(CalculatorCog(bot))

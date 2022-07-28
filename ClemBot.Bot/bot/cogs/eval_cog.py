@@ -7,6 +7,7 @@ import discord.utils as utils
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
@@ -19,7 +20,8 @@ EVAL_COMMAND_COOLDOWN = 2
 
 
 class EvalCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.command(aliases=["e"])
@@ -30,11 +32,13 @@ class EvalCog(commands.Cog):
     )
     @ext.short_help("Runs arbitrary python code in discord")
     @ext.example('eval print("hello world")')
-    async def eval(self, ctx, *, code) -> None:
+    async def eval(self, ctx: commands.Context[ClemBot], *, code: str) -> None:
         code = code.replace("```python", "")
         code = code.replace("```py", "")
         code = code.replace("`", "")
         code = utils.escape_mentions(code)
+
+        assert ctx.guild is not None
 
         feedback_mes = await ctx.send("Code execution started")
         log.info(
@@ -45,6 +49,8 @@ class EvalCog(commands.Cog):
         )
 
         output = await self._post_eval(code)
+        assert output is not None
+
         stdout = output["stdout"]
         stdout = stdout.strip("`")
         stdout = utils.escape_mentions(stdout)
@@ -64,14 +70,14 @@ class EvalCog(commands.Cog):
         else:
             await ctx.send(f"{out}\n\n```[No Output]```")
 
-    def _format(self, resp):
+    def _format(self, resp: str) -> str:
         lines = [f"{(i + 1):03d} | {line}" for i, line in enumerate(resp.split("\n")) if line]
         if len(lines) > MAX_LINE_LENGTH:
             lines = lines[:MAX_LINE_LENGTH]
             lines.append("... Output line limit exceeded, data truncated")
         return "\n".join(lines)
 
-    async def _post_eval(self, code) -> t.Union[str, None]:
+    async def _post_eval(self, code: str) -> t.Any:
         data = {"input": code}
 
         json_data = json.dumps(data)
@@ -84,5 +90,5 @@ class EvalCog(commands.Cog):
                     return json.loads(await resp.text())
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(EvalCog(bot))

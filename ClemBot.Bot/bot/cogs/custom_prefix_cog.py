@@ -5,6 +5,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.utils.logging_utils import get_logger
 
@@ -12,7 +13,8 @@ log = get_logger(__name__)
 
 
 class CustomPrefixCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=["prefixs"])
@@ -22,9 +24,9 @@ class CustomPrefixCog(commands.Cog):
     )
     @ext.short_help("Configure a custom command prefix")
     @ext.example(("prefix", "prefix ?", "prefix >>"))
-    async def prefix(self, ctx, *, prefix: t.Optional[str] = None):
+    async def prefix(self, ctx: commands.Context[ClemBot], *, prefix: t.Optional[str] = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
-        # those are global so we dont care about them
+        # those are global, so we don't care about them
         prefixes = (await self.bot.get_prefix(ctx.message))[2:]
 
         if not prefix:
@@ -34,7 +36,8 @@ class CustomPrefixCog(commands.Cog):
                 color=Colors.ClemsonOrange,
             )
 
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if prefix in await self.bot.get_prefix(ctx.message):
             embed = discord.Embed(title="Error", color=Colors.Error)
@@ -50,6 +53,7 @@ class CustomPrefixCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        assert ctx.guild is not None
         await self.bot.custom_prefix_route.set_custom_prefix(ctx.guild.id, prefix)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
@@ -63,7 +67,7 @@ class CustomPrefixCog(commands.Cog):
     @ext.long_help("resets the bot prefix to the default")
     @ext.short_help("resets a custom prefix")
     @ext.example("prefix reset")
-    async def reset(self, ctx):
+    async def reset(self, ctx: commands.Context[ClemBot]) -> None:
         default_prefix = bot_secrets.secrets.bot_prefix
 
         if default_prefix in await self.bot.get_prefix(ctx.message):
@@ -74,6 +78,7 @@ class CustomPrefixCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        assert ctx.guild is not None
         await self.bot.custom_prefix_route.set_custom_prefix(ctx.guild.id, default_prefix)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
@@ -84,5 +89,5 @@ class CustomPrefixCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(CustomPrefixCog(bot))

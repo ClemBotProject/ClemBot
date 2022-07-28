@@ -3,6 +3,7 @@
 
 import re
 import unicodedata
+import typing as t
 
 import aiohttp
 import discord
@@ -10,6 +11,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
@@ -18,22 +20,23 @@ log = get_logger(__name__)
 API_URL = "https://www.dictionaryapi.com/api/v3/references/collegiate/json/"
 
 
-class defineCog(commands.Cog):
-    def __init__(self, bot):
+class DefineCog(commands.Cog):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
-    def getPageData(self, jsonData, word):
+    def get_pate_data(self, json_data) -> list[str]:
         pages = []
 
         # If the word is not found and there are no suggestions.
-        if not jsonData:
+        if not json_data:
             return ["Word not found."]
 
         # If the word is found, the JSON will return a dictionary of information.
-        if isinstance(jsonData[0], dict):
+        if isinstance(json_data[0], dict):
 
             # For words with several definitions, it will return several dictionaries.
-            for wordData in jsonData:
+            for wordData in json_data:
                 # Stems of the given word (Past Tense, Future Tense, Perfect Tense, etc.)
                 wordStems = wordData.get("meta", {}).get("stems", [])
 
@@ -83,11 +86,11 @@ class defineCog(commands.Cog):
                     pages.append(page)
 
         # If the word cannot be found, the JSON returns a list of other possible suggestions.
-        elif isinstance(jsonData[0], str):
+        elif isinstance(json_data[0], str):
             template = "Word not found, see also: "
-            for s in enumerate(jsonData):
+            for s in enumerate(json_data):
                 template = f"{template} {s[1]}"
-                if s[0] != len(jsonData) - 1:
+                if s[0] != len(json_data) - 1:
                     template = f"{template}, "
 
             pages = [template]
@@ -96,9 +99,9 @@ class defineCog(commands.Cog):
 
     @ext.command()
     @ext.long_help("Gets the dictionary defintion of any given word")
-    @ext.short_help("Gets a words definition")
+    @ext.short_help("Gets a word's definition")
     @ext.example("define hello")
-    async def define(self, ctx, word):
+    async def define(self, ctx: commands.Context[ClemBot], word) -> None:
         """
         Given a word, find its definition and any other relevant information
 
@@ -138,7 +141,7 @@ class defineCog(commands.Cog):
             async with aiohttp.request("get", url) as response:
                 if response.status == 200:
                     jsonData = await response.json()
-                    wordPages = self.getPageData(jsonData, word)
+                    wordPages = self.get_pate_data(jsonData)
 
                 else:
                     embed = discord.Embed(title="Merriam-Webster Dictionary", color=Colors.Error)
@@ -161,5 +164,5 @@ class defineCog(commands.Cog):
             raise Exception(err_str).with_traceback(err.__traceback__)
 
 
-def setup(bot):
-    bot.add_cog(defineCog(bot))
+def setup(bot: ClemBot) -> None:
+    bot.add_cog(DefineCog(bot))

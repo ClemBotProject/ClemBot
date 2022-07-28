@@ -2,6 +2,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.utils.logging_utils import get_logger
 
@@ -9,7 +10,8 @@ log = get_logger(__name__)
 
 
 class DesignatedChannelsCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=["channels"])
@@ -20,7 +22,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Designated channel configuration")
     @ext.example("channel")
-    async def channel(self, ctx):
+    async def channel(self, ctx: commands.Context[ClemBot]) -> None:
         """
         Sends a formatted embed of the possible designated channels and their listeners to
         the context of the command
@@ -32,6 +34,8 @@ class DesignatedChannelsCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        assert ctx.guild is not None
+
         designated_channels = (
             await self.bot.designated_channel_route.get_guild_all_designated_channels(ctx.guild.id)
         )
@@ -42,7 +46,12 @@ class DesignatedChannelsCog(commands.Cog):
                 assigned_channels.append(ctx.bot.get_channel(channel_id))
 
             if len(assigned_channels) != 0:
-                embed_value = "\n".join(c.mention for c in assigned_channels)
+                channels = []
+                for ch in assigned_channels:
+                    if ch is None or isinstance(ch, discord.abc.PrivateChannel):
+                        continue
+                    channels.append(ch)
+                embed_value = "\n".join(c.mention for c in channels)
             else:
                 embed_value = "No channel added"
 
@@ -58,7 +67,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Set a Designated channel")
     @ext.example("channel add user_join_log #some-channel")
-    async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
+    async def add(self, ctx: commands.Context[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
 
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
@@ -72,6 +81,8 @@ class DesignatedChannelsCog(commands.Cog):
         if not DesignatedChannels.has(channel_type):
             await ctx.send(f"The requested designated channel `{channel_type}` does not exist")
             return
+
+        assert ctx.guild is not None
 
         if channel.id in await self.bot.designated_channel_route.get_guild_designated_channel_ids(
             ctx.guild.id, channel_type
@@ -98,11 +109,12 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Removes a Designated channel listing")
     @ext.example("channel delete user_join_log #some-channel")
-    async def delete(self, ctx, channel_type: str, channel: discord.TextChannel):
+    async def delete(self, ctx: commands.Context[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
         """
         Command to delete a registered TextChannel from a designated channel
 
         Args:
+            ctx (commands.Context[ClemBot]): Context
             channel_type (str): Designated channel to remove the textchannel from
             channel (discord.TextChannel): Channel to unregister
         """
@@ -118,6 +130,8 @@ class DesignatedChannelsCog(commands.Cog):
         if not DesignatedChannels.has(channel_type):
             await ctx.send(f"The requested designated channel `{channel_type}` does not exist")
             return
+
+        assert ctx.guild is not None
 
         if (
             channel.id
@@ -140,5 +154,5 @@ class DesignatedChannelsCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(DesignatedChannelsCog(bot))

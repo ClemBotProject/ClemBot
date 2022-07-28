@@ -3,6 +3,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.utils.logging_utils import get_logger
 
@@ -10,17 +11,18 @@ log = get_logger(__name__)
 
 
 class EmoteCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.group(hidden=True, aliases=["emoji"])
-    async def emote(self, ctx):
+    async def emote(self, ctx: commands.Context[ClemBot]) -> None:
         pass
 
     @emote.command()
     @ext.required_claims(Claims.emote_add)
-    async def add(self, ctx: commands.Context, emote, name: str):
-        emote_id = emote.split(":")[2][:-1]
+    async def add(self, ctx: commands.Context[ClemBot], emote: discord.Emoji, name: str) -> None:
+        emote_id = emote.name.split(":")[2][:-1]
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://cdn.discordapp.com/emojis/{emote_id}.gif?v=1") as resp:
                 test_gif = await resp.read()
@@ -28,6 +30,8 @@ class EmoteCog(commands.Cog):
                 f"https://cdn.discordapp.com/emojis/{emote_id}.png?v=1"
             ) as resp2:
                 test_png = await resp2.read()
+
+        assert ctx.guild is not None
 
         try:
             emote = await ctx.guild.create_custom_emoji(name=name, image=test_gif)
@@ -48,5 +52,5 @@ class EmoteCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(EmoteCog(bot))

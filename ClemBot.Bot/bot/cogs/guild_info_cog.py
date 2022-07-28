@@ -3,20 +3,26 @@ import discord
 from discord.ext import commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 
 
 class GuildInfoCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.command()
     @ext.long_help("Shows information on the current Guild/Discord server.")
     @ext.short_help("Shows info on a Discord server.")
     @ext.example("guildinfo")
-    async def guildinfo(self, ctx: commands.Context, guild: discord.Guild = None):
+    async def guildinfo(self, ctx: commands.Context[ClemBot]) -> None:
         guild = ctx.guild
+
+        assert guild is not None
+        assert guild.icon is not None
+        assert guild.owner is not None
 
         embed = discord.Embed(
             color=Colors.ClemsonOrange, title=f"{guild.name} Information [{guild.id}]"
@@ -49,5 +55,5 @@ class GuildInfoCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(GuildInfoCog(bot))

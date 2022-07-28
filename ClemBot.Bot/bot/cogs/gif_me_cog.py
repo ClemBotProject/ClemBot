@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
@@ -14,14 +15,15 @@ log = get_logger(__name__)
 
 
 class GifMeCog(commands.Cog):
-    def __init__(self, bot):
+
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
     @ext.command(aliases=["gif"])
     @ext.long_help("Gets a random gif from giphy")
     @ext.short_help("shows a random gif")
     @ext.example("gifme")
-    async def gifme(self, ctx, *args):
+    async def gifme(self, ctx: commands.Context[ClemBot]) -> None:
 
         params = {"api_key": bot_secrets.secrets.gif_me_token, "rating": "PG-13"}
 
@@ -47,5 +49,5 @@ class GifMeCog(commands.Cog):
         )
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(GifMeCog(bot))
