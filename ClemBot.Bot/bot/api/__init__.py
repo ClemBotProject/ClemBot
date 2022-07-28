@@ -1,4 +1,4 @@
-__all__ = [
+__all__: list[str] = [
     "guild_route",
     "user_route",
     "base_route",

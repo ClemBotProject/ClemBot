@@ -4,7 +4,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
-from discord.ext.commands.errors import ConversionError, UserInputError
+from discord.ext.commands.errors import UserInputError
 
 from bot.consts import Claims
 from bot.errors import ConversionError

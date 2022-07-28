@@ -1,6 +1,7 @@
 import discord
 
 import bot.bot_secrets as bot_secrets
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -15,9 +16,10 @@ class BotPingHelpService(BaseService):
     and provides a helpful embed showing the prefix of ClemBot and a link to the site
     """
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot) -> None:
         super().__init__(bot)
 
+        assert bot.user is not None
         # discord has two ways of mentioning users/accounts for some reason,
         # <@!...> is still used sometimes for some reason?
         self.mention_strs = {f"<@{bot.user.id}>", f"<@!{bot.user.id}>"}

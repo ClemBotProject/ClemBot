@@ -9,14 +9,12 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
-import bot.api as api
+from bot.api import (guild_route)
 import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
 import bot.extensions as ext
 import bot.services as services
 import bot.utils.log_serializers as serializers
-from bot.api import *
-from bot.api import health_check_route
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
 from bot.errors import BotOnlyRequestError, ClaimsAccessError
@@ -37,9 +35,9 @@ class ClemBot(commands.Bot):
     """
 
     # noinspection PyTypeChecker
-    def __init__(self, messenger, scheduler, **kwargs):
+    def __init__(self, messenger: Messenger, scheduler: Scheduler, **kwargs: dict[str, t.Any]) -> None:
         # this super call is to pass the prefix up to the super class
-        super().__init__(**kwargs)
+        super().__init__(**kwargs)  # type: ignore
 
         # Set the error callback in the messenger for queued events
         messenger.error_callback = self.global_error_handler
