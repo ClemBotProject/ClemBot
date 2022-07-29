@@ -1,4 +1,5 @@
 from bot.utils.clem_bot_model import ClemBotModel
+from datetime import datetime
 
 
 class Tag(ClemBotModel):
@@ -20,3 +21,18 @@ class Infraction(ClemBotModel):
     duration: int
     time: str
     active: int
+
+
+class MessageDto(ClemBotModel):
+    id: int
+    content: str
+    guild: int
+    author: int
+    channel: int
+    time: datetime
+
+
+class MessageEditDto(ClemBotModel):
+    id: int
+    content: str
+    time: datetime

@@ -10,7 +10,7 @@ class TagRoute(BaseRoute):
         super().__init__(api_client)
 
     async def create_tag(
-        self, name: str, content: str, guild_id: int, user_id: int, **kwargs
+        self, name: str, content: str, guild_id: int, user_id: int, **kwargs: t.Any
     ) -> t.Optional[Tag]:
         json = {
             "Name": name,
@@ -18,27 +18,36 @@ class TagRoute(BaseRoute):
             "GuildId": guild_id,
             "UserId": user_id,
         }
+
         tag_dict = await self._client.post("tags", data=json, **kwargs)
+
         if not tag_dict:
             return None
+
         return Tag(**tag_dict)
 
     async def edit_tag_content(
-        self, guild_id: int, name: str, content: str, **kwargs
+        self, guild_id: int, name: str, content: str, **kwargs: t.Any
     ) -> t.Optional[Tag]:
         json = {"GuildId": guild_id, "Name": name, "Content": content}
+
         tag_dict = await self._client.patch("bot/tags", data=json, **kwargs)
+
         if not tag_dict:
             return None
+
         return Tag(**tag_dict)
 
     async def edit_tag_owner(
-        self, guild_id: int, name: str, user_id: int, **kwargs
+        self, guild_id: int, name: str, user_id: int, **kwargs: t.Any
     ) -> t.Optional[Tag]:
         json = {"GuildId": guild_id, "Name": name, "UserId": user_id}
+
         tag_dict = await self._client.patch("bot/tags", data=json, **kwargs)
+
         if not tag_dict:
             return None
+
         return Tag(**tag_dict)
 
     async def get_tag(self, guild_id: int, name: str) -> t.Optional[Tag]:
@@ -46,9 +55,12 @@ class TagRoute(BaseRoute):
             "GuildId": guild_id,
             "Name": name,
         }
+
         tag_dict = await self._client.get("bot/tags", data=json)
+
         if not tag_dict:
             return None
+
         return Tag(**tag_dict)
 
     async def get_tag_content(self, guild_id: int, name: str) -> t.Optional[str]:
@@ -56,10 +68,12 @@ class TagRoute(BaseRoute):
             "GuildId": guild_id,
             "Name": name,
         }
+
         resp = await self._client.get("bot/tags", data=json)
+
         return None if resp is None else resp["content"]
 
-    async def delete_tag(self, guild_id: int, name: str, **kwargs):
+    async def delete_tag(self, guild_id: int, name: str, **kwargs: t.Any) -> dict[str, t.Any]:
         """
         Makes a call to the API to delete a tag w/ the given GuildId and Name.
         If successful, the API will return a dict with the given values:
@@ -67,13 +81,15 @@ class TagRoute(BaseRoute):
         - content   The content of the tag.
         - guildId   The guild id the tag was in.
         """
+        
         json = {
             "GuildId": guild_id,
             "Name": name,
         }
-        return await self._client.delete("bot/tags", data=json, **kwargs)
 
-    async def add_tag_use(self, guild_id: int, name: str, channel_id: int, user_id: int):
+        return t.cast(dict[str, t.Any], await self._client.delete("bot/tags", data=json, **kwargs))
+
+    async def add_tag_use(self, guild_id: int, name: str, channel_id: int, user_id: int) -> dict[str, t.Any]:
         """
         Makes a call to the API to say a tag w/ the given Name was used.
         If successful, the API will return a dict with the given values:
@@ -82,9 +98,9 @@ class TagRoute(BaseRoute):
         """
         json = {"GuildId": guild_id, "Name": name, "ChannelId": channel_id, "UserId": user_id}
 
-        return await self._client.post("bot/tags/invoke", data=json)
+        return t.cast(dict[str, t.Any], await self._client.post("bot/tags/invoke", data=json))
 
-    async def get_guilds_tags(self, guild_id: int) -> t.Iterator[Tag]:
+    async def get_guilds_tags(self, guild_id: int) -> list[Tag]:
         resp = await self._client.get(f"guilds/{guild_id}/tags")
 
         if not resp:

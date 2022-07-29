@@ -2,6 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.models import MessageDto, MessageEditDto
 
 
 class MessageRoute(BaseRoute):
@@ -15,9 +16,8 @@ class MessageRoute(BaseRoute):
         guild_id: int,
         author_id: int,
         channel_id: int,
-        **kwargs,
-    ):
-
+        **kwargs: t.Any,
+    ) -> None:
         json = {
             "Messages": [
                 {
@@ -32,8 +32,8 @@ class MessageRoute(BaseRoute):
 
         await self._client.post("bot/messages", data=json, **kwargs)
 
-    async def batch_create_message(self, messages: t.Iterable, **kwargs):
-        messages = [
+    async def batch_create_message(self, messages: list[MessageDto], **kwargs: t.Any) -> None:
+        json = {"Messages": [
             {
                 "Id": m.id,
                 "Content": m.content,
@@ -43,13 +43,11 @@ class MessageRoute(BaseRoute):
                 "Time": m.time.strftime("%Y-%m-%dT%H:%M:%S.%f"),
             }
             for m in messages
-        ]
-
-        json = {"Messages": messages}
+        ]}
 
         await self._client.post("bot/messages", data=json, **kwargs)
 
-    async def edit_message(self, message_id: int, content: str):
+    async def edit_message(self, message_id: int, content: str) -> None:
         json = {
             "Messages": [
                 {
@@ -61,23 +59,22 @@ class MessageRoute(BaseRoute):
 
         await self._client.patch("bot/messages", data=json)
 
-    async def batch_edit_message(self, messages: t.Iterable, **kwargs):
-        messages = [
+    async def batch_edit_message(self, messages: list[MessageEditDto], **kwargs: t.Any) -> None:
+        json = {"Messages": [
             {"Id": m.id, "Content": m.content, "Time": m.time.strftime("%Y-%m-%dT%H:%M:%S.%f")}
             for m in messages
-        ]
+        ]}
 
-        json = {"Messages": messages}
         await self._client.patch("bot/messages", data=json, **kwargs)
 
-    async def get_message(self, message_id: int):
+    async def get_message(self, message_id: int) -> t.Any:
         return await self._client.get(f"bot/messages/{message_id}")
 
-    async def range_count_messages(self, user_id: int, guild_id: int, days: int):
+    async def range_count_messages(self, user_id: int, guild_id: int, days: int) -> int:
         json = {"UserId": user_id, "GuildId": guild_id, "Days": days}
         resp = await self._client.get("bot/messages/Count", data=json)
 
         if not resp:
             return 0
 
-        return resp["messageCount"]
+        return t.cast(int, resp["messageCount"])

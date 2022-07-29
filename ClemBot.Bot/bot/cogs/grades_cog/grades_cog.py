@@ -4,6 +4,7 @@ import typing as t
 import discord
 import discord.ext.commands as commands
 import pandas as pd
+from bot.clem_bot import ClemBot
 
 import bot.extensions as ext
 from bot.consts import Colors
@@ -21,11 +22,15 @@ ASSET_LOCATION = "bot/cogs/grades_cog/assets/"
 
 
 class GradesCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
+
+        self.all_profs: list[discord.Embed] = []
+        self.all_courses: list[discord.Embed] = []
+
         self.load_data()
 
-    def load_data(self):
+    def load_data(self) -> None:
         self.grades_df = pd.DataFrame()
         for file in os.listdir(ASSET_LOCATION):
             self.grades_df = self.grades_df.append(pd.read_csv(f"{ASSET_LOCATION}{file}"))
@@ -66,12 +71,12 @@ class GradesCog(commands.Cog):
     )
     async def grades(
         self,
-        ctx,
+        ctx: commands.Context[ClemBot],
         honors: t.Optional[HonorsConverter] = "non-honors",
         year: t.Optional[int] = MIN_YEAR,
         *,
         course: str,
-    ):
+    ) -> None:
         course = course.upper()
 
         error_title = False
@@ -206,7 +211,7 @@ class GradesCog(commands.Cog):
             "prof all kristi whitehead",
         )
     )
-    async def prof(self, ctx, honors: t.Optional[HonorsConverter] = "non-honors", *, prof):
+    async def prof(self, ctx: commands.Context[ClemBot], honors: t.Optional[HonorsConverter] = "non-honors", *, prof: str) -> None:  # type: ignore
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
@@ -317,17 +322,20 @@ class GradesCog(commands.Cog):
             timeout=360,
         )
 
-    def get_courses(self):
+    def get_courses(self) -> list[discord.Embed]:
         grades = self.grades_df.groupby(["CourseId"]).mean().iterrows()
 
         embeds = []
 
         # begin generating paginated columns
         for chunk in chunk_sequence([prof.name for i, prof in grades], 51):
+            chunk = t.cast(list[str], chunk)
 
             # we need to create the columns on the page so chunk the list again
             content = ""
             for col in chunk_sequence(chunk, 3):
+                col = t.cast(list[str], col)
+
                 # the columns wont have the perfect number of elements every time, we need to append spaces if
                 # the list entries is less then the number of columns
                 while len(col) < 3:
@@ -354,7 +362,7 @@ class GradesCog(commands.Cog):
     @ext.long_help("Lists all available Courses, some Courses will just be a name with no data")
     @ext.short_help("Lists all courses")
     @ext.example("grades list")
-    async def list_grades(self, ctx):
+    async def list_grades(self, ctx: commands.Context[ClemBot]) -> None:
         await self.bot.messenger.publish(
             Events.on_set_pageable_embed,
             pages=self.all_courses,
@@ -363,7 +371,7 @@ class GradesCog(commands.Cog):
             timeout=360,
         )
 
-    def get_profs(self):
+    def get_profs(self) -> list[discord.Embed]:
         profs = self.grades_df.groupby(["Instructor"]).mean().iterrows()
 
         embeds = []
@@ -371,10 +379,12 @@ class GradesCog(commands.Cog):
         # begin generating paginated columns
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         for chunk in chunk_sequence([prof.name for i, prof in profs], TAG_CHUNK_SIZE):
+            chunk = t.cast(list[str], chunk)
 
             # we need to create the columns on the page so chunk the list again
             content = ""
             for col in chunk_sequence(chunk, 2):
+                col = t.cast(list[str], col)
                 # the columns wont have the perfect number of elements every time, we need to append spaces if
                 # the list entries is less then the number of columns
                 while len(col) < 3:
@@ -402,7 +412,7 @@ class GradesCog(commands.Cog):
     )
     @ext.short_help("Lists all professors")
     @ext.example("prof list")
-    async def list_prof(self, ctx):
+    async def list_prof(self, ctx: commands.Context[ClemBot]) -> None:
         await self.bot.messenger.publish(
             Events.on_set_pageable_embed,
             pages=self.all_profs,
@@ -412,5 +422,5 @@ class GradesCog(commands.Cog):
         )
 
 
-def setup(bot):
+def setup(bot: ClemBot) -> None:
     bot.add_cog(GradesCog(bot))
