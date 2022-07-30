@@ -1,3 +1,4 @@
+from __future__ import annotations
 import datetime
 import importlib
 import pkgutil
@@ -9,7 +10,8 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
-from bot.api import (guild_route)
+from bot.api import *
+import bot.api as api
 import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
 import bot.extensions as ext
@@ -25,6 +27,9 @@ from bot.utils.scheduler import Scheduler
 
 log = get_logger(__name__)
 
+if t.TYPE_CHECKING:
+    import bot.services.base_service as base_service
+
 
 class ClemBot(commands.Bot):
     """
@@ -33,6 +38,9 @@ class ClemBot(commands.Bot):
     This handles the sending of all api events
     as well as the dynamic loading of services and cogs
     """
+
+    # Override the parent user type here which is optional, we know that user won't be null
+    user: discord.ClientUser
 
     # noinspection PyTypeChecker
     def __init__(self, messenger: Messenger, scheduler: Scheduler, **kwargs: dict[str, t.Any]) -> None:
@@ -61,37 +69,32 @@ class ClemBot(commands.Bot):
         self._after_invoke = self.on_after_command_invoke
 
         # pylint: disable=undefined-variable
-        self.guild_route: guild_route.GuildRoute = None
-        self.user_route: user_route.UserRoute = None
-        self.role_route: role_route.RoleRoute = None
-        self.channel_route: channel_route.ChannelRoute = None
-        self.message_route: message_route.MessageRoute = None
-        self.tag_route: tag_route.TagRoute = None
-        self.designated_channel_route: designated_channel_route.DesignatedChannelRoute = None
-        self.welcome_message_route: welcome_message_route.WelcomeMessageRoute = None
-        self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None
-        self.custom_tag_prefix_route: custom_tag_prefix_route.CustomTagPrefixRoute = None
-        self.moderation_route: moderation_route.ModerationRoute = None
-        self.claim_route: claim_route.ClaimRoute = None
-        self.commands_route: commands_route.CommandsRoute = None
-        self.thread_route: thread_route.ThreadRoute = None
-        self.slots_score_route: slots_score_route.SlotsScoreRoute = None
-        self.health_check_route: health_check_route.HealthCheckRoute = None
+        self.guild_route: guild_route.GuildRoute = None  # type: ignore
+        self.user_route: user_route.UserRoute = None  # type: ignore
+        self.role_route: role_route.RoleRoute = None  # type: ignore
+        self.channel_route: channel_route.ChannelRoute = None  # type: ignore
+        self.message_route: message_route.MessageRoute = None  # type: ignore
+        self.tag_route: tag_route.TagRoute = None  # type: ignore
+        self.designated_channel_route: designated_channel_route.DesignatedChannelRoute = None  # type: ignore
+        self.welcome_message_route: welcome_message_route.WelcomeMessageRoute = None  # type: ignore
+        self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None  # type: ignore
+        self.custom_tag_prefix_route: custom_tag_prefix_route.CustomTagPrefixRoute = None  # type: ignore
+        self.moderation_route: moderation_route.ModerationRoute = None  # type: ignore
+        self.claim_route: claim_route.ClaimRoute = None  # type: ignore
+        self.commands_route: commands_route.CommandsRoute = None  # type: ignore
+        self.thread_route: thread_route.ThreadRoute = None  # type: ignore
+        self.slots_score_route: slots_score_route.SlotsScoreRoute = None  # type: ignore
+        self.health_check_route: health_check_route.HealthCheckRoute = None  # type: ignore
 
-        self.load_cogs()
-        self.active_services = {}
+        self.active_services: dict[str, base_service.BaseService] = {}
 
-        # Create a task to handle service and api startup
-        self.loop.create_task(self.bot_startup())
-
-    async def bot_startup(self):
+    async def setup_hook(self) -> None:
         """
         This is the entry point of the bot that is run after discord.py has finished its startup procedures.
         This is where services are loaded and the startup procedures for each service is run
         """
 
-        # Asynchronously wait until the api is ready for us
-        await self.wait_until_ready()
+        await self.load_cogs()
 
         # Load the route objects into the attributes so the
         # startup service has active routes
@@ -116,7 +119,7 @@ class ClemBot(commands.Bot):
 
         await self.send_startup_log_embed(embed)
 
-    async def on_backend_connect(self):
+    async def on_backend_connect(self) -> None:
         embed = discord.Embed(
             title="Bot Connected to ClemBot.Api  :rocket:", color=Colors.ClemsonOrange
         )
@@ -125,7 +128,7 @@ class ClemBot(commands.Bot):
 
         await self.send_startup_log_embed(embed)
 
-    async def on_backend_disconnect(self):
+    async def on_backend_disconnect(self) -> None:
         embed = discord.Embed(
             title="Bot Disconnected from ClemBot.Api  :warning:", color=Colors.ClemsonOrange
         )
@@ -151,12 +154,12 @@ class ClemBot(commands.Bot):
         await self.messenger.close()
         await super().close()
 
-    async def send_startup_log_embed(self, embed):
+    async def send_startup_log_embed(self, embed: discord.Embed) -> None:
         for channel_id in bot_secrets.secrets.startup_log_channel_ids:
             channel = await self.fetch_channel(channel_id)
             await channel.send(embed=embed)
 
-    async def command_claims_check(self, ctx: commands.Context):
+    async def command_claims_check(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
         """
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
@@ -164,7 +167,7 @@ class ClemBot(commands.Bot):
 
         if not isinstance(command, ext.ExtBase):
             # If the command isn't an extension command let it through, we dont need to think about it
-            return True
+            return
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
@@ -175,16 +178,16 @@ class ClemBot(commands.Bot):
 
         await self.raise_claims_access_error(command, ctx)
 
-    async def raise_claims_access_error(self, command, ctx):
+    async def raise_claims_access_error(self, command: ext.ExtBase, ctx: ext.ClemBotContext[ClemBot]) -> None:
         claims_str = "\n".join(command.claims)
         raise ClaimsAccessError(
             f"Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```"
             f"\n **Help:** For more information on how claims work please visit my website [Link!]"
             f"({bot_secrets.secrets.docs_url}/claims)\n"
-            f"or run the `{await self.current_prefix(ctx.message)}help claims` command"
+            f"or run the `{await self.current_prefix(ctx)}help claims` command"
         )
 
-    async def claims_check(self, ctx: commands.Context) -> bool:
+    async def claims_check(self, ctx: ext.ClemBotContext[ClemBot]) -> bool:
         """
         Before cog execution to check if a user has the correct claims for aspects of a command
         """
@@ -242,15 +245,15 @@ class ClemBot(commands.Bot):
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_edit, payload)
 
-    async def on_message_delete(self, message):
+    async def on_message_delete(self, message: discord.Message) -> None:
         if message.author.id != self.user.id:
             await self.publish_with_error(Events.on_message_delete, message)
 
-    async def on_raw_message_delete(self, payload):
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_delete, payload)
 
-    async def on_after_command_invoke(self, ctx: commands.Context):
+    async def on_after_command_invoke(self, ctx: ext.ClemBotContext["ClemBot"]) -> None:
         await self.publish_with_error(Events.on_after_command_invoke, ctx)
 
     """
@@ -263,83 +266,83 @@ class ClemBot(commands.Bot):
     in a controlled fashion
     """
 
-    async def on_guild_join(self, guild: discord.Guild):
+    async def on_guild_join(self, guild: discord.Guild) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_joined, guild.id, guild)
 
-    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_update, before.id, before, after)
 
-    async def on_guild_remove(self, guild: discord.Guild):
+    async def on_guild_remove(self, guild: discord.Guild) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_leave, guild.id, guild)
 
-    async def on_guild_role_create(self, role: discord.Role):
+    async def on_guild_role_create(self, role: discord.Role) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_role_create, role.guild.id, role)
 
-    async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
+    async def on_guild_role_update(self, before: discord.Role, after: discord.Role) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_role_update, before.guild.id, before, after
         )
 
-    async def on_guild_role_delete(self, role: discord.Role):
+    async def on_guild_role_delete(self, role: discord.Role) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_role_delete, role.guild.id, role)
 
-    async def on_guild_channel_create(self, channel):
+    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_channel_create, channel.guild.id, channel
         )
 
-    async def on_guild_channel_delete(self, channel):
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_channel_delete, channel.guild.id, channel
         )
 
-    async def on_guild_channel_update(self, before, after):
+    async def on_guild_channel_update(self, before, after) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_channel_update, before.guild.id, before, after
         )
 
-    async def on_thread_join(self, thread: discord.Thread):
+    async def on_thread_join(self, thread: discord.Thread) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_thread_join, thread.guild.id, thread)
 
-    async def on_thread_update(self, before: discord.Thread, after: discord.Thread):
+    async def on_thread_update(self, before: discord.Thread, after: discord.Thread) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_thread_update, before.guild.id, before, after
         )
 
-    async def on_member_join(self, user: discord.Member):
+    async def on_member_join(self, user: discord.Member) -> None:
         await self.publish_to_queue_with_error(Events.on_user_joined, user.guild.id, user)
 
-    async def on_member_remove(self, user: discord.Member):
+    async def on_member_remove(self, user: discord.Member) -> None:
         await self.publish_to_queue_with_error(Events.on_user_removed, user.guild.id, user)
 
-    async def on_member_ban(self, guild: discord.Guild, user):
+    async def on_member_ban(self, guild: discord.Guild, user) -> None:
         await self.publish_to_queue_with_error(Events.on_member_ban, guild.id, guild, user)
 
     async def on_reaction_add(
-        self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
-    ):
+            self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
+    ) -> None:
         if user.id != self.user.id:
             assert reaction.message.guild is not None
             await self.publish_to_queue_with_error(
                 Events.on_reaction_add, reaction.message.guild.id, reaction, user
             )
 
-    async def on_raw_reaction_add(self, reaction) -> None:
+    async def on_raw_reaction_add(self, reaction: discord.Reaction) -> None:
         pass
 
     async def on_reaction_remove(
-        self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
-    ):
+            self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
+    ) -> None:
         if user.id != self.user.id:
             assert reaction.message.guild is not None
             await self.publish_to_queue_with_error(
                 Events.on_reaction_remove, reaction.message.guild.id, reaction, user
             )
 
-    async def on_raw_reaction_remove(self, reaction) -> None:
+    async def on_raw_reaction_remove(self, reaction: discord.Reaction) -> None:
         pass
 
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
+    async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
         await self.publish_to_queue_with_error(
             Events.on_member_update, before.guild.id, before, after
         )
@@ -364,7 +367,7 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def get_command_not_found_help(self, ctx: commands.Context) -> t.Optional[str]:
+    async def get_command_not_found_help(self, ctx: ext.ClemBotContext["ClemBot"]) -> t.Optional[str]:
         prefix = ctx.clean_prefix or await self.current_prefix(ctx)
         cmd_name = ctx.message.content.removeprefix(prefix).strip().split()[0]
 
@@ -374,8 +377,8 @@ class ClemBot(commands.Bot):
 
         # attempt to fuzzy find a similar command name to suggest to them
         if (
-            len(cmd_name) > 2
-            and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= 0.3
+                len(cmd_name) > 2
+                and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= 0.3
         ):
             cmd = self.get_command(matcher_result.item)
 
@@ -410,7 +413,7 @@ class ClemBot(commands.Bot):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
 
         if isinstance(error, CommandNotFound) and (
-            help_text := await self.get_command_not_found_help(ctx)
+                help_text := await self.get_command_not_found_help(ctx)
         ):
             embed.add_field(name="Exception:", value=(str(error) + f"\n\n{help_text}"))
         else:
@@ -451,7 +454,7 @@ class ClemBot(commands.Bot):
             # this code will split the traceback into 1000 char chunks because
             # the embed will fail if we attempt to send more then that
             tb_split = [
-                traceback[i : i + field_length] for i in range(0, len(traceback), field_length)
+                traceback[i: i + field_length] for i in range(0, len(traceback), field_length)
             ]
 
             for i, field in enumerate(tb_split):
@@ -462,8 +465,8 @@ class ClemBot(commands.Bot):
                 channel = await self.fetch_channel(channel_id)
                 await channel.send(embed=embed)
 
-    async def current_prefix(self, ctx):
-        prefixes = await self.get_prefix(ctx)
+    async def current_prefix(self, ctx: ext.ClemBotContext['ClemBot']) -> str:
+        prefixes = await self.get_prefix(ctx.message)
         return prefixes[2]
 
     """
@@ -507,12 +510,12 @@ class ClemBot(commands.Bot):
                 if r is not api.base_route.BaseRoute:
                     self.activate_route(client, r)
 
-    def load_cogs(self) -> None:
+    async def load_cogs(self) -> None:
         log.info("Loading Cogs")
         for m in ClemBot.walk_modules("cogs", cogs):
             for c in ClemBot.walk_types(m, commands.Cog):
                 log.info("Loading cog: {cog}", cog=c.__module__)
-                self.load_extension(c.__module__)
+                await self.load_extension(c.__module__)
 
     @staticmethod
     def walk_modules(module: str, pkg: t.Any) -> t.Iterator[ModuleType]:
@@ -522,7 +525,7 @@ class ClemBot(commands.Bot):
             raise ImportError(name=name)
 
         for _, name, ispkg in pkgutil.walk_packages(
-            path=pkg.__path__, prefix=pkg.__name__ + ".", onerror=on_error
+                path=pkg.__path__, prefix=pkg.__name__ + ".", onerror=on_error
         ):
             if not ispkg:
                 yield importlib.import_module(name)

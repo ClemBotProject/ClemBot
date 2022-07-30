@@ -90,5 +90,5 @@ class EvalCog(commands.Cog):
                     return json.loads(await resp.text())
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(EvalCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(EvalCog(bot))

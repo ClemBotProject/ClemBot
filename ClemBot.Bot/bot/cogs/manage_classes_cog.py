@@ -5,6 +5,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
@@ -66,7 +67,7 @@ class ClassType:
 
 
 class ManageClassesCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.group(pass_context=True, aliases=["class"], case_insensitive=True)
@@ -350,5 +351,5 @@ def round_down(num, divisor):
     return num - (num % divisor)
 
 
-def setup(bot):
-    bot.add_cog(ManageClassesCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(ManageClassesCog(bot))

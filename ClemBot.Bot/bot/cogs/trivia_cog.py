@@ -10,6 +10,7 @@ import discord.ext.commands as commands
 from discord.ext.commands.errors import UserInputError
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import trivia_cog_converter
@@ -23,7 +24,7 @@ class TriviaCog(commands.Cog):
     def cog_unload(self):
         self.session.close()
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.messages = {}
         self.bot = bot
         self.session = aiohttp.ClientSession(headers={"Connection": "keep-alive"})
@@ -467,5 +468,5 @@ class Message:
         return embed
 
 
-def setup(bot):
-    bot.add_cog(TriviaCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(TriviaCog(bot))

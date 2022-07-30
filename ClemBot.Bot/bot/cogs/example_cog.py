@@ -69,6 +69,6 @@ class ExampleCog(commands.Cog):
 
 # This is the setup function at the module level, d.py expects this function to
 # load cogs into the library internally
-def setup(bot: ClemBot) -> None:
+async def setup(bot: ClemBot) -> None:
     # This adds the cog internally by creating a cog instance and registering that
-    bot.add_cog(ExampleCog(bot))
+    await bot.add_cog(ExampleCog(bot))

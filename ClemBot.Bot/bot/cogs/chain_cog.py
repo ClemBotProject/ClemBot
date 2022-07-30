@@ -186,5 +186,5 @@ class ChainCog(commands.Cog):
         return 0, ""
 
 
-def setup(bot):
-    bot.add_cog(ChainCog(bot))
+async def setup(bot):
+    await bot.add_cog(ChainCog(bot))

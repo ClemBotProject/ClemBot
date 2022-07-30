@@ -10,6 +10,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
@@ -20,7 +21,7 @@ URL_GEO = "https://geocode.xyz/"
 
 
 class WeatherCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     def getPageData(self, Lat, Lon, res_weather_json, city, is_cond, is_hr, is_day):
@@ -391,5 +392,5 @@ class WeatherCog(commands.Cog):
         await self.weatherCode(ctx, location, 1, 1, 1)
 
 
-def setup(bot):
-    bot.add_cog(WeatherCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(WeatherCog(bot))

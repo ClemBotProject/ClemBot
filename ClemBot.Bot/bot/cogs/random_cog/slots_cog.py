@@ -351,5 +351,5 @@ class SlotsCog(commands.Cog):
         return val
 
 
-def setup(bot):
-    bot.add_cog(SlotsCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(SlotsCog(bot))

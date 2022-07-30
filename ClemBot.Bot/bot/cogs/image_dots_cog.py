@@ -7,6 +7,7 @@ import requests
 from PIL import Image, UnidentifiedImageError
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.utils.logging_utils import get_logger
 
@@ -21,7 +22,7 @@ CHAR_LIMIT = 1950
 
 
 class DotCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     # So, I made this from a copy of image-to-braille. I am modifying the
@@ -234,5 +235,5 @@ class DotCog(commands.Cog):
         return await self.todots_helper(ctx, image, device, threshold, inverted)
 
 
-def setup(bot):
-    bot.add_cog(DotCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(DotCog(bot))

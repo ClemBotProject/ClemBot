@@ -251,5 +251,5 @@ class MemesCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(MemesCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(MemesCog(bot))

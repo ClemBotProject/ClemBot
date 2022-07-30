@@ -58,5 +58,5 @@ class InviteCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(InviteCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(InviteCog(bot))

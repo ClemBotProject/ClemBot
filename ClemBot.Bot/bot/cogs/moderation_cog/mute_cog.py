@@ -4,6 +4,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors, DesignatedChannels, Moderation
 from bot.messaging.events import Events
 from bot.utils.converters import Duration, DurationDelta
@@ -14,7 +15,7 @@ log = get_logger(__name__)
 
 
 class MuteCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -221,5 +222,5 @@ class MuteCog(commands.Cog):
         return s
 
 
-def setup(bot):
-    bot.add_cog(MuteCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(MuteCog(bot))

@@ -118,5 +118,5 @@ class OgSlotsCog(commands.Cog):
         return total_score
 
 
-def setup(bot):
-    bot.add_cog(OgSlotsCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(OgSlotsCog(bot))

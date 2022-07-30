@@ -83,5 +83,5 @@ class BaseConverterCog(commands.Cog):
         await self.result(ctx, int(number, 8))
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(BaseConverterCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(BaseConverterCog(bot))

@@ -196,5 +196,5 @@ class RockPaperScissorsCog(commands.Cog):
         await ctx.send(f"{user_1.mention} {user_2.mention}", embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(RockPaperScissorsCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(RockPaperScissorsCog(bot))

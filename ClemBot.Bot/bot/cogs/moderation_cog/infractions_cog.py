@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
@@ -18,7 +19,7 @@ INFRACTION_EMOJI_MAP = {"warn": ":warning:", "mute": ":mute:", "ban": ":hammer:"
 
 
 class InfractionsCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.group(
@@ -102,5 +103,5 @@ class InfractionsCog(commands.Cog):
         return await ctx.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(InfractionsCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(InfractionsCog(bot))

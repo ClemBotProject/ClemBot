@@ -460,5 +460,5 @@ class TagCog(commands.Cog):
         return pages
 
 
-def setup(bot):
-    bot.add_cog(TagCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(TagCog(bot))

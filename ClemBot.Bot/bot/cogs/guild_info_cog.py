@@ -55,5 +55,5 @@ class GuildInfoCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(GuildInfoCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(GuildInfoCog(bot))

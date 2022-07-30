@@ -270,5 +270,5 @@ class CalculatorCog(commands.Cog):
         return result
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(CalculatorCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(CalculatorCog(bot))

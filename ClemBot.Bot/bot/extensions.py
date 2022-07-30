@@ -1,9 +1,12 @@
 import typing as t
 
-import discord.ext.commands
+import discord
+import discord.ext.commands as commands
 from discord.ext.commands.errors import BadArgument
 
 from bot.consts import Claims
+
+BotT = t.TypeVar('BotT', bound=commands.Bot | commands.AutoShardedBot)
 
 
 def command(
@@ -255,3 +258,7 @@ class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
         """
         attrs.setdefault("cls", ClemBotGroup)
         return t.cast(t.Callable[..., ClemBotGroup], self.command(name=name, **attrs))
+
+
+class ClemBotContext(discord.ext.commands.Context[BotT]):
+    commands: t.Optional[ClemBotCommand]

@@ -89,5 +89,5 @@ class CustomPrefixCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(CustomPrefixCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(CustomPrefixCog(bot))

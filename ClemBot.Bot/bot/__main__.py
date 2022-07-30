@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import sys
@@ -11,7 +12,7 @@ from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 
 
-def main():
+async def main() -> None:
     bot_log = logging.getLogger()
 
     # check if this is a prod or a dev instance
@@ -56,7 +57,7 @@ def main():
     mentions = discord.AllowedMentions(everyone=False, roles=False)
 
     bot_log.info("Bot Starting Up")
-    ClemBot(
+    await ClemBot(
         messenger=messenger,
         scheduler=scheduler,
         command_prefix=custom_prefix.get_prefix,  # noqa: E126
@@ -66,8 +67,8 @@ def main():
         max_messages=50000,
         allowed_mentions=mentions,
         intents=intents,
-    ).run(bot_secrets.secrets.bot_token)
+    ).start(bot_secrets.secrets.bot_token)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

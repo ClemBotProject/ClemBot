@@ -49,5 +49,5 @@ class GifMeCog(commands.Cog):
         )
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(GifMeCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(GifMeCog(bot))

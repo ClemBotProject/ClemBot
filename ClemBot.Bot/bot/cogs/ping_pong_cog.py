@@ -4,11 +4,12 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 
 
 class PingPongCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command(name="ping", aliases=["pong"])
@@ -40,5 +41,5 @@ class PingPongCog(commands.Cog):
         await sent_message.edit(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(PingPongCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(PingPongCog(bot))

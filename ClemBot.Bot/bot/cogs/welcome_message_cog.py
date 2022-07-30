@@ -70,5 +70,5 @@ class WelcomeMessageCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: ClemBot):
-    bot.add_cog(WelcomeMessageCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(WelcomeMessageCog(bot))

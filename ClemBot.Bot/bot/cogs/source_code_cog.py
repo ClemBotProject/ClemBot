@@ -7,6 +7,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.displayable_path import DisplayablePath
@@ -27,7 +28,7 @@ class SourceCodeCog(commands.Cog):
     A cog to allow the bot to print its own source code given a file name
     """
 
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
         self.bot_files = {}
         self.ignored = [
@@ -240,5 +241,5 @@ class SourceCodeCog(commands.Cog):
         return paths
 
 
-def setup(bot):
-    bot.add_cog(SourceCodeCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(SourceCodeCog(bot))

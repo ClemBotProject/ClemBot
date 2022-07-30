@@ -164,5 +164,5 @@ class DefineCog(commands.Cog):
             raise Exception(err_str).with_traceback(err.__traceback__)
 
 
-def setup(bot: ClemBot) -> None:
-    bot.add_cog(DefineCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(DefineCog(bot))

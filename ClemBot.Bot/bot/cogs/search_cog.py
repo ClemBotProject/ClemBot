@@ -159,5 +159,5 @@ def category_from_code(code: str) -> str:
     return CATEGORIES[code]
 
 
-def setup(bot: ClemBot):
-    bot.add_cog(SearchCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(SearchCog(bot))

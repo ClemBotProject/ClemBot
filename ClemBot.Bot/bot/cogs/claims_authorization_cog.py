@@ -136,5 +136,5 @@ class ClaimsAuthorizationCog(commands.Cog):
         return "\n".join(claims) if claims else "No available claims"
 
 
-def setup(bot):
-    bot.add_cog(ClaimsAuthorizationCog(bot))
+async def setup(bot):
+    await bot.add_cog(ClaimsAuthorizationCog(bot))

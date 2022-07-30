@@ -10,6 +10,7 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.converters import Duration
@@ -22,7 +23,7 @@ DICE_LIMIT = 20
 
 
 class RandomCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
@@ -183,5 +184,5 @@ class RandomCog(commands.Cog):
                     )
 
 
-def setup(bot):
-    bot.add_cog(RandomCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(RandomCog(bot))

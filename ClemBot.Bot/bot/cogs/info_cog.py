@@ -91,6 +91,6 @@ class InfoCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
 
-def setup(bot):
+async def setup(bot) -> None:
     # This adds the cog internally by creating a cog instance and registering that
-    bot.add_cog(InfoCog(bot))
+    await bot.add_cog(InfoCog(bot))

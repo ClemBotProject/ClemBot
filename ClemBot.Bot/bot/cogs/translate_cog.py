@@ -8,6 +8,7 @@ from discord.ext.commands.errors import UserInputError
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
@@ -17,7 +18,7 @@ log = get_logger(__name__)
 
 
 class TranslateCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
 
@@ -277,5 +278,5 @@ HEADERS = {
 }
 
 
-def setup(bot):
-    bot.add_cog(TranslateCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(TranslateCog(bot))

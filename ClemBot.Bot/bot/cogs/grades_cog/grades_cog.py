@@ -412,5 +412,5 @@ class GradesCog(commands.Cog):
         )
 
 
-def setup(bot):
-    bot.add_cog(GradesCog(bot))
+async def setup(bot) -> None:
+    await bot.add_cog(GradesCog(bot))

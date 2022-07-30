@@ -126,5 +126,5 @@ class BanCog(commands.Cog):
         )
 
 
-def setup(bot):
-    bot.add_cog(BanCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(BanCog(bot))

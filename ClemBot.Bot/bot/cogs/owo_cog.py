@@ -5,13 +5,14 @@ import re
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
 
 
 class OwoCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
         self.FACES = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"]
 
@@ -43,5 +44,5 @@ class OwoCog(commands.Cog):
         return text
 
 
-def setup(bot):
-    bot.add_cog(OwoCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(OwoCog(bot))

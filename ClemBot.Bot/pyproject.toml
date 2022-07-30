@@ -6,7 +6,7 @@ authors = []
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "45d498c1b76deaf3b394d17ccf56112fa691d160" }
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "5527de688afe789266d4c2b1f6c5373985232dff" }
 aiohttp = "3.7.4"
 aiosqlite = "0.12.0"
 appdirs = "1.4.3"

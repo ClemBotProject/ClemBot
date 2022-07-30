@@ -18,7 +18,7 @@ MAX_MESSAGE_SIZE = 1900
 class OwnerCog(commands.Cog):
     """This is a cog for bot owner commands, things like log viewing and bot stats are shown here"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot: ClemBot = bot
 
     @ext.group(hidden=True, case_insensitive=True)
@@ -300,5 +300,5 @@ class OwnerCog(commands.Cog):
         await ctx.send("Done")
 
 
-def setup(bot):
-    bot.add_cog(OwnerCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(OwnerCog(bot))

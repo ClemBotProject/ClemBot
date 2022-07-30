@@ -83,5 +83,5 @@ class WarnCog(commands.Cog):
         )
 
 
-def setup(bot):
-    bot.add_cog(WarnCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(WarnCog(bot))

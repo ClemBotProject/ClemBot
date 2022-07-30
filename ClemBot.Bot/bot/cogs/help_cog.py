@@ -5,6 +5,7 @@ import discord.ext.commands as commands
 
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.utils.helpers import chunk_sequence
@@ -16,7 +17,7 @@ HELP_EMBED_SIZE = 15
 
 
 class HelpCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
         self.commands = []
 
@@ -205,5 +206,5 @@ class HelpCog(commands.Cog):
         raise TypeError("Help example must be of type iterable or str")
 
 
-def setup(bot):
-    bot.add_cog(HelpCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(HelpCog(bot))
