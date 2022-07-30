@@ -201,7 +201,7 @@ class ModerationService(BaseService):
 
     @BaseService.listener(Events.on_member_ban)
     async def on_member_ban(self, guild, user):
-        log = (await guild.audit_logs(limit=1, action=discord.AuditLogAction.ban).flatten())[0]
+        log = [action async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)][0]
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "Guild Member Banned"
         embed.set_author(name=log.user, icon_url=log.user.display_avatar.url)
