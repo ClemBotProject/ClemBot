@@ -1,6 +1,5 @@
 import asyncio
 import json
-import queue
 import typing as t
 from http import HTTPStatus
 from urllib.parse import quote
@@ -24,7 +23,7 @@ class Result:
         self.status = status
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Result Status: {self.status}\nValue:\n{json.dumps(self.value, indent=2)}"
 
 
@@ -36,9 +35,10 @@ class HttpRequestType:
     patch = "PATCH"
 
 
-class ApiClient:
-    def __init__(self, *, connect_callback=None, disconnect_callback=None, bot_only: bool = False):
+T_STATE_CHANGE_CB = t.Optional[t.Callable[[], t.Coroutine[t.Any, t.Any, None]]]
 
+class ApiClient:
+    def __init__(self, *, connect_callback: T_STATE_CHANGE_CB = None, disconnect_callback: T_STATE_CHANGE_CB = None, bot_only: bool = False):
         self.auth_token: t.Optional[str] = None
         self.session: t.Optional[aiohttp.ClientSession] = None
         self.connected: bool = False
@@ -46,12 +46,10 @@ class ApiClient:
 
         self._is_reconnecting: bool = False
 
-        self.request_queue: queue.Queue
-
         self.bot_only = bot_only
 
         # Create an empty async method so our callback doesnt throw when we await it
-        async def async_stub():
+        async def async_stub() -> None:
             pass
 
         # Specify a callback to alert the creation context of connection events
@@ -61,7 +59,7 @@ class ApiClient:
         self.disconnect_callback = disconnect_callback or async_stub
 
     @staticmethod
-    def _build_url(url: str):
+    def _build_url(url: str) -> str:
         url = f"{bot_secrets.secrets.api_url}{Urls.base_api_url}{quote(url)}"
         log.info("Building URL: {url}", url=url)
         return url
@@ -71,13 +69,13 @@ class ApiClient:
         assert self.session is not None
         await self.session.close()
 
-    async def connect(self):
+    async def connect(self) -> None:
         if self.bot_only:
             raise BotOnlyRequestError("Request Failed: Bot is in bot_only mode")
 
         await self._internal_connect()
 
-    async def _reconnect(self):
+    async def _reconnect(self) -> None:
 
         # Asynchronously lock here to make sure
         # that only one task is checking the connection status at a time
@@ -95,7 +93,7 @@ class ApiClient:
         log.info("Beginning ClemBot.Api reconnect request")
         await self._internal_connect()
 
-    async def _internal_connect(self):
+    async def _internal_connect(self) -> None:
         log.info("Connecting to ClemBot.Api at URL: {url}", url=bot_secrets.secrets.api_url)
 
         # Check if we have an active session, this means we are trying to reconnect
@@ -119,7 +117,7 @@ class ApiClient:
             )
             await asyncio.sleep(RECONNECT_TIMEOUT)
 
-    async def _disconnected(self):
+    async def _disconnected(self) -> None:
         log.warning("ClemBot.Api disconnected")
         await self._reconnect()
 
@@ -135,11 +133,11 @@ class ApiClient:
         assert self.session is not None
 
         try:
-            async with self.session.request(**auth_args) as resp:
+            async with self.session.request(**auth_args) as resp:  # type: ignore
 
                 if resp.status == HTTPStatus.OK:
                     log.info("JWT Bearer token received")
-                    return (await resp.json())["token"]
+                    return t.cast(str, (await resp.json())["token"])
 
                 if resp.status == HTTPStatus.FORBIDDEN:
                     log.error("JWT Auth denied, Invalid API key")
@@ -166,7 +164,7 @@ class ApiClient:
         log.info("Initialized JWT BEARER token Auth Headers")
         return True
 
-    async def _request(self, http_type: str, endpoint: str, raise_on_error, params=None, body=None):
+    async def _request(self, http_type: str, endpoint: str, raise_on_error: bool, params: t.Any = None, body: t.Any = None) -> Result:
 
         log.info(
             "HTTP {http_type} Request initializing to route: {endpoint}",
@@ -216,7 +214,7 @@ class ApiClient:
 
             return Result(resp.status, None)
 
-    async def _request_or_reconnect(self, http_type: str, endpoint: str, **kwargs):
+    async def _request_or_reconnect(self, http_type: str, endpoint: str, **kwargs: t.Any) -> t.Any:
 
         raise_on_error = kwargs.get("raise_on_error", False)
         body = kwargs.get("data", None)
@@ -260,7 +258,7 @@ class ApiClient:
 
         return resp.value
 
-    async def get(self, endpoint: str, **kwargs):
+    async def get(self, endpoint: str, **kwargs: t.Any) -> t.Any:
         """
         Sends an HTTP GET Method to ClemBot.Api
 
@@ -273,7 +271,7 @@ class ApiClient:
         """
         return await self._request_or_reconnect(HttpRequestType.get, endpoint, **kwargs)
 
-    async def post(self, endpoint: str, **kwargs):
+    async def post(self, endpoint: str, **kwargs: t.Any) -> t.Any:
         """
         Sends an HTTP POST Method to ClemBot.Api
 
@@ -286,7 +284,7 @@ class ApiClient:
         """
         return await self._request_or_reconnect(HttpRequestType.post, endpoint, **kwargs)
 
-    async def patch(self, endpoint: str, **kwargs):
+    async def patch(self, endpoint: str, **kwargs: t.Any) -> t.Any:
         """
         Sends an HTTP PATCH Method to ClemBot.Api
 
@@ -299,7 +297,7 @@ class ApiClient:
         """
         return await self._request_or_reconnect(HttpRequestType.patch, endpoint, **kwargs)
 
-    async def put(self, endpoint: str, **kwargs):
+    async def put(self, endpoint: str, **kwargs: t.Any) -> t.Any:
         """
         Sends an HTTP PUT Method to ClemBot.Api
 
@@ -312,7 +310,7 @@ class ApiClient:
         """
         return await self._request_or_reconnect(HttpRequestType.put, endpoint, **kwargs)
 
-    async def delete(self, endpoint: str, **kwargs):
+    async def delete(self, endpoint: str, **kwargs: t.Any) -> t.Any:
         """
         Sends an HTTP DELETE Method to ClemBot.Api
 

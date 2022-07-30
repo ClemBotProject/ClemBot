@@ -1,3 +1,5 @@
+import typing as t
+
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 
@@ -7,7 +9,7 @@ class CommandsRoute(BaseRoute):
         super().__init__(api_client)
 
     async def add_command_invocation(
-        self, command: str, guild_id: int, channel_id: int, user_id: int, **kwargs
+        self, command: str, guild_id: int, channel_id: int, user_id: int, **kwargs: t.Any
     ) -> None:
 
         json = {
@@ -17,4 +19,4 @@ class CommandsRoute(BaseRoute):
             "UserId": user_id,
         }
 
-        return await self._client.post("bot/commands", data=json, **kwargs)
+        await self._client.post("bot/commands", data=json, **kwargs)

@@ -1,4 +1,3 @@
-import dataclasses
 import datetime
 import json
 import re
@@ -11,28 +10,12 @@ from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
+from bot.models import MessageDto, MessageEditDto
 
 log = get_logger(__name__)
 
 MESSAGE_BATCH_SIZE = 20
 MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')
-
-
-@dataclasses.dataclass()
-class MessageDto:
-    id: int
-    content: str
-    guild: int
-    author: int
-    channel: int
-    time: datetime.datetime
-
-
-@dataclasses.dataclass()
-class MessageEditDto:
-    id: int
-    content: str
-    time: datetime.datetime
 
 
 class MessageHandlingService(BaseService):
@@ -57,12 +40,12 @@ class MessageHandlingService(BaseService):
             await self.bot.message_route.batch_create_message(batch_values, raise_on_error=False)
 
         self.message_batch[message.id] = MessageDto(
-            message.id,
-            message.content,
-            message.guild.id,
-            message.author.id,
-            message.channel.id,
-            datetime.datetime.utcnow(),
+            id=message.id,
+            content=message.content,
+            guild=message.guild.id,
+            author=message.author.id,
+            channel=message.channel.id,
+            time=datetime.datetime.utcnow(),
         )
 
     async def batch_send_message_edit(self, id: int, content: str):
@@ -84,7 +67,7 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
-        self.message_edit_batch.append(MessageEditDto(id, content, datetime.datetime.utcnow()))
+        self.message_edit_batch.append(MessageEditDto(id=id, content=content, time=datetime.datetime.utcnow()))
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:

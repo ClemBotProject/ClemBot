@@ -1,5 +1,6 @@
 import discord
 import pandas as pd
+import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
@@ -10,51 +11,51 @@ class GuildRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def add_guild(self, guild_id: int, name: str, owner_id):
+    async def add_guild(self, guild_id: int, name: str, owner_id: int) -> None:
         if await self._client.get(f"bot/guilds/{guild_id}"):
             return
 
         json = {"Id": guild_id, "Name": name, "OwnerId": owner_id}
         await self._client.post("bot/guilds", data=json)
 
-    async def get_all_guilds_ids(self):
+    async def get_all_guilds_ids(self) -> t.Optional[list[int]]:
         guilds = await self._client.get("bot/guilds")
 
         if not guilds:
-            return
+            return None
 
         return [g["id"] for g in guilds]
 
-    async def leave_guild(self, guild_id: int):
-        return await self._client.delete(f"bot/guilds/{guild_id}")
+    async def leave_guild(self, guild_id: int) -> None:
+        await self._client.delete(f"bot/guilds/{guild_id}")
 
-    async def get_guild(self, guild_id: int):
+    async def get_guild(self, guild_id: int) -> t.Any:
         return await self._client.get(f"bot/guilds/{guild_id}")
 
-    async def get_all_guilds(self):
-        return await self._client.get("bot/guilds")
+    async def get_all_guilds(self) -> list[dict[str, t.Any]]:
+        return t.cast(list[dict[str, t.Any]], await self._client.get("bot/guilds"))
 
-    async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool):
+    async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool) -> list[dict[str, t.Any]]:
         resp = await self._client.get(
             f"bot/Guilds/{guild_id}/SlotScores", params={"leader": str(leader), "limit": limit}
         )
-        return resp["scores"]
 
-    async def get_guild_user_ids(self, guild_id: int):
+        return t.cast(list[dict[str, t.Any]], resp["scores"])
+
+    async def get_guild_user_ids(self, guild_id: int) -> t.Optional[list[t.Any]]:
         guild = await self._client.get(f"bot/guilds/{guild_id}")
 
         if not guild:
-            return
+            return None
 
-        return guild["users"]
+        return t.cast(list[t.Any], guild["users"])
 
-    async def edit_guild(self, guild_id: int, name: str, owner_id: int):
+    async def edit_guild(self, guild_id: int, name: str, owner_id: int) -> None:
         json = {"Id": guild_id, "Name": name, "OwnerId": owner_id}
 
         await self._client.patch("bot/guilds", data=json)
 
-    async def update_guild_users(self, guild: discord.Guild):
-
+    async def update_guild_users(self, guild: discord.Guild) -> None:
         users = [{"UserId": u.id, "Name": u.name} for u in guild.members]
 
         df: pd.DataFrame = pd.DataFrame.from_records(users)
@@ -63,7 +64,7 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch("bot/guilds/update/users", data=json)
 
-    async def update_guild_roles(self, guild: discord.Guild):
+    async def update_guild_roles(self, guild: discord.Guild) -> None:
         roles = [
             {
                 "Id": r.id,
@@ -79,7 +80,7 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch("bot/guilds/update/roles", data=json)
 
-    async def update_guild_role_user_mappings(self, guild: discord.Guild):
+    async def update_guild_role_user_mappings(self, guild: discord.Guild) -> None:
 
         mappings = []
         for role in guild.roles:
@@ -92,7 +93,7 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch("bot/guilds/update/RoleUserMappings", data=json)
 
-    async def update_guild_channels(self, guild: discord.Guild):
+    async def update_guild_channels(self, guild: discord.Guild) -> None:
 
         channels = [{"ChannelId": c.id, "Name": c.name} for c in guild.channels]
 
@@ -102,7 +103,7 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch("bot/guilds/update/channels", data=json)
 
-    async def update_guild_threads(self, guild: discord.Guild):
+    async def update_guild_threads(self, guild: discord.Guild) -> None:
 
         threads = [
             {"ThreadId": c.id, "Name": c.name, "ParentId": c.parent_id} for c in guild.threads
@@ -114,7 +115,7 @@ class GuildRoute(BaseRoute):
 
         await self._client.patch("bot/guilds/update/threads", data=json)
 
-    async def get_can_embed_link(self, guild_id: int):
+    async def get_can_embed_link(self, guild_id: int) -> t.Any:
         resp = await self._client.get(
             f"guildsettings/{guild_id}/{GuildSettings.allow_embed_links.name}"
         )
