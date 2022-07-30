@@ -296,28 +296,29 @@ class BotSecrets:
 
     def load_production_secrets(self) -> None:
 
-        self.client_token = os.environ.get("CLIENT_TOKEN")
-        self.client_secret = os.environ.get("CLIENT_SECRET")
-        self.bot_token = os.environ.get("BOT_TOKEN")
-        self.bot_prefix = os.environ.get("BOT_PREFIX")
+        # Ignore these type errors, mypy doesn't know how to handle properties that return narrower types then they are assigned too
+        self.client_token = os.environ.get("CLIENT_TOKEN")  # type: ignore
+        self.client_secret = os.environ.get("CLIENT_SECRET")  # type: ignore
+        self.bot_token = os.environ.get("BOT_TOKEN")  # type: ignore
+        self.bot_prefix = os.environ.get("BOT_PREFIX")  # type: ignore
         self.startup_log_channel_ids = [
-            int(n) for n in os.environ.get("STARTUP_LOG_CHANNEL_IDS").split(",")
+            int(n) for n in os.environ.get("STARTUP_LOG_CHANNEL_IDS").split(",")  # type: ignore
         ]
         self.error_log_channel_ids = [
-            int(n) for n in os.environ.get("ERROR_LOG_CHANNEL_IDS").split(",")
+            int(n) for n in os.environ.get("ERROR_LOG_CHANNEL_IDS").split(",")  # type: ignore
         ]
-        self.bot_only = os.environ.get("BOT_ONLY")
-        self.gif_me_token = os.environ.get("GIF_ME_TOKEN")
-        self.repl_url = os.environ.get("REPL_URL")
-        self.github_url = os.environ.get("GITHUB_URL")
-        self.merriam_key = os.environ.get("MERRIAM_KEY")
-        self.weather_key = os.environ.get("WEATHER_KEY")
-        self.geocode_key = os.environ.get("GEOCODE_KEY")
-        self.azure_translate_key = os.environ.get("AZURE_TRANSLATE_KEY")
-        self.api_url = os.environ.get("API_URL")
-        self.api_key = os.environ.get("API_KEY")
-        self.site_url = os.environ.get("SITE_URL")
-        self.docs_url = os.environ.get("DOCS_URL")
+        self.bot_only = os.environ.get("BOT_ONLY")  # type: ignore
+        self.gif_me_token = os.environ.get("GIF_ME_TOKEN")  # type: ignore
+        self.repl_url = os.environ.get("REPL_URL")  # type: ignore
+        self.github_url = os.environ.get("GITHUB_URL")  # type: ignore
+        self.merriam_key = os.environ.get("MERRIAM_KEY")  # type: ignore
+        self.weather_key = os.environ.get("WEATHER_KEY")  # type: ignore
+        self.geocode_key = os.environ.get("GEOCODE_KEY")  # type: ignore
+        self.azure_translate_key = os.environ.get("AZURE_TRANSLATE_KEY  # type: ignore")  # type: ignore
+        self.api_url = os.environ.get("API_URL")  # type: ignore
+        self.api_key = os.environ.get("API_KEY")  # type: ignore
+        self.site_url = os.environ.get("SITE_URL")  # type: ignore
+        self.docs_url = os.environ.get("DOCS_URL")  # type: ignore
 
         log.info("Production keys loaded")
 
