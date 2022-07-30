@@ -107,10 +107,14 @@ class ClemBot(commands.Bot):
         if not bot_secrets.secrets.bot_only:
             await self.api_client.connect()
 
-        await self.load_services()
         log.info("Logged on as {user}", user=serializers.log_user(self.user))
 
     async def on_ready(self) -> None:
+
+        # Load the services after the gateway has connected and loaded state data into the cache
+        # So that we can be sure that we correctly iterate over known guilds
+        await self.load_services()
+
         embed = discord.Embed(
             title="Bot Started Up  :white_check_mark:", color=Colors.ClemsonOrange
         )
@@ -157,6 +161,10 @@ class ClemBot(commands.Bot):
     async def send_startup_log_embed(self, embed: discord.Embed) -> None:
         for channel_id in bot_secrets.secrets.startup_log_channel_ids:
             channel = await self.fetch_channel(channel_id)
+
+            if not isinstance(channel, discord.TextChannel):
+                return
+
             await channel.send(embed=embed)
 
     async def command_claims_check(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
@@ -194,9 +202,11 @@ class ClemBot(commands.Bot):
         command = ctx.command
         author = ctx.author
 
-        if await self.is_owner(author):
+        if isinstance(author, discord.abc.User) and await self.is_owner(author):
             # if the author owns the bot, authorize the command no matter what
             return True
+
+        assert isinstance(author, discord.Member)
 
         if author.guild_permissions.administrator:
             # Admins have full bot access no matter what
