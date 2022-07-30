@@ -3,8 +3,11 @@ from bot.services.base_service import BaseService
 from bot.utils.trigrams import BankSearchEntry, find_best_match, make_search_bank
 
 
+
 class FuzzyMatchingService(BaseService):
     def __init__(self, bot: ClemBot):
+        super().__init__(bot)
+
         self.bot = bot
 
         self._cmd_name_bank = make_search_bank([cmd.qualified_name for cmd in bot.walk_commands()])

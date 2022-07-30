@@ -1,6 +1,7 @@
 from __future__ import annotations
 import datetime
 import importlib
+import logging
 import pkgutil
 import traceback
 import typing as t
@@ -29,6 +30,10 @@ log = get_logger(__name__)
 
 if t.TYPE_CHECKING:
     import bot.services.base_service as base_service
+    import bot.api.base_route as base_route
+    from bot.services.fuzzy_matching_service import FuzzyMatchingService
+
+BotT = t.TypeVar('BotT', bound=commands.Bot | commands.AutoShardedBot)
 
 
 class ClemBot(commands.Bot):
@@ -42,10 +47,9 @@ class ClemBot(commands.Bot):
     # Override the parent user type here which is optional, we know that user won't be null
     user: discord.ClientUser
 
-    # noinspection PyTypeChecker
-    def __init__(self, messenger: Messenger, scheduler: Scheduler, **kwargs: dict[str, t.Any]) -> None:
+    def __init__(self, messenger: Messenger, scheduler: Scheduler, **kwargs: t.Any) -> None:
         # this super call is to pass the prefix up to the super class
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
 
         # Set the error callback in the messenger for queued events
         messenger.error_callback = self.global_error_handler
@@ -212,6 +216,8 @@ class ClemBot(commands.Bot):
             # Admins have full bot access no matter what
             return True
 
+        assert command is not None
+
         if len(command.claims) == 0:
             # command requires no claims nothing else to do
             return True
@@ -246,11 +252,11 @@ class ClemBot(commands.Bot):
             else:
                 await self.publish_with_error(Events.on_guild_message_received, message)
 
-    async def on_message_edit(self, before, after):
+    async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
         if before.author.id != self.user.id and len(before.embeds) == 0:
             await self.publish_with_error(Events.on_message_edit, before, after)
 
-    async def on_raw_message_edit(self, payload):
+    async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
         # if before.author.id != self.user.id and len(before.embeds) == 0:
         if payload.cached_message is None:
             await self.publish_with_error(Events.on_raw_message_edit, payload)
@@ -306,7 +312,7 @@ class ClemBot(commands.Bot):
             Events.on_guild_channel_delete, channel.guild.id, channel
         )
 
-    async def on_guild_channel_update(self, before, after) -> None:
+    async def on_guild_channel_update(self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel) -> None:
         await self.publish_to_queue_with_error(
             Events.on_guild_channel_update, before.guild.id, before, after
         )
@@ -325,7 +331,7 @@ class ClemBot(commands.Bot):
     async def on_member_remove(self, user: discord.Member) -> None:
         await self.publish_to_queue_with_error(Events.on_user_removed, user.guild.id, user)
 
-    async def on_member_ban(self, guild: discord.Guild, user) -> None:
+    async def on_member_ban(self, guild: discord.Guild, user: discord.Member) -> None:
         await self.publish_to_queue_with_error(Events.on_member_ban, guild.id, guild, user)
 
     async def on_reaction_add(
@@ -361,7 +367,11 @@ class ClemBot(commands.Bot):
     ----------------- End of queued event block ---------------------
     """
 
-    async def publish_to_queue_with_error(self, event: str, guild_id: int, *args, **kwargs):
+    async def publish_to_queue_with_error(self,
+                                          event: str,
+                                          guild_id: int,
+                                          *args: t.Any,
+                                          **kwargs: dict[str, t.Any]) -> None:
         try:
             if not self.is_starting_up:
                 await self.messenger.publish_to_queue(event, guild_id, *args, **kwargs)
@@ -369,7 +379,10 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def publish_with_error(self, event: str, *args, **kwargs):
+    async def publish_with_error(self,
+                                 event: str,
+                                 *args: t.Any,
+                                 **kwargs: dict[str, t.Any]) -> None:
         try:
             if not self.is_starting_up:
                 await self.messenger.publish(event, *args, **kwargs)
@@ -377,11 +390,11 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def get_command_not_found_help(self, ctx: ext.ClemBotContext["ClemBot"]) -> t.Optional[str]:
+    async def get_command_not_found_help(self, ctx: ext.ClemBotContext[BotT]) -> t.Optional[str]:
         prefix = ctx.clean_prefix or await self.current_prefix(ctx)
         cmd_name = ctx.message.content.removeprefix(prefix).strip().split()[0]
 
-        matcher = self.active_services.get("FuzzyMatchingService")
+        matcher = t.cast(FuzzyMatchingService, self.active_services.get("FuzzyMatchingService"))
         if not matcher:
             return None
 
@@ -391,6 +404,10 @@ class ClemBot(commands.Bot):
                 and round((matcher_result := matcher.fuzzy_find_command(cmd_name)).similarity, 1) >= 0.3
         ):
             cmd = self.get_command(matcher_result.item)
+
+            if not cmd:
+                log.error('Failed to get fuzzy matched command: {command}', command=matcher_result.item)
+                return None
 
             log.info(
                 "Fuzzy-matched {input} to {command_name} with similarity {similarity}",
@@ -403,7 +420,7 @@ class ClemBot(commands.Bot):
 
         return None
 
-    async def on_command_error(self, ctx: commands.Context, error: Exception):
+    async def on_command_error(self, ctx: discord.ext.commands.Context[BotT], error: Exception) -> None:
         """
         Handler for cog level errors, if a command throws and isn't handled
         the exception will end up here
@@ -412,6 +429,8 @@ class ClemBot(commands.Bot):
             ctx ([type]): The context that the command that errored was sent from
             error ([type]): The unhandled exception
         """
+
+        ctx = t.cast(ext.ClemBotContext[BotT], ctx)
 
         if ctx.cog:
             if commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
@@ -434,7 +453,7 @@ class ClemBot(commands.Bot):
 
         await self.global_error_handler(error)
 
-    async def global_error_handler(self, e, *, traceback: str = None):
+    async def global_error_handler(self, e: Exception, *, traceback: str | None = None) -> None:
         """
         This is the global error handler for all uncaught exceptions, if an exception is
         thrown and not handled it will end up here. If a traceback is included in the call then
@@ -473,9 +492,13 @@ class ClemBot(commands.Bot):
 
             for channel_id in bot_secrets.secrets.error_log_channel_ids:
                 channel = await self.fetch_channel(channel_id)
+
+                if not isinstance(channel, discord.TextChannel):
+                    return
+
                 await channel.send(embed=embed)
 
-    async def current_prefix(self, ctx: ext.ClemBotContext['ClemBot']) -> str:
+    async def current_prefix(self, ctx: ext.ClemBotContext[BotT]) -> str:
         prefixes = await self.get_prefix(ctx.message)
         return prefixes[2]
 
@@ -488,7 +511,7 @@ class ClemBot(commands.Bot):
     parent type.
     """
 
-    async def activate_service(self, service):
+    async def activate_service(self, service: t.Any) -> None:
         log.info("Loading service: {service}", service=service.__module__)
 
         s = service(bot=self)
@@ -498,7 +521,7 @@ class ClemBot(commands.Bot):
             await self.global_error_handler(e)
         self.active_services[service.__name__] = s
 
-    def activate_route(self, client: ApiClient, route):
+    def activate_route(self, client: ApiClient, route: t.Any) -> None:
         log.info("Loading route: {route}", route=route.__module__)
         r = route(api_client=client)
         # Here we remove the first 8 characters of the module name
@@ -541,7 +564,7 @@ class ClemBot(commands.Bot):
                 yield importlib.import_module(name)
 
     @staticmethod
-    def walk_types(module: ModuleType, base: t.Any) -> t.Iterator[commands.Cog]:
+    def walk_types(module: ModuleType, base: t.Any) -> t.Iterator[t.Any]:
         """Yield all cogs defined in an extension."""
         for obj in list(module.__dict__.values()):
             # Check if it's a class type cause otherwise issubclass() may raise a TypeError.
@@ -549,5 +572,6 @@ class ClemBot(commands.Bot):
             if is_cog and obj.__module__ == module.__name__:
                 yield obj
 
-    async def get_tag_prefix(self, ctx):
-        return await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id)
+    async def get_tag_prefix(self, ctx: ext.ClemBotContext[ClemBot]) -> list[str]:
+        assert ctx.guild is not None
+        return t.cast(list[str], await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id))
