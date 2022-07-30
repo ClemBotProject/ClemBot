@@ -2,6 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.models.channel_models import Channel
 
 
 class ChannelRoute(BaseRoute):
@@ -12,8 +13,8 @@ class ChannelRoute(BaseRoute):
         json = {"Id": channel_id, "Name": name, "GuildId": guild_id}
         await self._client.post("bot/channels", data=json, **kwargs)
 
-    async def get_channel(self, channel_id: int) -> t.Any:
-        return await self._client.get(f"bot/channels/{channel_id}")
+    async def get_channel(self, channel_id: int) -> Channel:
+        return Channel(**await self._client.get(f"bot/channels/{channel_id}"))
 
     async def edit_channel(self, channel_id: int, name: str, **kwargs: t.Any) -> None:
         json = {

@@ -58,7 +58,7 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def resetguilds(self, ctx, apply: bool = False):
         db_guilds = await self.bot.guild_route.get_all_guilds()
-        db_guilds_ids = set(g["id"] for g in db_guilds)
+        db_guilds_ids = set(g.id for g in db_guilds)
         disc_guilds = set(g.id for g in self.bot.guilds)
 
         difference = db_guilds_ids - disc_guilds

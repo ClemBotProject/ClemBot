@@ -2,7 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.models import Tag
+from bot.models.tag_models import Tag
 
 
 class TagRoute(BaseRoute):

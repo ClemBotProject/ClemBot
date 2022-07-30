@@ -4,6 +4,7 @@ import discord
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.models.user_models import User
 
 
 class UserRoute(BaseRoute):
@@ -28,8 +29,8 @@ class UserRoute(BaseRoute):
 
         await self._client.post("bot/users/createbulk", data=json, **kwargs)
 
-    async def get_user(self, user_id: int) -> dict[str, t.Any]:
-        return t.cast(dict[str, t.Any], await self._client.get(f"bot/users/{user_id}"))
+    async def get_user(self, user_id: int) -> User:
+        return User(**await self._client.get(f"bot/users/{user_id}"))
 
     async def get_user_slot_scores(self, user_id: int, guild_id: int, limit: int) -> t.Any:
         return await self._client.get(f"bot/users/{user_id}/{guild_id}/slotscores?limit={limit}")

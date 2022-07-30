@@ -5,6 +5,7 @@ import typing as t
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 from bot.consts import GuildSettings
+from bot.models.guild_models import Guild, SlotScore
 
 
 class GuildRoute(BaseRoute):
@@ -29,26 +30,18 @@ class GuildRoute(BaseRoute):
     async def leave_guild(self, guild_id: int) -> None:
         await self._client.delete(f"bot/guilds/{guild_id}")
 
-    async def get_guild(self, guild_id: int) -> t.Any:
-        return await self._client.get(f"bot/guilds/{guild_id}")
+    async def get_guild(self, guild_id: int) -> Guild:
+        return Guild(**await self._client.get(f"bot/guilds/{guild_id}"))
 
-    async def get_all_guilds(self) -> list[dict[str, t.Any]]:
-        return t.cast(list[dict[str, t.Any]], await self._client.get("bot/guilds"))
+    async def get_all_guilds(self) -> list[Guild]:
+        return [Guild(**i) for i in await self._client.get("bot/guilds")]
 
-    async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool) -> list[dict[str, t.Any]]:
+    async def get_guild_slot_scores(self, guild_id: int, limit: int, leader: bool) -> list[SlotScore]:
         resp = await self._client.get(
             f"bot/Guilds/{guild_id}/SlotScores", params={"leader": str(leader), "limit": limit}
         )
 
-        return t.cast(list[dict[str, t.Any]], resp["scores"])
-
-    async def get_guild_user_ids(self, guild_id: int) -> t.Optional[list[t.Any]]:
-        guild = await self._client.get(f"bot/guilds/{guild_id}")
-
-        if not guild:
-            return None
-
-        return t.cast(list[t.Any], guild["users"])
+        return [SlotScore(**i) for i in resp["scores"]]
 
     async def edit_guild(self, guild_id: int, name: str, owner_id: int) -> None:
         json = {"Id": guild_id, "Name": name, "OwnerId": owner_id}

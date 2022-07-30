@@ -4,7 +4,7 @@ import typing as t
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 from bot.consts import Infractions
-from bot.models import Infraction
+from bot.models.moderation_models import Infraction
 
 
 class ModerationRoute(BaseRoute):

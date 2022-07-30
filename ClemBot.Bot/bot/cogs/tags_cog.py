@@ -8,7 +8,7 @@ from bot import bot_secrets
 from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
-from bot.models import Tag
+from bot.models.tag_models import Tag
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 

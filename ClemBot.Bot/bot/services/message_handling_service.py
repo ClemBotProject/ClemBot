@@ -10,7 +10,7 @@ from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
-from bot.models import MessageDto, MessageEditDto
+from bot.models.message_models import Message, MessageEdit
 
 log = get_logger(__name__)
 
@@ -39,7 +39,7 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_create_message(batch_values, raise_on_error=False)
 
-        self.message_batch[message.id] = MessageDto(
+        self.message_batch[message.id] = Message(
             id=message.id,
             content=message.content,
             guild=message.guild.id,
@@ -67,7 +67,7 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
-        self.message_edit_batch.append(MessageEditDto(id=id, content=content, time=datetime.datetime.utcnow()))
+        self.message_edit_batch.append(MessageEdit(id=id, content=content, time=datetime.datetime.utcnow()))
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
