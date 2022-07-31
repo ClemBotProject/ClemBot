@@ -48,7 +48,7 @@ class AssignableRolesCog(commands.Cog):
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
         roles = []
         for role in assignable_roles:
-            r = ctx.guild.get_role(role["id"])
+            r = ctx.guild.get_role(role.id)
             if r is not None:
                 roles.append(r.name)
         return input_role in roles
@@ -60,7 +60,7 @@ class AssignableRolesCog(commands.Cog):
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
 
         str_role_list = [
-            str(i["name"]).casefold() for i in assignable_roles
+            str(i.name).casefold() for i in assignable_roles
         ]  # Case-fold to do case-insensitive matching
 
         # Compare input_role to role_list entries for matches
@@ -68,7 +68,7 @@ class AssignableRolesCog(commands.Cog):
 
         for j, val_j in enumerate(str_role_list):
             if str_input_role == val_j:
-                role = await commands.RoleConverter().convert(ctx, assignable_roles[j]["name"])
+                role = await commands.RoleConverter().convert(ctx, assignable_roles[j].name)
                 matching_roles.append(role)  # matching_roles.append(j)
 
         role_count = len(matching_roles)
@@ -182,7 +182,7 @@ class AssignableRolesCog(commands.Cog):
         pages = []
 
         if results:
-            for chunk in chunk_sequence([role["name"] for role in results], ROLE_LIST_CHUNK_SIZE):
+            for chunk in chunk_sequence([role.name for role in results], ROLE_LIST_CHUNK_SIZE):
                 embed = discord.Embed(title=title, color=Colors.ClemsonOrange)  # new
                 embed.add_field(name="Available:", value="\n".join(chunk), inline=True)
                 pages.append(embed)

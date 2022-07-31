@@ -2,7 +2,7 @@ from bot.utils.clem_bot_model import ClemBotModel
 from datetime import datetime
 
 
-class Message(ClemBotModel):
+class SingleBatchMessage(ClemBotModel):
     id: int
     content: str
     guild: int
@@ -11,7 +11,15 @@ class Message(ClemBotModel):
     time: datetime
 
 
-class MessageEdit(ClemBotModel):
+class SingleBatchMessageEdit(ClemBotModel):
     id: int
     content: str
     time: datetime
+
+
+class Message(ClemBotModel):
+    id: int
+    content: str
+    guild_id: int
+    channel_id: int
+    user_id: int

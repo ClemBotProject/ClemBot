@@ -2,6 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.models.role_models import Role, RoleFull
 
 
 class RoleRoute(BaseRoute):
@@ -13,8 +14,8 @@ class RoleRoute(BaseRoute):
 
         await self._client.post("bot/roles", data=json, **kwargs)
 
-    async def get_role(self, role_id: int) -> t.Any:
-        return await self._client.get(f"bot/roles/{role_id}")
+    async def get_role(self, role_id: int) -> RoleFull:
+        return RoleFull(**await self._client.get(f"bot/roles/{role_id}"))
 
     async def edit_role(self, role_id: int, name: str, is_admin: bool, **kwargs: t.Any) -> None:
         json = {"Id": role_id, "Name": name, "Admin": is_admin}
@@ -32,13 +33,13 @@ class RoleRoute(BaseRoute):
     async def get_guilds_roles(self, guild_id: int) -> t.Optional[list[int]]:
         return t.cast(t.Optional[list[int]], await self._client.get(f"bot/guilds/{guild_id}/roles"))
 
-    async def get_guilds_assignable_roles(self, guild_id: int) -> t.Optional[list[dict[str, t.Any]]]:
+    async def get_guilds_assignable_roles(self, guild_id: int) -> t.Optional[list[Role]]:
         roles = await self._client.get(f"bot/guilds/{guild_id}/roles")
 
         if not roles:
             return None
 
-        return [r for r in roles if r["isAssignable"]]
+        return [Role(**r) for r in roles if r["isAssignable"]]
 
     async def check_role_assignable(self, role_id: int) -> t.Optional[bool]:
         roles = await self._client.get(f"bot/roles/{role_id}")

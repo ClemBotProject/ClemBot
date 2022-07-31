@@ -2,6 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
+from bot.models.thread_models import Thread
 
 
 class ThreadRoute(BaseRoute):
@@ -14,8 +15,8 @@ class ThreadRoute(BaseRoute):
         json = {"Id": thread_id, "Name": name, "GuildId": guild_id, "ParentId": parent_id}
         await self._client.post("bot/threads", data=json, **kwargs)
 
-    async def get_thread(self, thread_id: int) -> t.Any:
-        return await self._client.get(f"bot/threads/{thread_id}")
+    async def get_thread(self, thread_id: int) -> Thread:
+        return Thread(**await self._client.get(f"bot/threads/{thread_id}"))
 
     async def edit_thread(self, thread_id: int, name: str, **kwargs: t.Any) -> None:
         json = {

@@ -10,7 +10,7 @@ from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
-from bot.models.message_models import Message, MessageEdit
+from bot.models.message_models import SingleBatchMessage, SingleBatchMessageEdit
 
 log = get_logger(__name__)
 
@@ -39,7 +39,7 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_create_message(batch_values, raise_on_error=False)
 
-        self.message_batch[message.id] = Message(
+        self.message_batch[message.id] = SingleBatchMessage(
             id=message.id,
             content=message.content,
             guild=message.guild.id,
@@ -67,7 +67,7 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
-        self.message_edit_batch.append(MessageEdit(id=id, content=content, time=datetime.datetime.utcnow()))
+        self.message_edit_batch.append(SingleBatchMessageEdit(id=id, content=content, time=datetime.datetime.utcnow()))
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
@@ -167,19 +167,19 @@ class MessageHandlingService(BaseService):
             if message is not None:
                 log.info(
                     "Uncached message edited By: {author} \nBefore: {before} \nAfter: {after}",
-                    author=message["userId"],
-                    before=message["content"],
+                    author=message.user_id,
+                    before=message.content,
                     after=payload.data["content"],
                 )
 
-                await self.batch_send_message_edit(message["id"], payload.data["content"])
+                await self.batch_send_message_edit(message.id, payload.data["content"])
 
                 embed = discord.Embed(
                     title=f":repeat: **Uncached message edited in #{channel.name}**",
                     color=Colors.ClemsonOrange,
                 )
 
-                before_chunk = self.split_string_chunks(message["content"], 900)
+                before_chunk = self.split_string_chunks(message.content, 900)
                 after_chunk = self.split_string_chunks(payload.data["content"], 900)
 
                 for i, val in enumerate(before_chunk):
@@ -286,7 +286,7 @@ class MessageHandlingService(BaseService):
                 title=f":wastebasket: **Uncached message deleted in #{channel.name}**",
                 color=Colors.ClemsonOrange,
             )
-            message_chunk = self.split_string_chunks(message["content"], 900)
+            message_chunk = self.split_string_chunks(message.content, 900)
             for i, val in enumerate(message_chunk):
                 embed.add_field(
                     name="**Message**" if i == 0 else "Cont...", value=f"```{val}```", inline=False

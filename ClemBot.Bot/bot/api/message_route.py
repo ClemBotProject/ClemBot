@@ -2,7 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.models.message_models import Message, MessageEdit
+from bot.models.message_models import Message, SingleBatchMessage, SingleBatchMessageEdit
 
 
 class MessageRoute(BaseRoute):
@@ -32,7 +32,7 @@ class MessageRoute(BaseRoute):
 
         await self._client.post("bot/messages", data=json, **kwargs)
 
-    async def batch_create_message(self, messages: list[Message], **kwargs: t.Any) -> None:
+    async def batch_create_message(self, messages: list[SingleBatchMessage], **kwargs: t.Any) -> None:
         json = {"Messages": [
             {
                 "Id": m.id,
@@ -59,7 +59,7 @@ class MessageRoute(BaseRoute):
 
         await self._client.patch("bot/messages", data=json)
 
-    async def batch_edit_message(self, messages: list[MessageEdit], **kwargs: t.Any) -> None:
+    async def batch_edit_message(self, messages: list[SingleBatchMessageEdit], **kwargs: t.Any) -> None:
         json = {"Messages": [
             {"Id": m.id, "Content": m.content, "Time": m.time.strftime("%Y-%m-%dT%H:%M:%S.%f")}
             for m in messages
@@ -67,8 +67,8 @@ class MessageRoute(BaseRoute):
 
         await self._client.patch("bot/messages", data=json, **kwargs)
 
-    async def get_message(self, message_id: int) -> t.Any:
-        return await self._client.get(f"bot/messages/{message_id}")
+    async def get_message(self, message_id: int) -> Message:
+        return Message(**await self._client.get(f"bot/messages/{message_id}"))
 
     async def range_count_messages(self, user_id: int, guild_id: int, days: int) -> int:
         json = {"UserId": user_id, "GuildId": guild_id, "Days": days}
