@@ -13,7 +13,7 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
-from bot.utils.converters import Duration
+from bot.utils.converters import FutureDuration
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
@@ -124,19 +124,16 @@ class RandomCog(commands.Cog):
     @ext.long_help(
         "Creates a raffle for giveaways inside discord and picks a random winner from all reactors after a specified time frame"
     )
-    @ext.short_help("Create giveaways!")
-    @ext.example(("raffle 1h this is fun", "raffle 1d a whole day raffle!"))
-    async def raffle(self, ctx, time: typing.Optional[Duration] = 5, *, reason):
-        if isinstance(time, datetime):
-            delay_time = (time - datetime.utcnow()).total_seconds()
-        else:
-            delay_time = time
+    @ext.short_help('Create giveaways!')
+    @ext.example(('raffle 1h this is fun', 'raffle 1d a whole day raffle!'))
+    async def raffle(self, ctx, time: FutureDuration, *, reason):
+        wait = (time - datetime.utcnow()).total_seconds()
 
         description = f"Raffle for {reason}\nReact with :tickets: to enter the raffle"
         embed = discord.Embed(title="RAFFLE", color=Colors.ClemsonOrange, description=description)
         msg = await ctx.send(embed=embed)
-        await msg.add_reaction("🎟️")
-        await asyncio.sleep(delay_time)
+        await msg.add_reaction('🎟️')
+        await asyncio.sleep(wait)
 
         cache_msg = await ctx.fetch_message(msg.id)
         for reaction in cache_msg.reactions:

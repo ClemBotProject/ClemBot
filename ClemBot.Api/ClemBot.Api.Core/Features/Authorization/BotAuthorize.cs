@@ -60,7 +60,7 @@ public class BotAuthorize
             _logger.LogInformation("Generating Claim: {BotApiKey}", Claims.BotApiKey);
             var claims = new[]
             {
-                new Claim(Claims.BotApiKey, request.Key)
+                new Claim(Claims.BotApiKey, "")
             };
 
             _logger.LogInformation("Generating JWT Access Token");

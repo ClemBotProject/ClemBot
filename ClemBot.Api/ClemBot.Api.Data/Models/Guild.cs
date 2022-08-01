@@ -26,8 +26,6 @@ public class Guild
 
     public List<Infraction> Infractions { get; set; } = new();
 
-    public List<Reminder> Reminders { get; set; } = new();
-
     public List<CustomPrefix> CustomPrefixes { get; set; } = new();
 
     public List<CustomTagPrefix> CustomTagPrefixes { get; set; } = new();

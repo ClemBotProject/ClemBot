@@ -1087,7 +1087,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.18"
+version = "1.26.19"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
@@ -1977,8 +1977,8 @@ types-requests = [
     {file = "types_requests-2.28.6-py3-none-any.whl", hash = "sha256:d8d7607419cd4b41a7b9497e15e8c0bad78d50df43c48ad25bc526a11518c3a9"},
 ]
 types-urllib3 = [
-    {file = "types-urllib3-1.26.18.tar.gz", hash = "sha256:8d65dfc04e9250447899843633c445a1f60f99c30b4807e96a4e1a707568eeda"},
-    {file = "types_urllib3-1.26.18-py3-none-any.whl", hash = "sha256:10ac26d8d4921bde84fa2b7ead6b3061ea81e52e9fa5ed3382538eb49354ac2a"},
+    {file = "types-urllib3-1.26.19.tar.gz", hash = "sha256:45b307bdb73d2eac0c2fb1386da97e51c9ae7f1474ef35f61024c3084b6bf371"},
+    {file = "types_urllib3-1.26.19-py3-none-any.whl", hash = "sha256:540bf5a42ba09a4a58c406cb2c2c8654b0aadf413f8337fdc184711ab48b900c"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},

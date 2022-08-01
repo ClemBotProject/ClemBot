@@ -89,6 +89,7 @@ class ClemBot(commands.Bot):
         self.thread_route: thread_route.ThreadRoute = None  # type: ignore
         self.slots_score_route: slots_score_route.SlotsScoreRoute = None  # type: ignore
         self.health_check_route: health_check_route.HealthCheckRoute = None  # type: ignore
+        self.reminder_route: reminder_route.ReminderRoute = None  # type: ignore
 
         self.active_services: dict[str, base_service.BaseService] = {}
 
