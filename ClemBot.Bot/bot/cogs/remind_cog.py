@@ -10,7 +10,7 @@ from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.models import Reminder
 from bot.utils import converters
-from bot.utils.helpers import parse_datetime
+from bot.utils.helpers import parse_datetime, format_duration
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class RemindCog(commands.Cog):
     def __init__(self, bot: ClemBot):
         self.bot = bot
 
-    @ext.group(aliases=['remindme'], case_insensitive=True)
+    @ext.group(aliases=['remindme', 'remind'], case_insensitive=True, invoke_without_command=True)
     @ext.long_help(
         """
         This command will direct message the user with their message at specified time in the future.
@@ -39,26 +39,20 @@ class RemindCog(commands.Cog):
     )
     @ext.short_help('Creates a reminder')
     @ext.example((
-        'remind 24h',
-        'remind 5m Exam!',
-        'remind 1h Homework!',
-        'remind 4y Graduation',
-        'remind 3y1M4w1d5h9m2s Pi'
+        'reminder 24h',
+        'reminder 5m Exam!',
+        'reminder 1h Homework!',
+        'reminder 4y Graduation',
+        'reminder 3y1M4w1d5h9m2s Pi'
     ))
-    async def reminder(self, ctx: commands.Context):
-        pass
-
-    @reminder.command()
-    @ext.long_help('Add a reminder.')
-    @ext.short_help('Add a reminder.')
-    async def add(self, ctx: commands.Context, wait: converters.FutureDuration, *, content: t.Optional[str]):
+    async def reminder(self, ctx: commands.Context, wait: converters.FutureDuration, *, content: t.Optional[str]):
         try:
             await self.bot.messenger.publish(Events.on_set_reminder, ctx, wait, content)
         except Exception as e:
             log.error('Failed to create reminder.', exc_info=e)
             return await self._error_embed(ctx, 'Failed to create reminder.')
         embed = discord.Embed(title='⏰ Reminder Created', color=Colors.ClemsonOrange)
-        embed.add_field(name='Time', value=wait)
+        embed.add_field(name='Time', value=format_duration(wait))
         embed.add_field(name='Message', value=f'{content or None}')
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
