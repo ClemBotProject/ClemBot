@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClemBot.Api.Data.Migrations
 {
     [DbContext(typeof(ClemBotContext))]
-    [Migration("20220725015518_ChangedReminderModel")]
-    partial class ChangedReminderModel
+    [Migration("20220801012041_UpdateRemindersTable")]
+    partial class UpdateRemindersTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -337,9 +337,6 @@ namespace ClemBot.Api.Data.Migrations
                     b.Property<bool>("Dispatched")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal?>("GuildId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<string>("Link")
                         .HasColumnType("text");
 
@@ -350,8 +347,6 @@ namespace ClemBot.Api.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GuildId");
 
                     b.HasIndex("UserId");
 
@@ -664,10 +659,6 @@ namespace ClemBot.Api.Data.Migrations
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Reminder", b =>
                 {
-                    b.HasOne("ClemBot.Api.Data.Models.Guild", null)
-                        .WithMany("Reminders")
-                        .HasForeignKey("GuildId");
-
                     b.HasOne("ClemBot.Api.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -794,8 +785,6 @@ namespace ClemBot.Api.Data.Migrations
                     b.Navigation("Infractions");
 
                     b.Navigation("Messages");
-
-                    b.Navigation("Reminders");
 
                     b.Navigation("Roles");
 

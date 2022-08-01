@@ -6,7 +6,7 @@ using NodaTime;
 
 namespace ClemBot.Api.Data.Migrations
 {
-    public partial class ChangedReminderModel : Migration
+    public partial class UpdateRemindersTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
