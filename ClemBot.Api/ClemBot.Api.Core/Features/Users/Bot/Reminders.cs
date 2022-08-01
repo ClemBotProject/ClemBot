@@ -26,6 +26,8 @@ public class Reminders
 
         public LocalDateTime Time { get; set; }
 
+        public bool Dispatched { get; set; }
+
         public ulong UserId { get; set; }
     }
 
@@ -59,6 +61,7 @@ public class Reminders
                     Link = item.Link,
                     Content = item.Content,
                     Time = item.Time,
+                    Dispatched = item.Dispatched,
                     UserId = item.UserId
                 })
                 .ToListAsync();
