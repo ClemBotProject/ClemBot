@@ -28,6 +28,8 @@ public class Details
 
         public LocalDateTime Time { get; set; }
 
+        public bool Dispatched { get; set; }
+
         public ulong UserId { get; set; }
     }
 
@@ -56,6 +58,7 @@ public class Details
                     Link = item.Link,
                     Content = item.Content,
                     Time = item.Time,
+                    Dispatched = item.Dispatched,
                     UserId = item.UserId
                 })
                 .FirstOrDefaultAsync();

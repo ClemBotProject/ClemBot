@@ -37,4 +37,5 @@ class Reminder(DataClassJsonMixin):
     link: str
     content: Optional[str]
     time: str
+    dispatched: bool
     user_id: int

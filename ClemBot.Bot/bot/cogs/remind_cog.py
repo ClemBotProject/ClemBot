@@ -83,6 +83,9 @@ class RemindCog(commands.Cog):
             return await self._error_embed(ctx, f'A reminder with the ID `{reminder_id}` does not exist.')
         if reminder.user_id != ctx.author.id:
             return await self._error_embed(ctx, 'You do not own this reminder!')
+        if reminder.dispatched:
+            return await self._error_embed(ctx,
+                                           f'The reminder with the ID `{reminder_id}` was already dispatched/deleted.')
         await self.bot.messenger.publish(Events.on_delete_reminder, reminder_id)
         embed = discord.Embed(title='⏰ Reminder Deleted', color=Colors.ClemsonOrange)
         embed.description = f'Successfully deleted reminder #{reminder_id}.'
