@@ -7,8 +7,9 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.consts import Claims, Colors, DesignatedChannels, Moderation
 from bot.messaging.events import Events
-from bot.utils.converters import Duration, DurationDelta
+from bot.utils.converters import FutureDuration
 from bot.utils.user_choice import UserChoice
+from bot.utils.helpers import format_duration
 
 log = logging.getLogger(__name__)
 
@@ -25,16 +26,13 @@ class MuteCog(commands.Cog):
     @ext.short_help('Mutes a user')
     @ext.example(('mute @SomeUser 1d Timeout', 'mute @SomUser 2d1h5m A much longer timeout'))
     @ext.required_claims(Claims.moderation_mute)
-    async def mute(self, ctx: commands.Context, subject: discord.Member, time: DurationDelta, *, reason: t.Optional[str]):
+    async def mute(self, ctx: commands.Context, subject: discord.Member, duration: FutureDuration, *, reason: t.Optional[str]):
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.add_field(name='Reason',
                             value=f'Reason length is greater than max {Moderation.max_reason_length} characters.')
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
-
-        duration_str = self._get_time_str(time)
-        time = await Duration().convert(ctx, time)
 
         if ctx.author.top_role.position <= subject.top_role.position:
             embed = discord.Embed(color=Colors.Error)
@@ -56,19 +54,19 @@ class MuteCog(commands.Cog):
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             return await ctx.send(embed=embed)
 
-        #Publish that a mute happened
+        # Publish that a mute happened
         await self.bot.messenger.publish(Events.on_bot_mute,
                                          guild=ctx.guild,
                                          author=ctx.author,
                                          subject=subject,
-                                         duration=time,
+                                         duration=duration,
                                          reason=reason)
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f'{subject} Muted :mute:'
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=subject.display_avatar.url)
-        embed.description = f'**{duration_str}** \n{reason}'
+        embed.description = f'**{format_duration(duration)}** \n{reason}'
 
         await ctx.send(embed=embed)
 
@@ -77,7 +75,7 @@ class MuteCog(commands.Cog):
         embed.title = 'Guild Member Muted :mute:'
         embed.set_author(name=f'{ctx.author}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
         embed.add_field(name=str(subject), value=f'Id: {subject.id}')
-        embed.add_field(name='Duration :timer:', value=duration_str)
+        embed.add_field(name='Duration :timer:', value=format_duration(duration))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
         embed.set_thumbnail(url=subject.display_avatar.url)
@@ -92,7 +90,7 @@ class MuteCog(commands.Cog):
         embed.title = 'You have been muted  :mute:'
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=str(ctx.guild.icon.url))
-        embed.add_field(name='Duration :timer:', value=duration_str)
+        embed.add_field(name='Duration :timer:', value=format_duration(duration))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
 
@@ -105,7 +103,6 @@ class MuteCog(commands.Cog):
                                              DesignatedChannels.moderation_log,
                                              ctx.guild.id,
                                              embed)
-
 
     @ext.command()
     @ext.long_help(
@@ -190,16 +187,6 @@ class MuteCog(commands.Cog):
         embed.title = f'@{Moderation.mute_role_name} Successfully Configured  :white_check_mark:'
         await ctx.send(embed=embed)
         return True
-
-    def _get_time_str(self, elapsed):
-        s = ''
-        if elapsed.days > 0:
-            s += f'{elapsed.days} Day{"s" if elapsed.days > 1 else ""} '
-        if elapsed.hours > 0:
-            s += f'{elapsed.hours} Hour{"s" if elapsed.hours > 1 else ""}'
-        if elapsed.minutes > 0:
-            s += f'{elapsed.minutes} Minute{"s" if elapsed.minutes > 1 else ""}'
-        return s
 
 
 def setup(bot):

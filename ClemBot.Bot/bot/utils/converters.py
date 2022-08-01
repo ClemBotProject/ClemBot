@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import ConversionError
 from discord.ext.commands.errors import UserInputError
+
 from bot.consts import Claims
 from bot.errors import ConversionError
 
@@ -51,21 +52,28 @@ class DurationDelta(Converter):
         return delta
 
 
-class Duration(DurationDelta):
-    """Convert duration strings into UTC datetime.datetime objects."""
+class FutureDuration(DurationDelta):
+    """Convert duration strings into UTC datetime.datetime objects represented in the future."""
 
     async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
-        """
-        Converts a `duration` string to a datetime object that's `duration` in the future.
-        The converter supports the same symbols for each unit of time as its parent class.
-        """
         delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
         now = datetime.utcnow()
-
         try:
             return now + delta
         except ValueError:
-            raise ConversionError(f"`{duration}` results in a datetime outside the supported range.")
+            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
+
+
+class PastDuration(DurationDelta):
+    """Converts duration strings into UTC datetime.datetime objects represented in the past."""
+
+    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
+        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
+        now = datetime.utcnow()
+        try:
+            return now - delta
+        except ValueError:
+            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
 
 
 class ClaimsConverter(Converter):
@@ -76,6 +84,7 @@ class ClaimsConverter(Converter):
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
+
 
 class HonorsConverter(Converter):
     """Sanitize honors argument input for grades_cog"""

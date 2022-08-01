@@ -1,4 +1,4 @@
-using System;
+using NodaTime;
 
 namespace ClemBot.Api.Data.Models;
 
@@ -8,10 +8,11 @@ public class Reminder
 
     public string Link { get; set; }
 
-    public DateTime Time { get; set; }
+    public string? Content { get; set; }
 
-    public ulong MessageId { get; set; }
-    public Guild Message { get; set; }
+    public LocalDateTime Time { get; set; }
+
+    public bool Dispatched { get; set; } = false;
 
     public ulong UserId { get; set; }
     public User User { get; set; }

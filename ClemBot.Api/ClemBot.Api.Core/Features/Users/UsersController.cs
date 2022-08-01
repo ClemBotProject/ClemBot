@@ -107,4 +107,14 @@ public class UsersController : ControllerBase
             { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpGet("bot/[controller]/{UserId}/reminders")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Reminders([FromRoute] Bot.Reminders.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
 }
