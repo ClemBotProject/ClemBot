@@ -32,9 +32,8 @@ class Messenger:
         self._events = dict[str, list[wr.ReferenceType[t.Any]]]()
 
         # Error callback to report exceptions in queued events back to
-        self.error_callback: t.Optional[t.Callable[..., t.Any]] = None
+        self.error_callback: t.Callable[..., t.Any] | None = None
 
-        # pylint: disable=E1136
         self._guild_event_queue = dict[int, asyncio.Queue[QueuedEvent]]()
 
         self._queue_dispatch_tasks = dict[int, DispatchQueue]()
