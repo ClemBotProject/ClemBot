@@ -50,7 +50,7 @@ class ReminderService(BaseService):
         self.bot.scheduler.cancel(self.reminders[reminder_id])
         self.reminders.pop(reminder_id)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         reminders = await self.bot.reminder_route.fetch_all_reminders(raise_on_error=True)
         for (reminder_id, time) in reminders:
             if (time - datetime.utcnow()).total_seconds() <= 0:

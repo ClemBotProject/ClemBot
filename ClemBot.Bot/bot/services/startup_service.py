@@ -52,7 +52,7 @@ class StartupService(BaseService):
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_threads(guild)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
 
         # The startup load is too heavy on prod to reset state everytime we restart,
         # So we should only do this on dev bots. We rely on the 24/7 uptime of the bot to

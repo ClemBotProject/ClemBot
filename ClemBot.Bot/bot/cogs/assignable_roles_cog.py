@@ -27,7 +27,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Lists all roles that have been marked as assignable in this server")
     @ext.short_help("Defines custom assignable roles")
     @ext.example("roles")
-    async def roles(self, ctx: commands.Context[ClemBot], *, input_role: t.Optional[str] = None) -> None:
+    async def roles(self, ctx: ext.ClemBotContext[ClemBot], *, input_role: t.Optional[str] = None) -> None:
         if input_role is None:
             await self.send_role_list(ctx, "Assignable Roles")
             return
@@ -43,7 +43,7 @@ class AssignableRolesCog(commands.Cog):
         except BadArgument:  # If RoleConverter failed
             await self.find_possible_roles(ctx, input_role)
 
-    async def check_role_assignable(self, ctx: commands.Context[ClemBot], input_role: str) -> bool:
+    async def check_role_assignable(self, ctx: ext.ClemBotContext[ClemBot], input_role: str) -> bool:
         assert ctx.guild is not None
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
         roles = []
@@ -53,7 +53,7 @@ class AssignableRolesCog(commands.Cog):
                 roles.append(r.name)
         return input_role in roles
 
-    async def find_possible_roles(self, ctx: commands.Context[ClemBot], input_role: str) -> None:
+    async def find_possible_roles(self, ctx: ext.ClemBotContext[ClemBot], input_role: str) -> None:
         # Casefold the roles
         str_input_role = str(input_role).casefold()
         assert ctx.guild is not None
@@ -82,7 +82,7 @@ class AssignableRolesCog(commands.Cog):
                 ctx, f"Multiple roles found for @{input_role}", matching_roles, role_count
             )
 
-    async def send_matching_roles_list(self, ctx: commands.Context[ClemBot], title: str, matching_roles: list[discord.Role], role_count: int) -> None:
+    async def send_matching_roles_list(self, ctx: ext.ClemBotContext[ClemBot], title: str, matching_roles: list[discord.Role], role_count: int) -> None:
         names = ""
         reactions = [
             "\u0031\ufe0f\u20e3",
@@ -175,7 +175,7 @@ class AssignableRolesCog(commands.Cog):
         )  # Attempt to assign user the requested role
         await mes.delete()  # Delete message now that user has made a successful choice
 
-    async def send_role_list(self, ctx: commands.Context[ClemBot], title: str) -> None:
+    async def send_role_list(self, ctx: ext.ClemBotContext[ClemBot], title: str) -> None:
         assert ctx.guild is not None
         results = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
         # list of all available roles
@@ -200,7 +200,7 @@ class AssignableRolesCog(commands.Cog):
             timeout=360,
         )
 
-    async def set_role(self, ctx: commands.Context[ClemBot], role: discord.Role) -> None:
+    async def set_role(self, ctx: ext.ClemBotContext[ClemBot], role: discord.Role) -> None:
 
         if not await self.bot.role_route.check_role_assignable(role.id):
             await self.send_role_list(ctx, f"@{str(role)} is not an assignable role")
@@ -213,7 +213,7 @@ class AssignableRolesCog(commands.Cog):
         else:
             await self.add_role(ctx, role)
 
-    async def add_role(self, ctx: commands.Context[ClemBot], role: discord.Role) -> None:
+    async def add_role(self, ctx: ext.ClemBotContext[ClemBot], role: discord.Role) -> None:
         assert isinstance(ctx.author, discord.Member)
         await ctx.author.add_roles(t.cast(discord.abc.Snowflake, role))
 
@@ -224,7 +224,7 @@ class AssignableRolesCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def remove_role(self, ctx: commands.Context[ClemBot], role: discord.Role) -> None:
+    async def remove_role(self, ctx: ext.ClemBotContext[ClemBot], role: discord.Role) -> None:
         assert isinstance(ctx.author, discord.Member)
         await ctx.author.remove_roles(t.cast(discord.abc.Snowflake, role))
 
@@ -240,7 +240,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to add a role as assignable in the current guild")
     @ext.short_help("Marks a role as user assignable")
     @ext.example("roles add @SomeExampleRole")
-    async def add(self, ctx: commands.Context[ClemBot], *, role: discord.Role) -> None:
+    async def add(self, ctx: ext.ClemBotContext[ClemBot], *, role: discord.Role) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_add, role)
 
         title = f"Role @{role.name} Added as assignable :white_check_mark:"
@@ -253,7 +253,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to remove a role as assignable in the current guild")
     @ext.short_help("Removes a role as user assignable")
     @ext.example("roles delete @SomeExampleRole")
-    async def remove(self, ctx: commands.Context[ClemBot], *, role: discord.Role) -> None:
+    async def remove(self, ctx: ext.ClemBotContext[ClemBot], *, role: discord.Role) -> None:
         await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
 
         title = f"Role @{role.name} Removed as assignable :white_check_mark:"

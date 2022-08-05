@@ -16,5 +16,5 @@ class WelcomeMessageService(BaseService):
         if message and not user.bot:
             await user.send(message)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

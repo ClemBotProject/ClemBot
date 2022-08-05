@@ -95,5 +95,5 @@ class GuildHandlingService(BaseService):
                 f"New guild joined embed failed Guild Id: {guild.id}",
             )
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

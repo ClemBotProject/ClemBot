@@ -23,7 +23,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Claims authorization setup")
     @ext.example(("claims", "claims @some_role", "claims @some_user"))
-    async def claims(self, ctx: commands.Context[ClemBot], listing: t.Union[discord.Role, discord.Member]) -> None:
+    async def claims(self, ctx: ext.ClemBotContext[ClemBot], listing: t.Union[discord.Role, discord.Member]) -> None:
         assert isinstance(ctx.author, discord.Member)
 
         listing = listing or ctx.author
@@ -33,13 +33,13 @@ class ClaimsAuthorizationCog(commands.Cog):
         elif isinstance(listing, discord.Member):
             await self._send_user_claims(ctx, listing)
 
-    async def _send_role_claims(self, ctx: commands.Context[ClemBot], role: discord.Role) -> None:
+    async def _send_role_claims(self, ctx: ext.ClemBotContext[ClemBot], role: discord.Role) -> None:
         claims = await self.bot.claim_route.get_claims_role(role.id)
 
         embed = self._build_claims_embed(ctx, claims, role)
         await ctx.send(embed=embed)
 
-    async def _send_user_claims(self, ctx: commands.Context[ClemBot], user: discord.Member) -> None:
+    async def _send_user_claims(self, ctx: ext.ClemBotContext[ClemBot], user: discord.Member) -> None:
         claims = await self.bot.claim_route.get_claims_user(user)
 
         embed = self._build_claims_embed(ctx, claims, user)
@@ -47,7 +47,7 @@ class ClaimsAuthorizationCog(commands.Cog):
 
     def _build_claims_embed(
         self,
-        ctx: commands.Context[ClemBot],
+        ctx: ext.ClemBotContext[ClemBot],
         claims: t.Iterable[str],
         subject: t.Union[discord.Role, discord.Member],
     ) -> discord.Embed:
@@ -70,7 +70,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Add claims to a given role")
     @ext.example(("claims add emote_add @some_role", "claims add tag_add @some_other_role"))
-    async def add(self, ctx: commands.Context[ClemBot], claim: ClaimsConverter, role: discord.Role) -> None:
+    async def add(self, ctx: ext.ClemBotContext[ClemBot], claim: ClaimsConverter, role: discord.Role) -> None:
         if await self.bot.claim_route.check_claim_role(claim, role):
             embed = discord.Embed(
                 title=f"Error: {claim.name} already added to {role.name}", color=Colors.Error

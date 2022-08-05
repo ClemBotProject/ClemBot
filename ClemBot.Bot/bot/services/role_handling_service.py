@@ -48,5 +48,5 @@ class RoleHandlingService(BaseService):
             after.id, after.name, after.permissions.administrator, raise_on_error=True
         )
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

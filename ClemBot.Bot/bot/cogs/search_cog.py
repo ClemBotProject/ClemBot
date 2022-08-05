@@ -95,7 +95,7 @@ class SearchCog(commands.Cog):
         "Searches via DuckDuckGo's instant web API to bring up results from Wikipedia, wikiHow, and more."
     )
     @ext.example(["search clemson", "search computer science", "search how to tie a tie"])
-    async def search(self, ctx: commands.Context[ClemBot], *, query: str) -> None:
+    async def search(self, ctx: ext.ClemBotContext[ClemBot], *, query: str) -> None:
         result = await self.duck_search(query)
         msg = (
             await self.results(ctx, result)
@@ -121,7 +121,7 @@ class SearchCog(commands.Cog):
 
         return SearchResult(response)
 
-    async def results(self, ctx: commands.Context[ClemBot], result: SearchResult) -> discord.Message:
+    async def results(self, ctx: ext.ClemBotContext[ClemBot], result: SearchResult) -> discord.Message:
         embed = discord.Embed(
             title=f"[{result.category()}] {result.title()} - {result.source()}",
             color=Colors.ClemsonOrange,
@@ -139,7 +139,7 @@ class SearchCog(commands.Cog):
             
         return await ctx.send(embed=embed)
 
-    async def no_results(self, ctx: commands.Context[ClemBot], query: str) -> discord.Message:
+    async def no_results(self, ctx: ext.ClemBotContext[ClemBot], query: str) -> discord.Message:
         embed = discord.Embed(
             title="No Results",
             color=Colors.Error,

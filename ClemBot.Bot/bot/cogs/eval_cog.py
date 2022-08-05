@@ -32,7 +32,7 @@ class EvalCog(commands.Cog):
     )
     @ext.short_help("Runs arbitrary python code in discord")
     @ext.example('eval print("hello world")')
-    async def eval(self, ctx: commands.Context[ClemBot], *, code: str) -> None:
+    async def eval(self, ctx: ext.ClemBotContext[ClemBot], *, code: str) -> None:
         code = code.replace("```python", "")
         code = code.replace("```py", "")
         code = code.replace("`", "")

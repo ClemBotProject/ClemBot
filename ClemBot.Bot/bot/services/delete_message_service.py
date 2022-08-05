@@ -82,5 +82,5 @@ class DeleteMessageService(BaseService):
                 await msg.delete()
             del self.messages[reaction.message.id]
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

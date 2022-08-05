@@ -17,7 +17,7 @@ class InviteCog(commands.Cog):
     @ext.long_help("My invite link so you can invite me to your server!")
     @ext.short_help("Shows my invite link")
     @ext.example("invite")
-    async def invite(self, ctx: commands.Context[ClemBot]) -> None:
+    async def invite(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "Here is my invite link!  :grin:"
         embed.description = "Add me to your server!"
@@ -37,7 +37,7 @@ class InviteCog(commands.Cog):
     @ext.long_help("Shows information about me and my owner!")
     @ext.short_help("Provides bot info")
     @ext.example("about")
-    async def about(self, ctx: commands.Context[ClemBot]) -> None:
+    async def about(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
         owner = self.bot.get_user(t.cast(int, self.bot.owner_id))
         assert owner is not None
         assert self.bot.user is not None

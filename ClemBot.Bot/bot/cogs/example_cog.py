@@ -46,7 +46,7 @@ class ExampleCog(commands.Cog):
     # Decorator to define the example of the help command, this is to give users an actual usage example for your command
     # do not include the prefix in your example the help command will add the prefix in accordance with the context its called from
     @ext.example("hello")
-    async def hello(self, ctx: commands.Context[ClemBot], *, member: t.Optional[discord.Member]) -> None:
+    async def hello(self, ctx: ext.ClemBotContext[ClemBot], *, member: t.Optional[discord.Member]) -> None:
         # self is a python OOP concept, if you are unfamiliar brush up on how python handles classes
         # ctx is the context from which the command was invoked from, it contains the message, the guild
         # the command was sent in, the channel, etc
@@ -61,7 +61,7 @@ class ExampleCog(commands.Cog):
     # temporary placement till i can do it better
     @ext.command(hidden=True)
     @commands.has_guild_permissions(administrator=True)
-    async def slowmode(self, ctx: commands.Context[ClemBot], value: int) -> None:
+    async def slowmode(self, ctx: ext.ClemBotContext[ClemBot], value: int) -> None:
         assert isinstance(ctx.channel, discord.TextChannel) or isinstance(ctx.channel, discord.Thread)
         await ctx.channel.edit(slowmode_delay=value)
         await ctx.send(f"Slowmode set to {value}")

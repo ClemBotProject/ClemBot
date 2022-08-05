@@ -101,7 +101,7 @@ class DefineCog(commands.Cog):
     @ext.long_help("Gets the dictionary defintion of any given word")
     @ext.short_help("Gets a word's definition")
     @ext.example("define hello")
-    async def define(self, ctx: commands.Context[ClemBot], word) -> None:
+    async def define(self, ctx: ext.ClemBotContext[ClemBot], word) -> None:
         """
         Given a word, find its definition and any other relevant information
 

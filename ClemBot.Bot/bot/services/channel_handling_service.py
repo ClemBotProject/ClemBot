@@ -43,5 +43,5 @@ class ChannelHandlingService(BaseService):
         if before.name != after.name:
             await self.bot.channel_route.edit_channel(after.id, after.name, raise_on_error=True)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

@@ -40,5 +40,5 @@ class ThreadHandlingService(BaseService):
         if before.name != after.name:
             await self.bot.thread_route.edit_thread(after.id, after.name, raise_on_error=True)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

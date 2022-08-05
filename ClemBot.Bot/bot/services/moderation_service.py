@@ -172,7 +172,7 @@ class ModerationService(BaseService):
             )
 
     @BaseService.listener(Events.on_guild_channel_create)
-    async def on_channel_create(self, channel: discord.TextChannel):
+    async def on_channel_create(self, channel: discord.TextChannel) -> None:
         mute_role = discord.utils.get(channel.guild.roles, name=Moderation.mute_role_name)
 
         # no mute role configured, do nothing
@@ -199,7 +199,7 @@ class ModerationService(BaseService):
         )
 
     @BaseService.listener(Events.on_member_ban)
-    async def on_member_ban(self, guild, user):
+    async def on_member_ban(self, guild, user) -> None:
         log = [action async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)][0]
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "Guild Member Banned"
@@ -217,12 +217,12 @@ class ModerationService(BaseService):
             Events.on_send_in_designated_channel, DesignatedChannels.moderation_log, guild.id, embed
         )
 
-    async def _unmute_callback(self, guild_id: int, user_id: int, mute_id) -> None:
+    async def _unmute_callback(self, guild_id: int, user_id: int, mute_id: int) -> None:
         await self.bot.messenger.publish(
             Events.on_bot_unmute, guild_id, user_id, mute_id, "Mute Time Expired"
         )
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         for guild in self.bot.guilds:
             mutes = await self.bot.moderation_route.get_guild_infractions(guild.id)
 

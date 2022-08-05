@@ -2,6 +2,7 @@ import datetime
 import json
 import re
 from typing import Iterable
+from bot.clem_bot import ClemBot
 
 import discord
 
@@ -19,12 +20,12 @@ MAX_QUOTED_CONTENT_SIZE = 1021  # 1024 - 3 (for content + '...')
 
 
 class MessageHandlingService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.message_batch = {}
-        self.message_edit_batch = []
+        self.message_batch = dict[int, SingleBatchMessage]()
+        self.message_edit_batch = list[SingleBatchMessageEdit]()
 
-    async def batch_send_message(self, message: discord.Message):
+    async def batch_send_message(self, message: discord.Message) -> None:
         """
         Batch the messages to send them all at once to
         the api to avoid sending hundreds a second
@@ -48,7 +49,7 @@ class MessageHandlingService(BaseService):
             time=datetime.datetime.utcnow(),
         )
 
-    async def batch_send_message_edit(self, id: int, content: str):
+    async def batch_send_message_edit(self, id: int, content: str) -> None:
         """
         Batch the message edits to send them all at once to
         the api to avoid sending hundreds a second
@@ -113,7 +114,7 @@ class MessageHandlingService(BaseService):
         )  # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.listener(Events.on_message_edit)
-    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+    async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
         # We do not want to track messages that have embeds inserted via links
         if before.content == after.content:
             return
@@ -158,8 +159,7 @@ class MessageHandlingService(BaseService):
 
     # noinspection PyArgumentList
     @BaseService.listener(Events.on_raw_message_edit)
-    async def on_raw_message_edit(self, payload):
-
+    async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
@@ -245,7 +245,7 @@ class MessageHandlingService(BaseService):
             log.error("raw_message_edit Error: {e} \n", e=e)
 
     @BaseService.listener(Events.on_message_delete)
-    async def on_message_delete(self, message: discord.Message):
+    async def on_message_delete(self, message: discord.Message) -> None:
         log.info(
             "Uncached message deleted in #{channel} by {author}: {content}",
             channel=serializers.log_channel(message.channel),
@@ -274,8 +274,7 @@ class MessageHandlingService(BaseService):
         )
 
     @BaseService.listener(Events.on_raw_message_delete)
-    async def on_raw_message_delete(self, payload):
-
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
@@ -401,5 +400,5 @@ class MessageHandlingService(BaseService):
     def split_string_chunks(self, string: str, n: int) -> Iterable[str]:
         return (string[i : i + n] for i in range(0, len(string), n))
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

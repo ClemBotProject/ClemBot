@@ -82,5 +82,5 @@ class DesignatedChannelService(BaseService):
                     sent_messages.append(mes)
         return sent_messages
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

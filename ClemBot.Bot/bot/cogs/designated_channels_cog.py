@@ -22,7 +22,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Designated channel configuration")
     @ext.example("channel")
-    async def channel(self, ctx: commands.Context[ClemBot]) -> None:
+    async def channel(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
         """
         Sends a formatted embed of the possible designated channels and their listeners to
         the context of the command
@@ -67,7 +67,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Set a Designated channel")
     @ext.example("channel add user_join_log #some-channel")
-    async def add(self, ctx: commands.Context[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
+    async def add(self, ctx: ext.ClemBotContext[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
 
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
@@ -109,12 +109,12 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Removes a Designated channel listing")
     @ext.example("channel delete user_join_log #some-channel")
-    async def delete(self, ctx: commands.Context[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
+    async def delete(self, ctx: ext.ClemBotContext[ClemBot], channel_type: str, channel: discord.TextChannel) -> None:
         """
         Command to delete a registered TextChannel from a designated channel
 
         Args:
-            ctx (commands.Context[ClemBot]): Context
+            ctx (ext.ClemBotContext[ClemBot]): Context
             channel_type (str): Designated channel to remove the textchannel from
             channel (discord.TextChannel): Channel to unregister
         """

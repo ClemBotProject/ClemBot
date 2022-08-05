@@ -180,5 +180,5 @@ class PaginateService(BaseService):
         await reaction.message.edit(embed=msg.curr_content)
         await reaction.message.remove_reaction(reaction.emoji, user)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

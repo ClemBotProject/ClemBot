@@ -42,5 +42,5 @@ class ExampleService(BaseService):
     # wont run, even if you dont use it you still need to define it as a stub
     # all startup functionality related to this cog is started here,
     # things like updated the db  or reloading internal state
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

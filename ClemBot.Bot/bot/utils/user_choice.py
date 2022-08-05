@@ -4,12 +4,14 @@ import typing as t
 import discord
 from discord.ext import commands
 
+import bot.extensions as ext
+
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 
 
 class UserChoice:
-    def __init__(self, ctx: commands.Context[ClemBot], *, timeout: float):
+    def __init__(self, ctx: ext.ClemBotContext[ClemBot], *, timeout: float):
         self.ctx = ctx
         self.timeout = timeout
 

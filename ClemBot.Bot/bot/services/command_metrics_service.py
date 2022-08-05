@@ -26,5 +26,5 @@ class CommandMetricsService(BaseService):
             ctx.command.name, ctx.guild.id, ctx.channel.id, ctx.author.id
         )
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

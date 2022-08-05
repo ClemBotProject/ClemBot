@@ -50,5 +50,5 @@ class BotPingHelpService(BaseService):
 
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=message.author)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

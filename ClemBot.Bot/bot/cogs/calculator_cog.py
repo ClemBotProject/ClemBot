@@ -33,7 +33,7 @@ class CalculatorCog(commands.Cog):
     )
     @ext.short_help("Does your math for you")
     @ext.example(("calc 1+1", "calc 10/20"))
-    async def calc(self, ctx: commands.Context[ClemBot], *args: str) -> None:
+    async def calc(self, ctx: ext.ClemBotContext[ClemBot], *args: str) -> None:
         """
         A simple calculator that supports pemdas.
         Examples:
