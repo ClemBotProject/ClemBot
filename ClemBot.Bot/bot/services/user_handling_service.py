@@ -96,7 +96,7 @@ class UserHandlingService(BaseService):
             before.id, [r.id for r in after.roles], raise_on_error=False
         )
 
-    async def notify_user_join(self, user: discord.Member):
+    async def notify_user_join(self, user: discord.Member) -> None:
         embed = discord.Embed(title="New User Joined", color=Colors.ClemsonOrange)
         embed.add_field(name="Username", value=str(user))
         embed.add_field(name="Account Creation date", value=user.created_at.date())
@@ -111,7 +111,7 @@ class UserHandlingService(BaseService):
             embed,
         )
 
-    async def notify_user_remove(self, user: discord.Member):
+    async def notify_user_remove(self, user: discord.Member) -> None:
         embed = discord.Embed(title="Guild User Left", color=Colors.Error)
         embed.add_field(name="Username", value=str(user))
         embed.add_field(name="Account Creation date", value=user.created_at.date())

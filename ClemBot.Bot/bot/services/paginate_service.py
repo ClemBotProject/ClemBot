@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import discord
 from discord.ext.commands.errors import BadArgument
+from bot.clem_bot import ClemBot
 
 from bot.consts import Colors
 from bot.messaging.events import Events
@@ -18,16 +19,16 @@ class Message:
     pages: t.Union[list[discord.Embed], list[str]]
     _curr_page_num: int
     author: int
-    footer: str = None
-    embed_name: str = None
-    field_title: str = None
+    footer: t.Optional[str] = None
+    embed_name: t.Optional[str] = None
+    field_title: t.Optional[str] = None
 
     @property
     def curr_page_num(self) -> int:
         return self._curr_page_num
 
     @curr_page_num.setter
-    def curr_page_num(self, page_num: int):
+    def curr_page_num(self, page_num: int) -> None:
         self._curr_page_num = page_num
 
     @property
@@ -59,9 +60,9 @@ class PaginateService(BaseService):
     This service allows for messages sent by the bot to be paginated
     """
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.messages = {}
+        self.messages = dict[int, Message]()
         self.reactions = ["⏮️", "⬅️", "➡️", "⏭️"]
 
     # Called When a cog would like to be able to paginate a message
@@ -71,11 +72,11 @@ class PaginateService(BaseService):
         *,
         embed_name: str,
         field_title: str,
-        pages: list[str],
-        author: discord.Member = None,
+        pages: list[str] | str,
+        author: discord.Member,
         channel: discord.TextChannel,
         timeout: int = 60,
-    ):
+    ) -> None:
 
         if not isinstance(pages, list):
             pages = [pages]
@@ -91,7 +92,7 @@ class PaginateService(BaseService):
 
         # stores the message info
         message = Message(
-            pages, 0, author.id if author else None, embed_name=embed_name, field_title=field_title
+            pages, 0, author.id, embed_name=embed_name, field_title=field_title
         )
         self.messages[msg.id] = message
         await self.send_scroll_reactions(msg, author, timeout)
@@ -101,10 +102,10 @@ class PaginateService(BaseService):
         self,
         *,
         pages: list[discord.Embed],
-        author: discord.Member = None,
+        author: discord.Member,
         channel: discord.TextChannel,
         timeout: int = 60,
-    ):
+    ) -> None:
 
         if not isinstance(pages, list):
             pages = [pages]
@@ -118,7 +119,7 @@ class PaginateService(BaseService):
         if not pages[0].footer.text is None:
             footer = pages[0].footer.text
 
-        message = Message(pages, 0, author.id if author else None, footer=footer)
+        message = Message(pages, 0, author.id, footer=footer)
 
         pages[0].set_footer(text=f"{footer}\nPage 1 of {len(pages)}")
         # send the first initial embed
@@ -131,7 +132,7 @@ class PaginateService(BaseService):
 
     async def send_scroll_reactions(
         self, msg: discord.Message, author: discord.Member, timeout: int
-    ):
+    ) -> None:
         # add every emoji from the reaction list
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
@@ -151,8 +152,8 @@ class PaginateService(BaseService):
 
     @BaseService.listener(Events.on_reaction_add)
     async def change_page(
-        self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
-    ):
+        self, reaction: discord.Reaction, user: discord.Member
+    ) -> None:
 
         # check if emoji matches and user has perm to change page
         if reaction.emoji not in self.reactions or reaction.message.id not in self.messages.keys():
@@ -178,7 +179,7 @@ class PaginateService(BaseService):
                 msg.curr_page_num = len(msg.pages) - 1
 
         await reaction.message.edit(embed=msg.curr_content)
-        await reaction.message.remove_reaction(reaction.emoji, user)
+        await reaction.message.remove_reaction(reaction.emoji, t.cast(discord.abc.Snowflake, user))
 
     async def load_service(self) -> None:
         pass
