@@ -57,8 +57,8 @@ async def main() -> None:
     # set allowed mentions
     mentions = discord.AllowedMentions(everyone=False, roles=False)
 
-    bot_log.info("Bot Starting Up")
-    await ClemBot(
+    bot_log.info("Creating Bot Client")
+    client = ClemBot(
         messenger=messenger,
         scheduler=scheduler,
         command_prefix=custom_prefix.get_prefix,  # noqa: E126
@@ -68,7 +68,11 @@ async def main() -> None:
         max_messages=50000,
         allowed_mentions=mentions,
         intents=intents,
-    ).start(bot_secrets.secrets.bot_token)
+    )
+
+    async with client:
+        bot_log.info("Bot starting up")
+        await client.start(bot_secrets.secrets.bot_token)
 
 
 if __name__ == "__main__":
