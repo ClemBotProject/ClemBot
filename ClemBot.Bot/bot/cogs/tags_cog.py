@@ -34,7 +34,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Supports custom tag functionality")
     @ext.example(("tag", "tag mytag"))
-    async def tag(self, ctx: commands.Context, tag_name: str | None = None):
+    async def tag(self, ctx: ext.ClemBotCtx, tag_name: str | None = None) -> None:
         # check if a tag name was given
         if tag_name:
             tag_name = tag_name.lower()
@@ -66,7 +66,7 @@ class TagCog(commands.Cog):
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         # pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
-        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, ctx.prefix, "Available Tags", tags_url)
+        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), "Available Tags", tags_url)
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(
@@ -84,7 +84,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Lists owned tags")
     @ext.example(["tag owned", "tag owned @user"])
     # returns a list of all tags owned by the calling user or given user returned in pages
-    async def owned(self, ctx: commands.Context, user: discord.Member | None = None):
+    async def owned(self, ctx: ext.ClemBotCtx, user: discord.Member | None = None) -> None:
         if not user:
             user = ctx.author
         tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
@@ -103,7 +103,7 @@ class TagCog(commands.Cog):
 
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
         pages = self.chunked_tags(
-            owned_tags, TAG_CHUNK_SIZE, ctx.prefix, f"{user.name}'s Available Tags", tags_url
+            owned_tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), f"{user.name}'s Available Tags", tags_url
         )
 
         await self.bot.messenger.publish(
@@ -121,7 +121,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Creates a tag")
     @ext.example("tag add mytagname mytagcontent")
-    async def add(self, ctx, name: str, *, content: str):
+    async def add(self, ctx: ext.ClemBotCtx, name: str, *, content: str) -> None:
         name = name.lower()
 
         if len(name) > MAX_TAG_NAME_SIZE:
@@ -154,7 +154,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Deletes a tag")
     @ext.example("tag delete mytagname")
-    async def delete(self, ctx: commands.Context, name: str):
+    async def delete(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
 
@@ -164,7 +164,9 @@ class TagCog(commands.Cog):
 
         claims = await self.bot.claim_route.get_claims_user(ctx.author)
 
-        if ctx.command.claims_check(claims):
+        assert ctx.command is not None
+
+        if ctx.command.claims_check(t.cast(list[Claims | str], claims)):
             await self._delete_tag(tag.name, ctx)
             return
 
@@ -178,7 +180,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Provides info about tag")
     @ext.example("tag info mytagname")
-    async def info(self, ctx, name: str):
+    async def info(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
         owner = ctx.guild.get_member(tag.user_id)
@@ -201,7 +203,7 @@ class TagCog(commands.Cog):
     @ext.long_help("Searches for a tag in this guild using the inputted query")
     @ext.short_help("Searches for a tag")
     @ext.example("tag search pepepunch")
-    async def search(self, ctx: commands.Context, query: str):
+    async def search(self, ctx: ext.ClemBotCtx, query: str) -> None:
         tags = await self.bot.tag_route.search_tags(ctx.guild.id, query)
 
         embed = discord.Embed(
@@ -224,7 +226,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Edits a tag")
     @ext.long_help("Edits the content of a tag")
     @ext.example("tag edit mytagname mynewtagcontent")
-    async def edit(self, ctx, name: str, *, content: str):
+    async def edit(self, ctx: ext.ClemBotCtx, name: str, *, content: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
         # check that author is tag owner
@@ -247,7 +249,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Claims a tag")
     @ext.long_help("Claims a tag with the given name as your own")
     @ext.example("tag claim mytagname")
-    async def claim(self, ctx, name: str):
+    async def claim(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name)):
             return
         # make sure tag is unclaimed
@@ -267,7 +269,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Lists all unclaimed tags")
     @ext.long_help("Gets a list of all unowned tags available to be claimed")
     @ext.example(["tag unclaimed", "tag unowned"])
-    async def unclaimed(self, ctx):
+    async def unclaimed(self, ctx: ext.ClemBotCtx) -> None:
         guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
         unclaimed_tags = []
         for tag in guild_tags:
@@ -286,7 +288,7 @@ class TagCog(commands.Cog):
         # chunk the unclaimed tags into pages
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
         pages = self.chunked_tags(
-            unclaimed_tags, TAG_CHUNK_SIZE, ctx.prefix, "Unclaimed Tags", tags_url
+            unclaimed_tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), "Unclaimed Tags", tags_url
         )
 
         # send the pages to the paginator service
@@ -299,7 +301,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Gives your tag to someone else.")
     @ext.long_help("Transfers the tag to the given user")
     @ext.example(["tag transfer tagname @user", "tag give tagname @user"])
-    async def transfer(self, ctx, name: str, user: discord.User):
+    async def transfer(self, ctx: ext.ClemBotCtx, name: str, user: discord.User) -> None:
         # check if user is a bot
         if user.bot:
             await self._error_embed(ctx, f"Cannot transfer tag `{name}` to a bot.")
@@ -341,10 +343,10 @@ class TagCog(commands.Cog):
     @ext.ignore_claims_pre_invoke()
     @ext.short_help("Configure a custom command tag prefix")
     @ext.example(("tag prefix", "tag prefix ?", "tag prefix >>"))
-    async def prefix(self, ctx, *, tag_prefix: str | None = None):
+    async def prefix(self, ctx: ext.ClemBotCtx, *, tag_prefix: str | None = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
-        tag_prefixes = await self.bot.get_tag_prefix(ctx.message)
+        tag_prefixes = await self.bot.get_tag_prefix(ctx)
 
         if not tag_prefixes:
             tag_prefixes = [DEFAULT_TAG_PREFIX]
@@ -355,7 +357,8 @@ class TagCog(commands.Cog):
                 description=f'```{", ".join(tag_prefixes)}```',
                 color=Colors.ClemsonOrange,
             )
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if not await self.bot.claims_check(ctx):
             return await self._error_embed(
@@ -380,8 +383,8 @@ class TagCog(commands.Cog):
     @ext.long_help("Resets the bot tag prefix to the default")
     @ext.short_help("Resets the custom tag prefix")
     @ext.example("tag prefix reset")
-    async def reset(self, ctx):
-        if DEFAULT_TAG_PREFIX in await self.bot.get_tag_prefix(ctx.message):
+    async def reset(self, ctx: ext.ClemBotCtx) -> None:
+        if DEFAULT_TAG_PREFIX in await self.bot.get_tag_prefix(ctx):
             return await self._error_embed(ctx, f"{DEFAULT_TAG_PREFIX} is already the tag prefix.")
 
         await self.bot.custom_tag_prefix_route.set_custom_tag_prefix(
@@ -393,15 +396,19 @@ class TagCog(commands.Cog):
         embed.add_field(name="New Tag Prefix", value=f"```{DEFAULT_TAG_PREFIX}```")
         await ctx.send(embed=embed)
 
-    async def _delete_tag(self, name, ctx):
+    async def _delete_tag(self, name: str, ctx: ext.ClemBotCtx) -> None:
         name = name.lower()
-        dictionary = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
+        tag = await self.bot.tag_route.delete_tag(ctx.guild.id, name, raise_on_error=True)
+
+        if not tag:
+            return None
+
         embed = discord.Embed(title=":white_check_mark: Tag Deleted", color=Colors.ClemsonOrange)
-        embed.add_field(name="Name", value=dictionary["name"], inline=False)
+        embed.add_field(name="Name", value=tag.name, inline=False)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx, name: str) -> Tag | None:
+    async def _check_tag_exists(self, ctx: ext.ClemBotCtx, name: str) -> Tag | None:
         """
         Checks if the given tag exists.
         If so, returns the tag.
@@ -410,10 +417,10 @@ class TagCog(commands.Cog):
         name = name.lower()
         if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name)):
             await self._error_embed(ctx, f"Requested tag `{name}` does not exist.")
-            return
+            return None
         return tag
 
-    async def _check_tag_content(self, ctx, content: str) -> str | None:
+    async def _check_tag_content(self, ctx: ext.ClemBotCtx, content: str) -> str | None:
         """
         Checks if the given tag content meets max length & content size.
         If so, returns the content formatted.
@@ -424,13 +431,13 @@ class TagCog(commands.Cog):
             await self._error_embed(
                 ctx, f"Tag line number exceeds {MAX_NON_ADMIN_LINE_LENGTH} lines."
             )
-            return
+            return None
         if len(content) > MAX_TAG_CONTENT_SIZE:
             await self._error_embed(ctx, f"Tag content exceeds {MAX_TAG_CONTENT_SIZE} characters.")
-            return
+            return None
         return discord.utils.escape_mentions(content)
 
-    async def _error_embed(self, ctx, desc: str):
+    async def _error_embed(self, ctx: ext.ClemBotCtx, desc: str) -> None:
         """Short-hand for sending an error message w/ consistent formatting."""
         embed = discord.Embed(title="Error", color=Colors.Error, description=desc)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
@@ -439,7 +446,7 @@ class TagCog(commands.Cog):
             Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60
         )
 
-    def chunked_tags(self, tags_list: list, n: int, prefix: str, title: str, url: str):
+    def chunked_tags(self, tags_list: list[Tag], n: int, prefix: str, title: str, url: str) -> list[discord.Embed]:
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
         for chunk in chunk_sequence(tags_list, n):

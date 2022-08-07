@@ -264,8 +264,9 @@ class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
 
 
 class ClemBotContext(discord.ext.commands.Context[BotT]):
-    command: t.Optional[ClemBotCommand]
+    command: ClemBotCommand | None
     guild: discord.Guild
+    author: discord.Member
 
 
 ClemBotCtx: t.TypeAlias = ClemBotContext["ClemBot"]
