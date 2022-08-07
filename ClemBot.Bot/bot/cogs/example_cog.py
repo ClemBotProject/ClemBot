@@ -3,6 +3,7 @@
 # import the discord specific libraries we will use
 import typing as t
 
+# Import needed third party libraries
 import discord
 import discord.ext.commands as commands
 
@@ -57,7 +58,6 @@ class ExampleCog(commands.Cog):
         else:
             await ctx.send(f"Hello {member.name}... This feels familiar :thinking:")
         self._last_member = member
-
 
 
 # This is the setup function at the module level, d.py expects this function to
