@@ -171,7 +171,7 @@ class ExtBase:
         self.claims: set[str] = kwargs.get("claims") or getattr(func, "claims", None) or set()
         self.ignore_claims_pre_invoke = getattr(func, "ignore_claims_pre_invoke", False)
 
-    def claims_check(self, claims: list[str]) -> bool:
+    def claims_check(self, claims: list[str | Claims]) -> bool:
         """
         Checks if a given set of claims is valid for the current command
 

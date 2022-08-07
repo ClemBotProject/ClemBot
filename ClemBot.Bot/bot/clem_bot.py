@@ -12,13 +12,14 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
-from bot.api import *
-import bot.api as api
 import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
 import bot.extensions as ext
 import bot.services as services
 import bot.utils.log_serializers as serializers
+from bot.api import guild_route, user_route, role_route, channel_route, message_route, tag_route, designated_channel_route, welcome_message_route, \
+    custom_tag_prefix_route, custom_prefix_route, moderation_route, claim_route, commands_route, thread_route, slots_score_route, health_check_route, \
+    reminder_route
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
 from bot.errors import BotOnlyRequestError, ClaimsAccessError
@@ -74,23 +75,23 @@ class ClemBot(commands.Bot):
         self._after_invoke = self.on_after_command_invoke
 
         # pylint: disable=undefined-variable
-        self.guild_route: guild_route.GuildRoute = None  # type: ignore
-        self.user_route: user_route.UserRoute = None  # type: ignore
-        self.role_route: role_route.RoleRoute = None  # type: ignore
-        self.channel_route: channel_route.ChannelRoute = None  # type: ignore
-        self.message_route: message_route.MessageRoute = None  # type: ignore
-        self.tag_route: tag_route.TagRoute = None  # type: ignore
-        self.designated_channel_route: designated_channel_route.DesignatedChannelRoute = None  # type: ignore
-        self.welcome_message_route: welcome_message_route.WelcomeMessageRoute = None  # type: ignore
-        self.custom_prefix_route: custom_prefix_route.CustomPrefixRoute = None  # type: ignore
-        self.custom_tag_prefix_route: custom_tag_prefix_route.CustomTagPrefixRoute = None  # type: ignore
-        self.moderation_route: moderation_route.ModerationRoute = None  # type: ignore
-        self.claim_route: claim_route.ClaimRoute = None  # type: ignore
-        self.commands_route: commands_route.CommandsRoute = None  # type: ignore
-        self.thread_route: thread_route.ThreadRoute = None  # type: ignore
-        self.slots_score_route: slots_score_route.SlotsScoreRoute = None  # type: ignore
-        self.health_check_route: health_check_route.HealthCheckRoute = None  # type: ignore
-        self.reminder_route: reminder_route.ReminderRoute = None  # type: ignore
+        self.guild_route = guild_route.GuildRoute(self.api_client)
+        self.user_route = user_route.UserRoute(self.api_client)
+        self.role_route = role_route.RoleRoute(self.api_client)
+        self.channel_route = channel_route.ChannelRoute(self.api_client)
+        self.message_route = message_route.MessageRoute(self.api_client)
+        self.tag_route = tag_route.TagRoute(self.api_client)
+        self.designated_channel_route = designated_channel_route.DesignatedChannelRoute(self.api_client)
+        self.welcome_message_route = welcome_message_route.WelcomeMessageRoute(self.api_client)
+        self.custom_prefix_route = custom_prefix_route.CustomPrefixRoute(self.api_client)
+        self.custom_tag_prefix_route = custom_tag_prefix_route.CustomTagPrefixRoute(self.api_client)
+        self.moderation_route = moderation_route.ModerationRoute(self.api_client)
+        self.claim_route = claim_route.ClaimRoute(self.api_client)
+        self.commands_route = commands_route.CommandsRoute(self.api_client)
+        self.thread_route = thread_route.ThreadRoute(self.api_client)
+        self.slots_score_route = slots_score_route.SlotsScoreRoute(self.api_client)
+        self.health_check_route = health_check_route.HealthCheckRoute(self.api_client)
+        self.reminder_route = reminder_route.ReminderRoute(self.api_client)
 
         self.active_services: dict[str, base_service.BaseService] = {}
 
@@ -101,10 +102,6 @@ class ClemBot(commands.Bot):
         """
 
         await self.load_cogs()
-
-        # Load the route objects into the attributes so the
-        # startup service has active routes
-        self.load_routes(self.api_client)
 
         # Connect to the api Before the services are loaded, so they can begin their startup routines
         # this will block until the api is connected to, only THEN will we run our service startups
@@ -523,27 +520,12 @@ class ClemBot(commands.Bot):
             await self.global_error_handler(e)
         self.active_services[service.__name__] = s
 
-    def activate_route(self, client: ApiClient, route: t.Any) -> None:
-        log.info("Loading route: {route}", route=route.__module__)
-        r = route(api_client=client)
-        # Here we remove the first 8 characters of the module name
-        # That's because __module__ gives us the full name e.g bot.api.guild_route
-        # so we need to remove the bot.api. to correctly set the attr name
-        self.__setattr__(r.__module__[8:], r)
-
     async def load_services(self) -> None:
         log.info("Loading Services")
         for m in ClemBot.walk_modules("services", services):
             for s in ClemBot.walk_types(m, services.base_service.BaseService):
                 if s is not services.base_service.BaseService:
                     await self.activate_service(s)
-
-    def load_routes(self, client: ApiClient) -> None:
-        log.info("Loading routes")
-        for m in ClemBot.walk_modules("api", api):
-            for r in ClemBot.walk_types(m, api.base_route.BaseRoute):
-                if r is not api.base_route.BaseRoute:
-                    self.activate_route(client, r)
 
     async def load_cogs(self) -> None:
         log.info("Loading Cogs")
@@ -576,4 +558,4 @@ class ClemBot(commands.Bot):
 
     async def get_tag_prefix(self, ctx: ext.ClemBotContext[ClemBot]) -> list[str]:
         assert ctx.guild is not None
-        return t.cast(list[str], await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id))
+        return await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id)

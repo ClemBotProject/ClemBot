@@ -17,9 +17,9 @@ log = get_logger(__name__)
 
 class Scheduler:
     def __init__(self) -> None:
-        self._scheduled_tasks: dict[t.Hashable, asyncio.Task] = {}
+        self._scheduled_tasks: dict[t.Hashable, asyncio.Task[t.Any]] = {}
 
-    def schedule_at(self, callback: t.Awaitable, *, time: datetime) -> uuid.UUID:
+    def schedule_at(self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: datetime) -> uuid.UUID:
         """Schedules a callback for execution at a given datetime object
 
         Args:
@@ -47,7 +47,7 @@ class Scheduler:
 
         return self._schedule(delay_time, callback)
 
-    def schedule_in(self, callback: t.Awaitable, *, time: t.Union[int, float]) -> uuid.UUID:
+    def schedule_in(self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: t.Union[int, float]) -> uuid.UUID:
         """Schedules a callback for exection in a given number of seconds
 
         Args:
@@ -74,7 +74,7 @@ class Scheduler:
 
         return self._schedule(time, callback)
 
-    def get_task(self, task_id: int) -> Optional[Task]:
+    def get_task(self, task_id: int) -> Optional[Task[t.Any]]:
         if task_id in self._scheduled_tasks.keys():
             return self._scheduled_tasks[task_id]
         return None
@@ -83,7 +83,7 @@ class Scheduler:
         """Return True if a task with the given `task_id` is currently scheduled."""
         return task_id in self._scheduled_tasks
 
-    def cancel(self, task_id):
+    def cancel(self, task_id: uuid.UUID) -> None:
         try:
             self._scheduled_tasks[task_id].cancel()
         except KeyError:
@@ -92,7 +92,7 @@ class Scheduler:
 
         del self._scheduled_tasks[task_id]
 
-    def _schedule(self, time, coro: t.Awaitable):
+    def _schedule(self, time: float | int, coro: t.Coroutine[t.Any, t.Any, t.Any]) -> uuid.UUID:
 
         task_id = uuid.uuid4()
 
@@ -113,8 +113,8 @@ class Scheduler:
         return task_id
 
     async def _delayed_coro(
-        self, delay: t.Union[float, int], coro: t.Awaitable, task_id: uuid.UUID
-    ):
+        self, delay: float | int, coro: t.Coroutine[t.Any, t.Any, t.Any], task_id: uuid.UUID
+    ) -> None:
         try:
             # await the timed delay
             log.info(
@@ -137,13 +137,13 @@ class Scheduler:
             else:
                 log.info("Finally block reached for #{task_id}", task_id=str(task_id))
 
-    def _end_scheduled_task(self, task_id, coro):
+    def _end_scheduled_task(self, task_id: uuid.UUID, coro: t.Coroutine[t.Any, t.Any, t.Any]) -> None:
         finished_task = self._scheduled_tasks.get(task_id)
         if finished_task:
             del self._scheduled_tasks[task_id]
 
         with contextlib.suppress(asyncio.CancelledError):
-            exception = coro.exception()
+            exception = coro.exception()  # type: ignore
             # Log the exception if one exists.
             if exception:
                 raise exception

@@ -1,22 +1,25 @@
 import re
+import typing
 import typing as t
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
-from discord.ext.commands.errors import ConversionError
 from discord.ext.commands.errors import UserInputError
 
 from bot.consts import Claims
 from bot.errors import ConversionError
+import bot.extensions as ext
 
 """
 This converter code was copied from the python discord bot
 https://github.com/python-discord/bot/blob/master/bot/converters.py
 """
 
+T = t.TypeVar("T")
 
-class DurationDelta(Converter):
+
+class DurationDelta(Converter[T]):
     """Convert duration strings into dateutil.relativedelta.relativedelta objects."""
 
     duration_parser = re.compile(
@@ -29,7 +32,7 @@ class DurationDelta(Converter):
         r"((?P<seconds>\d+?) ?(seconds|second|sec|S|s))?"
     )
 
-    async def convert(self, ctx: Context, duration: str) -> relativedelta:
+    async def convert(self, ctx: t.Any, duration: str) -> T:
         """
         Converts a `duration` string to a relativedelta object.
         The converter supports the following symbols for each unit of time:
@@ -47,16 +50,20 @@ class DurationDelta(Converter):
             raise ConversionError(f"`{duration}` is not a valid duration string.")
 
         duration_dict = {unit: int(amount) for unit, amount in match.groupdict(default=0).items()}
-        delta = relativedelta(**duration_dict)
+        delta = relativedelta(**duration_dict)  # type: ignore
 
-        return delta
+        # Add one second to the delta to account for passing second when we send it,
+        # This fixes the embed being a second delayed
+        delta.seconds += 1
+
+        return t.cast(T, delta)
 
 
-class FutureDuration(DurationDelta):
+class FutureDuration(DurationDelta[relativedelta | datetime]):
     """Convert duration strings into UTC datetime.datetime objects represented in the future."""
 
-    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
-        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
+    async def convert(self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]) -> relativedelta | datetime:
+        delta = t.cast(relativedelta, duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration))
         now = datetime.utcnow()
         try:
             return now + delta
@@ -64,11 +71,11 @@ class FutureDuration(DurationDelta):
             raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
 
 
-class PastDuration(DurationDelta):
+class PastDuration(DurationDelta[relativedelta | datetime]):
     """Converts duration strings into UTC datetime.datetime objects represented in the past."""
 
-    async def convert(self, ctx: Context, duration: t.Union[str, relativedelta]) -> datetime:
-        delta = duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration)
+    async def convert(self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]) -> relativedelta | datetime:
+        delta = t.cast(relativedelta, duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration))
         now = datetime.utcnow()
         try:
             return now - delta
@@ -76,20 +83,20 @@ class PastDuration(DurationDelta):
             raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
 
 
-class ClaimsConverter(Converter):
+class ClaimsConverter(Converter[Claims]):
     """Convert a given claim string into its enum representation"""
 
-    async def convert(self, ctx: Context, claim: str) -> Claims:
+    async def convert(self, ctx: Context[ext.BotT], claim: str) -> Claims:
         try:
             return Claims.__members__[claim]
         except KeyError:
             raise ConversionError(f'`{claim}` is not a valid Claim')
 
 
-class HonorsConverter(Converter):
+class HonorsConverter(Converter[str]):
     """Sanitize honors argument input for grades_cog"""
 
-    async def convert(self, ctx: Context, argument: str) -> str:
+    async def convert(self, ctx: Context[ext.BotT], argument: str) -> str:
         honors = None
 
         if argument in ('honors', 'hon', 'h'):
@@ -104,6 +111,7 @@ class HonorsConverter(Converter):
         return honors
 
 
+@typing.no_type_check
 def trivia_cog_converter(input_length, input_list):  #converts the args as fast as possible
 
     url_parameters = []

@@ -1,7 +1,7 @@
 import typing as t
 
 from datetime import datetime
-from bot.models.reminder_models import Reminder
+from bot.models.reminder_models import Reminder, ReminderReload
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 from bot.utils.helpers import parse_datetime, format_datetime
@@ -48,10 +48,10 @@ class ReminderRoute(BaseRoute):
 
         return Reminder(**resp)
 
-    async def fetch_all_reminders(self, **kwargs: t.Any) -> list[tuple[int, datetime]]:
+    async def fetch_all_reminders(self, **kwargs: t.Any) -> list[ReminderReload]:
         resp = await self._client.get('bot/reminders', **kwargs)
 
         if not resp:
             return []
 
-        return [(i['id'], parse_datetime(i['time'])) for i in resp]
+        return [ReminderReload(**i) for i in resp]

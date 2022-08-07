@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from bot.models.clem_bot_model import ClemBotModel
 
 
@@ -7,7 +9,7 @@ class Infraction(ClemBotModel):
     author_id: int
     subject_id: int
     type: str
-    reason: str
-    duration: int
-    time: str
-    active: int
+    reason: str | None
+    duration: datetime | None
+    time: datetime
+    active: int | None
