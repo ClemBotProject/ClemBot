@@ -219,7 +219,7 @@ class ModerationService(BaseService):
 
         embed.set_author(name=log.user, icon_url=log.user.display_avatar.url)
 
-        # Don't send anything if clembot did the banning, we handled that case elsewhere
+        # Don't send anything in log channels if clembot did the banning, we handled that case elsewhere
         if log.user == self.bot.user:
             return
 

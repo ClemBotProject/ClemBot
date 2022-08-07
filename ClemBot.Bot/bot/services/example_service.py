@@ -19,14 +19,14 @@ log = get_logger(__name__)
 
 
 # Services are postfixed with "Service" by convention
-# The inherit from base service too allow the bot to dynamically
-# reflect over the types within and load all of the children of BaseService
+# They inherit from base service to allow the bot to dynamically
+# reflect over the types within and load all the children of BaseService
 # It also defines abstract load methods the bot depends on and handles registering
 # Instance methods as messenger event callbacks
 class ExampleService(BaseService):
     """
     This is an example service to demonstrate the expected layout
-    A service is defined as any functionality that doesnt directly interact with a discord user
+    A service is defined as any functionality that doesn't directly interact with a discord user
     or command, it handles background tasks and startup functionality
     """
 
@@ -42,8 +42,8 @@ class ExampleService(BaseService):
         pass
 
     # The load service abstract method implementation defined in BaseService
-    # If this method isnt added to a class that Inherits from BaseService the bot
-    # wont run, even if you dont use it you still need to define it as a stub
+    # If this method isn't added to a class that Inherits from BaseService the bot
+    # won't run, even if you don't use it you still need to define it as a stub
     # all startup functionality related to this cog is started here,
     # things like updated the db  or reloading internal state
     async def load_service(self) -> None:
