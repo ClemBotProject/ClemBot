@@ -59,14 +59,14 @@ class DeleteMessageService(BaseService):
 
     @BaseService.listener(Events.on_reaction_add)
     async def delete_message(
-        self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
+        self, reaction: discord.Reaction, user: discord.User | discord.Member
     ) -> None:
         role_ids = [role.id for role in user.roles] if isinstance(user, discord.Member) else []
         delete = False
 
         if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
             return
-        elif await self.bot.claim_route.check_claim_user(Claims.delete_message, user):
+        elif await self.bot.claim_route.check_claim_user(Claims.delete_message, t.cast(discord.Member, user)):
             delete = True
         elif user.id == self.messages[reaction.message.id]["Author"]:
             delete = True
