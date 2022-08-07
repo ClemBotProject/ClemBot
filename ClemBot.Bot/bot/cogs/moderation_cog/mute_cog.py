@@ -24,7 +24,7 @@ class MuteCog(commands.Cog):
     @ext.short_help("Mutes a user")
     @ext.example(("mute @SomeUser 1d Timeout", "mute @SomUser 2d1h5m A much longer timeout"))
     @ext.required_claims(Claims.moderation_mute)
-    async def mute(self, ctx: commands.Context, subject: discord.Member, duration: FutureDuration, *, reason: t.Optional[str]):
+    async def mute(self, ctx: commands.Context, subject: discord.Member, duration: FutureDuration, *, reason: str | None):
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
             embed.add_field(
@@ -114,7 +114,7 @@ class MuteCog(commands.Cog):
     @ext.example("Unmute @SomeUser Timeout")
     @ext.required_claims(Claims.moderation_mute)
     async def unmute(
-        self, ctx: commands.Context, subject: discord.Member, *, reason: t.Optional[str]
+        self, ctx: commands.Context, subject: discord.Member, *, reason: str | None
     ):
         mute_role = discord.utils.get(subject.guild.roles, name=Moderation.mute_role_name)
 

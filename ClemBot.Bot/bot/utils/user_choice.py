@@ -18,8 +18,8 @@ class UserChoice:
     async def send_confirmation(
         self,
         *,
-        content: t.Optional[str] = None,
-        embed: t.Optional[discord.Embed] = None,
+        content: str | None = None,
+        embed: discord.Embed | None = None,
         is_error: bool = False
     ) -> bool:
         if embed and content:

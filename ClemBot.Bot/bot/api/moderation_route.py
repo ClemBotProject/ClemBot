@@ -13,7 +13,7 @@ class ModerationRoute(BaseRoute):
 
     async def insert_ban(
         self, *, guild_id: int, author_id: int, subject_id: int, reason: str, **kwargs: t.Any
-    ) -> t.Optional[int]:
+    ) -> int | None:
         json = {
             "GuildId": guild_id,
             "AuthorId": author_id,
@@ -35,10 +35,10 @@ class ModerationRoute(BaseRoute):
         guild_id: int,
         author_id: int,
         subject_id: int,
-        reason: t.Optional[str] = None,
+        reason: str | None = None,
         duration: datetime,
         **kwargs: t.Any,
-    ) -> t.Optional[int]:
+    ) -> int | None:
         json = {
             "GuildId": guild_id,
             "AuthorId": author_id,
@@ -58,7 +58,7 @@ class ModerationRoute(BaseRoute):
 
     async def insert_warn(
         self, *, guild_id: int, author_id: int, subject_id: int, reason: str, **kwargs: t.Any
-    ) -> t.Optional[int]:
+    ) -> int | None:
         json = {
             "GuildId": guild_id,
             "AuthorId": author_id,

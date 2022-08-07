@@ -27,7 +27,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Lists all roles that have been marked as assignable in this server")
     @ext.short_help("Defines custom assignable roles")
     @ext.example("roles")
-    async def roles(self, ctx: ext.ClemBotContext[ClemBot], *, input_role: t.Optional[str] = None) -> None:
+    async def roles(self, ctx: ext.ClemBotContext[ClemBot], *, input_role: str | None = None) -> None:
         if input_role is None:
             await self.send_role_list(ctx, "Assignable Roles")
             return

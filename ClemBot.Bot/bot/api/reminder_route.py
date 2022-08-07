@@ -16,8 +16,8 @@ class ReminderRoute(BaseRoute):
                               user_id: int,
                               time: datetime,
                               message_url: str,
-                              content: t.Optional[str],
-                              **kwargs: t.Any) -> t.Optional[int]:
+                              content: str | None,
+                              **kwargs: t.Any) -> int | None:
         json = {
             'UserId': user_id,
             'Time': format_datetime(time),
@@ -32,15 +32,15 @@ class ReminderRoute(BaseRoute):
 
         return t.cast(int, resp['id'])
 
-    async def dispatch_reminder(self, reminder_id: int, **kwargs: t.Any) -> t.Optional[int]:
+    async def dispatch_reminder(self, reminder_id: int, **kwargs: t.Any) -> int | None:
         """
             Tells the API to mark the reminder with the given reminder_id as dispatched.
             Returns: the reminder id stored in the DB
         """
 
-        return t.cast(t.Optional[int], await self._client.patch(f'bot/reminders/{reminder_id}/dispatch', **kwargs))
+        return t.cast(int | None, await self._client.patch(f'bot/reminders/{reminder_id}/dispatch', **kwargs))
 
-    async def get_reminder(self, reminder_id: int, **kwargs: t.Any) -> t.Optional[Reminder]:
+    async def get_reminder(self, reminder_id: int, **kwargs: t.Any) -> Reminder | None:
         resp = await self._client.get(f'bot/reminders/{reminder_id}/details', **kwargs)
 
         if not resp:

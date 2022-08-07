@@ -30,10 +30,10 @@ class RoleRoute(BaseRoute):
     async def remove_role(self, role_id: int, **kwargs: t.Any) -> None:
         await self._client.delete(f"bot/roles/{role_id}", **kwargs)
 
-    async def get_guilds_roles(self, guild_id: int) -> t.Optional[list[int]]:
-        return t.cast(t.Optional[list[int]], await self._client.get(f"bot/guilds/{guild_id}/roles"))
+    async def get_guilds_roles(self, guild_id: int) -> list[int] | None:
+        return t.cast(list[int] | None, await self._client.get(f"bot/guilds/{guild_id}/roles"))
 
-    async def get_guilds_assignable_roles(self, guild_id: int) -> t.Optional[list[Role]]:
+    async def get_guilds_assignable_roles(self, guild_id: int) -> list[Role] | None:
         roles = await self._client.get(f"bot/guilds/{guild_id}/roles")
 
         if not roles:
@@ -41,7 +41,7 @@ class RoleRoute(BaseRoute):
 
         return [Role(**r) for r in roles if r["isAssignable"]]
 
-    async def check_role_assignable(self, role_id: int) -> t.Optional[bool]:
+    async def check_role_assignable(self, role_id: int) -> bool | None:
         roles = await self._client.get(f"bot/roles/{role_id}")
 
         if not roles:

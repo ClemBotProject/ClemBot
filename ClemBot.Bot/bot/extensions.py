@@ -10,7 +10,7 @@ BotT = t.TypeVar('BotT', bound=commands.Bot | commands.AutoShardedBot)
 
 
 def command(
-    name: t.Optional[str] = None, cls: t.Optional[type["ClemBotCommand"]] = None, **attrs: t.Any
+    name: str | None = None, cls: t.Optional[type["ClemBotCommand"]] = None, **attrs: t.Any
 ) -> t.Callable[..., "ClemBotCommand"]:
     """
     -----------

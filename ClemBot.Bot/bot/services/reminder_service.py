@@ -35,7 +35,7 @@ class ReminderService(BaseService):
         await user.send(embed=embed)
 
     @BaseService.listener(Events.on_set_reminder)
-    async def on_set_reminder(self, ctx: commands.Context, time: datetime, content: t.Optional[str]):
+    async def on_set_reminder(self, ctx: commands.Context, time: datetime, content: str | None):
         reminder_id = await self.bot.reminder_route.create_reminder(ctx.author.id,
                                                                     time,
                                                                     ctx.message.jump_url,

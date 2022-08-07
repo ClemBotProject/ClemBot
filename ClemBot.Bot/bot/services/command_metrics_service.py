@@ -27,7 +27,7 @@ class CommandMetricsService(BaseService):
         )
 
         await self.bot.commands_route.add_command_invocation(
-            ctx.command.name, ctx.guild.id, ctx.channel.id, ctx.author.id
+            ctx.command.qualified_name, ctx.guild.id, ctx.channel.id, ctx.author.id
         )
 
     async def load_service(self) -> None:

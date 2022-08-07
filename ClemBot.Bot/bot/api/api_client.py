@@ -35,12 +35,12 @@ class HttpRequestType:
     patch = "PATCH"
 
 
-T_STATE_CHANGE_CB = t.Optional[t.Callable[[], t.Coroutine[t.Any, t.Any, None]]]
+T_STATE_CHANGE_CB = t.Callable[[], t.Coroutine[t.Any, t.Any, None]] | None
 
 class ApiClient:
     def __init__(self, *, connect_callback: T_STATE_CHANGE_CB = None, disconnect_callback: T_STATE_CHANGE_CB = None, bot_only: bool = False):
-        self.auth_token: t.Optional[str] = None
-        self.session: t.Optional[aiohttp.ClientSession] = None
+        self.auth_token: str | None = None
+        self.session: aiohttp.ClientSession | None = None
         self.connected: bool = False
         self.headers = dict[str, str]()
 
@@ -121,7 +121,7 @@ class ApiClient:
         log.warning("ClemBot.Api disconnected")
         await self._reconnect()
 
-    async def _get_auth_token(self) -> t.Optional[str]:
+    async def _get_auth_token(self) -> str | None:
         auth_args = {
             "method": HttpRequestType.get,
             "ssl": False,

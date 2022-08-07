@@ -392,7 +392,7 @@ class ClemBot(commands.Bot):
             tb = traceback.format_exc()
             await self.global_error_handler(e, traceback=tb)
 
-    async def get_command_not_found_help(self, ctx: ext.ClemBotContext[BotT]) -> t.Optional[str]:
+    async def get_command_not_found_help(self, ctx: ext.ClemBotContext[BotT]) -> str | None:
         prefix = ctx.clean_prefix or await self.current_prefix(ctx)
         cmd_name = ctx.message.content.removeprefix(prefix).strip().split()[0]
 
