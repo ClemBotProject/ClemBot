@@ -8,3 +8,4 @@ class ClemBotModel(BaseModel):
     class Config:
         alias_generator = camel.case
         allow_population_by_field_name = True
+        use_enum_values = True

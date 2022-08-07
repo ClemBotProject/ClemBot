@@ -36,23 +36,23 @@ class ClaimsAuthorizationCog(commands.Cog):
     async def _send_role_claims(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
         claims = await self.bot.claim_route.get_claims_role(role.id)
 
-        embed = self._build_claims_embed(ctx, claims, role)
+        embed = self._build_claims_embed(ctx, t.cast(list[str], claims), role)
         await ctx.send(embed=embed)
 
     async def _send_user_claims(self, ctx: ext.ClemBotCtx, user: discord.Member) -> None:
         claims = await self.bot.claim_route.get_claims_user(user)
 
-        embed = self._build_claims_embed(ctx, claims, user)
+        embed = self._build_claims_embed(ctx, t.cast(list[str], claims), user)
         await ctx.send(embed=embed)
 
     def _build_claims_embed(
         self,
         ctx: ext.ClemBotCtx,
-        claims: t.Iterable[str],
+        claims: list[str],
         subject: (discord.Role | discord.Member),
     ) -> discord.Embed:
 
-        claims_str = "\n".join(sorted(list(claims))) if claims else "No current claims"
+        claims_str = "\n".join(sorted(claims)) if claims else "No current claims"
 
         embed = discord.Embed(
             title="Current Valid Claims",
@@ -70,7 +70,9 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Add claims to a given role")
     @ext.example(("claims add emote_add @some_role", "claims add tag_add @some_other_role"))
-    async def add(self, ctx: ext.ClemBotCtx, claim: ClaimsConverter, role: discord.Role) -> None:
+    async def add(self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role) -> None:
+        claim: Claims = t.cast(Claims, claim_t)
+
         if await self.bot.claim_route.check_claim_role(claim, role):
             embed = discord.Embed(
                 title=f"Error: {claim.name} already added to {role.name}", color=Colors.Error
@@ -78,12 +80,12 @@ class ClaimsAuthorizationCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        await self.bot.claim_route.add_claim_mapping(claim.name, role.id, raise_on_error=True)
+        await self.bot.claim_route.add_claim_mapping(claim, role.id, raise_on_error=True)
 
         title = f'Claim: "{claim.name}" successfully added to role @{role.name} :white_check_mark:'
 
         claims = await self.bot.claim_route.get_claims_role(role.id)
-        claims_str = "\n".join(claims)
+        claims_str = "\n".join(c.name for c in claims)
         desc = f"Current {role.mention} claims ```\n{claims_str}```"
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange, description=desc)
@@ -94,7 +96,9 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.long_help("Removes a claim from a given role. ")
     @ext.short_help("Removes a claim from a given role")
     @ext.example(("claims remove emote_add @some_role", "claims delete tag_add @some_other_role"))
-    async def remove(self, ctx: ext.ClemBotCtx, claim: ClaimsConverter, role: discord.Role):
+    async def remove(self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role) -> None:
+        claim: Claims = t.cast(Claims, claim_t)
+
         if not await self.bot.claim_route.check_claim_role(claim, role):
             embed = discord.Embed(
                 title=f"Error: {claim.name} not added to {role.name}", color=Colors.Error
@@ -106,19 +110,20 @@ class ClaimsAuthorizationCog(commands.Cog):
             f'Claim: "{claim.name}" successfully removed from role @{role.name} :white_check_mark:'
         )
 
+        await self.bot.claim_route.remove_claim_mapping(claim, role.id, raise_on_error=True)
+
         claims = await self.bot.claim_route.get_claims_role(role.id)
-        claims_str = "\n".join(claims) if claims else "No current claims"
+        claims_str = "\n".join(c.name for c in claims) if claims else "No current claims"
         desc = f"Current {role.mention} claims ```\n{claims_str}```"
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange, description=desc)
         await ctx.send(embed=embed)
-        await self.bot.claim_route.remove_claim_mapping(claim.name, role.id, raise_on_error=True)
 
     @claims.command(aliases=["get"])
     @ext.long_help("Lists the currently available bot claims that can be assigned")
     @ext.short_help("Lists the available bot claims")
     @ext.example("claim list")
-    async def list(self, ctx):
+    async def list(self, ctx: ext.ClemBotCtx) -> None:
         claims_str = self.get_all_claims()
 
         embed = discord.Embed(
@@ -130,11 +135,11 @@ class ClaimsAuthorizationCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def get_all_claims(self):
+    def get_all_claims(self) -> str:
         claims = [c for c, _ in Claims.__members__.items()]
         claims.sort()
         return "\n".join(claims) if claims else "No available claims"
 
 
-async def setup(bot):
+async def setup(bot: ClemBot) -> None:
     await bot.add_cog(ClaimsAuthorizationCog(bot))
