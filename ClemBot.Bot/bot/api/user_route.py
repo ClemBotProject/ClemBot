@@ -5,6 +5,7 @@ import discord
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
 import bot.models.user_models as models
+from bot.models.reminder_models import Reminder
 
 
 class UserRoute(BaseRoute):
@@ -82,3 +83,11 @@ class UserRoute(BaseRoute):
         json = {"Roles": roles}
 
         await self._client.post(f"bot/users/{user_id}/updateroles", data=json, **kwargs)
+
+    async def get_reminders(self, user_id: int, **kwargs: t.Any) -> list[Reminder]:
+        resp = await self._client.get(f'bot/users/{user_id}/reminders', **kwargs)
+
+        if not resp:
+            return []
+
+        return [Reminder(**i) for i in resp]

@@ -5,7 +5,7 @@ import discord
 
 import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
-from bot.utils.helpers import parse_datetime, format_datetime
+from bot.utils.helpers import format_datetime
 from bot.consts import Colors, DesignatedChannels, Infractions, Moderation
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
