@@ -2,6 +2,7 @@ import dataclasses
 from datetime import datetime
 
 import discord
+from bot.clem_bot import ClemBot
 
 import bot.utils.log_serializers as serializers
 from bot.consts import Colors, DesignatedChannels
@@ -21,9 +22,9 @@ class UpdateEvent:
 
 
 class UserHandlingService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         # UserId cache so that we don't hit the database on subsequent user updates
-        self.user_id_cache: list[int] = []
+        self.user_id_cache = set[int]()
 
         super().__init__(bot)
 
@@ -46,7 +47,7 @@ class UserHandlingService(BaseService):
         await self.notify_user_join(user)
 
     @BaseService.listener(Events.on_user_removed)
-    async def on_user_removed(self, user) -> None:
+    async def on_user_removed(self, user: discord.Member) -> None:
         log.info(
             '"{user}" has left guild "{guild}"',
             user=serializers.log_user(user),
@@ -89,7 +90,7 @@ class UserHandlingService(BaseService):
                 size=(len(self.user_id_cache) + 1),
             )
             # This user exists, add it to the cache
-            self.user_id_cache.append(before.id)
+            self.user_id_cache.add(before.id)
 
         await self.bot.user_route.update_roles(
             before.id, [r.id for r in after.roles], raise_on_error=False
