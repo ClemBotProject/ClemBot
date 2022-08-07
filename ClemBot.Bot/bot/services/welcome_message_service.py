@@ -1,6 +1,7 @@
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
+import discord
 
 log = get_logger(__name__)
 
@@ -10,7 +11,7 @@ class WelcomeMessageService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_user_joined)
-    async def user_joined(self, user):
+    async def user_joined(self, user: discord.Member):
         message = await self.bot.welcome_message_route.get_welcome_message(user.guild.id)
 
         if message and not user.bot:

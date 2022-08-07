@@ -44,7 +44,7 @@ PAY_TABLE = {
 @dataclasses.dataclass
 class PayLine:
     multiplier: int
-    weights: t.Dict[str, float]
+    weights: dict[str, float]
 
 
 VERTICAL_MULTIPLIERS = {
@@ -226,7 +226,7 @@ class SlotsCog(commands.Cog):
         *,
         results: list[str],
         count_singles: bool,
-        consecutive_multipliers: t.Dict[int, int],
+        consecutive_multipliers: dict[int, int],
         payline_multiplier: int = 1,
     ) -> tuple[list[str | list[str]], int]:
 

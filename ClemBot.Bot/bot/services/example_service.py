@@ -1,7 +1,11 @@
+# import discord.py
+import discord
+
 # import a method to allow us to easily setup a logger instance with mypy not
 # screaming at us (thanks seqlog)
 # Import the events class so that we have all the possible events
 # in the messenger defined for us clearly
+from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 
 # Import the base service class so we can subclass it
@@ -26,7 +30,7 @@ class ExampleService(BaseService):
     or command, it handles background tasks and startup functionality
     """
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         # The bot object that represents the current client is injected in to the service on startup and
         # Sent to the base class where it is stored
         super().__init__(bot)
@@ -34,7 +38,7 @@ class ExampleService(BaseService):
     # This is the decorator for the messenger that marks a given message as a callback for an event,
     # if an event is not supplied it will default to the name of the method as the event
     @BaseService.listener(Events.on_example)
-    async def on_guild_message_received(self, message) -> None:
+    async def on_guild_message_received(self, message: discord.Message) -> None:
         pass
 
     # The load service abstract method implementation defined in BaseService

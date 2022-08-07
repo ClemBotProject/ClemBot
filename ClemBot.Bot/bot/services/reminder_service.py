@@ -18,7 +18,7 @@ class ReminderService(BaseService):
 
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.reminders: t.Dict[int, uuid.UUID] = {}
+        self.reminders: dict[int, uuid.UUID] = {}
 
     async def _reminder_callback(self, reminder_id: int):
         reminder = await self.bot.reminder_route.get_reminder(reminder_id, raise_on_error=True)

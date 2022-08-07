@@ -17,7 +17,7 @@ log = get_logger(__name__)
 
 class Scheduler:
     def __init__(self) -> None:
-        self._scheduled_tasks: t.Dict[t.Hashable, asyncio.Task] = {}
+        self._scheduled_tasks: dict[t.Hashable, asyncio.Task] = {}
 
     def schedule_at(self, callback: t.Awaitable, *, time: datetime) -> uuid.UUID:
         """Schedules a callback for execution at a given datetime object

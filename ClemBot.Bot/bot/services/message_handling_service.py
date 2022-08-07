@@ -31,6 +31,8 @@ class MessageHandlingService(BaseService):
         the api to avoid sending hundreds a second
         """
 
+        assert message.guild is not None
+
         if len(self.message_batch) > MESSAGE_BATCH_SIZE:
             # Copy the list values and clear the batch list BEFORE
             # we send them. This way we can accept new messages while
@@ -72,6 +74,7 @@ class MessageHandlingService(BaseService):
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
+        assert message.guild is not None
 
         log.info(
             'Message from {author}: "{content}" Guild {guild} Channel: {channel}',
@@ -130,7 +133,7 @@ class MessageHandlingService(BaseService):
         await self.batch_send_message_edit(after.id, after.content)
 
         embed = discord.Embed(
-            title=f":repeat: **Message Edited in #{before.channel.name}**",
+            title=f":repeat: **Message Edited in #{before.channel}**",
             color=Colors.ClemsonOrange,
         )
         embed.add_field(name="Message Link", value=f"[Click Here]({after.jump_url})")
@@ -149,6 +152,8 @@ class MessageHandlingService(BaseService):
             )
 
         embed.set_footer(text=f"{before.author}", icon_url=before.author.display_avatar.url)
+
+        assert after.guild is not None
 
         await self.bot.messenger.publish(
             Events.on_send_in_designated_channel,
@@ -175,7 +180,7 @@ class MessageHandlingService(BaseService):
                 await self.batch_send_message_edit(message.id, payload.data["content"])
 
                 embed = discord.Embed(
-                    title=f":repeat: **Uncached message edited in #{channel.name}**",
+                    title=f":repeat: **Uncached message edited in #{channel}**",
                     color=Colors.ClemsonOrange,
                 )
 
@@ -207,8 +212,8 @@ class MessageHandlingService(BaseService):
             else:
                 try:
                     log.info(
-                        f'Uncached message edited in #{channel.name} By: \
-                        {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["Content"]}'
+                        f'Uncached message edited in #{channel} By: \
+                        {payload.data["author"]["id"]} \nBefore: Unknown Content \nAfter: {payload.data["content"]}'
                     )
                 except KeyError:
                     log.info(
@@ -217,7 +222,7 @@ class MessageHandlingService(BaseService):
                     )
 
                 embed = discord.Embed(
-                    title=f":repeat: **Uncached message edited in #{channel.name}**",
+                    title=f":repeat: **Uncached message edited in #{channel}**",
                     color=Colors.ClemsonOrange,
                 )
 
@@ -254,7 +259,7 @@ class MessageHandlingService(BaseService):
         )
 
         embed = discord.Embed(
-            title=f":wastebasket: **Message Deleted in #{message.channel.name}**",
+            title=f":wastebasket: **Message Deleted in #{message.channel}**",
             color=Colors.ClemsonOrange,
         )
 
@@ -265,6 +270,8 @@ class MessageHandlingService(BaseService):
             )
 
         embed.set_footer(text=f"{message.author}", icon_url=message.author.display_avatar.url)
+
+        assert message.guild is not None
 
         await self.bot.messenger.publish(
             Events.on_send_in_designated_channel,
@@ -278,11 +285,11 @@ class MessageHandlingService(BaseService):
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
-        log.info(f"Uncached message deleted id:{payload.message_id} in #{channel.name}")
+        log.info(f"Uncached message deleted id:{payload.message_id} in #{channel}")
 
         if message is not None:
             embed = discord.Embed(
-                title=f":wastebasket: **Uncached message deleted in #{channel.name}**",
+                title=f":wastebasket: **Uncached message deleted in #{channel}**",
                 color=Colors.ClemsonOrange,
             )
             message_chunk = self.split_string_chunks(message.content, 900)
@@ -292,7 +299,7 @@ class MessageHandlingService(BaseService):
                 )
         else:
             embed = discord.Embed(
-                title=f":wastebasket: **Uncached message deleted in #{channel.name}**",
+                title=f":wastebasket: **Uncached message deleted in #{channel}**",
                 color=Colors.ClemsonOrange,
             )
             embed.add_field(
@@ -302,7 +309,7 @@ class MessageHandlingService(BaseService):
         await self.bot.messenger.publish(
             Events.on_send_in_designated_channel,
             DesignatedChannels.message_log,
-            int(payload.guild_id),
+            payload.guild_id,
             embed,
         )
 
@@ -322,16 +329,20 @@ class MessageHandlingService(BaseService):
         if not result:
             return
 
+        assert message.guild is not None
+
         if not await self.bot.guild_route.get_can_embed_link(message.guild.id):
             return
 
         matches = result.groupdict()
         avi = message.author.display_avatar.url
         source_channel = message.channel
-        link_channel = await self.bot.fetch_channel(matches["channel_id"])
+        link_channel = await self.bot.fetch_channel(int(matches["channel_id"]))
+
+        assert isinstance(link_channel, discord.TextChannel)
 
         try:
-            link_message = await link_channel.fetch_message(matches["message_id"])
+            link_message = await link_channel.fetch_message(int(matches["message_id"]))
         except:
             log.warning("Failed to embed a message link with ids: {ids}", ids=matches)
             return
@@ -356,8 +367,10 @@ class MessageHandlingService(BaseService):
             )
             return
 
+        assert isinstance(link_channel, discord.abc.GuildChannel)
+
         embed = discord.Embed(
-            title=f"Message linked from #{link_channel.name}", color=Colors.ClemsonOrange
+            title=f"Message linked from #{link_channel}", color=Colors.ClemsonOrange
         )
         embed.set_author(name=f"Quoted by: {message.author}", icon_url=avi)
 
@@ -384,11 +397,13 @@ class MessageHandlingService(BaseService):
             name="Message Link", value=f"[Click Me]({link_message.jump_url})", inline=True
         )
 
-        reply_to = None
+        reply_to: discord.MessageReference | discord.Message | None = None
         if has_reply:
             reply_to = message.reference
         elif raw_text and not has_reply:
             reply_to = message
+
+        assert reply_to is not None
 
         msg = await source_channel.send(embed=embed, reference=reply_to)
         if not raw_text:

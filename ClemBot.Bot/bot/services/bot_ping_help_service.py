@@ -30,13 +30,13 @@ class BotPingHelpService(BaseService):
         if message.content not in self.mention_strs:
             return
 
-        prefix = await self.bot.current_prefix(message)
+        prefix = (await self.bot.get_prefix(message))[2]
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.set_author(
             name=self.bot.user.name,
             url=bot_secrets.secrets.site_url,
-            icon_url=self.bot.user.avatar.url,
+            icon_url=self.bot.user.display_avatar,
         )
         embed.description = (
             f"My prefix here is `{prefix}` and the help command is `{prefix}help`\n"

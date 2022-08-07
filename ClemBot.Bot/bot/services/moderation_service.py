@@ -1,4 +1,5 @@
 from datetime import datetime
+import typing as t
 
 import discord
 
@@ -18,7 +19,7 @@ class ModerationService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_bot_warn)
-    async def on_bot_warn(self, guild, author: discord.Member, subject: discord.Member, reason):
+    async def on_bot_warn(self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason: t.Optional[str]) -> None:
         await self.bot.moderation_route.insert_warn(
             guild_id=guild.id,
             author_id=author.id,
@@ -29,10 +30,9 @@ class ModerationService(BaseService):
 
     @BaseService.listener(Events.on_bot_ban)
     async def on_bot_ban(
-        self, guild, author: discord.Member, purge_days: int, subject: discord.Member, reason
-    ):
-
-        await guild.ban(subject, reason=reason, delete_message_days=purge_days)
+        self, guild: discord.Guild, author: discord.Member, purge_days: int, subject: discord.Member, reason: t.Optional[str]
+    ) -> None:
+        await guild.ban(t.cast(discord.abc.Snowflake, subject), reason=reason, delete_message_days=purge_days)
 
         await self.bot.moderation_route.insert_ban(
             guild_id=guild.id,
@@ -48,12 +48,13 @@ class ModerationService(BaseService):
         guild: discord.Guild,
         author: discord.Member,
         subject: discord.Member,
-        reason,
-        duration,
-    ):
+        reason: t.Optional[str],
+        duration: datetime,
+    ) -> None:
 
         mute_role = discord.utils.get(author.guild.roles, name=Moderation.mute_role_name)
-        await subject.add_roles(mute_role)
+        assert mute_role is not None
+        await subject.add_roles(t.cast(discord.abc.Snowflake, mute_role))
 
         mute_id = await self.bot.moderation_route.insert_mute(guild_id=guild.id,
                                                               author_id=author.id,
@@ -73,15 +74,21 @@ class ModerationService(BaseService):
         subject_id: int,
         mute_id: int,
         reason: str,
-        author: discord.Member = None,
-    ):
+        author: t.Optional[discord.Member] = None,
+    ) -> None:
 
         guild = self.bot.get_guild(guild_id)
 
+        assert guild is not None
+
         mute_role = discord.utils.get(guild.roles, name=Moderation.mute_role_name)
 
+        assert mute_role is not None
+
         if not author:
-            author = self.bot.user
+            author = guild.me
+        
+        assert author is not None
 
         mute = await self.bot.moderation_route.get_infraction(mute_id)
 
@@ -112,13 +119,13 @@ class ModerationService(BaseService):
         if mute_role not in subject.roles:
             return
 
-        await subject.remove_roles(mute_role)
+        await subject.remove_roles(t.cast(discord.abc.Snowflake, mute_role))
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "You have been Unmuted"
-        embed.set_thumbnail(url=str(guild.icon.url))
+        embed.set_thumbnail(url=str(guild.icon))
         embed.add_field(name="Reason :page_facing_up:", value=f"```{reason}```", inline=False)
-        embed.description = f"**Guild:** {guild.name}"
+        embed.description = f"**Guild:** {guild}"
 
         try:
             await subject.send(embed=embed)
@@ -144,7 +151,7 @@ class ModerationService(BaseService):
         )
 
     @BaseService.listener(Events.on_user_joined)
-    async def on_joined(self, user: discord.Member):
+    async def on_joined(self, user: discord.Member) -> None:
         mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
 
         # no mute role configured, do nothing
@@ -155,7 +162,7 @@ class ModerationService(BaseService):
         mutes = [mute for mute in mutes if mute.active]
 
         if len(mutes) > 0:
-            await user.add_roles(mute_role)
+            await user.add_roles(t.cast(discord.abc.Snowflake, mute_role))
             embed = discord.Embed(color=Colors.ClemsonOrange)
             embed.title = "Reapplied Mute"
             embed.add_field(name=str(user), value=f"Id: {user.id}")
@@ -199,10 +206,13 @@ class ModerationService(BaseService):
         )
 
     @BaseService.listener(Events.on_member_ban)
-    async def on_member_ban(self, guild, user) -> None:
+    async def on_member_ban(self, guild: discord.Guild, user: discord.Member) -> None:
         log = [action async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)][0]
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "Guild Member Banned"
+
+        assert log.user is not None
+
         embed.set_author(name=log.user, icon_url=log.user.display_avatar.url)
 
         # Don't send anything if clembot did the banning, we handled that case elsewhere

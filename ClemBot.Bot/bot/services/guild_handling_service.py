@@ -1,4 +1,5 @@
 import discord
+from bot.clem_bot import ClemBot
 
 import bot.utils.log_serializers as serializers
 from bot.consts import Colors, OwnerDesignatedChannels
@@ -10,7 +11,7 @@ log = get_logger(__name__)
 
 
 class GuildHandlingService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_guild_joined)
@@ -18,6 +19,8 @@ class GuildHandlingService(BaseService):
         log.info(f"Loading guild {guild.name}: {guild.id}")
 
         await self._send_guild_joined_embed(guild)
+
+        assert guild.owner is not None
 
         await self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)
         log.info(f"Finished Loading guild {guild.name}: {guild.id}")
@@ -44,12 +47,15 @@ class GuildHandlingService(BaseService):
         )
 
     @BaseService.listener(Events.on_guild_update)
-    async def on_guild_edit(self, before: discord.Guild, after: discord.Guild):
+    async def on_guild_edit(self, before: discord.Guild, after: discord.Guild) -> None:
+        assert before.owner is not None
+        assert after.owner is not None
+
         if before.name != after.name or before.owner.id != after.owner.id:
             await self.bot.guild_route.edit_guild(after.id, after.name, after.owner.id)
 
     @BaseService.listener(Events.on_guild_leave)
-    async def on_guild_leave(self, guild) -> None:
+    async def on_guild_leave(self, guild: discord.Guild) -> None:
         log.info("Bot removed from {guild}", guild=serializers.log_guild(guild))
 
         await self.bot.messenger.publish(
@@ -60,12 +66,14 @@ class GuildHandlingService(BaseService):
 
         await self.bot.guild_route.leave_guild(guild.id)
 
-    async def _send_guild_joined_embed(self, guild):
+    async def _send_guild_joined_embed(self, guild: discord.Guild) -> None:
 
         # We arent sure what values will be there, some guilds have an odd guild object
         # Do a blanket try catch to make sure that sending the embed doesnt cause the
         # Join routines to not run if the embed throws
         try:
+            assert guild.owner is not None
+
             embed = discord.Embed(
                 title=f"{self.bot.user.name} added to a new guild", color=Colors.ClemsonOrange
             )

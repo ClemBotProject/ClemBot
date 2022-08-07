@@ -2,6 +2,7 @@ import asyncio
 import typing as t
 
 import discord
+from bot.clem_bot import ClemBot
 
 from bot.consts import Claims
 from bot.messaging.events import Events
@@ -17,9 +18,9 @@ class DeleteMessageService(BaseService):
     The messages by default are allowed by deleted by admins and the person who called the bot
     """
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.messages = {}
+        self.messages = dict[int, dict[str, t.Any]]()
 
     # Called When a cog would like to be able to delete a message or messages
     @BaseService.listener(Events.on_set_deletable)
@@ -28,9 +29,9 @@ class DeleteMessageService(BaseService):
         *,
         msg: list[discord.Message],
         roles: list[discord.Role] = [],
-        author: discord.Member = None,
-        timeout: int = None
-    ):
+        author: t.Optional[discord.Member] = None,
+        timeout: t.Optional[int] = None
+    ) -> None:
 
         if not isinstance(msg, list):
             msg = [msg]
@@ -59,22 +60,23 @@ class DeleteMessageService(BaseService):
     @BaseService.listener(Events.on_reaction_add)
     async def delete_message(
         self, reaction: discord.Reaction, user: t.Union[discord.User, discord.Member]
-    ):
-        role_ids = [role.id for role in user.roles]
+    ) -> None:
+        role_ids = [role.id for role in user.roles] if isinstance(user, discord.Member) else []
         delete = False
 
         if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
             return
         elif await self.bot.claim_route.check_claim_user(Claims.delete_message, user):
             delete = True
-        elif user.guild_permissions.administrator:
-            delete = True
         elif user.id == self.messages[reaction.message.id]["Author"]:
             delete = True
-        elif any(
-            True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids
-        ):
-            delete = True
+        elif isinstance(user, discord.Member):
+            if user.guild_permissions.administrator:
+                delete = True
+            elif any(
+                True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids
+            ):
+                delete = True
 
         if delete:
             for msg in self.messages[reaction.message.id]["MessagesToDelete"]:

@@ -1,6 +1,7 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
 import discord
+from bot.clem_bot import ClemBot
 
 from bot.consts import DesignatedChannelBase, DesignatedChannels
 from bot.messaging.events import Events
@@ -11,7 +12,7 @@ log = get_logger(__name__)
 
 
 class DesignatedChannelService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_send_in_designated_channel)
@@ -19,9 +20,9 @@ class DesignatedChannelService(BaseService):
         self,
         designated_name: DesignatedChannelBase,
         guild_id: int,
-        content: Union[str, discord.Embed],
-        dc_id: int = None,
-    ):
+        content: (str | discord.Embed),
+        dc_id: Optional[int] = None,
+    ) -> None:
         """
         Event call back to sent a given string or embed message to all registered designated channels
         in a given guild
@@ -48,8 +49,8 @@ class DesignatedChannelService(BaseService):
 
     @BaseService.listener(Events.on_broadcast_designated_channel)
     async def broadcast_designated_message(
-        self, designated_name: DesignatedChannels, content: Union[str, discord.Embed]
-    ):
+        self, designated_name: DesignatedChannels, content: (str | discord.Embed)
+    ) -> None:
         """
         Event call back to broadcast a given string or embed message to all registered designated channels
         in all guilds
@@ -74,12 +75,16 @@ class DesignatedChannelService(BaseService):
 
         if len(assigned_channel_ids) > 0:
             for channel_id in assigned_channel_ids:
+                channel = self.bot.get_channel(channel_id)
+                assert isinstance(channel, discord.TextChannel)
+
                 if isinstance(content, str):
-                    mes = await self.bot.get_channel(channel_id).send(content)
+                    mes = await channel.send(content)
                     sent_messages.append(mes)
                 elif isinstance(content, discord.Embed):
-                    mes = await self.bot.get_channel(channel_id).send(embed=content)
+                    mes = await channel.send(embed=content)
                     sent_messages.append(mes)
+
         return sent_messages
 
     async def load_service(self) -> None:

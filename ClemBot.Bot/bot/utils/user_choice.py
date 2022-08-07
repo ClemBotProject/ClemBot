@@ -39,8 +39,8 @@ class UserChoice:
             return False
 
     async def _send(
-        self, embed: discord.Embed, choices: t.Dict[t.Union[int, str], t.Union[discord.Emoji, str]]
-    ) -> t.Union[int, str]:
+        self, embed: discord.Embed, choices: dict[(int | str), (discord.Emoji | str)]
+    ) -> int | str:
 
         msg = await self.ctx.send(embed=embed)
 

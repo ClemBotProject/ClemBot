@@ -18,8 +18,12 @@ def log_user(member: (discord.Member | discord.User | discord.ClientUser)) -> di
     )
 
 
-def log_channel(channel: discord.TextChannel) -> dict[str, t.Any]:
-    return {"id": channel.id, "name": channel.name, "guild": log_guild(channel.guild)}
+def log_channel(channel: t.Any) -> dict[str, t.Any]:
+    id = getattr(channel, "id", None)
+    name = getattr(channel, "name", str(channel))
+    guild = getattr(channel, "guild", None)
+    
+    return {"id": id, "name": name, "guild": log_guild(guild) if guild else None}
 
 
 def log_role(role: discord.Role) -> dict[str, t.Any]:
