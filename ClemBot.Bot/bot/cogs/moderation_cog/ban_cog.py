@@ -36,9 +36,7 @@ class BanCog(commands.Cog):
         purge_days: int = 0,
         *,
         reason: str,
-    ):
-        ctx.author: discord.Member
-        ctx.guild: discord.Guild
+    ) -> None:
 
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
@@ -47,7 +45,8 @@ class BanCog(commands.Cog):
                 value=f"Reason length is greater than max {Moderation.max_reason_length} characters.",
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
@@ -56,20 +55,25 @@ class BanCog(commands.Cog):
                 name="Reason", value="Cannot moderate someone with the same rank or higher"
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if not 0 <= purge_days <= 7:
             embed = discord.Embed(color=Colors.Error)
             embed.title = "Error: Invalid Purge Dates"
             embed.add_field(name="Reason", value="Message purge days must be between 0 and 7")
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         # Dm the user who was banned
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f"You have been banned from Guild {ctx.guild.name}  :hammer:"
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
+        if ctx.guild.icon:
+            embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
         embed.add_field(name="Reason :page_facing_up:", value=f"```{reason}```", inline=False)
         embed.description = f"**Guild:** {ctx.guild.name}"
 

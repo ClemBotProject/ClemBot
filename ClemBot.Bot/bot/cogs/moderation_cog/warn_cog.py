@@ -20,8 +20,7 @@ class WarnCog(commands.Cog):
     @ext.example("warn @SomeUser an example warning")
     @ext.required_claims(Claims.moderation_mute)
     @ext.required_claims(Claims.moderation_warn)
-    async def warn(self, ctx: ext.ClemBotCtx, subject: discord.Member, *, reason: str):
-        ctx.author: discord.Member
+    async def warn(self, ctx: ext.ClemBotCtx, subject: discord.Member, *, reason: str) -> None:
 
         if ctx.author.roles[-1].position <= subject.roles[-1].position:
             embed = discord.Embed(color=Colors.Error)
@@ -30,7 +29,8 @@ class WarnCog(commands.Cog):
                 name="Reason", value="Cannot moderate someone with the same rank or higher"
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         # Log the warning first so if it throws we notify and dont dm people
         await self.bot.messenger.publish(
@@ -41,7 +41,10 @@ class WarnCog(commands.Cog):
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f"You have been warned in Guild {ctx.guild.name}  :warning:"
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
+        if ctx.guild.icon:
+            embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
         embed.add_field(name="Reason :page_facing_up:", value=f"```{reason}```", inline=False)
         embed.description = f"**Guild:** {ctx.guild.name}"
 

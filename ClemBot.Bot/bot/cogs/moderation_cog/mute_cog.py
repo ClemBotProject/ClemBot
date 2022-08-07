@@ -24,7 +24,7 @@ class MuteCog(commands.Cog):
     @ext.short_help("Mutes a user")
     @ext.example(("mute @SomeUser 1d Timeout", "mute @SomUser 2d1h5m A much longer timeout"))
     @ext.required_claims(Claims.moderation_mute)
-    async def mute(self, ctx: commands.Context, subject: discord.Member, duration: FutureDuration, *, reason: str | None):
+    async def mute(self, ctx: ext.ClemBotCtx, subject: discord.Member, duration: FutureDuration, *, reason: str | None) -> None:
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
             embed.add_field(
@@ -32,7 +32,8 @@ class MuteCog(commands.Cog):
                 value=f"Reason length is greater than max {Moderation.max_reason_length} characters.",
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if ctx.author.top_role.position <= subject.top_role.position:
             embed = discord.Embed(color=Colors.Error)
@@ -41,7 +42,8 @@ class MuteCog(commands.Cog):
                 name="Reason", value="Cannot moderate someone with the same rank or higher"
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
         if not mute_role:
@@ -54,7 +56,8 @@ class MuteCog(commands.Cog):
             embed.title = "Error: Current Active Mute"
             embed.add_field(name="Reason", value="Cannot mute someone who is already muted")
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         # Publish that a mute happened
         await self.bot.messenger.publish(Events.on_bot_mute,
@@ -93,7 +96,10 @@ class MuteCog(commands.Cog):
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "You have been muted  :mute:"
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
+        if ctx.guild.icon:
+            embed.set_thumbnail(url=str(ctx.guild.icon.url))
+
         embed.add_field(name='Duration :timer:', value=format_duration(duration))
         embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
         embed.description = f'**Guild:** {ctx.guild.name}'
@@ -114,8 +120,8 @@ class MuteCog(commands.Cog):
     @ext.example("Unmute @SomeUser Timeout")
     @ext.required_claims(Claims.moderation_mute)
     async def unmute(
-        self, ctx: commands.Context, subject: discord.Member, *, reason: str | None
-    ):
+        self, ctx: ext.ClemBotCtx, subject: discord.Member, *, reason: str | None
+    ) -> None:
         mute_role = discord.utils.get(subject.guild.roles, name=Moderation.mute_role_name)
 
         if not mute_role:
@@ -125,7 +131,8 @@ class MuteCog(commands.Cog):
                 name="Reason", value="Run the mute command to initiate mute role activation"
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         mutes = await self.bot.moderation_route.get_guild_mutes_user(subject.guild.id, subject.id)
         mutes = [mute for mute in mutes if mute.active]
@@ -134,7 +141,8 @@ class MuteCog(commands.Cog):
             embed = discord.Embed(color=Colors.Error)
             embed.title = "Error: This user has no active mutes"
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
@@ -143,7 +151,8 @@ class MuteCog(commands.Cog):
                 value=f"Reason length is greater than max {Moderation.max_reason_length} characters.",
             )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         for mute in mutes:
             await self.bot.messenger.publish(
@@ -158,7 +167,7 @@ class MuteCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def _create_mute_role(self, ctx) -> bool:
+    async def _create_mute_role(self, ctx: ext.ClemBotCtx) -> bool:
         get_input = UserChoice(ctx=ctx, timeout=30)
         choice = await get_input.send_confirmation(
             content="Error: ClemBots Mute role not found. Would you like me to create it?",
