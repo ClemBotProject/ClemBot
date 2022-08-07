@@ -6,6 +6,9 @@ from discord.ext.commands.errors import BadArgument
 
 from bot.consts import Claims
 
+if t.TYPE_CHECKING:
+    from bot.clem_bot import ClemBot
+
 BotT = t.TypeVar('BotT', bound=commands.Bot | commands.AutoShardedBot)
 
 
@@ -262,3 +265,7 @@ class ClemBotGroup(discord.ext.commands.Group[t.Any, t.Any, t.Any], ExtBase):
 
 class ClemBotContext(discord.ext.commands.Context[BotT]):
     command: t.Optional[ClemBotCommand]
+    guild: discord.Guild
+
+
+ClemBotCtx: t.TypeAlias = ClemBotContext["ClemBot"]

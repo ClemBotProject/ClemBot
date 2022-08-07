@@ -65,7 +65,7 @@ class OgSlotsCog(commands.Cog):
     @ext.long_help("A slot machine inside discord with a chance to win fame and fortune")
     @ext.short_help("How lucky are you?")
     @ext.example("slots")
-    async def ogslots(self, ctx):
+    async def ogslots(self, ctx:ext.ClemBotCtx) -> None:
         results = random.choices(Symbols.combined, weights=WEIGHTS, k=5)
         score = self.calculate_score(results)
 
@@ -75,7 +75,7 @@ class OgSlotsCog(commands.Cog):
 
         slotstitle = "💎 ClemBot Slot Machine 💎"
 
-        def slots_rolling(input, spinstatus):
+        def slots_rolling(input: str, spinstatus: str) -> discord.Embed:
             slotembed = discord.Embed(
                 title=f"{slotstitle}", color=Colors.ClemsonOrange, description=quote
             )
@@ -97,8 +97,8 @@ class OgSlotsCog(commands.Cog):
         await msg.edit(embed=final)
 
     def calculate_score(self, results: list[str]) -> int:
-        groups = []
-        curr_group = []
+        groups: list[list[str] | str] = []
+        curr_group: list[str] = []
 
         for i, val in enumerate(results):
             if val in curr_group or len(curr_group) == 0:

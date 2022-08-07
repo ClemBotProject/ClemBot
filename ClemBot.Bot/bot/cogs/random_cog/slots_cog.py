@@ -122,12 +122,12 @@ class SlotsCog(commands.Cog):
     @ext.long_help("A slot machine inside discord with a chance to win fame and fortune")
     @ext.short_help("How lucky are you?")
     @ext.example("slots")
-    async def slots(self, ctx: commands.Context):
+    async def slots(self, ctx: ext.ClemBotCtx) -> None:
         paylines = self._generate_paylines()
 
         score = self._calculate_score(np.array(paylines))
 
-        embed, msg = await self._render_slots_embed(ctx, paylines, score[0])
+        embed, msg = await self._render_slots_embed(ctx, paylines, score[0])  # type: ignore
 
         # Wait a second before showing the score
         await asyncio.sleep(1)
@@ -137,7 +137,7 @@ class SlotsCog(commands.Cog):
         await self.bot.slots_score_route.add_slot_score(score[1], ctx.guild.id, ctx.author.id)
 
     @slots.command(aliases=["top", "winners"])
-    async def leaderboard(self, ctx: commands.Context):
+    async def leaderboard(self, ctx: ext.ClemBotCtx) -> None:
         scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, True)
 
         scores_str = ""
@@ -145,8 +145,12 @@ class SlotsCog(commands.Cog):
             scores_str = "No scores found"
 
         for i, score in enumerate(scores):
-            user = self.bot.get_user(score["userId"])
-            scores_str += f'{i+1: >3}. {user.name}: {score["highScore"]}\n'
+            user = self.bot.get_user(score.user_id)
+
+            if not user:
+                continue
+
+            scores_str += f'{i+1: >3}. {user.name}: {score.high_score}\n'
 
         embed = discord.Embed(
             title="💎 ClemBot Slot Machine Leaderboard 💎", colour=Colors.ClemsonOrange
@@ -158,7 +162,7 @@ class SlotsCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @slots.command(aliases=["bottom", "losers"])
-    async def loserboard(self, ctx: commands.Context):
+    async def loserboard(self, ctx: ext.ClemBotCtx) -> None:
         scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, False)
 
         scores_str = ""
@@ -167,6 +171,10 @@ class SlotsCog(commands.Cog):
 
         for i, score in enumerate(scores):
             user = self.bot.get_user(score["userId"])
+
+            if not user:
+                continue
+
             scores_str += f'{i+1: >3}. {user.name}: {score["highScore"]}\n'
 
         embed = discord.Embed(
@@ -178,7 +186,7 @@ class SlotsCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def _calculate_score(self, paylines: np.ndarray) -> Tuple[List[Union[str, List[str]]], int]:
+    def _calculate_score(self, paylines: np.ndarray[t.Any, t.Any]) -> tuple[list[str | list[str]], int]:
 
         winning_groups = []
 
@@ -195,7 +203,7 @@ class SlotsCog(commands.Cog):
             winning_groups.extend(groups[0])
 
         # Transpose the matrix to easily check for vertical groupings
-        flipped_arr = np.rot90(paylines)
+        flipped_arr = np.rot90(paylines)  # type: ignore
         vertical_score = 0
         for i, line in enumerate(flipped_arr):
             groups = self._calculate_line_score(
@@ -230,8 +238,8 @@ class SlotsCog(commands.Cog):
         payline_multiplier: int = 1,
     ) -> tuple[list[str | list[str]], int]:
 
-        groups = []
-        curr_group = []
+        groups: list[list[str] | str] = []
+        curr_group: list[str] = []
 
         for i, val in enumerate(results):
             if val in curr_group or len(curr_group) == 0:
@@ -256,7 +264,7 @@ class SlotsCog(commands.Cog):
 
         return groups, total_score
 
-    def _get_all_diagonals(self, matrix: np.ndarray):
+    def _get_all_diagonals(self, matrix: np.ndarray[t.Any, t.Any]) -> list[list[t.Any]]:
         """https://stackoverflow.com/a/6313414"""
         diags = [matrix[::-1, :].diagonal(i) for i in range(-matrix.shape[0] + 1, matrix.shape[1])]
 
@@ -278,7 +286,7 @@ class SlotsCog(commands.Cog):
         return results
 
     async def _render_slots_embed(
-        self, ctx: commands.Context, paylines: list[list[str]], winning_groups: list[list[str]]
+        self, ctx: ext.ClemBotCtx, paylines: list[list[str]], winning_groups: list[list[str]]
     ) -> tuple[discord.Embed, discord.Message]:
 
         slots_title = "💎 ClemBot Slot Machine 💎"
@@ -287,7 +295,7 @@ class SlotsCog(commands.Cog):
         with open(PHRASES_PATH) as f:
             quote = random.choice(f.readlines())
 
-        def slots_rolling(iter: int):
+        def slots_rolling(iter: int) -> discord.Embed:
             embed = discord.Embed(title=slots_title, description=quote, colour=Colors.ClemsonOrange)
 
             embed.add_field(
@@ -321,7 +329,7 @@ class SlotsCog(commands.Cog):
 
         return embed, msg
 
-    def _render_board(self, paylines: list[list[str]], iter_num=3):
+    def _render_board(self, paylines: list[list[str]], iter_num: int = 3) -> str:
 
         # Generate empty game-board
         game_board = [["◻️" for _ in range(NUM_COLUMNS)] for _ in range(NUM_ROWS)]

@@ -30,7 +30,7 @@ class RandomCog(commands.Cog):
     @ext.long_help("Simply flips a coin in discord")
     @ext.short_help("Flip a coin!")
     @ext.example("flip")
-    async def flip(self, ctx):
+    async def flip(self, ctx: ext.ClemBotCtx) -> None:
 
         random.seed(time.time())
 
@@ -62,7 +62,7 @@ class RandomCog(commands.Cog):
     )
     @ext.short_help("Rolls any type of dice in discord")
     @ext.example(("roll 1d6", "roll 4d20"))
-    async def diceroll(self, ctx, dice: str):
+    async def diceroll(self, ctx: ext.ClemBotCtx, dice: str) -> None:
         try:
             rolls, limit = map(int, dice.split("d"))
         except Exception:
@@ -92,7 +92,7 @@ class RandomCog(commands.Cog):
     @ext.long_help("Rolls a magic 8ball to tell you your future, guarenteed to work!")
     @ext.short_help("Know your future")
     @ext.example(("ball Will I have a good day today?", "8ball Will I have a bad day today?"))
-    async def ball(self, ctx, *, question):
+    async def ball(self, ctx: ext.ClemBotCtx, *, question: str) -> None:
         responses = [
             "It is certain.",
             "It is decidedly so.",
@@ -126,7 +126,7 @@ class RandomCog(commands.Cog):
     )
     @ext.short_help('Create giveaways!')
     @ext.example(('raffle 1h this is fun', 'raffle 1d a whole day raffle!'))
-    async def raffle(self, ctx, time: FutureDuration, *, reason):
+    async def raffle(self, ctx: ext.ClemBotCtx, time: FutureDuration, *, reason: str) -> None:
         wait = (time - datetime.utcnow()).total_seconds()
 
         description = f"Raffle for {reason}\nReact with :tickets: to enter the raffle"
@@ -145,7 +145,7 @@ class RandomCog(commands.Cog):
                     )
                     await msg.edit(embed=embed)
                 else:
-                    reactors = await reaction.users().flatten()
+                    reactors = [user async for user in reaction.users()]
                     # remove first user b/c first user is always bot
                     reactors.pop(0)
                     winner = random.choice(reactors).name
@@ -161,7 +161,7 @@ class RandomCog(commands.Cog):
     )
     @ext.short_help('"relevant xkcd"')
     @ext.example("xkcd")
-    async def xkcd(self, ctx):
+    async def xkcd(self, ctx: ext.ClemBotCtx) -> None:
         async with aiohttp.ClientSession() as session:
             async with await session.get(url="https://c.xkcd.com/random/comic/") as resp:
                 if resp.status == 200:
