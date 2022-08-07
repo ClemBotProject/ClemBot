@@ -33,14 +33,14 @@ RANKINGS = {
 class StarboardPost:
     star_posts: list[discord.Message]
     star_num: int
-    star_users: set[int] = dataclasses.field(default_factory=set)
+    star_users: set[discord.User] = dataclasses.field(default_factory=set)
 
 
 class StarboardService(BaseService):
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.curr_posts = {}
-        self.call_back_ids = {}
+        self.curr_posts: dict[int, StarboardPost] = {}
+        self.call_back_ids: dict[uuid.UUID, int] = {}
 
     # function to check to see if a reaction is legal
     def update_check(self, user: discord.User, reaction: discord.Reaction) -> bool:
@@ -68,6 +68,8 @@ class StarboardService(BaseService):
 
         title = f'{RANKINGS.get(math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS), 5)} | {stars} Star{"s" if stars > 1 else ""}'
 
+        assert isinstance(message.channel, discord.TextChannel)
+
         embed = discord.Embed(
             title=title,
             color=Colors.ClemsonOrange,
@@ -94,12 +96,14 @@ class StarboardService(BaseService):
 
         # create message to send in the starboards
         starboard_message = self.make_star_post(reaction.message, reaction.count)
-        self.curr_posts[reaction.message.id] = StarboardPost(None, reaction.count)
+        self.curr_posts[reaction.message.id] = StarboardPost([], reaction.count)
         self.curr_posts[reaction.message.id].star_users.add(user)
 
         # create unique callback id
         callback_id = uuid.uuid4()
         self.call_back_ids[callback_id] = reaction.message.id
+
+        assert reaction.message.guild is not None
 
         # send the message to #starboard
         await self.bot.messenger.publish(
@@ -111,7 +115,7 @@ class StarboardService(BaseService):
         )
 
     @BaseService.listener(Events.on_designated_message_sent)
-    async def get_starboard_post(self, dc_id, messages) -> None:
+    async def get_starboard_post(self, dc_id: uuid.UUID, messages) -> None:
         if dc_id in self.call_back_ids:
             star_message_id = self.call_back_ids[dc_id]
 

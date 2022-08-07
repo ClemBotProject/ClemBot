@@ -280,7 +280,7 @@ class EventsMeta(type):
 
         Args:
 
-            dc_id (int) The id of the dc send event that was given to the dc service
+            dc_id (int | uuid) The id of the dc send event that was given to the dc service
             message (Union[discord.Message, list[discord.Message]]) the message or the list of The messages sent in dc channels
         """
         return "on_designated_message_sent"

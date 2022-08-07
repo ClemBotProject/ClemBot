@@ -1,4 +1,5 @@
 import re
+import typing as t
 
 import discord
 
@@ -22,7 +23,7 @@ class TagService(BaseService):
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
-        tag_prefix = await self.get_tag_prefixes(self.bot, message=message)
+        tag_prefix: list[str] | str = await self.get_tag_prefixes(self.bot, message=message)
         if tag_prefix is None:
             return
 
@@ -33,6 +34,10 @@ class TagService(BaseService):
         # find all tag matches in the message content
         pattern = re.compile(rf"(^|\s){re.escape(tag_prefix)}(\w+)")
         for match in set(i[1] for i in pattern.findall(message.content)):
+
+            if not message.guild:
+                return
+
             tag = await self.bot.tag_route.get_tag(message.guild.id, match)
 
             if not tag:
@@ -47,7 +52,7 @@ class TagService(BaseService):
             log.info(
                 'Tag "{match}" invoked in guild: {guild} by: {author}',
                 match=match,
-                guild=serializers.log_guild(message.author.guild),
+                guild=serializers.log_guild(t.cast(discord.Member, message.author).guild),
                 author=serializers.log_user(message.author),
             )
 
@@ -84,7 +89,7 @@ class TagService(BaseService):
             Events.on_set_deletable, msg=msg, author=message.author, timeout=60
         )
 
-    async def get_tag_prefixes(self, bot: ClemBot, message: discord.Message) -> list[str]:
+    async def get_tag_prefixes(self, bot: ClemBot, message: discord.Message) -> list[str] | None:
         tag_prefixes = []
 
         assert message.guild is not None

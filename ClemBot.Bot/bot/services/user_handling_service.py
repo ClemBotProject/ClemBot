@@ -71,7 +71,7 @@ class UserHandlingService(BaseService):
         await self.notify_user_remove(user)
 
     @BaseService.listener(Events.on_member_update)
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
+    async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
         # only update roles if they have changed
         if set(r.id for r in before.roles) == set(r.id for r in after.roles):
             return

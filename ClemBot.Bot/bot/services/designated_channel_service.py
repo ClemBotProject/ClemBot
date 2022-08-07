@@ -1,3 +1,4 @@
+import uuid
 from typing import List, Optional, Union
 
 import discord
@@ -21,7 +22,7 @@ class DesignatedChannelService(BaseService):
         designated_name: DesignatedChannelBase,
         guild_id: int,
         content: (str | discord.Embed),
-        dc_id: Optional[int] = None,
+        dc_id: int | uuid.UUID | None = None,
     ) -> None:
         """
         Event call back to sent a given string or embed message to all registered designated channels

@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import bot.bot_secrets as bot_secrets
+from bot.clem_bot import ClemBot
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
 
@@ -15,14 +16,15 @@ class StartupService(BaseService):
     that happened while the bot was offline
     """
 
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot) -> None:
         super().__init__(bot)
 
-    async def load_guilds(self):
+    async def load_guilds(self) -> None:
         tasks = []
         for guild in self.bot.guilds:
             if not await self.bot.guild_route.get_guild(guild.id):
                 log.info(f"Loading guild {guild.name}: {guild.id}")
+                assert guild.owner is not None
                 tasks.append(
                     asyncio.create_task(
                         self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id)
@@ -30,25 +32,25 @@ class StartupService(BaseService):
                 )
         await asyncio.gather(*tasks)
 
-    async def load_users(self):
+    async def load_users(self) -> None:
         await self.bot.user_route.create_user_bulk(self.bot.users)
 
-    async def load_users_guilds(self):
+    async def load_users_guilds(self) -> None:
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_users(guild)
 
-    async def load_roles(self):
+    async def load_roles(self) -> None:
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_roles(guild)
 
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_role_user_mappings(guild)
 
-    async def load_channels(self):
+    async def load_channels(self) -> None:
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_channels(guild)
 
-    async def load_threads(self):
+    async def load_threads(self) -> None:
         for guild in self.bot.guilds:
             await self.bot.guild_route.update_guild_threads(guild)
 
