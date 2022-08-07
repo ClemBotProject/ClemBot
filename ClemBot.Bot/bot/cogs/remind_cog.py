@@ -45,7 +45,7 @@ class RemindCog(commands.Cog):
         'reminder 4y Graduation',
         'reminder 3y1M4w1d5h9m2s Pi'
     ))
-    async def reminder(self, ctx: commands.Context, wait: converters.FutureDuration, *, content: t.Optional[str]):
+    async def reminder(self, ctx: commands.Context, wait: converters.FutureDuration, *, content: str | None):
         try:
             await self.bot.messenger.publish(Events.on_set_reminder, ctx, wait, content)
         except Exception as e:

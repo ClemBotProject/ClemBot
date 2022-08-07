@@ -191,7 +191,7 @@ class DotCog(commands.Cog):
         )
     )
     async def todots(
-        self, ctx, image, device=None, threshold=150, inverted: t.Optional[bool] = False
+        self, ctx, image, device=None, threshold=150, inverted: bool | None = False
     ) -> None:
         return await self.todots_helper(ctx, image, device, threshold, inverted)
 
@@ -221,7 +221,7 @@ class DotCog(commands.Cog):
         )
     )
     async def attachment(
-        self, ctx, device=None, threshold=150, inverted: t.Optional[bool] = False
+        self, ctx, device=None, threshold=150, inverted: bool | None = False
     ) -> None:
         try:
             image = ctx.message.attachments[0].url

@@ -68,7 +68,7 @@ class CalculatorCog(commands.Cog):
         return bool(op1["precedence"] <= op2["precedence"])
 
     # searches through a list operators and return its information
-    def search_operators_symbol(self, symbol: str) -> t.Optional[dict[str, t.Any]]:
+    def search_operators_symbol(self, symbol: str) -> dict[str, t.Any] | None:
         for operator in self.operators:
             if symbol == operator["symbol"]:
                 return operator

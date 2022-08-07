@@ -4,7 +4,7 @@ import discord
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.models.user_models import User
+import bot.models.user_models as models
 
 
 class UserRoute(BaseRoute):
@@ -29,11 +29,16 @@ class UserRoute(BaseRoute):
 
         await self._client.post("bot/users/createbulk", data=json, **kwargs)
 
-    async def get_user(self, user_id: int) -> User:
-        return User(**await self._client.get(f"bot/users/{user_id}"))
+    async def get_user(self, user_id: int) -> models.User:
+        return models.User(**await self._client.get(f"bot/users/{user_id}"))
 
-    async def get_user_slot_scores(self, user_id: int, guild_id: int, limit: int) -> t.Any:
-        return await self._client.get(f"bot/users/{user_id}/{guild_id}/slotscores?limit={limit}")
+    async def get_user_slot_scores(self, user_id: int, guild_id: int, limit: int) -> models.UserSlotScores | None:
+        resp = await self._client.get(f"bot/users/{user_id}/{guild_id}/slotscores?limit={limit}")
+
+        if not resp:
+            return None
+
+        return models.UserSlotScores(**resp)
 
     async def add_user_guild(self, user_id: int, guild_id: int, **kwargs: t.Any) -> None:
         json = {
@@ -49,7 +54,7 @@ class UserRoute(BaseRoute):
         }
         await self._client.delete("bot/guilds/removeuser", data=json, **kwargs)
 
-    async def get_user_guilds_ids(self, user_id: int) -> t.Optional[list[int]]:
+    async def get_user_guilds_ids(self, user_id: int) -> list[int] | None:
         user = await self._client.get(f"bot/users/{user_id}")
 
         if not user:

@@ -47,7 +47,7 @@ class BotSecrets:
             return self._client_token
 
     @client_token.setter
-    def client_token(self, value: t.Optional[str]) -> None:
+    def client_token(self, value: str | None) -> None:
         if self._client_token:
             raise ConfigAccessError("client_token has already been initialized")
         else:
@@ -60,7 +60,7 @@ class BotSecrets:
         return self._client_secret
 
     @client_secret.setter
-    def client_secret(self, value: t.Optional[str]) -> None:
+    def client_secret(self, value: str | None) -> None:
         if self._client_secret:
             raise ConfigAccessError("client_secret has already been initialized")
         self._client_secret = value
@@ -81,7 +81,7 @@ class BotSecrets:
         return self._bot_token
 
     @bot_token.setter
-    def bot_token(self, value: t.Optional[str]) -> None:
+    def bot_token(self, value: str | None) -> None:
         if self._bot_token:
             raise ConfigAccessError("bot_token has already been initialized")
         self._bot_token = value
@@ -109,7 +109,7 @@ class BotSecrets:
         return self._bot_prefix
 
     @bot_prefix.setter
-    def bot_prefix(self, value: t.Optional[str]) -> None:
+    def bot_prefix(self, value: str | None) -> None:
         if self._bot_prefix:
             raise ConfigAccessError("bot_prefix has already been initialized")
         self._bot_prefix = value
@@ -121,7 +121,7 @@ class BotSecrets:
         return self._gifMe_token
 
     @gif_me_token.setter
-    def gif_me_token(self, value: t.Optional[str]) -> None:
+    def gif_me_token(self, value: str | None) -> None:
         if self._gifMe_token:
             raise ConfigAccessError("gif_me_token has already been initialized")
         self._gifMe_token = value
@@ -133,7 +133,7 @@ class BotSecrets:
         return self._github_url
 
     @github_url.setter
-    def github_url(self, value: t.Optional[str]) -> None:
+    def github_url(self, value: str | None) -> None:
         if self._github_url:
             raise ConfigAccessError("github_url has already been initialized")
         self._github_url = value
@@ -145,7 +145,7 @@ class BotSecrets:
         return self._repl_url
 
     @repl_url.setter
-    def repl_url(self, value: t.Optional[str]) -> None:
+    def repl_url(self, value: str | None) -> None:
         if self._repl_url:
             raise ConfigAccessError("repl_url has already been initialized")
         self._repl_url = value
@@ -157,7 +157,7 @@ class BotSecrets:
         return self._merriam_key
 
     @merriam_key.setter
-    def merriam_key(self, value: t.Optional[str]) -> None:
+    def merriam_key(self, value: str | None) -> None:
         if self._merriam_key:
             raise ConfigAccessError("merriam_key has already been initialized")
         self._merriam_key = value
@@ -169,7 +169,7 @@ class BotSecrets:
         return self._weather_key
 
     @weather_key.setter
-    def weather_key(self, value: t.Optional[str]) -> None:
+    def weather_key(self, value: str | None) -> None:
         if self._weather_key:
             raise ConfigAccessError("weather_key has already been initialized")
         self._weather_key = value
@@ -205,7 +205,7 @@ class BotSecrets:
         return self._geocode_key
 
     @geocode_key.setter
-    def geocode_key(self, value: t.Optional[str]) -> None:
+    def geocode_key(self, value: str | None) -> None:
         if self._geocode_key:
             raise ConfigAccessError("geocode_key has already been initialized")
         self._geocode_key = value
@@ -217,7 +217,7 @@ class BotSecrets:
         return self._azure_translate_key
 
     @azure_translate_key.setter
-    def azure_translate_key(self, value: t.Optional[str]) -> None:
+    def azure_translate_key(self, value: str | None) -> None:
         if self._azure_translate_key:
             raise ConfigAccessError("azure_translate_key has already been initialized")
         self._azure_translate_key = value
@@ -229,7 +229,7 @@ class BotSecrets:
         return self._api_url
 
     @api_url.setter
-    def api_url(self, value: t.Optional[str]) -> None:
+    def api_url(self, value: str | None) -> None:
         if self._api_url:
             raise ConfigAccessError("api_url has already been initialized")
         self._api_url = value
@@ -241,7 +241,7 @@ class BotSecrets:
         return self._api_key
 
     @api_key.setter
-    def api_key(self, value: t.Optional[str]) -> None:
+    def api_key(self, value: str | None) -> None:
         if self._api_key:
             raise ConfigAccessError("api_key has already been initialized")
         self._api_key = value
@@ -253,7 +253,7 @@ class BotSecrets:
         return self._site_url
 
     @site_url.setter
-    def site_url(self, value: t.Optional[str]) -> None:
+    def site_url(self, value: str | None) -> None:
         if self._site_url:
             raise ConfigAccessError("site_url has already been initialized")
         self._site_url = value
@@ -265,7 +265,7 @@ class BotSecrets:
         return self._docs_url
 
     @docs_url.setter
-    def docs_url(self, value: t.Optional[str]) -> None:
+    def docs_url(self, value: str | None) -> None:
         if self._docs_url:
             raise ConfigAccessError("docs_url has already been initialized")
         self._docs_url = value

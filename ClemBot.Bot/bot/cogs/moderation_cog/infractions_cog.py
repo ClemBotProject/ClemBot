@@ -29,7 +29,7 @@ class InfractionsCog(commands.Cog):
     @ext.short_help("Lists a users infractions")
     @ext.example(("infractions", "infractions @SomeUser"))
     @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_infraction_view_self)
-    async def infractions(self, ctx: commands.Context, user: t.Optional[discord.Member] = None):
+    async def infractions(self, ctx: commands.Context, user: discord.Member | None = None):
         user = user or ctx.author
         claims = await self.bot.claim_route.get_claims_user(ctx.author)
 

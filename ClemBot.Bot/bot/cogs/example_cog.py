@@ -33,7 +33,7 @@ class ExampleCog(commands.Cog):
     # it's with this that we can access all parts of the discord api
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
-        self._last_member: t.Optional[discord.Member] = None
+        self._last_member: discord.Member | None = None
 
     # To create a command you decorate an async method with ext.command
     # the command name in discord will be the name of the function that you have decorated
@@ -46,7 +46,7 @@ class ExampleCog(commands.Cog):
     # Decorator to define the example of the help command, this is to give users an actual usage example for your command
     # do not include the prefix in your example the help command will add the prefix in accordance with the context its called from
     @ext.example("hello")
-    async def hello(self, ctx: ext.ClemBotContext[ClemBot], *, member: t.Optional[discord.Member]) -> None:
+    async def hello(self, ctx: ext.ClemBotContext[ClemBot], *, member: discord.Member | None) -> None:
         # self is a python OOP concept, if you are unfamiliar brush up on how python handles classes
         # ctx is the context from which the command was invoked from, it contains the message, the guild
         # the command was sent in, the channel, etc

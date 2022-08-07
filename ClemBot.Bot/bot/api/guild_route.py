@@ -19,7 +19,7 @@ class GuildRoute(BaseRoute):
         json = {"Id": guild_id, "Name": name, "OwnerId": owner_id}
         await self._client.post("bot/guilds", data=json)
 
-    async def get_all_guilds_ids(self) -> t.Optional[list[int]]:
+    async def get_all_guilds_ids(self) -> list[int] | None:
         guilds = await self._client.get("bot/guilds")
 
         if not guilds:

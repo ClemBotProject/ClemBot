@@ -26,7 +26,7 @@ class DispatchQueue:
 class Messenger:
     """The global message bus that handles all application level events"""
 
-    def __init__(self, name: t.Optional[str] = None):
+    def __init__(self, name: str | None = None):
         log.info("New messenger created with name: {name}", name=name)
         self.name = name
         self._events = dict[str, list[wr.ReferenceType[t.Any]]]()

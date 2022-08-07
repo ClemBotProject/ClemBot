@@ -24,7 +24,7 @@ class CustomPrefixCog(commands.Cog):
     )
     @ext.short_help("Configure a custom command prefix")
     @ext.example(("prefix", "prefix ?", "prefix >>"))
-    async def prefix(self, ctx: ext.ClemBotContext[ClemBot], *, prefix: t.Optional[str] = None) -> None:
+    async def prefix(self, ctx: ext.ClemBotContext[ClemBot], *, prefix: str | None = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
         prefixes = (await self.bot.get_prefix(ctx.message))[2:]

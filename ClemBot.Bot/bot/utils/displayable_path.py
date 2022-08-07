@@ -1,3 +1,7 @@
+# type: ignore
+# This file is just for dev debugging stuff and doesn't need to be fully typed
+
+from __future__ import annotations
 import typing as t
 from pathlib import Path
 
@@ -10,10 +14,11 @@ class DisplayablePath:
     display_parent_prefix_middle = "    "
     display_parent_prefix_last = "│   "
 
-    def __init__(self, path: (str | t.Any), parent_path: t.Optional["DisplayablePath"], is_last: bool):
+    def __init__(self, path: str | t.Any, parent_path: DisplayablePath | None, is_last: bool):
         self.path = Path(str(path))
         self.parent = parent_path
         self.is_last = is_last
+        self.depth: int
 
         if self.parent:
             self.depth = self.parent.depth + 1
@@ -27,7 +32,7 @@ class DisplayablePath:
         return self.path.name
 
     @classmethod
-    def make_tree(cls, root: (str | t.Any), parent: t.Optional["DisplayablePath"] = None, is_last: bool = False, criteria=None):
+    def make_tree(cls, root: str | t.Any, parent: DisplayablePath | None = None, is_last: bool = False, criteria=None):
         root = Path(str(root))
         criteria = criteria or cls._default_criteria
 

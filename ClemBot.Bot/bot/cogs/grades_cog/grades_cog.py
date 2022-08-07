@@ -72,8 +72,8 @@ class GradesCog(commands.Cog):
     async def grades(
         self,
         ctx: ext.ClemBotContext[ClemBot],
-        honors: t.Optional[HonorsConverter] = "non-honors",
-        year: t.Optional[int] = MIN_YEAR,
+        honors: HonorsConverter | None = "non-honors",
+        year: int | None = MIN_YEAR,
         *,
         course: str,
     ) -> None:
@@ -211,7 +211,7 @@ class GradesCog(commands.Cog):
             "prof all kristi whitehead",
         )
     )
-    async def prof(self, ctx: ext.ClemBotContext[ClemBot], honors: t.Optional[HonorsConverter] = "non-honors", *, prof: str) -> None:  # type: ignore
+    async def prof(self, ctx: ext.ClemBotContext[ClemBot], honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:  # type: ignore
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'

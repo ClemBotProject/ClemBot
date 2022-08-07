@@ -6,3 +6,7 @@ class User(ClemBotModel):
     id: int
     name: Optional[str]
     guilds: list[int]
+
+
+class UserSlotScores(ClemBotModel):
+    scores: list[int]
