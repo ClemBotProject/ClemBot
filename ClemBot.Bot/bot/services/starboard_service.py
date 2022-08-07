@@ -4,10 +4,12 @@ import typing as t
 import uuid
 
 import discord
+from bot.clem_bot import ClemBot
 
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
@@ -35,7 +37,7 @@ class StarboardPost:
 
 
 class StarboardService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
         self.curr_posts = {}
         self.call_back_ids = {}
@@ -77,7 +79,7 @@ class StarboardService(BaseService):
 
         if len(message.content) > 0:
             for i, chunk in enumerate(
-                self.chunk_iterable(message.content, DiscordLimits.EmbedFieldLength)
+                chunk_sequence(message.content, DiscordLimits.EmbedFieldLength)
             ):
                 embed.add_field(name="Message" if i < 1 else "Continued", value=chunk, inline=False)
 
@@ -88,7 +90,7 @@ class StarboardService(BaseService):
         return embed
 
     # function to add an entry from the starboard
-    async def add_to_starboard(self, user: discord.User, reaction: discord.Reaction):
+    async def add_to_starboard(self, user: discord.User, reaction: discord.Reaction) -> None:
 
         # create message to send in the starboards
         starboard_message = self.make_star_post(reaction.message, reaction.count)
@@ -109,8 +111,7 @@ class StarboardService(BaseService):
         )
 
     @BaseService.listener(Events.on_designated_message_sent)
-    async def get_starboard_post(self, dc_id, messages):
-        pass
+    async def get_starboard_post(self, dc_id, messages) -> None:
         if dc_id in self.call_back_ids:
             star_message_id = self.call_back_ids[dc_id]
 
@@ -142,10 +143,6 @@ class StarboardService(BaseService):
                 await self.add_to_starboard(user, reaction)
             else:
                 await self.updateStarboardEntry(user, reaction)
-
-    def chunk_iterable(self, iterable, chunk_size):
-        for i in range(0, len(iterable), chunk_size):
-            yield iterable[i : i + chunk_size]
 
     async def load_service(self) -> None:
         pass

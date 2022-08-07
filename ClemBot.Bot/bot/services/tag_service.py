@@ -8,6 +8,7 @@ from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
+from bot.utils.helpers import chunk_sequence
 
 log = get_logger(__name__)
 
@@ -16,12 +17,12 @@ TAG_PREFIX_DEFAULT = "$"
 
 
 class TagService(BaseService):
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
-        tag_prefix = await self.get_tag_prefix(self.bot, message=message)
+        tag_prefix = await self.get_tag_prefixes(self.bot, message=message)
         if tag_prefix is None:
             return
 
@@ -59,7 +60,7 @@ class TagService(BaseService):
         # if there is more than one tag invoked, check if we should paginate
         if len(tags_contents) > 1:
             # check if there's more than one page of tags, if there is we should paginate them
-            if len(pages := list(self.chunk_iterable(tags_str, TAG_PAGINATE_THRESHOLD))) > 1:
+            if len(pages := list(chunk_sequence(tags_str, TAG_PAGINATE_THRESHOLD))) > 1:
                 await self.bot.messenger.publish(
                     Events.on_set_pageable_text,
                     embed_name="Tags Contents",
@@ -83,8 +84,10 @@ class TagService(BaseService):
             Events.on_set_deletable, msg=msg, author=message.author, timeout=60
         )
 
-    async def get_tag_prefix(self, bot: ClemBot, message: discord.Message):
+    async def get_tag_prefixes(self, bot: ClemBot, message: discord.Message) -> list[str]:
         tag_prefixes = []
+
+        assert message.guild is not None
 
         # Check if bot is in BotOnly mode, if it is we cant get custom tag prefixes
         # so we have to fall back to self.default
@@ -106,11 +109,6 @@ class TagService(BaseService):
             tag_prefixes = [TAG_PREFIX_DEFAULT]
 
         return tag_prefixes
-
-    @staticmethod
-    def chunk_iterable(iterable, chunk_size):
-        for i in range(0, len(iterable), chunk_size):
-            yield iterable[i : i + chunk_size]
 
     async def load_service(self) -> None:
         pass

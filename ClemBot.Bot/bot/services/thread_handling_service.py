@@ -13,8 +13,7 @@ class ThreadHandlingService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_guild_thread_join)
-    async def thread_join(self, thread: discord.Thread):
-
+    async def thread_join(self, thread: discord.Thread) -> None:
         # This event fires whenever the bot joins a thread and when a thread is created
         # Check if the thread already exists in the db and if it does do nothing else
         if await self.bot.thread_route.get_thread(thread.id):
@@ -32,11 +31,11 @@ class ThreadHandlingService(BaseService):
         )
 
     @BaseService.listener(Events.on_new_guild_initialized)
-    async def on_new_guild_init(self, guild: discord.Guild):
+    async def on_new_guild_init(self, guild: discord.Guild) -> None:
         await self.bot.guild_route.update_guild_threads(guild)
 
     @BaseService.listener(Events.on_guild_thread_update)
-    async def thread_update(self, before: discord.Thread, after: discord.Thread):
+    async def thread_update(self, before: discord.Thread, after: discord.Thread) -> None:
         if before.name != after.name:
             await self.bot.thread_route.edit_thread(after.id, after.name, raise_on_error=True)
 
