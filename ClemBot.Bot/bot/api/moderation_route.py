@@ -12,7 +12,7 @@ class ModerationRoute(BaseRoute):
         super().__init__(api_client)
 
     async def insert_ban(
-        self, *, guild_id: int, author_id: int, subject_id: int, reason: str, **kwargs: t.Any
+        self, *, guild_id: int, author_id: int, subject_id: int, reason: str | None, **kwargs: t.Any
     ) -> int | None:
         json = {
             "GuildId": guild_id,
@@ -36,7 +36,7 @@ class ModerationRoute(BaseRoute):
         author_id: int,
         subject_id: int,
         reason: str | None = None,
-        duration: datetime,
+        duration: str,
         **kwargs: t.Any,
     ) -> int | None:
         json = {

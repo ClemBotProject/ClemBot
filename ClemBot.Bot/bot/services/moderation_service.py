@@ -19,7 +19,7 @@ class ModerationService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_bot_warn)
-    async def on_bot_warn(self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason: t.Optional[str]) -> None:
+    async def on_bot_warn(self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason: str) -> None:
         await self.bot.moderation_route.insert_warn(
             guild_id=guild.id,
             author_id=author.id,
@@ -30,7 +30,7 @@ class ModerationService(BaseService):
 
     @BaseService.listener(Events.on_bot_ban)
     async def on_bot_ban(
-        self, guild: discord.Guild, author: discord.Member, purge_days: int, subject: discord.Member, reason: t.Optional[str]
+        self, guild: discord.Guild, author: discord.Member, purge_days: int, subject: discord.Member, reason: str | None
     ) -> None:
         await guild.ban(t.cast(discord.abc.Snowflake, subject), reason=reason, delete_message_days=purge_days)
 
@@ -62,6 +62,10 @@ class ModerationService(BaseService):
                                                               duration=format_datetime(duration),
                                                               reason=reason,
                                                               raise_on_error=True)
+
+        if not mute_id:
+            log.error("Creating mute failed in guild: {guild_id}", guild_id=guild.id)
+            return None
 
         self.bot.scheduler.schedule_at(
             self._unmute_callback(guild.id, subject.id, mute_id), time=duration
@@ -237,6 +241,8 @@ class ModerationService(BaseService):
             mutes = await self.bot.moderation_route.get_guild_infractions(guild.id)
 
             for mute in (m for m in mutes if m.type == Infractions.mute and m.active):
+
+                assert mute.duration is not None
 
                 if (mute.duration - datetime.utcnow()).total_seconds() <= 0:
                     await self._unmute_callback(guild.id, mute.subject_id, mute.id)

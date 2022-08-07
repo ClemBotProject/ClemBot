@@ -316,6 +316,9 @@ class ClemBot(commands.Bot):
             Events.on_guild_channel_update, before.guild.id, before, after
         )
 
+    async def on_thread_create(self, thread: discord.Thread) -> None:
+        await self.publish_to_queue_with_error(Events.on_guild_thread_create, thread.guild.id, thread)
+
     async def on_thread_join(self, thread: discord.Thread) -> None:
         await self.publish_to_queue_with_error(Events.on_guild_thread_join, thread.guild.id, thread)
 

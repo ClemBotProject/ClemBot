@@ -10,13 +10,18 @@ class ThreadRoute(BaseRoute):
         super().__init__(api_client)
 
     async def create_thread(
-        self, thread_id: int, name: int, guild_id: int, parent_id: int, **kwargs: t.Any
+        self, thread_id: int, name: str, guild_id: int, parent_id: int, **kwargs: t.Any
     ) -> None:
         json = {"Id": thread_id, "Name": name, "GuildId": guild_id, "ParentId": parent_id}
         await self._client.post("bot/threads", data=json, **kwargs)
 
-    async def get_thread(self, thread_id: int) -> Thread:
-        return Thread(**await self._client.get(f"bot/threads/{thread_id}"))
+    async def get_thread(self, thread_id: int) -> Thread | None:
+        resp = await self._client.get(f"bot/threads/{thread_id}")
+
+        if not resp:
+            return None
+
+        return Thread(**resp)
 
     async def edit_thread(self, thread_id: int, name: str, **kwargs: t.Any) -> None:
         json = {

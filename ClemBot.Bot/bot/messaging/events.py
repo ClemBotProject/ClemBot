@@ -508,6 +508,16 @@ class EventsMeta(type):
         return "on_after_command_invoke"
 
     @property
+    def on_guild_thread_create(self) -> str:
+        """
+        Published when a new thread channel is created in a guild
+
+        Args:
+            thread (discord.Thread): The new thread
+        """
+        return "on_guild_thread_create"
+
+    @property
     def on_guild_thread_join(self) -> str:
         """
         Published when a new thread channel is joined in a guild

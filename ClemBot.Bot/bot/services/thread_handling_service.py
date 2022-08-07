@@ -1,6 +1,7 @@
 import discord
 
 import bot.utils.log_serializers as serializers
+from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
@@ -9,11 +10,12 @@ log = get_logger(__name__)
 
 
 class ThreadHandlingService(BaseService):
-    def __init__(self, *, bot):
+
+    def __init__(self, *, bot: ClemBot) -> None:
         super().__init__(bot)
 
-    @BaseService.listener(Events.on_guild_thread_join)
-    async def thread_join(self, thread: discord.Thread) -> None:
+    @BaseService.listener(Events.on_guild_thread_create)
+    async def thread_create(self, thread: discord.Thread) -> None:
         # This event fires whenever the bot joins a thread and when a thread is created
         # Check if the thread already exists in the db and if it does do nothing else
         if await self.bot.thread_route.get_thread(thread.id):
