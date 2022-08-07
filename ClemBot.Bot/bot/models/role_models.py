@@ -4,13 +4,13 @@ from bot.models.clem_bot_model import ClemBotModel
 
 class Role(ClemBotModel):
     id: int
-    name: Optional[str]
+    name: str
     is_assignable: bool
 
 
 class RoleFull(Role):
     id: int
-    name: Optional[str]
+    name: str
     guild_id: int
     admin: bool
     is_assignable: bool

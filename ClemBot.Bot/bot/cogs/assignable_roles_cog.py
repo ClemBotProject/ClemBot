@@ -46,6 +46,10 @@ class AssignableRolesCog(commands.Cog):
     async def check_role_assignable(self, ctx: ext.ClemBotCtx, input_role: str) -> bool:
         assert ctx.guild is not None
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
+
+        if not assignable_roles:
+            return False
+
         roles = []
         for role in assignable_roles:
             r = ctx.guild.get_role(role.id)
@@ -58,6 +62,9 @@ class AssignableRolesCog(commands.Cog):
         str_input_role = str(input_role).casefold()
         assert ctx.guild is not None
         assignable_roles = await self.bot.role_route.get_guilds_assignable_roles(ctx.guild.id)
+
+        if not assignable_roles:
+            return None
 
         str_role_list = [
             str(i.name).casefold() for i in assignable_roles
@@ -120,7 +127,7 @@ class AssignableRolesCog(commands.Cog):
 
         # Remove unnecessary extra emojis from reactions list
         if role_count < len(reactions):
-            del reactions[role_count : len(reactions)]
+            del reactions[role_count: len(reactions)]
 
         """
             USING EMOJIS WITH d.py
