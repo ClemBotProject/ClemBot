@@ -44,7 +44,7 @@ class InviteCog(commands.Cog):
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.description = (
-            f"{len(self.bot.guilds)} Guilds\n{sum([g.member_count for g in self.bot.guilds])} Users"
+            f"{len(self.bot.guilds)} Guilds\n{sum([g.member_count for g in self.bot.guilds if g.member_count])} Users"
         )
         embed.title = str(self.bot.user)
         embed.add_field(name="Owner", value=owner.mention, inline=False)

@@ -18,29 +18,29 @@ TIMEOUT = 60
 
 @dataclass
 class ClassType:
-    _abbv: str = None
+    _abbv: str | None = None
 
     @property
-    def abbv(self) -> str:
+    def abbv(self) -> str | None:
         return self._abbv
 
     @abbv.setter
-    def abbv(self, val):
+    def abbv(self, val: str) -> None:
         self._abbv = val.lower()
 
-    _teacher: str = None
+    _teacher: str | None = None
 
     @property
-    def teacher(self) -> str:
+    def teacher(self) -> str | None:
         return self._teacher
 
     @teacher.setter
-    def teacher(self, val):
+    def teacher(self, val: str) -> None:
         self._teacher = val.lower()
 
-    number: int = None
-    name: str = None
-    description: str = None
+    number = 0
+    name: str | None = None
+    description: str | None = None
 
     @property
     def channel(self) -> str:
@@ -73,7 +73,7 @@ class ManageClassesCog(commands.Cog):
     @ext.group(pass_context=True, aliases=["class"], case_insensitive=True)
     @ext.long_help("Command group for the manage classes functionality")
     @ext.short_help("Academic class creation functionality")
-    async def classes(self, ctx):
+    async def classes(self, ctx: ext.ClemBotCtx) -> None:
         pass
 
     @classes.command(pass_context=True, aliases=["create"])
@@ -84,7 +84,7 @@ class ManageClassesCog(commands.Cog):
     )
     @ext.short_help("Starts the class creation wizard")
     @ext.example(("class add", "class add cpsc-1010"))
-    async def add(self, ctx: ext.ClemBotCtx, class_name: str = None):
+    async def add(self, ctx: ext.ClemBotCtx, class_name: str | None = None) -> None:
         """
         Command to initiate the new class creation wizard, optionally takes a
         class name as a parameter E.G "cpsc-1010"
@@ -94,8 +94,9 @@ class ManageClassesCog(commands.Cog):
             E.G "cpsc-1010" Defaults to None.
         """
 
-        class_repr = ClassType()
+        class_repr: ClassType | None = ClassType()
 
+        assert class_repr
         if class_name:
             # try to parse the class name given, if its not in the correct format split will throw
             abbv, num = class_name.split("-")
@@ -109,7 +110,7 @@ class ManageClassesCog(commands.Cog):
 
         try:
             # attempt to get the category to add the class too
-            category = await commands.converter.CategoryChannelConverter().convert(
+            category: discord.CategoryChannel | None = await commands.converter.CategoryChannelConverter().convert(
                 ctx, class_repr.category
             )
         except:
@@ -142,7 +143,7 @@ class ManageClassesCog(commands.Cog):
         # sync perms with cleanup role
         await self.sync_perms(ctx, channel, role)
 
-    async def input_class(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> ClassType:
+    async def input_class(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> ClassType | None:
         def input_check(msg: discord.Message) -> bool:
             return msg.author == ctx.author and ctx.channel == msg.channel
 
@@ -170,7 +171,7 @@ class ManageClassesCog(commands.Cog):
                 class_repr.number = int(number)
             except asyncio.TimeoutError:
                 await self.input_timeout(ctx)
-                return
+                return None
         else:
             embed = discord.Embed(
                 title="**New class setup wizard started :white_check_mark:**",
@@ -198,7 +199,7 @@ class ManageClassesCog(commands.Cog):
                 class_repr.name = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return
+            return None
 
         embed = discord.Embed(
             title=f'Class name: "{class_repr.name}" set', color=Colors.ClemsonOrange
@@ -230,7 +231,7 @@ class ManageClassesCog(commands.Cog):
                 class_repr.description = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return
+            return None
 
         embed = discord.Embed(
             title=f'Class description: "{class_repr.description}" set', color=Colors.ClemsonOrange
@@ -252,7 +253,7 @@ class ManageClassesCog(commands.Cog):
                 class_repr.teacher = val
         except asyncio.TimeoutError:
             await self.input_timeout(ctx)
-            return
+            return None
 
         embed = discord.Embed(
             title=f'Class and role "{class_repr.role}" created in category "{class_repr.category}" ',
@@ -263,7 +264,7 @@ class ManageClassesCog(commands.Cog):
 
         return class_repr
 
-    async def create_category(self, ctx: ext.ClemBotCtx, class_repr):
+    async def create_category(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> discord.CategoryChannel | None:
         get_input = UserChoice(ctx=ctx, timeout=TIMEOUT)
         choice = await get_input.send_confirmation(
             content=f"""
@@ -279,13 +280,13 @@ class ManageClassesCog(commands.Cog):
         log.info(f'Creating category "{class_repr.category}" in guild: "{ctx.guild.name}"')
         return await ctx.guild.create_category(class_repr.category)
 
-    async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType):
+    async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType) -> discord.TextChannel:
         log.info(f'Creating new Class channel "{class_repr.name}""')
         return await category.create_text_channel(
             class_repr.channel, topic=f"{class_repr.name} - {class_repr.description}"
         )
 
-    async def create_role(self, ctx: ext.ClemBotCtx, class_repr):
+    async def create_role(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> discord.Role:
         log.info(f'Creating new class role "{class_repr.role}""')
         # Attempt to convert the role, if we cant then we create a new one
         try:
@@ -305,12 +306,13 @@ class ManageClassesCog(commands.Cog):
 
         return role
 
-    async def sync_perms(self, ctx: ext.ClemBotCtx, channel, role):
+    async def sync_perms(self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, role: discord.Role) -> None:
         # Check if cleanup role exists
-        if discord.utils.get(ctx.guild.roles, name="Cleanup"):
-            cleanup = discord.utils.get(ctx.guild.roles, name="Cleanup")
-        else:
+        if not (cleanup := discord.utils.get(ctx.guild.roles, name="Cleanup")):
             cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)
+
+            assert cleanup
+
             await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)
 
             # Upon detecting first time user, show embed showing how to use commands
@@ -336,18 +338,19 @@ class ManageClassesCog(commands.Cog):
         await channel.set_permissions(role, view_channel=True)
         await channel.set_permissions(cleanup, view_channel=False)
         await role.edit(position=2)
+
         await cleanup.edit(position=1)
 
     @classes.command(pass_context=True, aliases=["delete"])
     @commands.has_guild_permissions(administrator=True)
-    async def archive(self, ctx: ext.ClemBotCtx, channel: discord.TextChannel):
+    async def archive(self, ctx: ext.ClemBotCtx, channel: discord.TextChannel) -> None:
         pass
 
-    async def input_timeout(self, ctx):
+    async def input_timeout(self, ctx: ext.ClemBotCtx) -> None:
         await ctx.send("Response timed out please redo the class wizard")
 
 
-def round_down(num, divisor):
+def round_down(num: int, divisor: int) -> int:
     return num - (num % divisor)
 
 

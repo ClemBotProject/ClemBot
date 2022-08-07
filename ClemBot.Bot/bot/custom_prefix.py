@@ -14,7 +14,7 @@ class CustomPrefix:
         log.info(f'Setting default prefix too: "{default}""')
         self.default = default
 
-    async def get_prefix(self, bot: ClemBot, message: discord.Message):
+    async def get_prefix(self, bot: ClemBot, message: discord.Message) -> list[str]:
 
         prefixes = []
 
@@ -25,6 +25,7 @@ class CustomPrefix:
             try:
                 # Try to grab the prefixes from the db, raise an error on failure
                 # and bailout, we cant respond to anything at the moment
+                assert message.guild
                 prefixes = await bot.custom_prefix_route.get_custom_prefixes(
                     message.guild.id, raise_on_error=True
                 )
