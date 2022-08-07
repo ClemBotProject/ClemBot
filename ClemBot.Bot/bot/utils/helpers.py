@@ -3,7 +3,7 @@ from datetime import datetime
 import arrow
 from dateutil.relativedelta import relativedelta
 
-from bot.utils.converters import DurationDelta
+from bot.utils.converters import DurationDelta, FutureDuration, PastDuration
 
 T = TypeVar("T")
 
@@ -23,7 +23,7 @@ def format_datetime(time: datetime) -> str:
     return time.strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
-def format_duration(duration: DurationDelta[relativedelta]) -> str:
+def format_duration(duration: FutureDuration | PastDuration) -> str:
     """
         Formats the given datetime to a string.
         Uses relativedelta to calculate the difference between datetime.utcnow()
