@@ -18,7 +18,7 @@ class InfoCog(commands.Cog):
     @ext.command()
     @ext.required_claims(Claims.moderation_infraction_view)
     @ext.ignore_claims_pre_invoke()
-    async def info(self, ctx, user: discord.User = None):
+    async def info(self, ctx: ext.ClemBotCtx, user: discord.User = None):
         # Default range for message count 30 days(~1 month)
 
         # If the command is invoked without a specified user, it will return info on the calling user

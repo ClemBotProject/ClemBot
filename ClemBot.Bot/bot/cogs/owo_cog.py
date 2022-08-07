@@ -1,3 +1,4 @@
+# type: ignore
 import math
 import random
 import re
@@ -21,7 +22,7 @@ class OwoCog(commands.Cog):
     @ext.long_help("Owo's the text given to the command")
     @ext.short_help("owo any string")
     @ext.example("owo hello there")
-    async def owo(self, ctx, *, message) -> None:
+    async def owo(self, ctx: ext.ClemBotCtx, *, message) -> None:
         await ctx.send(self.owoify(message))
 
     def owoify(self, text):

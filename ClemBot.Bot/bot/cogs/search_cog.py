@@ -1,3 +1,4 @@
+# type: ignore
 import json
 import re
 import typing as t

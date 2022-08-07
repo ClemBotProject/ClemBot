@@ -1,3 +1,5 @@
+# type: ignore
+
 import asyncio
 import json
 from collections import deque
@@ -37,13 +39,13 @@ class OwnerCog(commands.Cog):
 
     @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
-    async def leave(self, ctx, id: int):
+    async def leave(self, ctx: ext.ClemBotCtx, id: int):
         server = self.bot.get_guild(id)
         await server.leave()
 
     @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx, id: int):
+    async def reload(self, ctx: ext.ClemBotCtx, id: int):
         guild = self.bot.get_guild(id)
         await ctx.send(f"reloading {guild.name} users")
         await self.bot.guild_route.update_guild_users(guild)
@@ -64,7 +66,7 @@ class OwnerCog(commands.Cog):
 
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
-    async def resetguilds(self, ctx, apply: bool = False):
+    async def resetguilds(self, ctx: ext.ClemBotCtx, apply: bool = False):
         db_guilds = await self.bot.guild_route.get_all_guilds()
         db_guilds_ids = set(g.id for g in db_guilds)
         disc_guilds = set(g.id for g in self.bot.guilds)
@@ -82,7 +84,7 @@ class OwnerCog(commands.Cog):
 
     @owner.group(invoke_without_command=True)
     @commands.is_owner()
-    async def userupdatequeuestats(self, ctx, full_output: bool = False):
+    async def userupdatequeuestats(self, ctx: ext.ClemBotCtx, full_output: bool = False):
         queue = {
             k: str(v) if full_output else v.qsize()
             for k, v in self.bot.active_services["UserHandlingService"].user_update_queue.items()
@@ -129,7 +131,7 @@ class OwnerCog(commands.Cog):
 
     @channel.command(pass_context=True, aliases=["register", "set"])
     @commands.is_owner()
-    async def add(self, ctx, channel_type: str, channel: discord.TextChannel):
+    async def add(self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel):
         """
         Command to add a registered TextChannel too an owner designated channel
 
@@ -161,7 +163,7 @@ class OwnerCog(commands.Cog):
 
     @channel.command(pass_context=True, aliases=["unregister"])
     @commands.is_owner()
-    async def delete(self, ctx, channel_type: str, channel: discord.TextChannel):
+    async def delete(self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel):
         """
         Command to delete a registered TextChannel from an owner designated channel
 
@@ -225,7 +227,7 @@ class OwnerCog(commands.Cog):
 
     @log.command()
     @commands.is_owner()
-    async def get(self, ctx, lines: int):
+    async def get(self, ctx: ext.ClemBotCtx, lines: int):
         log_name = log.parent.handlers[0].baseFilename
         with open(log_name, "r") as f:
             logs = "".join(deque(f, lines))
@@ -235,7 +237,7 @@ class OwnerCog(commands.Cog):
 
     @eval_bot.command()
     @commands.is_owner()
-    async def bot(self, ctx, *, code):
+    async def bot(self, ctx: ext.ClemBotCtx, *, code):
         code = code.replace("```python", "")
         code = code.replace("```py", "")
         code = code.replace("`", "")
@@ -256,7 +258,7 @@ class OwnerCog(commands.Cog):
 
     @eval_bot.command(aliases=["db"])
     @commands.is_owner()
-    async def database(self, ctx, *, query):
+    async def database(self, ctx: ext.ClemBotCtx, *, query):
         pass
 
     @count.command()
@@ -271,7 +273,7 @@ class OwnerCog(commands.Cog):
 
     @count.command()
     @commands.is_owner()
-    async def users(self, ctx, guild_id: int = None):
+    async def users(self, ctx: ext.ClemBotCtx, guild_id: int = None):
         count = sum(len(i.members) for i in self.bot.guilds)
 
         embed = discord.Embed(title="Current user count", color=Colors.ClemsonOrange)

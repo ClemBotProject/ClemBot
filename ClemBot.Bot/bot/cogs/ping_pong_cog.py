@@ -18,7 +18,7 @@ class PingPongCog(commands.Cog):
     )
     @ext.short_help("shows bot latency")
     @ext.example("ping")
-    async def ping(self, ctx: commands.Context) -> None:
+    async def ping(self, ctx: ext.ClemBotCtx) -> None:
         start = time.perf_counter()
         await self.bot.health_check_route.ping()
         clembot_api_latency = time.perf_counter() - start

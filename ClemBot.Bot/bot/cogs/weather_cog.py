@@ -1,6 +1,4 @@
-# Thomas Delvaux
-# 12-16-2020
-
+# type: ignore
 import datetime as dt
 import re
 
@@ -178,7 +176,7 @@ class WeatherCog(commands.Cog):
 
         return pages, num_hr, num_day
 
-    async def weatherCode(self, ctx, loc, is_cond, is_hr, is_day):
+    async def weatherCode(self, ctx: ext.ClemBotCtx, loc, is_cond, is_hr, is_day):
         # Remove any characters not in ranges a-z, A-Z, or 0-9
         # Exceptions: & _ - , and <space>
         # per the ASCII Table https://www.asciitable.com
@@ -317,7 +315,7 @@ class WeatherCog(commands.Cog):
         )
     )
     async def weather(
-        self, ctx, *, location
+        self, ctx: ext.ClemBotCtx, *, location
     ):  # the * is used to "greedily" catch all text after it in the variable "loc"
         await self.weatherCode(ctx, location, 1, 0, 1)
 
@@ -332,7 +330,7 @@ class WeatherCog(commands.Cog):
     )
     @ext.short_help("Current weather conditions")
     @ext.example("weather current Clemson")
-    async def current(self, ctx, *, location):
+    async def current(self, ctx: ext.ClemBotCtx, *, location):
         await self.weatherCode(ctx, location, 1, 0, 0)
 
     # Daily and Hourly Forecasts
@@ -346,7 +344,7 @@ class WeatherCog(commands.Cog):
     )
     @ext.short_help("Daily and hourly forecasts")
     @ext.example("weather forecast Clemson")
-    async def forecast(self, ctx, *, location):
+    async def forecast(self, ctx: ext.ClemBotCtx, *, location):
         await self.weatherCode(ctx, location, 0, 1, 1)
 
     # Hourly Forecast
@@ -360,7 +358,7 @@ class WeatherCog(commands.Cog):
     )
     @ext.short_help("Hourly forecast")
     @ext.example("weather hourly Clemson")
-    async def hourly(self, ctx, *, location):
+    async def hourly(self, ctx: ext.ClemBotCtx, *, location):
         await self.weatherCode(ctx, location, 0, 1, 0)
 
     # Daily Forecast
@@ -374,7 +372,7 @@ class WeatherCog(commands.Cog):
     )
     @ext.short_help("Daily forecast")
     @ext.example("weather daily Clemson")
-    async def daily(self, ctx, *, location):
+    async def daily(self, ctx: ext.ClemBotCtx, *, location):
         await self.weatherCode(ctx, location, 0, 0, 1)
 
     # Current Conditions with Daily and Hourly Forecasts
@@ -388,7 +386,7 @@ class WeatherCog(commands.Cog):
     )
     @ext.short_help("Current conditions w/hourly and daily forecast")
     @ext.example(("weather all Clemson", "weather everything Clemson"))
-    async def all(self, ctx, *, location):
+    async def all(self, ctx: ext.ClemBotCtx, *, location):
         await self.weatherCode(ctx, location, 1, 1, 1)
 
 

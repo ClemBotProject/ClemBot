@@ -24,7 +24,7 @@ class ChainCog(commands.Cog):
     @ext.long_help("Chains multiple chainable commands together")
     @ext.short_help("Chains commands")
     @ext.example("chain command1 command2 hello")
-    async def chain(self, ctx, *, text: str):
+    async def chain(self, ctx: ext.ClemBotCtx, *, text: str):
         prefix = await self.bot.get_prefix(ctx)
         if not any(sub in text for sub in prefix):
             await ctx.send(f"{prefix[2]}chain requires 1 or more commands to run")

@@ -94,7 +94,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.long_help("Removes a claim from a given role. ")
     @ext.short_help("Removes a claim from a given role")
     @ext.example(("claims remove emote_add @some_role", "claims delete tag_add @some_other_role"))
-    async def remove(self, ctx, claim: ClaimsConverter, role: discord.Role):
+    async def remove(self, ctx: ext.ClemBotCtx, claim: ClaimsConverter, role: discord.Role):
         if not await self.bot.claim_route.check_claim_role(claim, role):
             embed = discord.Embed(
                 title=f"Error: {claim.name} not added to {role.name}", color=Colors.Error

@@ -1,3 +1,5 @@
+# type: ignore
+
 import asyncio
 import html
 import random
@@ -81,7 +83,7 @@ class TriviaCog(commands.Cog):
     @ext.example(
         "trivia m <Question Number> <category/substring/number> <Difficulty/Number> <question type/index>"
     )
-    async def manual(self, ctx, *input_list: str):
+    async def manual(self, ctx: ext.ClemBotCtx, *input_list: str):
         input_length = len(input_list)
         if input_length < 1 or 4 < input_length:
             raise UserInputError("Invalid arguments! Specify between 1 to 4")
@@ -245,13 +247,13 @@ class TriviaCog(commands.Cog):
 
         return mega_list
 
-    async def asyncio_publisher(self, ctx, cog_embeds):
+    async def asyncio_publisher(self, ctx: ext.ClemBotCtx, cog_embeds):
         embed_list = await self.set_embed_pageable(
             cog_embeds, ctx.author, ctx.channel, len(cog_embeds) * 10
         )
         return embed_list
 
-    async def on_reaction(self, ctx, message, timeout: int):
+    async def on_reaction(self, ctx: ext.ClemBotCtx, message, timeout: int):
         author = ctx.author
 
         def check(reaction, user):
@@ -269,7 +271,7 @@ class TriviaCog(commands.Cog):
         return return_list
 
     async def parse_reaction(
-        self, ctx, message, reaction, user, right_answer, page_int, total_questions
+        self, ctx: ext.ClemBotCtx, message, reaction, user, right_answer, page_int, total_questions
     ):
         msg = self.messages[
             reaction.message.id
@@ -323,7 +325,7 @@ class TriviaCog(commands.Cog):
 
         return [msg, author, timeout, msg.id, pages_length]
 
-    async def scoreboard_embed(self, ctx, score, total_questions):
+    async def scoreboard_embed(self, ctx: ext.ClemBotCtx, score, total_questions):
         current_author = ctx.author
         percent_questions = round((score / total_questions) * 100, 2)
         score_embed = discord.Embed(
@@ -335,7 +337,7 @@ class TriviaCog(commands.Cog):
         await ctx.send(embed=score_embed)
 
     async def send_scroll_reactions(
-        self, ctx, msg: discord.Message, author: discord.Member, timeout: int, total_questions
+        self, ctx: ext.ClemBotCtx, msg: discord.Message, author: discord.Member, timeout: int, total_questions
     ):
         # add every emoji from the reaction list
 

@@ -84,7 +84,7 @@ class ManageClassesCog(commands.Cog):
     )
     @ext.short_help("Starts the class creation wizard")
     @ext.example(("class add", "class add cpsc-1010"))
-    async def add(self, ctx, class_name: str = None):
+    async def add(self, ctx: ext.ClemBotCtx, class_name: str = None):
         """
         Command to initiate the new class creation wizard, optionally takes a
         class name as a parameter E.G "cpsc-1010"
@@ -142,7 +142,7 @@ class ManageClassesCog(commands.Cog):
         # sync perms with cleanup role
         await self.sync_perms(ctx, channel, role)
 
-    async def input_class(self, ctx, class_repr: ClassType) -> ClassType:
+    async def input_class(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> ClassType:
         def input_check(msg: discord.Message) -> bool:
             return msg.author == ctx.author and ctx.channel == msg.channel
 
@@ -263,7 +263,7 @@ class ManageClassesCog(commands.Cog):
 
         return class_repr
 
-    async def create_category(self, ctx, class_repr):
+    async def create_category(self, ctx: ext.ClemBotCtx, class_repr):
         get_input = UserChoice(ctx=ctx, timeout=TIMEOUT)
         choice = await get_input.send_confirmation(
             content=f"""
@@ -285,7 +285,7 @@ class ManageClassesCog(commands.Cog):
             class_repr.channel, topic=f"{class_repr.name} - {class_repr.description}"
         )
 
-    async def create_role(self, ctx, class_repr):
+    async def create_role(self, ctx: ext.ClemBotCtx, class_repr):
         log.info(f'Creating new class role "{class_repr.role}""')
         # Attempt to convert the role, if we cant then we create a new one
         try:
@@ -305,7 +305,7 @@ class ManageClassesCog(commands.Cog):
 
         return role
 
-    async def sync_perms(self, ctx, channel, role):
+    async def sync_perms(self, ctx: ext.ClemBotCtx, channel, role):
         # Check if cleanup role exists
         if discord.utils.get(ctx.guild.roles, name="Cleanup"):
             cleanup = discord.utils.get(ctx.guild.roles, name="Cleanup")
@@ -340,7 +340,7 @@ class ManageClassesCog(commands.Cog):
 
     @classes.command(pass_context=True, aliases=["delete"])
     @commands.has_guild_permissions(administrator=True)
-    async def archive(self, ctx, channel: discord.TextChannel):
+    async def archive(self, ctx: ext.ClemBotCtx, channel: discord.TextChannel):
         pass
 
     async def input_timeout(self, ctx):

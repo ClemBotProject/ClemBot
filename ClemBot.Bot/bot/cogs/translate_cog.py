@@ -1,3 +1,4 @@
+# type: ignore
 import json
 import uuid
 
@@ -36,7 +37,7 @@ class TranslateCog(commands.Cog):
             "!translate <outputlang> <text>",
         )
     )
-    async def translate(self, ctx, *input: str):
+    async def translate(self, ctx: ext.ClemBotCtx, *input: str):
 
         if len(input) < 2:
             raise UserInputError("Incorrect Number of Arguments. Minimum of 2 arguments")
@@ -69,7 +70,7 @@ class TranslateCog(commands.Cog):
     )
     @ext.short_help("Specify an output language + the language you entered to translate")
     @ext.example("translate m or translate manual")
-    async def manual(self, ctx, *input: str):
+    async def manual(self, ctx: ext.ClemBotCtx, *input: str):
 
         output_lang = await get_lang_code(input[0])
         input_lang = await get_lang_code(input[1])
@@ -97,7 +98,7 @@ class TranslateCog(commands.Cog):
             await self.error_handling(ctx, output_lang)
             return
 
-    async def error_handling(self, ctx, error: str):
+    async def error_handling(self, ctx: ext.ClemBotCtx, error: str):
 
         if (
             not error
@@ -111,7 +112,7 @@ class TranslateCog(commands.Cog):
                 channel=ctx.channel,
             )
 
-    async def translate_given_lang(self, ctx, language: str, input):
+    async def translate_given_lang(self, ctx: ext.ClemBotCtx, language: str, input):
 
         output_lang = language
         text = " ".join(input[1:])

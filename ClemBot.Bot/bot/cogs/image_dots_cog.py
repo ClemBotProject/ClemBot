@@ -118,7 +118,7 @@ class DotCog(commands.Cog):
             finished_image.append(line_of_braille)
         return finished_image
 
-    async def todots_helper(self, ctx, image, device=None, threshold=150, inverted=False) -> None:
+    async def todots_helper(self, ctx: ext.ClemBotCtx, image, device=None, threshold=150, inverted=False) -> None:
         filename = image
 
         if device is None or device.lower() == "pc":
@@ -191,7 +191,7 @@ class DotCog(commands.Cog):
         )
     )
     async def todots(
-        self, ctx, image, device=None, threshold=150, inverted: bool | None = False
+        self, ctx: ext.ClemBotCtx, image, device=None, threshold=150, inverted: bool | None = False
     ) -> None:
         return await self.todots_helper(ctx, image, device, threshold, inverted)
 
@@ -221,7 +221,7 @@ class DotCog(commands.Cog):
         )
     )
     async def attachment(
-        self, ctx, device=None, threshold=150, inverted: bool | None = False
+        self, ctx: ext.ClemBotCtx, device=None, threshold=150, inverted: bool | None = False
     ) -> None:
         try:
             image = ctx.message.attachments[0].url

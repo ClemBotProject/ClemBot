@@ -85,7 +85,7 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Links the bots source repo")
     @ext.example(("source", "source clem_bot.py"))
-    async def source(self, ctx, file: str = None):
+    async def source(self, ctx: ext.ClemBotCtx, file: str = None):
         if not file:
             embed = discord.Embed(
                 title="Here's my source repository",
@@ -141,7 +141,7 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Displays a source file directly in discord")
     @ext.example(("source print __main__.py", "source print __main__.py 10 20"))
-    async def print(self, ctx, file: str = None, line_start: int = None, line_stop: int = None):
+    async def print(self, ctx: ext.ClemBotCtx, file: str = None, line_start: int = None, line_stop: int = None):
 
         file_type = file.split(".")[-1]
 

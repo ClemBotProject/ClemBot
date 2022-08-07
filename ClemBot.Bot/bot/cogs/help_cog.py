@@ -22,7 +22,7 @@ class HelpCog(commands.Cog):
         self.commands = []
 
     @ext.command()
-    async def help(self, ctx, *, command_name=None):
+    async def help(self, ctx: ext.ClemBotCtx, *, command_name=None):
         if command_name:
             command = self.find_command(self.bot, command_name.lower())
             if isinstance(command, ext.ClemBotCommand):
@@ -36,7 +36,7 @@ class HelpCog(commands.Cog):
         else:
             await self.send_default_help(ctx)
 
-    async def send_group_help(self, ctx, command: ext.ClemBotGroup):
+    async def send_group_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotGroup):
         if command.hidden and not await self.bot.is_owner(ctx.author):
             return await self.send_default_help(ctx, f"Command: {command.name} not found.")
 
@@ -84,7 +84,7 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def send_command_help(self, ctx, command: ext.ClemBotCommand):
+    async def send_command_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotCommand):
         if command.hidden and not await self.bot.is_owner(ctx.author):
             return await self.send_default_help(ctx, f"Command {command.name} not found.")
 
@@ -140,7 +140,7 @@ class HelpCog(commands.Cog):
                     return result
         return None
 
-    async def send_default_help(self, ctx, title=None):
+    async def send_default_help(self, ctx: ext.ClemBotCtx, title=None):
 
         prefix = await self.bot.current_prefix(ctx)
 
