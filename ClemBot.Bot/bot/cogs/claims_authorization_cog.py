@@ -49,7 +49,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         self,
         ctx: ext.ClemBotContext[ClemBot],
         claims: t.Iterable[str],
-        subject: t.Union[discord.Role, discord.Member],
+        subject: (discord.Role | discord.Member),
     ) -> discord.Embed:
 
         claims_str = "\n".join(sorted(list(claims))) if claims else "No current claims"

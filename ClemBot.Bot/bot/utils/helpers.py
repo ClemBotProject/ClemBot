@@ -39,7 +39,7 @@ def format_duration(duration: DurationDelta) -> str:
         A Year(s) B Month(s) C Week(s) D Day(s) E Hour(s) F Minute(s) G Second(s)
     """
     now = datetime.utcnow()
-    delta = relativedelta(now, duration) if duration < now else relativedelta(duration, now)
+    delta = relativedelta(now, duration) if duration < now else relativedelta(duration, now)  # type: ignore
     s = ''
     if delta.years > 0:
         s += f'{delta.years} Year{"s" if delta.years > 1 else ""} '

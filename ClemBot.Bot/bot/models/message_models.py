@@ -1,4 +1,4 @@
-from bot.utils.clem_bot_model import ClemBotModel
+from bot.models.clem_bot_model import ClemBotModel
 from datetime import datetime
 
 

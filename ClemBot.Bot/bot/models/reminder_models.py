@@ -1,13 +1,7 @@
-import uuid
-from datetime import datetime
 from typing import Optional
-from dataclasses import dataclass
-from dataclasses_json import LetterCase, DataClassJsonMixin, dataclass_json
+from bot.models.clem_bot_model import ClemBotModel
 
-
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Reminder(DataClassJsonMixin):
+class Reminder(ClemBotModel):
     id: int
     link: str
     content: Optional[str]

@@ -77,7 +77,7 @@ class PaginateService(BaseService):
         timeout: int = 60,
     ):
 
-        if not isinstance(pages, t.List):
+        if not isinstance(pages, list):
             pages = [pages]
 
         if not all(isinstance(p, str) for p in pages):
@@ -106,7 +106,7 @@ class PaginateService(BaseService):
         timeout: int = 60,
     ):
 
-        if not isinstance(pages, t.List):
+        if not isinstance(pages, list):
             pages = [pages]
 
         pages = [e.copy() for e in pages]

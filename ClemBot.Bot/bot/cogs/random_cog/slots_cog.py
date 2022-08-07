@@ -228,7 +228,7 @@ class SlotsCog(commands.Cog):
         count_singles: bool,
         consecutive_multipliers: t.Dict[int, int],
         payline_multiplier: int = 1,
-    ) -> t.Tuple[list[t.Union[str, list[str]]], int]:
+    ) -> tuple[list[str | list[str]], int]:
 
         groups = []
         curr_group = []
@@ -279,7 +279,7 @@ class SlotsCog(commands.Cog):
 
     async def _render_slots_embed(
         self, ctx: commands.Context, paylines: list[list[str]], winning_groups: list[list[str]]
-    ) -> t.Tuple[discord.Embed, discord.Message]:
+    ) -> tuple[discord.Embed, discord.Message]:
 
         slots_title = "💎 ClemBot Slot Machine 💎"
         prefix = await self.bot.current_prefix(ctx)

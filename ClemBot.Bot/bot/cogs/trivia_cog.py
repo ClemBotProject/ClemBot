@@ -299,7 +299,7 @@ class TriviaCog(commands.Cog):
         channel: discord.TextChannel,
         timeout: int,
     ):
-        if not isinstance(pages, t.List):
+        if not isinstance(pages, list):
             pages = [pages]
 
         pages = [e.copy() for e in pages]
@@ -414,7 +414,7 @@ CATEGORY_LIST_LOWER = [k.lower() for k in CATEGORY_LIST]
 
 @dataclass
 class Message:
-    pages: t.Union[list[discord.Embed], list[str]]
+    pages: list[discord.Embed] | list[str]
     _curr_page_num: int
     author: int
     footer: str = None

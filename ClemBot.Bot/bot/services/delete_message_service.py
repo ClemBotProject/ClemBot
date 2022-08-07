@@ -32,9 +32,9 @@ class DeleteMessageService(BaseService):
         timeout: int = None
     ):
 
-        if not isinstance(msg, t.List):
+        if not isinstance(msg, list):
             msg = [msg]
-        if not isinstance(roles, t.List):
+        if not isinstance(roles, list):
             roles = [roles]
 
         # stores the message info

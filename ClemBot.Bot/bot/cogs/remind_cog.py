@@ -57,10 +57,10 @@ class RemindCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    @reminder.command()
+    @reminder.command(name="list")
     @ext.long_help('List all of your reminders that have not gone off.')
     @ext.short_help('List all of your reminders.')
-    async def list(self, ctx: commands.Context):
+    async def list_reminders(self, ctx: commands.Context):
         reminders = await self.bot.user_route.get_reminders(ctx.author.id)
         if len(reminders) == 0:
             embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange,
@@ -92,7 +92,7 @@ class RemindCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _reminder_pages(self, ctx: commands.Context, reminders: t.List[Reminder]) -> t.List[discord.Embed]:
+    async def _reminder_pages(self, ctx: commands.Context, reminders: list[Reminder]) -> list[discord.Embed]:
         pages = []
         for reminder in reminders:
             time = parse_datetime(reminder.time)
