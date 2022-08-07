@@ -1,4 +1,5 @@
 import os
+import typing
 from dataclasses import dataclass
 from typing import List
 
@@ -85,7 +86,7 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Links the bots source repo")
     @ext.example(("source", "source clem_bot.py"))
-    async def source(self, ctx: ext.ClemBotCtx, file: str = None):
+    async def source(self, ctx: ext.ClemBotCtx, file: str | None = None) -> None:
         if not file:
             embed = discord.Embed(
                 title="Here's my source repository",
@@ -122,7 +123,7 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Prints the source directory")
     @ext.example("source list")
-    async def list(self, ctx):
+    async def list(self, ctx: ext.ClemBotCtx) -> None:
         file_tree = self.list_files(os.getcwd(), self.ignored)
 
         sent_messages = []
@@ -141,7 +142,11 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Displays a source file directly in discord")
     @ext.example(("source print __main__.py", "source print __main__.py 10 20"))
-    async def print(self, ctx: ext.ClemBotCtx, file: str = None, line_start: int = None, line_stop: int = None):
+    async def print(self, ctx: ext.ClemBotCtx, file: str | None = None, line_start: int | None = None, line_stop: int | None = None) -> None:
+
+        if not file:
+            await ctx.send("needs a file name")
+            return None
 
         file_type = file.split(".")[-1]
 
@@ -222,14 +227,14 @@ class SourceCodeCog(commands.Cog):
                 Events.on_set_deletable, msg=sent_messages, author=ctx.author
             )
 
-    def process_source(self, source: str, line_start: int = None, line_stop: int = None):
+    def process_source(self, source: str, line_start: int | None = None, line_stop: int | None = None) -> typing.Iterable[str]:
         split_source = [f"{i + 1:03d} |  {value}" for i, value in enumerate(source.splitlines())]
 
         if line_start and line_start <= 0:
             line_start = 1
 
         filtered_source = split_source[
-            line_start - 1 if line_start else 0 : line_stop or len(source)
+            line_start - 1 if line_start else 0: line_stop or len(source)
         ]
 
         return filtered_source
@@ -238,7 +243,7 @@ class SourceCodeCog(commands.Cog):
         paths = DisplayablePath.get_tree(
             startpath, criteria=lambda s: not any(i in s.parts for i in to_ignore)
         )
-        return paths
+        return typing.cast(str, paths)
 
 
 async def setup(bot: ClemBot) -> None:
