@@ -31,7 +31,7 @@ class BanCog(commands.Cog):
     @ext.required_claims(Claims.moderation_ban)
     async def ban(
         self,
-        ctx: ext.ClemBotContext[ClemBot],
+        ctx: ext.ClemBotCtx,
         subject: discord.Member,
         purge_days: int = 0,
         *,

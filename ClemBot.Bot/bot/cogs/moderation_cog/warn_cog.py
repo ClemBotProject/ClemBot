@@ -20,7 +20,7 @@ class WarnCog(commands.Cog):
     @ext.example("warn @SomeUser an example warning")
     @ext.required_claims(Claims.moderation_mute)
     @ext.required_claims(Claims.moderation_warn)
-    async def warn(self, ctx: ext.ClemBotContext[ClemBot], subject: discord.Member, *, reason: str):
+    async def warn(self, ctx: ext.ClemBotCtx, subject: discord.Member, *, reason: str):
         ctx.author: discord.Member
 
         if ctx.author.roles[-1].position <= subject.roles[-1].position:

@@ -71,7 +71,7 @@ class GradesCog(commands.Cog):
     )
     async def grades(
         self,
-        ctx: ext.ClemBotContext[ClemBot],
+        ctx: ext.ClemBotCtx,
         honors: HonorsConverter | None = "non-honors",
         year: int | None = MIN_YEAR,
         *,
@@ -211,7 +211,7 @@ class GradesCog(commands.Cog):
             "prof all kristi whitehead",
         )
     )
-    async def prof(self, ctx: ext.ClemBotContext[ClemBot], honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:  # type: ignore
+    async def prof(self, ctx: ext.ClemBotCtx, honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:  # type: ignore
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
@@ -362,7 +362,7 @@ class GradesCog(commands.Cog):
     @ext.long_help("Lists all available Courses, some Courses will just be a name with no data")
     @ext.short_help("Lists all courses")
     @ext.example("grades list")
-    async def list_grades(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def list_grades(self, ctx: ext.ClemBotCtx) -> None:
         await self.bot.messenger.publish(
             Events.on_set_pageable_embed,
             pages=self.all_courses,
@@ -412,7 +412,7 @@ class GradesCog(commands.Cog):
     )
     @ext.short_help("Lists all professors")
     @ext.example("prof list")
-    async def list_prof(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def list_prof(self, ctx: ext.ClemBotCtx) -> None:
         await self.bot.messenger.publish(
             Events.on_set_pageable_embed,
             pages=self.all_profs,

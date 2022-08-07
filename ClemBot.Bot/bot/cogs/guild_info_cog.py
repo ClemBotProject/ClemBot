@@ -17,7 +17,7 @@ class GuildInfoCog(commands.Cog):
     @ext.long_help("Shows information on the current Guild/Discord server.")
     @ext.short_help("Shows info on a Discord server.")
     @ext.example("guildinfo")
-    async def guildinfo(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def guildinfo(self, ctx: ext.ClemBotCtx) -> None:
         guild = ctx.guild
 
         assert guild is not None

@@ -23,7 +23,7 @@ class GifMeCog(commands.Cog):
     @ext.long_help("Gets a random gif from giphy")
     @ext.short_help("shows a random gif")
     @ext.example("gifme")
-    async def gifme(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def gifme(self, ctx: ext.ClemBotCtx) -> None:
 
         params = {"api_key": bot_secrets.secrets.gif_me_token, "rating": "PG-13"}
 

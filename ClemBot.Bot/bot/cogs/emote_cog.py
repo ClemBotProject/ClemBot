@@ -16,12 +16,12 @@ class EmoteCog(commands.Cog):
         self.bot = bot
 
     @ext.group(hidden=True, aliases=["emoji"])
-    async def emote(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def emote(self, ctx: ext.ClemBotCtx) -> None:
         pass
 
     @emote.command()
     @ext.required_claims(Claims.emote_add)
-    async def add(self, ctx: ext.ClemBotContext[ClemBot], emote: discord.Emoji, name: str) -> None:
+    async def add(self, ctx: ext.ClemBotCtx, emote: discord.Emoji, name: str) -> None:
         emote_id = emote.name.split(":")[2][:-1]
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://cdn.discordapp.com/emojis/{emote_id}.gif?v=1") as resp:

@@ -27,6 +27,14 @@ class OwnerCog(commands.Cog):
         """For User by the bots owner to get errors and metrics"""
         pass
 
+    # temporary placement till I can do it better
+    @ext.command(hidden=True)
+    @commands.has_guild_permissions(administrator=True)
+    async def slowmode(self, ctx: ext.ClemBotCtx, value: int) -> None:
+        assert isinstance(ctx.channel, discord.TextChannel) or isinstance(ctx.channel, discord.Thread)
+        await ctx.channel.edit(slowmode_delay=value)
+        await ctx.send(f"Slowmode set to {value}")
+
     @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def leave(self, ctx, id: int):

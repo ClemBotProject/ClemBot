@@ -71,7 +71,7 @@ class MemesCog(commands.Cog):
     @ext.long_help("A fun command to generate a pseudo bubblewrap effect in discord")
     @ext.short_help("Creates bubblewrap!")
     @ext.example("bubblewrap")
-    async def bubblewrap(self, ctx: ext.ClemBotContext[ClemBot]):
+    async def bubblewrap(self, ctx: ext.ClemBotCtx):
         msg = ""
         for _ in range(0, 5):
             for _ in range(0, 10):
@@ -87,7 +87,7 @@ class MemesCog(commands.Cog):
     )
     @ext.short_help("Can you find him?")
     @ext.example(("waldo", "waldo 10"))
-    async def waldo(self, ctx: ext.ClemBotContext[ClemBot], size: int = MAX_WALDO_GRID_SIZE):
+    async def waldo(self, ctx: ext.ClemBotCtx, size: int = MAX_WALDO_GRID_SIZE):
         """
         Play Where's Waldo!
 
@@ -176,7 +176,7 @@ class MemesCog(commands.Cog):
     @ext.short_help("Generates a crab rave gif")
     @ext.chainable_input()
     @ext.example("crab hello from crab world")
-    async def crab(self, ctx: ext.ClemBotContext[ClemBot], *, args: str = "Bottom text\n is dead"):
+    async def crab(self, ctx: ext.ClemBotCtx, *, args: str = "Bottom text\n is dead"):
         """
         Create your own crab rave.
         Usage: <prefix>crab [text=Bottom text\\n is dead]
@@ -217,7 +217,7 @@ class MemesCog(commands.Cog):
         os.remove(f"bot/cogs/memes_cog/assets/out_{timestamp}.gif")
 
     @ext.command(hidden=True, aliases=["ctray", "trayforjay"])
-    async def cookouttray(self, ctx: ext.ClemBotContext[ClemBot], input: str):
+    async def cookouttray(self, ctx: ext.ClemBotCtx, input: str):
         """
         For those who do finances with cookout trays, we proudly present the command for you
             Simply type one of the following:

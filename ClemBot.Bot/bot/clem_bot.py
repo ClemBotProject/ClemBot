@@ -170,7 +170,7 @@ class ClemBot(commands.Bot):
 
             await channel.send(embed=embed)
 
-    async def command_claims_check(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def command_claims_check(self, ctx: ext.ClemBotCtx) -> None:
         """
         Before invoke hook to make sure a user has the correct claims to allow a command invocation
         """
@@ -189,7 +189,7 @@ class ClemBot(commands.Bot):
 
         await self.raise_claims_access_error(command, ctx)
 
-    async def raise_claims_access_error(self, command: ext.ExtBase, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def raise_claims_access_error(self, command: ext.ExtBase, ctx: ext.ClemBotCtx) -> None:
         claims_str = "\n".join(command.claims)
         raise ClaimsAccessError(
             f"Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```"
@@ -198,7 +198,7 @@ class ClemBot(commands.Bot):
             f"or run the `{await self.current_prefix(ctx)}help claims` command"
         )
 
-    async def claims_check(self, ctx: ext.ClemBotContext[ClemBot]) -> bool:
+    async def claims_check(self, ctx: ext.ClemBotCtx) -> bool:
         """
         Before cog execution to check if a user has the correct claims for aspects of a command
         """
@@ -556,6 +556,6 @@ class ClemBot(commands.Bot):
             if is_cog and obj.__module__ == module.__name__:
                 yield obj
 
-    async def get_tag_prefix(self, ctx: ext.ClemBotContext[ClemBot]) -> list[str]:
+    async def get_tag_prefix(self, ctx: ext.ClemBotCtx) -> list[str]:
         assert ctx.guild is not None
         return await self.custom_tag_prefix_route.get_custom_tag_prefixes(ctx.guild.id)

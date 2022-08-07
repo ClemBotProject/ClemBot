@@ -24,7 +24,7 @@ class CustomPrefixCog(commands.Cog):
     )
     @ext.short_help("Configure a custom command prefix")
     @ext.example(("prefix", "prefix ?", "prefix >>"))
-    async def prefix(self, ctx: ext.ClemBotContext[ClemBot], *, prefix: str | None = None) -> None:
+    async def prefix(self, ctx: ext.ClemBotCtx, *, prefix: str | None = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
         prefixes = (await self.bot.get_prefix(ctx.message))[2:]
@@ -67,7 +67,7 @@ class CustomPrefixCog(commands.Cog):
     @ext.long_help("resets the bot prefix to the default")
     @ext.short_help("resets a custom prefix")
     @ext.example("prefix reset")
-    async def reset(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def reset(self, ctx: ext.ClemBotCtx) -> None:
         default_prefix = bot_secrets.secrets.bot_prefix
 
         if default_prefix in await self.bot.get_prefix(ctx.message):

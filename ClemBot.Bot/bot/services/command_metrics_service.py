@@ -15,7 +15,7 @@ class CommandMetricsService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_after_command_invoke)
-    async def log_invoked_commands(self, ctx: ext.ClemBotContext[ClemBot]) -> None:
+    async def log_invoked_commands(self, ctx: ext.ClemBotCtx) -> None:
         assert ctx.command is not None
         assert ctx.guild is not None
 

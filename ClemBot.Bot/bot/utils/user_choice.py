@@ -11,7 +11,7 @@ from bot.consts import Colors
 
 
 class UserChoice:
-    def __init__(self, ctx: ext.ClemBotContext[ClemBot], *, timeout: float):
+    def __init__(self, ctx: ext.ClemBotCtx, *, timeout: float):
         self.ctx = ctx
         self.timeout = timeout
 
