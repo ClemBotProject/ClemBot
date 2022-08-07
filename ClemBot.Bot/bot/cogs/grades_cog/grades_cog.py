@@ -1,3 +1,4 @@
+# type: ignore
 import os
 import typing as t
 
@@ -211,7 +212,7 @@ class GradesCog(commands.Cog):
             "prof all kristi whitehead",
         )
     )
-    async def prof(self, ctx: ext.ClemBotCtx, honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:  # type: ignore
+    async def prof(self, ctx: ext.ClemBotCtx, honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
