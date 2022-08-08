@@ -20,6 +20,7 @@ log = get_logger(__name__)
 
 class TranslateCog(commands.Cog):
     def __init__(self, bot: ClemBot):
+        self.headers: dict[str, str] = {}
         self.bot = bot
         self.session = aiohttp.ClientSession()
 
@@ -54,6 +55,13 @@ class TranslateCog(commands.Cog):
     @ext.example(("translate languages"))
     async def languages(self, ctx):
 
+        self.headers = {
+            "Ocp-Apim-Subscription-Key": bot_secrets.secrets.azure_translate_key,
+            "Ocp-Apim-Subscription-Region": "global",
+            "Content-type": "application/json",
+            "X-ClientTraceId": str(uuid.uuid4()),
+        }
+
         await self.bot.messenger.publish(
             Events.on_set_pageable_text,
             embed_name="Languages",
@@ -83,7 +91,7 @@ class TranslateCog(commands.Cog):
             body = [{"text": text}]
 
             async with await self.session.post(
-                url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body
+                url=TRANSLATE_API_URL, params=params, headers=self.headers, json=body
             ) as resp:
                 response = json.loads(await resp.text())
 
@@ -122,7 +130,7 @@ class TranslateCog(commands.Cog):
         body = [{"text": text}]
 
         async with await self.session.post(
-            url=TRANSLATE_API_URL, params=params, headers=HEADERS, json=body
+            url=TRANSLATE_API_URL, params=params, headers=self.headers, json=body
         ) as resp:
             response = json.loads(await resp.text())
 
@@ -271,12 +279,6 @@ LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHO
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
 
-HEADERS = {
-    "Ocp-Apim-Subscription-Key": bot_secrets.secrets.azure_translate_key,
-    "Ocp-Apim-Subscription-Region": "global",
-    "Content-type": "application/json",
-    "X-ClientTraceId": str(uuid.uuid4()),
-}
 
 
 async def setup(bot: ClemBot) -> None:
