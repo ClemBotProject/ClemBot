@@ -35,6 +35,24 @@ jobs:
         pip install poetry
         poetry install
 
+    - name: Validate static typing
+      id: static-typing-ci
+      continue-on-error: true
+      run: poetry run mypy
+
+    - uses: actions/github-script@v3
+      name: Black lint failure comment
+      if: steps.static-typing-ci.outcome != 'success' && github.event_name == 'pull_request'
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Static type linting failed \n\n Please see CI error output for details and fix the PRs typing'
+          })
+
     - name: Check if Black would make any changes
       id: black-ci
       continue-on-error: true
