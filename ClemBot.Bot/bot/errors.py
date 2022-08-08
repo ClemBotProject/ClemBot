@@ -1,4 +1,6 @@
 # define Python user-defined exceptions
+import typing
+
 from discord.ext.commands import CommandError
 
 
@@ -48,24 +50,25 @@ class ClaimsAccessError(CommandError):
 
 
 class ConversionError(CommandError):
-
-    def __init__(self, message):
+    def __init__(self, message: typing.Optional[str] = None):
         self.message = message
 
 
 class ApiClientRequestError(Exception):
-
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
 
 
 class BotOnlyRequestError(Exception):
-
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
 
 
 class PrefixRequestError(Exception):
+    def __init__(self, message: str):
+        self.message = message
 
-    def __init__(self, message):
+
+class ReminderError(Exception):
+    def __init__(self, message: str):
         self.message = message

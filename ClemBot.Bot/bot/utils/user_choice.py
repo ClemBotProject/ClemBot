@@ -2,36 +2,47 @@ import asyncio
 import typing as t
 
 import discord
+from discord.ext import commands
 
+import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 
 
 class UserChoice:
-
-    def __init__(self, ctx, *, timeout: float) -> None:
+    def __init__(self, ctx: ext.ClemBotCtx, *, timeout: float):
         self.ctx = ctx
         self.timeout = timeout
 
-    async def send_confirmation(self, *, content: str = None, embed=None, is_error=False) -> bool:
-
+    async def send_confirmation(
+        self,
+        *,
+        content: str | None = None,
+        embed: discord.Embed | None = None,
+        is_error: bool = False
+    ) -> bool:
         if embed and content:
-            raise TypeError('Only specify the embed or the content, not both')
+            raise TypeError("Only specify the embed or the content, not both")
 
         if not embed and not content:
-            raise TypeError('Content or embed must be specified')
+            raise TypeError("Content or embed must be specified")
 
         if not embed and content:
-            embed = discord.Embed(title=content,
-                                  color=Colors.ClemsonOrange if not is_error else Colors.Error)
+            embed = discord.Embed(
+                title=content, color=Colors.ClemsonOrange if not is_error else Colors.Error
+            )
 
         try:
-            return bool(await self._send(embed, {1: '✅', 0: '❌'}))
+            assert embed
+            return bool(await self._send(embed, {1: "✅", 0: "❌"}))
         except asyncio.TimeoutError:
             return False
 
-    async def _send(self,
-                    embed: discord.Embed,
-                    choices: t.Dict[t.Union[int, str], t.Union[discord.Emoji, str]]) -> t.Union[int, str]:
+    async def _send(
+        self,
+        embed: discord.Embed,
+        choices: dict[(int | str), (discord.Emoji | discord.PartialEmoji | str)],
+    ) -> int | str:
 
         msg = await self.ctx.send(embed=embed)
 
@@ -42,18 +53,25 @@ class UserChoice:
         for e in choices.values():
             await msg.add_reaction(e)
 
-        def check(reaction, user) -> bool:
+        def check(reaction: discord.Reaction, user: discord.User) -> bool:
             return (
-                    reaction.message.id == msg.id
-                    and user == self.ctx.author
-                    and reaction.emoji in choices.values()
+                reaction.message.id == msg.id
+                and user == self.ctx.author
+                and reaction.emoji in choices.values()
             )
 
         try:
-            reaction, _ = await self.ctx.cog.bot.wait_for('reaction_add', timeout=self.timeout, check=check)
+            reaction: discord.Reaction
+            reaction, _ = await self.ctx.bot.wait_for(
+                "reaction_add", timeout=self.timeout, check=check
+            )
             return ret_dict[reaction.emoji]
         except asyncio.TimeoutError:
-            embed.add_field(name='Request Timeout:', value='User failed to respond in the alloted time', inline='false')
+            embed.add_field(
+                name="Request Timeout:",
+                value="User failed to respond in the allotted time",
+                inline=False,
+            )
             await msg.edit(embed=embed)
             raise
         finally:

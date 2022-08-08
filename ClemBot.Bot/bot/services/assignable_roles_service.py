@@ -1,23 +1,24 @@
-import logging
+import discord
 
+from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.logging_utils import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class AssignableRolesService(BaseService):
-
-    def __init__(self, *, bot):
+    def __init__(self, *, bot: ClemBot) -> None:
         super().__init__(bot)
 
-    @BaseService.Listener(Events.on_assignable_role_add)
-    async def assignable_role_add(self, role):
+    @BaseService.listener(Events.on_assignable_role_add)
+    async def assignable_role_add(self, role: discord.Role) -> None:
         await self.bot.role_route.set_assignable(role.id, True, raise_on_error=True)
 
-    @BaseService.Listener(Events.on_assignable_role_remove)
-    async def assignable_role_remove(self, role):
+    @BaseService.listener(Events.on_assignable_role_remove)
+    async def assignable_role_remove(self, role: discord.Role) -> None:
         await self.bot.role_route.set_assignable(role.id, False, raise_on_error=True)
 
-    async def load_service(self):
+    async def load_service(self) -> None:
         pass

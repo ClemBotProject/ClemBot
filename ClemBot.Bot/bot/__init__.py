@@ -1,17 +1,17 @@
-import os
 import logging
+import os
 
 import seqlog
-from seqlog import StructuredRootLogger, StructuredLogger, ConsoleStructuredLogHandler
+from seqlog import ConsoleStructuredLogHandler, StructuredLogger, StructuredRootLogger
 
-if bool(os.environ.get('PROD')):
+if bool(os.environ.get("PROD")):
 
     # Production logging setup
-    url = os.environ.get('SEQ_URL')
-    key = os.environ.get('SEQ_BOT_KEY')
+    url = os.environ.get("SEQ_URL")
+    key = os.environ.get("SEQ_BOT_KEY")
 
     if not key:
-        raise Exception('SEQ_BOT_KEY not found but SEQ_URL was specified')
+        raise Exception("SEQ_BOT_KEY not found but SEQ_URL was specified")
 
     seqlog.log_to_seq(
         # Initialize the seq logging url before the secrets are loaded
@@ -32,9 +32,7 @@ else:
     logging.Logger.manager = logging.Manager(logging.Logger.root)
 
     logging.basicConfig(
-        format='%(asctime)s %(levelname)s %(module)s %(message)s',
-        handlers=[
-            ConsoleStructuredLogHandler()
-        ],
+        format="%(asctime)s %(levelname)s %(module)s %(message)s",
+        handlers=[ConsoleStructuredLogHandler()],
         level=logging.INFO,
     )

@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Generator, Sequence, TypeVar
+
 import arrow
 from dateutil.relativedelta import relativedelta
 
-from bot.utils.converters import DurationDelta
+from bot.utils.converters import DurationDelta, FutureDuration, PastDuration
 
 T = TypeVar("T")
 
@@ -12,35 +13,27 @@ def chunk_sequence(sequence: Sequence[T], chunk_size: int) -> Generator[Sequence
     """Yield successive chunks from the passed sequence."""
 
     for i in range(0, len(sequence), chunk_size):
-        yield sequence[i: i + chunk_size]
-
-
-def parse_datetime(time: str) -> datetime:
-    """
-        Parses the given string to a datetime.
-        Used for converting C#'s DateTime to Python's datetime.
-    """
-    return datetime.strptime(time, '%Y-%m-%dT%H:%M:%S.%f')
+        yield sequence[i : i + chunk_size]
 
 
 def format_datetime(time: datetime) -> str:
     """
-        Formats the given datetime to a string.
-        Used for converting Python's datetime to C#'s DateTime.
+    Formats the given datetime to a string.
+    Used for converting Python's datetime to C#'s DateTime.
     """
-    return time.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    return time.strftime("%Y-%m-%dT%H:%M:%S.%f")
 
 
-def format_duration(duration: DurationDelta) -> str:
+def format_duration(duration: FutureDuration | PastDuration) -> str:
     """
-        Formats the given datetime to a string.
-        Uses relativedelta to calculate the difference between datetime.utcnow()
-        and the given datetime and formats it as:
-        A Year(s) B Month(s) C Week(s) D Day(s) E Hour(s) F Minute(s) G Second(s)
+    Formats the given datetime to a string.
+    Uses relativedelta to calculate the difference between datetime.utcnow()
+    and the given datetime and formats it as:
+    A Year(s) B Month(s) C Week(s) D Day(s) E Hour(s) F Minute(s) G Second(s)
     """
     now = datetime.utcnow()
-    delta = relativedelta(now, duration) if duration < now else relativedelta(duration, now)
-    s = ''
+    delta = relativedelta(now, duration) if duration < now else relativedelta(duration, now)  # type: ignore
+    s = ""
     if delta.years > 0:
         s += f'{delta.years} Year{"s" if delta.years > 1 else ""} '
     if delta.months > 0:

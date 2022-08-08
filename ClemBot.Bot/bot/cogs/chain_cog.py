@@ -1,4 +1,5 @@
-import logging
+# type: ignore
+
 import re
 import typing as t
 from copy import copy
@@ -7,8 +8,9 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.utils.logging_utils import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class ChainCog(commands.Cog):
@@ -19,13 +21,13 @@ class ChainCog(commands.Cog):
 
     @ext.command()
     @ext.chainable(False)
-    @ext.long_help('Chains multiple chainable commands together')
-    @ext.short_help('Chains commands')
-    @ext.example('chain command1 command2 hello')
-    async def chain(self, ctx, *, text: str):
+    @ext.long_help("Chains multiple chainable commands together")
+    @ext.short_help("Chains commands")
+    @ext.example("chain command1 command2 hello")
+    async def chain(self, ctx: ext.ClemBotCtx, *, text: str):
         prefix = await self.bot.get_prefix(ctx)
         if not any(sub in text for sub in prefix):
-            await ctx.send(f'{prefix[2]}chain requires 1 or more commands to run')
+            await ctx.send(f"{prefix[2]}chain requires 1 or more commands to run")
             return
         # Make a Fake ctx to intercept ctx send
         fakectx = copy(ctx)  # We gotta use this as to not pass a reference to the ctx object
@@ -34,19 +36,21 @@ class ChainCog(commands.Cog):
         # Actually does the intercepting
         async def fakesend(embed):
             if type(embed) == discord.Embed:
-                raise Exception('Chainable Command Output is not String')
+                raise Exception("Chainable Command Output is not String")
             resultqueue.append(str(embed))
 
         fakectx.send = fakesend
-        pattern = f'[\w\d\s.](?={prefix[0]}|{prefix[1]}|\\{prefix[2]})'  # Divide our input by the prefixes
+        pattern = f"[\w\d\s.](?={prefix[0]}|{prefix[1]}|\\{prefix[2]})"  # Divide our input by the prefixes
         commandls = re.split(pattern, text)
         isfirstcommandatfirst = any(sub in commandls[0] for sub in prefix)
         for i in range(0, len(commandls)):
-            secondpattern = f'^\\{prefix[2]}'
-            commandls[i] = commandls[i].replace(prefix[0], '')
-            commandls[i] = commandls[i].replace(prefix[1], '')
-            commandls[i] = re.sub(secondpattern, '', commandls[i])
-            commandls[i] = commandls[i].replace('\\' + prefix[2], prefix[2])  # Allows the use of escaped prefixes as
+            secondpattern = f"^\\{prefix[2]}"
+            commandls[i] = commandls[i].replace(prefix[0], "")
+            commandls[i] = commandls[i].replace(prefix[1], "")
+            commandls[i] = re.sub(secondpattern, "", commandls[i])
+            commandls[i] = commandls[i].replace(
+                "\\" + prefix[2], prefix[2]
+            )  # Allows the use of escaped prefixes as
             # regular characters without invoking command
         # Main Loop
         index = len(commandls) - 1
@@ -58,11 +62,13 @@ class ChainCog(commands.Cog):
             for i in range(0, len(resultqueue)):
                 commandls[index - 1] += resultqueue[i]
                 if i != len(resultqueue) - 1:
-                    commandls[index - 1] += '\n'
+                    commandls[index - 1] += "\n"
             resultqueue = []
             index -= 1
         # Process the last command differently
-        if isfirstcommandatfirst:  # If there is nothing before the last command then use the real ctx
+        if (
+            isfirstcommandatfirst
+        ):  # If there is nothing before the last command then use the real ctx
             buffer, err = await self.process_command(commandls.pop(0), False, ctx)
             if buffer == 1:
                 await ctx.send(err)
@@ -75,7 +81,7 @@ class ChainCog(commands.Cog):
             for i in range(0, len(resultqueue)):
                 commandls[index - 1] += resultqueue[i]
                 if i != len(resultqueue) - 1:
-                    commandls[index - 1] += '\n'
+                    commandls[index - 1] += "\n"
             await ctx.send(commandls.pop(0))
 
     # Code Copied from help_cog.py
@@ -100,9 +106,9 @@ class ChainCog(commands.Cog):
         return None
 
     def boolcast(self, string):
-        if string == 'False':
+        if string == "False":
             return False
-        if string == 'True':
+        if string == "True":
             return True
         raise ValueError
 
@@ -110,27 +116,27 @@ class ChainCog(commands.Cog):
         try:
             func = self.find_command(self.bot, command.split()[0])
         except IndexError:
-            return 1, ' Empty command'
+            return 1, " Empty command"
         if func is None:
-            return 1, command.split()[0] + ' Is not a valid command'
+            return 1, command.split()[0] + " Is not a valid command"
         if checkfordecorator and not func.chainable_output:
-            return 1, command.split()[0] + ' Is not a chainable command'
+            return 1, command.split()[0] + " Is not a chainable command"
         if not checkfordecorator and not func.chainable_input and not func.chainable_output:
-            return 1, command.split()[0] + ' Is not a chainable input command'
+            return 1, command.split()[0] + " Is not a chainable input command"
 
-        args = {'context': ctx}
+        args = {"context": ctx}
         temp = []
         for arg in func.params:
-            if arg != 'self' and arg != 'ctx':
+            if arg != "self" and arg != "ctx":
                 temp.append(arg)
         if len(temp) == 1:
-            index = command.find(' ')
-            arg = ''
+            index = command.find(" ")
+            arg = ""
             if index != -1:
                 arg = command[index:]
             args[temp[0]] = arg
         elif len(temp) == 0:
-            return 1, command.split()[0] + ' Takes no arguments'
+            return 1, command.split()[0] + " Takes no arguments"
         else:
             remainder = command.split()
             remainder.pop(0)
@@ -170,15 +176,15 @@ class ChainCog(commands.Cog):
                         pass  # This means that remainder[0] wasn't castable to that argument so we will move on to the next
                     except IndexError:
                         break  # We ran out of arguments so continuing with command execution
-            buffer = ''
+            buffer = ""
             for i in range(0, len(remainder)):
                 buffer += remainder[i]
                 if i != len(remainder) - 1:
-                    buffer += ' '
+                    buffer += " "
             args[temp[-1]] = buffer
         await func(**args)
-        return 0, ''
+        return 0, ""
 
 
-def setup(bot):
-    bot.add_cog(ChainCog(bot))
+async def setup(bot):
+    await bot.add_cog(ChainCog(bot))

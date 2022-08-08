@@ -1,22 +1,20 @@
-import logging
-
 import discord
 from discord.ext import commands
 
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
 from bot.errors import PrefixRequestError
+from bot.utils.logging_utils import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class CustomPrefix:
-
     def __init__(self, *, default: str):
         log.info(f'Setting default prefix too: "{default}""')
         self.default = default
 
-    async def get_prefix(self, bot: ClemBot, message: discord.Message):
+    async def get_prefix(self, bot: ClemBot, message: discord.Message) -> list[str]:
 
         prefixes = []
 
@@ -27,10 +25,13 @@ class CustomPrefix:
             try:
                 # Try to grab the prefixes from the db, raise an error on failure
                 # and bailout, we cant respond to anything at the moment
-                prefixes = await bot.custom_prefix_route.get_custom_prefixes(message.guild.id, raise_on_error=True)
+                assert message.guild
+                prefixes = await bot.custom_prefix_route.get_custom_prefixes(
+                    message.guild.id, raise_on_error=True
+                )
             except Exception as e:
-                log.error('Custom prefix request failed with error: {error}', error=e)
-                raise PrefixRequestError('Requesting custom prefix from the api failed')
+                log.error("Custom prefix request failed with error: {error}", error=e)
+                raise PrefixRequestError("Requesting custom prefix from the api failed")
 
         if len(prefixes) == 0:
             prefixes = [self.default]

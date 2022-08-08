@@ -2,11 +2,12 @@ from enum import Enum, auto
 
 
 class Urls:
-    base_api_url = 'api/'
+    base_api_url = "api/"
 
 
 class Colors:
     """Hex Color values"""
+
     Error = 0xE20000
     ClemsonOrange = 0xF56600
 
@@ -72,8 +73,8 @@ class Claims(Enum):
     custom_tag_prefix_set = auto()
 
     @staticmethod
-    def get_claims_str():
-        return '\n'.join(name for name, _ in Claims.__members__.items())
+    def get_claims_str() -> str:
+        return "\n".join(name for name, _ in Claims.__members__.items())
 
 
 class DiscordLimits:
@@ -82,14 +83,14 @@ class DiscordLimits:
 
 
 class Infractions:
-    mute = 'Mute'
-    ban = 'Ban'
-    warn = 'Warn'
+    mute = "Mute"
+    ban = "Ban"
+    warn = "Warn"
 
 
 class Moderation:
-    mute_role_name = 'ClemBot Mute'
+    mute_role_name = "ClemBot Mute"
     max_reason_length = 1018  # 1024 - 6 ("```reason```")
 
 
-TAG_INVOKE_REGEX = r'{tag_prefix}([^\s]+)'
+TAG_INVOKE_REGEX = r"{tag_prefix}([^\s]+)"

@@ -1,14 +1,16 @@
+# type: ignore
+
 import asyncio
 import enum
 from typing import Optional
 
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
+import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
-import bot.extensions as ext
 
 
 class RpsChoice(enum.Enum):
@@ -28,7 +30,7 @@ EMOJI_TO_CHOICE = {
     SCISSORS_EMOJI: RpsChoice.SCISSORS,
 }
 
-CHOICE_TO_EMOJI = dict(map(reversed, EMOJI_TO_CHOICE.items()))
+CHOICE_TO_EMOJI = {v: k for k, v in EMOJI_TO_CHOICE.items()}
 
 WIN_MAP = [RpsChoice.ROCK, RpsChoice.SCISSORS, RpsChoice.PAPER]
 
@@ -50,7 +52,7 @@ class RockPaperScissorsCog(commands.Cog):
 
         def check(r: discord.Reaction, u: discord.User) -> bool:
             return str(r.emoji) in EMOJI_TO_CHOICE and r.message == msg and u != self.bot.user
-        
+
         try:
             r, u = await self.bot.wait_for("reaction_add", check=check, timeout=60)
         finally:
@@ -59,7 +61,9 @@ class RockPaperScissorsCog(commands.Cog):
             except discord.HTTPException:
                 pass
 
-        await msg.edit(embed=discord.Embed(color=Colors.ClemsonOrange, description=f"You chose {r.emoji}"))
+        await msg.edit(
+            embed=discord.Embed(color=Colors.ClemsonOrange, description=f"You chose {r.emoji}")
+        )
 
         return EMOJI_TO_CHOICE[str(r.emoji)]
 
@@ -67,17 +71,25 @@ class RockPaperScissorsCog(commands.Cog):
     @ext.long_help("Play rock paper scissors in Discord!")
     @ext.short_help("Play rock paper scissors in Discord!")
     @ext.example("rps @bozo")
-    async def rock_paper_scissors(self, ctx: commands.Context, user_2: Optional[discord.Member] = None):
+    async def rock_paper_scissors(
+        self, ctx: commands.Context, user_2: Optional[discord.Member] = None
+    ):
         user_1 = ctx.author
 
         if user_1 == user_2:
             await ctx.send("You can't play rock paper scissors with yourself.")
             return
 
-        embed = discord.Embed(color=Colors.ClemsonOrange, title="Rock Paper Scissors!", description=f"*React with {FIRE_EMOJI} to accept the challenge*")
+        embed = discord.Embed(
+            color=Colors.ClemsonOrange,
+            title="Rock Paper Scissors!",
+            description=f"*React with {FIRE_EMOJI} to accept the challenge*",
+        )
 
         if user_2:
-            embed.description = f"*React with {FIRE_EMOJI} to accept the challenge, {user_2.mention}*"
+            embed.description = (
+                f"*React with {FIRE_EMOJI} to accept the challenge, {user_2.mention}*"
+            )
 
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)
@@ -85,11 +97,23 @@ class RockPaperScissorsCog(commands.Cog):
 
         # wait for challenge accept reaction from user_2 or anyone if user_2 is None
         try:
-            _, user_2 = await self.bot.wait_for("reaction_add", check=(lambda r, u: str(r.emoji) == FIRE_EMOJI and r.message == msg and (u == user_2 or user_2 is None)), timeout=120)
+            _, user_2 = await self.bot.wait_for(
+                "reaction_add",
+                check=(
+                    lambda r, u: str(r.emoji) == FIRE_EMOJI
+                    and r.message == msg
+                    and (u == user_2 or user_2 is None)
+                ),
+                timeout=120,
+            )
         except asyncio.TimeoutError:
             msg: discord.Message = await msg.edit(
-                (f"Timed-out while waiting for {user_2.mention} to accept..." if user_2 else f"Timed-out while waiting for someone to accept..."),
-                embed=None
+                (
+                    f"Timed-out while waiting for {user_2.mention} to accept..."
+                    if user_2
+                    else f"Timed-out while waiting for someone to accept..."
+                ),
+                embed=None,
             )
 
             try:
@@ -107,37 +131,57 @@ class RockPaperScissorsCog(commands.Cog):
             msg.edit(embed=embed),
             return_exceptions=True,
         )
-        
-        embed = discord.Embed(color=Colors.ClemsonOrange, title="Rock Paper Scissors", description=f"*react with {ROCK_EMOJI}, {PAPER_EMOJI}, or {SCISSORS_EMOJI}*")
+
+        embed = discord.Embed(
+            color=Colors.ClemsonOrange,
+            title="Rock Paper Scissors",
+            description=f"*react with {ROCK_EMOJI}, {PAPER_EMOJI}, or {SCISSORS_EMOJI}*",
+        )
 
         async with ctx.typing():
             # send the choice select messages to both users
             try:
-                user_1_msg, user_2_msg = await asyncio.gather(user_1.send(embed=embed), user_2.send(embed=embed))
+                user_1_msg, user_2_msg = await asyncio.gather(
+                    user_1.send(embed=embed), user_2.send(embed=embed)
+                )
             except discord.HTTPException:
-                await msg.edit("Unable to send both users a direct message, which is required to play rock paper scissors.", embed=None)
-                await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
+                await msg.edit(
+                    "Unable to send both users a direct message, which is required to play rock paper scissors.",
+                    embed=None,
+                )
+                await self.bot.messenger.publish(
+                    Events.on_set_deletable, msg=msg, author=ctx.author
+                )
                 return
 
             # add the rps reactions to those messages
-            await asyncio.wait([self.add_rps_reactions(user_1_msg), self.add_rps_reactions(user_2_msg)])
-        
+            await asyncio.wait(
+                [self.add_rps_reactions(user_1_msg), self.add_rps_reactions(user_2_msg)]
+            )
+
             # await their choices
             try:
                 user_1_choice, user_2_choice = await asyncio.gather(
                     self.rps_select(user_1_msg),
                     self.rps_select(user_2_msg),
                 )
-            except asyncio.TimeoutError: # handle if someone doesn't pick something within a minute
-                embed = discord.Embed(color=Colors.ClemsonOrange, description="Timed-out while waiting for users to react...")
+            except asyncio.TimeoutError:  # handle if someone doesn't pick something within a minute
+                embed = discord.Embed(
+                    color=Colors.ClemsonOrange,
+                    description="Timed-out while waiting for users to react...",
+                )
                 await msg.edit(embed=embed)
                 return
 
         user_choices_str = f"{user_1.mention} chose {CHOICE_TO_EMOJI[user_1_choice]}, {user_2.mention} chose {CHOICE_TO_EMOJI[user_2_choice]}"
 
         def win_embed(user: discord.User) -> discord.Embed:
-            return discord.Embed(color=Colors.ClemsonOrange, title=f"{user.display_name} won!", description=user_choices_str)
-        
+            return discord.Embed(
+                color=Colors.ClemsonOrange,
+                title=f"{user.display_name} won!",
+                description=user_choices_str,
+            )
+
         if WIN_MAP[((WIN_MAP.index(user_1_choice) + 1) % len(WIN_MAP))] == user_2_choice:
             # user 1 win
             embed = win_embed(user_1)
@@ -146,11 +190,13 @@ class RockPaperScissorsCog(commands.Cog):
             embed = win_embed(user_2)
         else:
             # tie
-            embed = discord.Embed(color=Colors.ClemsonOrange, title="It's a tie!", description=user_choices_str)
+            embed = discord.Embed(
+                color=Colors.ClemsonOrange, title="It's a tie!", description=user_choices_str
+            )
 
         await msg.delete()
         await ctx.send(f"{user_1.mention} {user_2.mention}", embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(RockPaperScissorsCog(bot))
+async def setup(bot: ClemBot) -> None:
+    await bot.add_cog(RockPaperScissorsCog(bot))

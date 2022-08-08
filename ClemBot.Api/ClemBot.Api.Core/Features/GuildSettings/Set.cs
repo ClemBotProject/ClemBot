@@ -35,7 +35,6 @@ public class Set
 
     public class Model : IResponseModel
     {
-        public object? Value { get; init; }
     }
 
     public class Handler : IRequestHandler<Command, IQueryResult<Model>>
@@ -50,7 +49,7 @@ public class Set
         public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken) =>
             await _settingsService.SetPropertyAsync(request.Setting, request.GuildId, request.Value) switch
             {
-                true => QueryResult<Model>.Success(new Model{Value = request.Value}),
+                true => QueryResult<Model>.Success(),
                 false => QueryResult<Model>.Invalid()
             };
     }
