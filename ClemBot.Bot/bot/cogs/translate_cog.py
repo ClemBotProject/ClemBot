@@ -279,7 +279,5 @@ LANGUAGE_SHORT_CODE_TO_NAME = {value: key for key, value in LANGUAGE_NAME_TO_SHO
 TRANSLATE_API_URL = "https://api.cognitive.microsofttranslator.com/translate"
 
 
-
-
 async def setup(bot: ClemBot) -> None:
     await bot.add_cog(TranslateCog(bot))

@@ -32,8 +32,13 @@ class UserRoute(BaseRoute):
 
         await self._client.post("bot/users/createbulk", data=json, **kwargs)
 
-    async def get_user(self, user_id: int) -> models.User:
-        return models.User(**await self._client.get(f"bot/users/{user_id}"))
+    async def get_user(self, user_id: int) -> models.User | None:
+        resp = await self._client.get(f"bot/users/{user_id}")
+
+        if not resp:
+            return None
+
+        return models.User(**resp)
 
     async def get_user_slot_scores(
         self, user_id: int, guild_id: int, limit: int
