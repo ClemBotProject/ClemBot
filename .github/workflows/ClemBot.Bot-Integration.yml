@@ -60,7 +60,7 @@ jobs:
 
     - uses: actions/github-script@v3
     - name: isort lint failure comment
-      if: steps.isort-ci.outcome == 'success' && github.event_name == 'pull_request'
+      if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
