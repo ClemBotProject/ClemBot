@@ -11,9 +11,9 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
-from bot.utils.displayable_path import DisplayablePath
 from bot.utils.logging_utils import get_logger
 from bot.utils.helpers import chunk_sequence
+from bot.utils.displayable_path import DisplayablePath  # type: ignore
 
 log = get_logger(__name__)
 

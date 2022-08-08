@@ -1,5 +1,5 @@
+# type: ignore
 import math
-import typing as t
 
 import discord
 import discord.ext.commands as commands

@@ -1,7 +1,10 @@
+import typing as t
+
 import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.utils.logging_utils import get_logger
@@ -12,13 +15,13 @@ log = get_logger(__name__)
 
 
 class InfoCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: ClemBot):
         self.bot = bot
 
     @ext.command()
     @ext.required_claims(Claims.moderation_infraction_view)
     @ext.ignore_claims_pre_invoke()
-    async def info(self, ctx: ext.ClemBotCtx, user: discord.User = None):
+    async def info(self, ctx: ext.ClemBotCtx, user: discord.Member | None = None) -> None:
         # Default range for message count 30 days(~1 month)
 
         # If the command is invoked without a specified user, it will return info on the calling user
@@ -64,9 +67,12 @@ class InfoCog(commands.Cog):
                 embed.add_field(name="**Moderation Info:**", value=moderation_info)
 
             guild_info = ""
+            assert ctx.command
+
             if (ctx.command.claims_check(claims)) or (ctx.author.id == user.id):
                 # prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
-                guild_info = "» **Joined:** " + member.joined_at.strftime("%b %d %Y %I:%M:%S %p")
+                if member.joined_at:
+                    guild_info = "» **Joined:** " + member.joined_at.strftime("%b %d %Y %I:%M:%S %p")
 
             guild_info += f"\n» **Message count (last 30 days):** {await self.bot.message_route.range_count_messages(user.id, ctx.guild.id, DEFAULT_MESSAGE_RANGE)}"
             guild_info += "\n» **Roles:** "
@@ -91,6 +97,6 @@ class InfoCog(commands.Cog):
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
 
 
-async def setup(bot) -> None:
+async def setup(bot: ClemBot) -> None:
     # This adds the cog internally by creating a cog instance and registering that
     await bot.add_cog(InfoCog(bot))

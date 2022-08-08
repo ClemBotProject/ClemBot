@@ -52,7 +52,7 @@ class ExampleCog(commands.Cog):
         # ctx is the context from which the command was invoked from, it contains the message, the guild
         # the command was sent in, the channel, etc
         # it provides contextual metadata about how the command was invoked
-        member = member or t.cast(discord.Member, ctx.author)
+        member = member or discord.Member
         if self._last_member is None or self._last_member.id != member.id:
             await ctx.send(f"Hello {member.name}!")
         else:

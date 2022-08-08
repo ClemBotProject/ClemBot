@@ -71,7 +71,7 @@ class MemesCog(commands.Cog):
     @ext.long_help("A fun command to generate a pseudo bubblewrap effect in discord")
     @ext.short_help("Creates bubblewrap!")
     @ext.example("bubblewrap")
-    async def bubblewrap(self, ctx: ext.ClemBotCtx):
+    async def bubblewrap(self, ctx: ext.ClemBotCtx) -> None:
         msg = ""
         for _ in range(0, 5):
             for _ in range(0, 10):
@@ -151,7 +151,7 @@ class MemesCog(commands.Cog):
     @ext.long_help("A fun command to spongebob meme text in discord")
     @ext.short_help("sO yOu doNt KnOw wHat tHiS Is?")
     @ext.example("spongebob hello world")
-    async def spongebob(self, ctx: commands.Context, *, args: str):
+    async def spongebob(self, ctx: ext.ClemBotCtx, *, args: str) -> None:
         """
         Spongebob Text
         """
