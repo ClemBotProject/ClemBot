@@ -36,10 +36,21 @@ jobs:
         poetry install
 
     - name: Check if Black would make any changes
-      run: poetry run black --check .
+      run: poetry run black bot --check .
 
     - name: Check if isort would make any changes
       run: poetry run isort --check-only .
+
+    - uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Test comment'
+          })
 
     - name: Lint with pylint
       run: |
