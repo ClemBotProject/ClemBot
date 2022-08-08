@@ -15,7 +15,6 @@ log = get_logger(__name__)
 
 
 class ReminderService(BaseService):
-
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
         self.reminders: dict[int, uuid.UUID] = {}
@@ -23,7 +22,10 @@ class ReminderService(BaseService):
     async def _reminder_callback(self, reminder_id: int) -> None:
         reminder = await self.bot.reminder_route.get_reminder(reminder_id, raise_on_error=True)
         if not reminder:
-            log.warning('Reminder with id {reminder_id} returned None from API call.', reminder_id=reminder_id)
+            log.warning(
+                "Reminder with id {reminder_id} returned None from API call.",
+                reminder_id=reminder_id,
+            )
             return None
         user = self.bot.get_user(reminder.user_id)
 
@@ -33,24 +35,25 @@ class ReminderService(BaseService):
             await self.bot.reminder_route.dispatch_reminder(reminder_id, raise_on_error=True)
             return None
 
-        embed = discord.Embed(title='⏰ Reminder', color=Colors.ClemsonOrange,
-                              description="Time's up!")
-        embed.add_field(name='Original Message', value=f'[Link]({reminder.link})')
-        embed.add_field(name='Message', value=reminder.content)
+        embed = discord.Embed(
+            title="⏰ Reminder", color=Colors.ClemsonOrange, description="Time's up!"
+        )
+        embed.add_field(name="Original Message", value=f"[Link]({reminder.link})")
+        embed.add_field(name="Message", value=reminder.content)
         embed.set_footer(text=str(user), icon_url=user.display_avatar.url)
         await self.bot.reminder_route.dispatch_reminder(reminder_id, raise_on_error=True)
         await user.send(embed=embed)
 
     @BaseService.listener(Events.on_set_reminder)
-    async def on_set_reminder(self, author_id: int, jump_url: str, time: datetime, content: str | None) -> None:
-        reminder_id = await self.bot.reminder_route.create_reminder(author_id,
-                                                                    time,
-                                                                    jump_url,
-                                                                    content,
-                                                                    raise_on_error=True)
+    async def on_set_reminder(
+        self, author_id: int, jump_url: str, time: datetime, content: str | None
+    ) -> None:
+        reminder_id = await self.bot.reminder_route.create_reminder(
+            author_id, time, jump_url, content, raise_on_error=True
+        )
 
         if not reminder_id:
-            raise ReminderError('Creating reminder failed')
+            raise ReminderError("Creating reminder failed")
 
         task_id = self.bot.scheduler.schedule_at(self._reminder_callback(reminder_id), time=time)
         self.reminders[reminder_id] = task_id
@@ -60,7 +63,7 @@ class ReminderService(BaseService):
         del_id = await self.bot.reminder_route.dispatch_reminder(reminder_id, raise_on_error=True)
 
         if not del_id:
-            log.warning('Attempted to delete nonexistent reminder: {id}', id=reminder_id)
+            log.warning("Attempted to delete nonexistent reminder: {id}", id=reminder_id)
             return None
 
         self.bot.scheduler.cancel(self.reminders[reminder_id])
@@ -74,5 +77,7 @@ class ReminderService(BaseService):
                 await self.bot.reminder_route.dispatch_reminder(reminder.id)
                 continue
 
-            task_id = self.bot.scheduler.schedule_at(self._reminder_callback(reminder.id), time=reminder.time)
+            task_id = self.bot.scheduler.schedule_at(
+                self._reminder_callback(reminder.id), time=reminder.time
+            )
             self.reminders[reminder.id] = task_id

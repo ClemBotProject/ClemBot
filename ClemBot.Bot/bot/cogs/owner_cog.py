@@ -33,7 +33,9 @@ class OwnerCog(commands.Cog):
     @ext.command(hidden=True)
     @commands.has_guild_permissions(administrator=True)
     async def slowmode(self, ctx: ext.ClemBotCtx, value: int) -> None:
-        assert isinstance(ctx.channel, discord.TextChannel) or isinstance(ctx.channel, discord.Thread)
+        assert isinstance(ctx.channel, discord.TextChannel) or isinstance(
+            ctx.channel, discord.Thread
+        )
         await ctx.channel.edit(slowmode_delay=value)
         await ctx.send(f"Slowmode set to {value}")
 

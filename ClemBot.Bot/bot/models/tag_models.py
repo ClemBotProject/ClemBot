@@ -19,4 +19,3 @@ class TagDelete(ClemBotModel):
 class TagInvoke(ClemBotModel):
     guildId: int
     name: str | None
-

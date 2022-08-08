@@ -8,7 +8,9 @@ class WelcomeMessageRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def set_welcome_message(self, guild_id: int, message: str | None, **kwargs: t.Any) -> None:
+    async def set_welcome_message(
+        self, guild_id: int, message: str | None, **kwargs: t.Any
+    ) -> None:
         json = {"Message": message}
         await self._client.post(f"guilds/{guild_id}/SetWelcomeMessage", data=json, **kwargs)
 

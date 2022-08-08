@@ -89,7 +89,9 @@ class AssignableRolesCog(commands.Cog):
                 ctx, f"Multiple roles found for @{input_role}", matching_roles, role_count
             )
 
-    async def send_matching_roles_list(self, ctx: ext.ClemBotCtx, title: str, matching_roles: list[discord.Role], role_count: int) -> None:
+    async def send_matching_roles_list(
+        self, ctx: ext.ClemBotCtx, title: str, matching_roles: list[discord.Role], role_count: int
+    ) -> None:
         names = ""
         reactions = [
             "\u0031\ufe0f\u20e3",
@@ -127,7 +129,7 @@ class AssignableRolesCog(commands.Cog):
 
         # Remove unnecessary extra emojis from reactions list
         if role_count < len(reactions):
-            del reactions[role_count: len(reactions)]
+            del reactions[role_count : len(reactions)]
 
         """
             USING EMOJIS WITH d.py

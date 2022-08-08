@@ -93,4 +93,4 @@ class Moderation:
     max_reason_length = 1018  # 1024 - 6 ("```reason```")
 
 
-TAG_INVOKE_REGEX = r'{tag_prefix}([^\s]+)'
+TAG_INVOKE_REGEX = r"{tag_prefix}([^\s]+)"

@@ -24,7 +24,14 @@ class MuteCog(commands.Cog):
     @ext.short_help("Mutes a user")
     @ext.example(("mute @SomeUser 1d Timeout", "mute @SomUser 2d1h5m A much longer timeout"))
     @ext.required_claims(Claims.moderation_mute)
-    async def mute(self, ctx: ext.ClemBotCtx, subject: discord.Member, duration: FutureDuration, *, reason: str | None) -> None:
+    async def mute(
+        self,
+        ctx: ext.ClemBotCtx,
+        subject: discord.Member,
+        duration: FutureDuration,
+        *,
+        reason: str | None,
+    ) -> None:
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
             embed.add_field(
@@ -60,29 +67,33 @@ class MuteCog(commands.Cog):
             return
 
         # Publish that a mute happened
-        await self.bot.messenger.publish(Events.on_bot_mute,
-                                         guild=ctx.guild,
-                                         author=ctx.author,
-                                         subject=subject,
-                                         duration=duration,
-                                         reason=reason)
+        await self.bot.messenger.publish(
+            Events.on_bot_mute,
+            guild=ctx.guild,
+            author=ctx.author,
+            subject=subject,
+            duration=duration,
+            reason=reason,
+        )
 
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = f"{subject} Muted :mute:"
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=subject.display_avatar.url)
-        embed.description = f'**{format_duration(duration)}** \n{reason}'
+        embed.description = f"**{format_duration(duration)}** \n{reason}"
 
         await ctx.send(embed=embed)
 
         # Send the mute in the mod channels
         embed = discord.Embed(color=Colors.ClemsonOrange)
-        embed.title = 'Guild Member Muted :mute:'
-        embed.set_author(name=f'{ctx.author}\nId: {ctx.author.id}', icon_url=ctx.author.display_avatar.url)
-        embed.add_field(name=str(subject), value=f'Id: {subject.id}')
-        embed.add_field(name='Duration :timer:', value=format_duration(duration))
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
-        embed.add_field(name='Message Link  :rocket:', value=f'[Link]({ctx.message.jump_url})')
+        embed.title = "Guild Member Muted :mute:"
+        embed.set_author(
+            name=f"{ctx.author}\nId: {ctx.author.id}", icon_url=ctx.author.display_avatar.url
+        )
+        embed.add_field(name=str(subject), value=f"Id: {subject.id}")
+        embed.add_field(name="Duration :timer:", value=format_duration(duration))
+        embed.add_field(name="Reason :page_facing_up:", value=f"```{reason}```", inline=False)
+        embed.add_field(name="Message Link  :rocket:", value=f"[Link]({ctx.message.jump_url})")
         embed.set_thumbnail(url=subject.display_avatar.url)
 
         await self.bot.messenger.publish(
@@ -100,19 +111,21 @@ class MuteCog(commands.Cog):
         if ctx.guild.icon:
             embed.set_thumbnail(url=str(ctx.guild.icon.url))
 
-        embed.add_field(name='Duration :timer:', value=format_duration(duration))
-        embed.add_field(name='Reason :page_facing_up:', value=f'```{reason}```', inline=False)
-        embed.description = f'**Guild:** {ctx.guild.name}'
+        embed.add_field(name="Duration :timer:", value=format_duration(duration))
+        embed.add_field(name="Reason :page_facing_up:", value=f"```{reason}```", inline=False)
+        embed.description = f"**Guild:** {ctx.guild.name}"
 
         try:
             await subject.send(embed=embed)
         except (discord.Forbidden, discord.HTTPException):
             embed = discord.Embed(color=Colors.ClemsonOrange)
-            embed.title = f'Dm Mute to {subject} forbidden'
-            await self.bot.messenger.publish(Events.on_send_in_designated_channel,
-                                             DesignatedChannels.moderation_log,
-                                             ctx.guild.id,
-                                             embed)
+            embed.title = f"Dm Mute to {subject} forbidden"
+            await self.bot.messenger.publish(
+                Events.on_send_in_designated_channel,
+                DesignatedChannels.moderation_log,
+                ctx.guild.id,
+                embed,
+            )
 
     @ext.command()
     @ext.long_help("Unmutes a user for a with an optional reason")

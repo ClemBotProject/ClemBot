@@ -66,7 +66,9 @@ class DeleteMessageService(BaseService):
 
         if reaction.emoji != "🗑️" or reaction.message.id not in self.messages:
             return
-        elif await self.bot.claim_route.check_claim_user(Claims.delete_message, t.cast(discord.Member, user)):
+        elif await self.bot.claim_route.check_claim_user(
+            Claims.delete_message, t.cast(discord.Member, user)
+        ):
             delete = True
         elif user.id == self.messages[reaction.message.id]["Author"]:
             delete = True

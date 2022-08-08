@@ -62,25 +62,43 @@ class DurationDelta(Converter[T]):
 class FutureDuration(DurationDelta[relativedelta | datetime]):
     """Convert duration strings into UTC datetime.datetime objects represented in the future."""
 
-    async def convert(self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]) -> relativedelta | datetime:
-        delta = t.cast(relativedelta, duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration))
+    async def convert(
+        self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]
+    ) -> relativedelta | datetime:
+        delta = t.cast(
+            relativedelta,
+            duration
+            if isinstance(duration, relativedelta)
+            else await super().convert(ctx, duration),
+        )
         now = datetime.utcnow()
         try:
             return now + delta
         except ValueError:
-            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
+            raise ConversionError(
+                f"`{duration}` results in a datetime outside of the supported range."
+            )
 
 
 class PastDuration(DurationDelta[relativedelta | datetime]):
     """Converts duration strings into UTC datetime.datetime objects represented in the past."""
 
-    async def convert(self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]) -> relativedelta | datetime:
-        delta = t.cast(relativedelta, duration if isinstance(duration, relativedelta) else await super().convert(ctx, duration))
+    async def convert(
+        self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]
+    ) -> relativedelta | datetime:
+        delta = t.cast(
+            relativedelta,
+            duration
+            if isinstance(duration, relativedelta)
+            else await super().convert(ctx, duration),
+        )
         now = datetime.utcnow()
         try:
             return now - delta
         except ValueError:
-            raise ConversionError(f'`{duration}` results in a datetime outside of the supported range.')
+            raise ConversionError(
+                f"`{duration}` results in a datetime outside of the supported range."
+            )
 
 
 class ClaimsConverter(Converter[Claims]):
@@ -90,7 +108,7 @@ class ClaimsConverter(Converter[Claims]):
         try:
             return Claims.__members__[claim]
         except KeyError:
-            raise ConversionError(f'`{claim}` is not a valid Claim')
+            raise ConversionError(f"`{claim}` is not a valid Claim")
 
 
 class HonorsConverter(Converter[str]):
@@ -99,12 +117,12 @@ class HonorsConverter(Converter[str]):
     async def convert(self, ctx: Context[ext.BotT], argument: str) -> str:
         honors = None
 
-        if argument in ('honors', 'hon', 'h'):
-            honors = 'honors'
-        elif argument in ('non-honors', 'non-hon', 'regular', 'normal', 'nh'):
-            honors = 'non-honors'
-        elif argument in ('all', 'a'):
-            honors = 'all'
+        if argument in ("honors", "hon", "h"):
+            honors = "honors"
+        elif argument in ("non-honors", "non-hon", "regular", "normal", "nh"):
+            honors = "non-honors"
+        elif argument in ("all", "a"):
+            honors = "all"
         else:
             raise ConversionError()
 
@@ -112,33 +130,36 @@ class HonorsConverter(Converter[str]):
 
 
 @typing.no_type_check
-def trivia_cog_converter(input_length, input_list):  #converts the args as fast as possible
+def trivia_cog_converter(input_length, input_list):  # converts the args as fast as possible
 
     url_parameters = []
 
     for i in range(0, input_length):
-        match i:  #Revolves around beautiful O(1) based indexing
+        match i:  # Revolves around beautiful O(1) based indexing
             case 0:  # question number
                 if input_list[0].isnumeric():
                     question_number = int(input_list[0])
                     if 0 < question_number <= 50:
                         url_parameters.append(question_number)
                     else:
-                        raise UserInputError(
-                            "Question Number entered is out of range!")
+                        raise UserInputError("Question Number entered is out of range!")
                 else:
                     raise UserInputError(
-                        "Question Number has to be a number within the range of 1 to 50")
-            case 1:  #category
+                        "Question Number has to be a number within the range of 1 to 50"
+                    )
+            case 1:  # category
                 if input_list[1].isnumeric():
                     trivia_number = int(input_list[1])
                     if 0 < trivia_number <= 24:
                         url_parameters.append(trivia_number + 8)
-                    elif trivia_number == 0:  # special number to allow entry of empty arguments since it would be impossible otherwise
+                    elif (
+                        trivia_number == 0
+                    ):  # special number to allow entry of empty arguments since it would be impossible otherwise
                         url_parameters.append(None)
                     else:
                         raise UserInputError(
-                            "Category Number out of bounds(Number has to be 1-24) or enter the category you want! Type ?trivia help to see the category list")
+                            "Category Number out of bounds(Number has to be 1-24) or enter the category you want! Type ?trivia help to see the category list"
+                        )
                 else:
                     trivia_category = input_list[1].lower()
 
@@ -146,10 +167,10 @@ def trivia_cog_converter(input_length, input_list):  #converts the args as fast 
                         if x.find(trivia_category) != -1:
                             return_this = CATEGORYLIST_LOWER.index(x) + 9
                             url_parameters.append(return_this)
-                            break;
+                            break
                     else:
                         raise UserInputError("Category not found!")
-            case 2:  #difficulty
+            case 2:  # difficulty
                 if input_list[2].isnumeric():
                     evaluate_int = int(input_list[2])
                     if 0 < evaluate_int <= 3:
@@ -159,18 +180,20 @@ def trivia_cog_converter(input_length, input_list):  #converts the args as fast 
                         url_parameters.append(None)
                     else:
                         raise UserInputError(
-                            "Difficulty Number out of bounds(Number has to be 1-3) or enter Easy-Hard! Type ?trivia help to see the difficulty list.")
+                            "Difficulty Number out of bounds(Number has to be 1-3) or enter Easy-Hard! Type ?trivia help to see the difficulty list."
+                        )
                 else:
                     difficulty = input_list[2].lower()
                     for x in DIFFICULTY_LOWER:
 
                         if (
-                                x.find(difficulty) != -1):  #Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
+                            x.find(difficulty) != -1
+                        ):  # Searches the substring. If this ever comes up, its not a bug you can type in a and not find your category GIGO. It is better than exact case parsing.
                             url_parameters.append(x)
-                            break;
+                            break
                     else:
                         raise UserInputError("Difficulty not found")
-            case 3:  #question type
+            case 3:  # question type
                 if input_list[3].isnumeric():
                     evaluate_int = int(input_list[3])
                     if 0 < evaluate_int < 3:
@@ -180,28 +203,32 @@ def trivia_cog_converter(input_length, input_list):  #converts the args as fast 
                         url_parameters.append(None)
                     else:
                         raise UserInputError(
-                            "Question type number out of bounds(1 or 2) 1: Multiple Choice 2: Boolean. Type ?trivia help to see our question types.")
+                            "Question type number out of bounds(1 or 2) 1: Multiple Choice 2: Boolean. Type ?trivia help to see our question types."
+                        )
                 else:
                     question_type = input_list[3].lower()
                     for x in QUESTIONTYPE:
-                        if (x.find(question_type) != -1):
+                        if x.find(question_type) != -1:
                             url_parameters.append(x)
-                            break;
+                            break
                     else:
                         raise UserInputError(
-                            "Couldn't find the question type you are looking for!.")
+                            "Couldn't find the question type you are looking for!."
+                        )
 
-    url = URL_BUILDER + str(url_parameters[0])  #This has to exist or else it would have raised an exception and exited
+    url = URL_BUILDER + str(
+        url_parameters[0]
+    )  # This has to exist or else it would have raised an exception and exited
 
     for x in range(1, input_length):
         if url_parameters[x]:
             match x:
                 case 1:
-                    url = (f"{url}&category={str(url_parameters[1])}")
+                    url = f"{url}&category={str(url_parameters[1])}"
                 case 2:
-                    url = (f"{url}&difficulty={url_parameters[2]}")
+                    url = f"{url}&difficulty={url_parameters[2]}"
                 case 3:
-                    url = (f"{url}&type={url_parameters[input_length - 1]}")
+                    url = f"{url}&type={url_parameters[input_length - 1]}"
     return url
 
 
@@ -209,40 +236,37 @@ URL_BUILDER = R"https://opentdb.com/api.php?amount="
 
 DEFAULT_URL = "https://opentdb.com/api.php?amount=10"
 
-DIFFICULTY = ["Easy",
-              "Medium",
-              "Hard"]
+DIFFICULTY = ["Easy", "Medium", "Hard"]
 
 DIFFICULTY_LOWER = [k.lower() for k in DIFFICULTY]
 
-QUESTIONTYPE = [
-    "multiple",
-    "boolean"
-]
+QUESTIONTYPE = ["multiple", "boolean"]
 
-CATEGORYLIST = ["General-Knowledge",  #Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
-                "Books",
-                "Film",
-                "Music",
-                "Musicals&Theatres",
-                "Television",
-                "Video-Games",
-                "Board-Games",
-                "Science&Nature",
-                "Computers",
-                "Mathematics",
-                "Mythology",
-                "Sports",
-                "Geography",
-                "History",
-                "Politics",
-                "Art",
-                "Celebrities",
-                "Animals",
-                "Vehicles",
-                "Comics",
-                "Gadgets",
-                "Japanese-Anime&Manga",
-                "Cartoon&Animations"]
+CATEGORYLIST = [
+    "General-Knowledge",  # Including this out of consistency to avoid making the offset 10 for no reason. This will be the default value.
+    "Books",
+    "Film",
+    "Music",
+    "Musicals&Theatres",
+    "Television",
+    "Video-Games",
+    "Board-Games",
+    "Science&Nature",
+    "Computers",
+    "Mathematics",
+    "Mythology",
+    "Sports",
+    "Geography",
+    "History",
+    "Politics",
+    "Art",
+    "Celebrities",
+    "Animals",
+    "Vehicles",
+    "Comics",
+    "Gadgets",
+    "Japanese-Anime&Manga",
+    "Cartoon&Animations",
+]
 
 CATEGORYLIST_LOWER = [k.lower() for k in CATEGORYLIST]

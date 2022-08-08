@@ -9,7 +9,9 @@ class ChannelRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def create_channel(self, channel_id: int, name: str, guild_id: int, **kwargs: t.Any) -> None:
+    async def create_channel(
+        self, channel_id: int, name: str, guild_id: int, **kwargs: t.Any
+    ) -> None:
         json = {"Id": channel_id, "Name": name, "GuildId": guild_id}
         await self._client.post("bot/channels", data=json, **kwargs)
 

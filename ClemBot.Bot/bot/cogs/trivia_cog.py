@@ -337,7 +337,12 @@ class TriviaCog(commands.Cog):
         await ctx.send(embed=score_embed)
 
     async def send_scroll_reactions(
-        self, ctx: ext.ClemBotCtx, msg: discord.Message, author: discord.Member, timeout: int, total_questions
+        self,
+        ctx: ext.ClemBotCtx,
+        msg: discord.Message,
+        author: discord.Member,
+        timeout: int,
+        total_questions,
     ):
         # add every emoji from the reaction list
 

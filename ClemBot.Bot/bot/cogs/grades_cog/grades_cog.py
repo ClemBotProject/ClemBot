@@ -212,7 +212,9 @@ class GradesCog(commands.Cog):
             "prof all kristi whitehead",
         )
     )
-    async def prof(self, ctx: ext.ClemBotCtx, honors: HonorsConverter | None = "non-honors", *, prof: str) -> None:
+    async def prof(
+        self, ctx: ext.ClemBotCtx, honors: HonorsConverter | None = "non-honors", *, prof: str
+    ) -> None:
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known Professor\n'
@@ -421,7 +423,6 @@ class GradesCog(commands.Cog):
             channel=ctx.channel,
             timeout=360,
         )
-
 
 
 async def setup(bot) -> None:

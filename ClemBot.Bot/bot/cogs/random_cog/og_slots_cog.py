@@ -65,7 +65,7 @@ class OgSlotsCog(commands.Cog):
     @ext.long_help("A slot machine inside discord with a chance to win fame and fortune")
     @ext.short_help("How lucky are you?")
     @ext.example("slots")
-    async def ogslots(self, ctx:ext.ClemBotCtx) -> None:
+    async def ogslots(self, ctx: ext.ClemBotCtx) -> None:
         results = random.choices(Symbols.combined, weights=WEIGHTS, k=5)
         score = self.calculate_score(results)
 

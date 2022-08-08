@@ -19,7 +19,9 @@ class ModerationService(BaseService):
         super().__init__(bot)
 
     @BaseService.listener(Events.on_bot_warn)
-    async def on_bot_warn(self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason: str) -> None:
+    async def on_bot_warn(
+        self, guild: discord.Guild, author: discord.Member, subject: discord.Member, reason: str
+    ) -> None:
         await self.bot.moderation_route.insert_warn(
             guild_id=guild.id,
             author_id=author.id,
@@ -30,9 +32,16 @@ class ModerationService(BaseService):
 
     @BaseService.listener(Events.on_bot_ban)
     async def on_bot_ban(
-        self, guild: discord.Guild, author: discord.Member, purge_days: int, subject: discord.Member, reason: str | None
+        self,
+        guild: discord.Guild,
+        author: discord.Member,
+        purge_days: int,
+        subject: discord.Member,
+        reason: str | None,
     ) -> None:
-        await guild.ban(t.cast(discord.abc.Snowflake, subject), reason=reason, delete_message_days=purge_days)
+        await guild.ban(
+            t.cast(discord.abc.Snowflake, subject), reason=reason, delete_message_days=purge_days
+        )
 
         await self.bot.moderation_route.insert_ban(
             guild_id=guild.id,
@@ -56,12 +65,14 @@ class ModerationService(BaseService):
         assert mute_role is not None
         await subject.add_roles(t.cast(discord.abc.Snowflake, mute_role))
 
-        mute_id = await self.bot.moderation_route.insert_mute(guild_id=guild.id,
-                                                              author_id=author.id,
-                                                              subject_id=subject.id,
-                                                              duration=format_datetime(duration),
-                                                              reason=reason,
-                                                              raise_on_error=True)
+        mute_id = await self.bot.moderation_route.insert_mute(
+            guild_id=guild.id,
+            author_id=author.id,
+            subject_id=subject.id,
+            duration=format_datetime(duration),
+            reason=reason,
+            raise_on_error=True,
+        )
 
         if not mute_id:
             log.error("Creating mute failed in guild: {guild_id}", guild_id=guild.id)
@@ -91,7 +102,7 @@ class ModerationService(BaseService):
 
         if not author:
             author = guild.me
-        
+
         assert author is not None
 
         mute = await self.bot.moderation_route.get_infraction(mute_id)
@@ -211,7 +222,9 @@ class ModerationService(BaseService):
 
     @BaseService.listener(Events.on_member_ban)
     async def on_member_ban(self, guild: discord.Guild, user: discord.Member) -> None:
-        log = [action async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)][0]
+        log = [
+            action async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)
+        ][0]
         embed = discord.Embed(color=Colors.ClemsonOrange)
         embed.title = "Guild Member Banned"
 
@@ -248,5 +261,6 @@ class ModerationService(BaseService):
                     await self._unmute_callback(guild.id, mute.subject_id, mute.id)
                 else:
                     self.bot.scheduler.schedule_at(
-                        self._unmute_callback(guild.id, mute.subject_id, mute.id), time=mute.duration
+                        self._unmute_callback(guild.id, mute.subject_id, mute.id),
+                        time=mute.duration,
                     )

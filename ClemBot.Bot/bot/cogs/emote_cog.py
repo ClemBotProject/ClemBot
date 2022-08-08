@@ -11,7 +11,6 @@ log = get_logger(__name__)
 
 
 class EmoteCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 

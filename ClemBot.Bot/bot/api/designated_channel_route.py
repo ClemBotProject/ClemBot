@@ -36,4 +36,6 @@ class DesignatedChannelRoute(BaseRoute):
         return {i["designation"]: i["channelIds"] for i in resp}
 
     async def get_global_designations(self, designation: str) -> list[int]:
-        return t.cast(list[int], await self._client.get(f"bot/designatedchannels/{designation}/index"))
+        return t.cast(
+            list[int], await self._client.get(f"bot/designatedchannels/{designation}/index")
+        )

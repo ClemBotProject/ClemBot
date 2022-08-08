@@ -73,7 +73,9 @@ class TagRoute(BaseRoute):
 
         return None if resp is None else resp["content"]
 
-    async def delete_tag(self, guild_id: int, name: str, **kwargs: t.Any) -> models.TagDelete | None:
+    async def delete_tag(
+        self, guild_id: int, name: str, **kwargs: t.Any
+    ) -> models.TagDelete | None:
         """
         Makes a call to the API to delete a tag w/ the given GuildId and Name.
         If successful, the API will return a dict with the given values:
@@ -81,7 +83,7 @@ class TagRoute(BaseRoute):
         - content   The content of the tag.
         - guildId   The guild id the tag was in.
         """
-        
+
         json = {
             "GuildId": guild_id,
             "Name": name,
@@ -94,7 +96,9 @@ class TagRoute(BaseRoute):
 
         return models.TagDelete(**resp)
 
-    async def add_tag_use(self, guild_id: int, name: str, channel_id: int, user_id: int) -> models.TagInvoke | None:
+    async def add_tag_use(
+        self, guild_id: int, name: str, channel_id: int, user_id: int
+    ) -> models.TagInvoke | None:
         """
         Makes a call to the API to say a tag w/ the given Name was used.
         If successful, the API will return a dict with the given values:

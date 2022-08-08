@@ -10,7 +10,6 @@ log = get_logger(__name__)
 
 
 class DesignatedChannelsCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
@@ -67,7 +66,9 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Set a Designated channel")
     @ext.example("channel add user_join_log #some-channel")
-    async def add(self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel) -> None:
+    async def add(
+        self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel
+    ) -> None:
 
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
@@ -109,7 +110,9 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Removes a Designated channel listing")
     @ext.example("channel delete user_join_log #some-channel")
-    async def delete(self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel) -> None:
+    async def delete(
+        self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel
+    ) -> None:
         """
         Command to delete a registered TextChannel from a designated channel
 

@@ -10,7 +10,6 @@ log = get_logger(__name__)
 
 
 class ThreadHandlingService(BaseService):
-
     def __init__(self, *, bot: ClemBot) -> None:
         super().__init__(bot)
 

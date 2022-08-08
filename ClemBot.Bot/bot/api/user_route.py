@@ -20,20 +20,24 @@ class UserRoute(BaseRoute):
         await self._client.post("bot/users", data=json, **kwargs)
 
     async def create_user_bulk(self, users: t.Iterable[discord.User], **kwargs: t.Any) -> None:
-        json = {"Users": [
-            {
-                "Id": u.id,
-                "Name": u.name,
-            }
-            for u in users
-        ]}
+        json = {
+            "Users": [
+                {
+                    "Id": u.id,
+                    "Name": u.name,
+                }
+                for u in users
+            ]
+        }
 
         await self._client.post("bot/users/createbulk", data=json, **kwargs)
 
     async def get_user(self, user_id: int) -> models.User:
         return models.User(**await self._client.get(f"bot/users/{user_id}"))
 
-    async def get_user_slot_scores(self, user_id: int, guild_id: int, limit: int) -> models.UserSlotScores | None:
+    async def get_user_slot_scores(
+        self, user_id: int, guild_id: int, limit: int
+    ) -> models.UserSlotScores | None:
         resp = await self._client.get(f"bot/users/{user_id}/{guild_id}/slotscores?limit={limit}")
 
         if not resp:
@@ -85,7 +89,7 @@ class UserRoute(BaseRoute):
         await self._client.post(f"bot/users/{user_id}/updateroles", data=json, **kwargs)
 
     async def get_reminders(self, user_id: int, **kwargs: t.Any) -> list[Reminder]:
-        resp = await self._client.get(f'bot/users/{user_id}/reminders', **kwargs)
+        resp = await self._client.get(f"bot/users/{user_id}/reminders", **kwargs)
 
         if not resp:
             return []

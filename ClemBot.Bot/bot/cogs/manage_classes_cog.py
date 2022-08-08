@@ -110,8 +110,10 @@ class ManageClassesCog(commands.Cog):
 
         try:
             # attempt to get the category to add the class too
-            category: discord.CategoryChannel | None = await commands.converter.CategoryChannelConverter().convert(
-                ctx, class_repr.category
+            category: discord.CategoryChannel | None = (
+                await commands.converter.CategoryChannelConverter().convert(
+                    ctx, class_repr.category
+                )
             )
         except:
             # the category wasnt found, ask if we want to create one
@@ -264,7 +266,9 @@ class ManageClassesCog(commands.Cog):
 
         return class_repr
 
-    async def create_category(self, ctx: ext.ClemBotCtx, class_repr: ClassType) -> discord.CategoryChannel | None:
+    async def create_category(
+        self, ctx: ext.ClemBotCtx, class_repr: ClassType
+    ) -> discord.CategoryChannel | None:
         get_input = UserChoice(ctx=ctx, timeout=TIMEOUT)
         choice = await get_input.send_confirmation(
             content=f"""
@@ -280,7 +284,9 @@ class ManageClassesCog(commands.Cog):
         log.info(f'Creating category "{class_repr.category}" in guild: "{ctx.guild.name}"')
         return await ctx.guild.create_category(class_repr.category)
 
-    async def create_channel(self, category: discord.CategoryChannel, class_repr: ClassType) -> discord.TextChannel:
+    async def create_channel(
+        self, category: discord.CategoryChannel, class_repr: ClassType
+    ) -> discord.TextChannel:
         log.info(f'Creating new Class channel "{class_repr.name}""')
         return await category.create_text_channel(
             class_repr.channel, topic=f"{class_repr.name} - {class_repr.description}"
@@ -306,7 +312,9 @@ class ManageClassesCog(commands.Cog):
 
         return role
 
-    async def sync_perms(self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, role: discord.Role) -> None:
+    async def sync_perms(
+        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, role: discord.Role
+    ) -> None:
         # Check if cleanup role exists
         if not (cleanup := discord.utils.get(ctx.guild.roles, name="Cleanup")):
             cleanup = await ctx.guild.create_role(name="Cleanup", mentionable=False)

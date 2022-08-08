@@ -39,7 +39,13 @@ T_STATE_CHANGE_CB = t.Optional[t.Callable[[], t.Coroutine[t.Any, t.Any, None]]]
 
 
 class ApiClient:
-    def __init__(self, *, connect_callback: T_STATE_CHANGE_CB = None, disconnect_callback: T_STATE_CHANGE_CB = None, bot_only: bool = False):
+    def __init__(
+        self,
+        *,
+        connect_callback: T_STATE_CHANGE_CB = None,
+        disconnect_callback: T_STATE_CHANGE_CB = None,
+        bot_only: bool = False,
+    ):
         self.auth_token: str | None = None
         self.session: aiohttp.ClientSession | None = None
         self.connected: bool = False
@@ -165,7 +171,14 @@ class ApiClient:
         log.info("Initialized JWT BEARER token Auth Headers")
         return True
 
-    async def _request(self, http_type: str, endpoint: str, raise_on_error: bool, params: t.Any = None, body: t.Any = None) -> Result:
+    async def _request(
+        self,
+        http_type: str,
+        endpoint: str,
+        raise_on_error: bool,
+        params: t.Any = None,
+        body: t.Any = None,
+    ) -> Result:
 
         log.info(
             "HTTP {http_type} Request initializing to route: {endpoint}",

@@ -19,7 +19,9 @@ class Scheduler:
     def __init__(self) -> None:
         self._scheduled_tasks: dict[t.Hashable, asyncio.Task[t.Any]] = {}
 
-    def schedule_at(self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: datetime) -> uuid.UUID:
+    def schedule_at(
+        self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: datetime
+    ) -> uuid.UUID:
         """Schedules a callback for execution at a given datetime object
 
         Args:
@@ -47,7 +49,9 @@ class Scheduler:
 
         return self._schedule(delay_time, callback)
 
-    def schedule_in(self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: t.Union[int, float]) -> uuid.UUID:
+    def schedule_in(
+        self, callback: t.Coroutine[t.Any, t.Any, t.Any], *, time: t.Union[int, float]
+    ) -> uuid.UUID:
         """Schedules a callback for exection in a given number of seconds
 
         Args:
@@ -137,7 +141,9 @@ class Scheduler:
             else:
                 log.info("Finally block reached for #{task_id}", task_id=str(task_id))
 
-    def _end_scheduled_task(self, task_id: uuid.UUID, coro: t.Coroutine[t.Any, t.Any, t.Any]) -> None:
+    def _end_scheduled_task(
+        self, task_id: uuid.UUID, coro: t.Coroutine[t.Any, t.Any, t.Any]
+    ) -> None:
         finished_task = self._scheduled_tasks.get(task_id)
         if finished_task:
             del self._scheduled_tasks[task_id]

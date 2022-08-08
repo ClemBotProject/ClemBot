@@ -21,7 +21,6 @@ API_URL = "https://www.dictionaryapi.com/api/v3/references/collegiate/json/"
 
 
 class DefineCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 

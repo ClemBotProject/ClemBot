@@ -77,7 +77,9 @@ class ModerationRoute(BaseRoute):
         return t.cast(int, await self._client.delete(f"bot/infractions/{infraction_id}", **kwargs))
 
     async def deactivate_mute(self, infraction_id: int, **kwargs: t.Any) -> int:
-        return t.cast(int, await self._client.patch(f"bot/infractions/{infraction_id}/deactivate", **kwargs))
+        return t.cast(
+            int, await self._client.patch(f"bot/infractions/{infraction_id}/deactivate", **kwargs)
+        )
 
     async def get_infraction(self, infraction_id: int) -> Infraction:
         dict = await self._client.get(f"bot/infractions/{infraction_id}")
@@ -91,9 +93,7 @@ class ModerationRoute(BaseRoute):
 
         return [Infraction(**i) for i in resp]
 
-    async def get_guild_infractions_user(
-        self, guild_id: int, user_id: int
-    ) -> list[Infraction]:
+    async def get_guild_infractions_user(self, guild_id: int, user_id: int) -> list[Infraction]:
         resp = await self._client.get(f"bot/users/infractions/{user_id}/{guild_id}")
 
         if not resp:

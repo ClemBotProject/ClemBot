@@ -10,7 +10,6 @@ from bot.utils.converters import ClaimsConverter
 
 
 class ClaimsAuthorizationCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
@@ -23,7 +22,9 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Claims authorization setup")
     @ext.example(("claims", "claims @some_role", "claims @some_user"))
-    async def claims(self, ctx: ext.ClemBotCtx, listing: t.Union[discord.Role, discord.Member]) -> None:
+    async def claims(
+        self, ctx: ext.ClemBotCtx, listing: t.Union[discord.Role, discord.Member]
+    ) -> None:
         assert isinstance(ctx.author, discord.Member)
 
         listing = listing or ctx.author
@@ -96,7 +97,9 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.long_help("Removes a claim from a given role. ")
     @ext.short_help("Removes a claim from a given role")
     @ext.example(("claims remove emote_add @some_role", "claims delete tag_add @some_other_role"))
-    async def remove(self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role) -> None:
+    async def remove(
+        self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role
+    ) -> None:
         claim: Claims = t.cast(Claims, claim_t)
 
         if not await self.bot.claim_route.check_claim_role(claim, role):

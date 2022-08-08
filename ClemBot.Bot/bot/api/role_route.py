@@ -9,7 +9,9 @@ class RoleRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def create_role(self, role_id: int, name: str, is_admin: bool, guild_id: int, **kwargs: t.Any) -> None:
+    async def create_role(
+        self, role_id: int, name: str, is_admin: bool, guild_id: int, **kwargs: t.Any
+    ) -> None:
         json = {"Id": role_id, "Name": name, "Admin": is_admin, "GuildId": guild_id}
 
         await self._client.post("bot/roles", data=json, **kwargs)

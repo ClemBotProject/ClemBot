@@ -70,7 +70,9 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
-        self.message_edit_batch.append(SingleBatchMessageEdit(id=id, content=content, time=datetime.datetime.utcnow()))
+        self.message_edit_batch.append(
+            SingleBatchMessageEdit(id=id, content=content, time=datetime.datetime.utcnow())
+        )
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:

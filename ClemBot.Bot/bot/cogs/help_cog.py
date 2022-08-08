@@ -123,7 +123,9 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def find_command(self, parent: commands.Command[t.Any, t.Any, t.Any] | commands.Bot, command_name: str) -> ext.ClemBotCommand | None:
+    def find_command(
+        self, parent: commands.Command[t.Any, t.Any, t.Any] | commands.Bot, command_name: str
+    ) -> ext.ClemBotCommand | None:
         """
         Recursively searches the command tree to find a given command, if none found then returns None
         """

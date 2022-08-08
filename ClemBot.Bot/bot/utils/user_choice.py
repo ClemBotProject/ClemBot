@@ -40,7 +40,9 @@ class UserChoice:
             return False
 
     async def _send(
-        self, embed: discord.Embed, choices: dict[(int | str), (discord.Emoji | discord.PartialEmoji | str)]
+        self,
+        embed: discord.Embed,
+        choices: dict[(int | str), (discord.Emoji | discord.PartialEmoji | str)],
     ) -> int | str:
 
         msg = await self.ctx.send(embed=embed)

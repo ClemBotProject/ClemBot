@@ -71,7 +71,7 @@ class SearchResult:
         for i, val in enumerate(related_topics):
             if i >= max_topics:
                 break
-            
+
             url = val["FirstURL"]
             title = RELATED_TOPICS_PATTERN.match(url).group(3).replace("_", " ")
             title = unquote_plus(title)
@@ -137,7 +137,7 @@ class SearchCog(commands.Cog):
 
         if result.has_thumbnail():
             embed.set_thumbnail(url=result.thumbnail())
-            
+
         return await ctx.send(embed=embed)
 
     async def no_results(self, ctx: ext.ClemBotCtx, query: str) -> discord.Message:

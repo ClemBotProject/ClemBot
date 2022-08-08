@@ -22,7 +22,7 @@ def log_channel(channel: t.Any) -> dict[str, t.Any]:
     id = getattr(channel, "id", None)
     name = getattr(channel, "name", str(channel))
     guild = getattr(channel, "guild", None)
-    
+
     return {"id": id, "name": name, "guild": log_guild(guild) if guild else None}
 
 

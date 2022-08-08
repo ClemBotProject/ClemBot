@@ -118,7 +118,9 @@ class DotCog(commands.Cog):
             finished_image.append(line_of_braille)
         return finished_image
 
-    async def todots_helper(self, ctx: ext.ClemBotCtx, image, device=None, threshold=150, inverted=False) -> None:
+    async def todots_helper(
+        self, ctx: ext.ClemBotCtx, image, device=None, threshold=150, inverted=False
+    ) -> None:
         filename = image
 
         if device is None or device.lower() == "pc":

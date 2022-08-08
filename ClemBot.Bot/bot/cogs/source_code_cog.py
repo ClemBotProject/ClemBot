@@ -142,7 +142,13 @@ class SourceCodeCog(commands.Cog):
     )
     @ext.short_help("Displays a source file directly in discord")
     @ext.example(("source print __main__.py", "source print __main__.py 10 20"))
-    async def print(self, ctx: ext.ClemBotCtx, file: str | None = None, line_start: int | None = None, line_stop: int | None = None) -> None:
+    async def print(
+        self,
+        ctx: ext.ClemBotCtx,
+        file: str | None = None,
+        line_start: int | None = None,
+        line_stop: int | None = None,
+    ) -> None:
 
         if not file:
             await ctx.send("needs a file name")
@@ -227,14 +233,16 @@ class SourceCodeCog(commands.Cog):
                 Events.on_set_deletable, msg=sent_messages, author=ctx.author
             )
 
-    def process_source(self, source: str, line_start: int | None = None, line_stop: int | None = None) -> typing.Iterable[str]:
+    def process_source(
+        self, source: str, line_start: int | None = None, line_stop: int | None = None
+    ) -> typing.Iterable[str]:
         split_source = [f"{i + 1:03d} |  {value}" for i, value in enumerate(source.splitlines())]
 
         if line_start and line_start <= 0:
             line_start = 1
 
         filtered_source = split_source[
-            line_start - 1 if line_start else 0: line_stop or len(source)
+            line_start - 1 if line_start else 0 : line_stop or len(source)
         ]
 
         return filtered_source

@@ -72,7 +72,9 @@ class InfoCog(commands.Cog):
             if (ctx.command.claims_check(claims)) or (ctx.author.id == user.id):
                 # prints the datetime in the format of <Months> <day> <year> <hours>:<minutes>:<seconds> <AM/PM>
                 if member.joined_at:
-                    guild_info = "» **Joined:** " + member.joined_at.strftime("%b %d %Y %I:%M:%S %p")
+                    guild_info = "» **Joined:** " + member.joined_at.strftime(
+                        "%b %d %Y %I:%M:%S %p"
+                    )
 
             guild_info += f"\n» **Message count (last 30 days):** {await self.bot.message_route.range_count_messages(user.id, ctx.guild.id, DEFAULT_MESSAGE_RANGE)}"
             guild_info += "\n» **Roles:** "

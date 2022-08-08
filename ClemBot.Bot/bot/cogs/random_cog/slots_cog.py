@@ -150,7 +150,7 @@ class SlotsCog(commands.Cog):
             if not user:
                 continue
 
-            scores_str += f'{i+1: >3}. {user.name}: {score.high_score}\n'
+            scores_str += f"{i+1: >3}. {user.name}: {score.high_score}\n"
 
         embed = discord.Embed(
             title="💎 ClemBot Slot Machine Leaderboard 💎", colour=Colors.ClemsonOrange
@@ -175,7 +175,7 @@ class SlotsCog(commands.Cog):
             if not user:
                 continue
 
-            scores_str += f'{i+1: >3}. {user.name}: {score.high_score}\n'
+            scores_str += f"{i+1: >3}. {user.name}: {score.high_score}\n"
 
         embed = discord.Embed(
             title="💩 ClemBot Slot Machine Loserboard 💩", colour=Colors.ClemsonOrange
@@ -186,7 +186,9 @@ class SlotsCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def _calculate_score(self, paylines: np.ndarray[t.Any, t.Any]) -> tuple[list[str | list[str]], int]:
+    def _calculate_score(
+        self, paylines: np.ndarray[t.Any, t.Any]
+    ) -> tuple[list[str | list[str]], int]:
 
         winning_groups = []
 

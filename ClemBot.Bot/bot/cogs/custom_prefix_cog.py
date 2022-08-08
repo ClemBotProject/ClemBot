@@ -13,7 +13,6 @@ log = get_logger(__name__)
 
 
 class CustomPrefixCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 

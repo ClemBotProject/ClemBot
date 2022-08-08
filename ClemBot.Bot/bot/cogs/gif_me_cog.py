@@ -15,7 +15,6 @@ log = get_logger(__name__)
 
 
 class GifMeCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 

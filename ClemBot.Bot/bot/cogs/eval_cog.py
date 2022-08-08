@@ -20,7 +20,6 @@ EVAL_COMMAND_COOLDOWN = 2
 
 
 class EvalCog(commands.Cog):
-
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 

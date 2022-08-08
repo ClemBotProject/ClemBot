@@ -66,7 +66,9 @@ class TagCog(commands.Cog):
         # chunk the list of tags into groups of TAG_CHUNK_SIZE for each page
         # pages = self.chunked_pages([role.name for role in tags], TAG_CHUNK_SIZE)
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
-        pages = self.chunked_tags(tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), "Available Tags", tags_url)
+        pages = self.chunked_tags(
+            tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), "Available Tags", tags_url
+        )
 
         # send the pages to the paginator service
         await self.bot.messenger.publish(
@@ -103,7 +105,11 @@ class TagCog(commands.Cog):
 
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
         pages = self.chunked_tags(
-            owned_tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), f"{user.name}'s Available Tags", tags_url
+            owned_tags,
+            TAG_CHUNK_SIZE,
+            await self.bot.current_prefix(ctx),
+            f"{user.name}'s Available Tags",
+            tags_url,
         )
 
         await self.bot.messenger.publish(
@@ -288,7 +294,11 @@ class TagCog(commands.Cog):
         # chunk the unclaimed tags into pages
         tags_url = f"{bot_secrets.secrets.site_url}dashboard/{ctx.guild.id}/tags"
         pages = self.chunked_tags(
-            unclaimed_tags, TAG_CHUNK_SIZE, await self.bot.current_prefix(ctx), "Unclaimed Tags", tags_url
+            unclaimed_tags,
+            TAG_CHUNK_SIZE,
+            await self.bot.current_prefix(ctx),
+            "Unclaimed Tags",
+            tags_url,
         )
 
         # send the pages to the paginator service
@@ -446,7 +456,9 @@ class TagCog(commands.Cog):
             Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60
         )
 
-    def chunked_tags(self, tags_list: list[Tag], n: int, prefix: str, title: str, url: str) -> list[discord.Embed]:
+    def chunked_tags(
+        self, tags_list: list[Tag], n: int, prefix: str, title: str, url: str
+    ) -> list[discord.Embed]:
         """Chunks the given list into a markdown-ed list of n-sized items (row * col)"""
         pages = []
         for chunk in chunk_sequence(tags_list, n):

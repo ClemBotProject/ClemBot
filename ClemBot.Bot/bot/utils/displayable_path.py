@@ -32,7 +32,13 @@ class DisplayablePath:
         return self.path.name
 
     @classmethod
-    def make_tree(cls, root: str | t.Any, parent: DisplayablePath | None = None, is_last: bool = False, criteria=None):
+    def make_tree(
+        cls,
+        root: str | t.Any,
+        parent: DisplayablePath | None = None,
+        is_last: bool = False,
+        criteria=None,
+    ):
         root = Path(str(root))
         criteria = criteria or cls._default_criteria
 

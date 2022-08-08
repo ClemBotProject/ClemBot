@@ -91,9 +91,7 @@ class PaginateService(BaseService):
         msg = await channel.send(embed=embed)
 
         # stores the message info
-        message = Message(
-            pages, 0, author.id, embed_name=embed_name, field_title=field_title
-        )
+        message = Message(pages, 0, author.id, embed_name=embed_name, field_title=field_title)
         self.messages[msg.id] = message
         await self.send_scroll_reactions(msg, author, timeout)
 
@@ -151,9 +149,7 @@ class PaginateService(BaseService):
                 log.info("Message: {msg_id} timed out as pageable", msg_id=msg.id)
 
     @BaseService.listener(Events.on_reaction_add)
-    async def change_page(
-        self, reaction: discord.Reaction, user: discord.Member
-    ) -> None:
+    async def change_page(self, reaction: discord.Reaction, user: discord.Member) -> None:
 
         # check if emoji matches and user has perm to change page
         if reaction.emoji not in self.reactions or reaction.message.id not in self.messages.keys():

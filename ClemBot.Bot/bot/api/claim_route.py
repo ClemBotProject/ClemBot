@@ -24,7 +24,9 @@ class ClaimRoute(BaseRoute):
         return [Claims[c] for c in await self._client.get(f"bot/roles/{role_id}/claimmappings")]
 
     async def get_claims_user(self, user: discord.Member) -> list[Claims]:
-        return [Claims[c] for c in await self._client.get(f"bot/users/{user.id}/{user.guild.id}/claims")]
+        return [
+            Claims[c] for c in await self._client.get(f"bot/users/{user.id}/{user.guild.id}/claims")
+        ]
 
     async def check_claim_role(self, claim: Claims, role: discord.Role) -> bool:
         return claim in await self.get_claims_role(role.id)
