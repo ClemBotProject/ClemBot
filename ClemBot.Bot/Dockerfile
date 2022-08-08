@@ -15,16 +15,15 @@ RUN apt-get update && apt-get install -y git
 
 # Install poetry
 RUN python -m pip install poetry
+RUN poetry config virtualenvs.in-project true
 
 # Install dependencies with Poetry
 ADD pyproject.toml .
 ADD poetry.lock .
-RUN python -m poetry install --no-dev
+RUN poetry install --no-dev
 
 WORKDIR /ClemBot.Bot
 ADD . /ClemBot.Bot
 
-RUN python -m poetry shell
-
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "-m", "bot"]
+CMD ["poetry", "run", "python3", "-m", "bot"]
