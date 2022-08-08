@@ -7,22 +7,19 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED 1
 
-
-ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-ENV POETRY_NO_INTERACTION=1
-
 RUN apt-get update && apt-get install -y git
 
 # Install poetry
 RUN python -m pip install poetry
-RUN poetry config virtualenvs.in-project true
 
 # Install dependencies with Poetry
+WORKDIR /ClemBot.Bot
 ADD pyproject.toml .
 ADD poetry.lock .
-RUN poetry install --no-dev
 
-WORKDIR /ClemBot.Bot
+RUN poetry config virtualenvs.in-project true
+RUN poetry install --no-dev --no-interaction
+
 ADD . /ClemBot.Bot
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
