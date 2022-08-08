@@ -36,12 +36,16 @@ jobs:
         poetry install
 
     - name: Check if Black would make any changes
+      id: black-ci
+      continue-on-error: true
       run: poetry run black bot --check 
 
     - name: Check if isort would make any changes
       run: poetry run isort --check-only .
 
     - uses: actions/github-script@v3
+    - name: Black lint failure comment
+      if: steps.black-check.outcome == 'success' && github.event_name == 'pull_request'
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
@@ -49,7 +53,7 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Test comment'
+            body: 'Black linting failed \n\n Please run ```poetry run black bot``` from the `ClemBot.Bot` folder'
           })
 
     - name: Lint with pylint
