@@ -112,9 +112,9 @@ class GradesCog(commands.Cog):
         df = self.grades_df[(self.grades_df.CourseId == course) & (self.grades_df.Year >= year)]
 
         if honors == "honors":
-            df = df[df.Honors is True]
+            df = df[df.Honors == True]
         elif honors == "non-honors":
-            df = df[df.Honors is not True]
+            df = df[df.Honors != True]
 
         description = df.Title.tolist()[0]
 
