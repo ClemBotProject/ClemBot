@@ -231,9 +231,9 @@ class GradesCog(commands.Cog):
 
         # Honors/Non-honors logic
         if honors == "honors":
-            df = df[df.Honors is True]
+            df = df[df.Honors == True]
         elif honors == "non-honors":
-            df = df[df.Honors is not True]
+            df = df[df.Honors != True]
 
         if df.empty:
             title = "Error: That professor has no available data"
