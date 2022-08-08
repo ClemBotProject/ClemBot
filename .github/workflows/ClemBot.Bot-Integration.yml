@@ -43,6 +43,10 @@ jobs:
         path: .venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
+    - name: Set venv as in project
+      run: | 
+        poetry config virtualenvs.in-project true
+
     - name: install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: | 
