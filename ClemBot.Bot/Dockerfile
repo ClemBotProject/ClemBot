@@ -19,7 +19,7 @@ RUN python -m pip install poetry
 # Install dependencies with Poetry
 ADD pyproject.toml .
 ADD poetry.lock .
-RUN python -m poetry config virtualenvs.create false && python -m poetry install --no-dev
+RUN python -m poetry install --no-dev
 
 WORKDIR /ClemBot.Bot
 ADD . /ClemBot.Bot
