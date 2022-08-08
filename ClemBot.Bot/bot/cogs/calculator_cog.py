@@ -16,6 +16,7 @@ log = get_logger(__name__)
 
 
 class CalculatorCog(commands.Cog):
+
     def __init__(self, bot: ClemBot):
         self.bot = bot
         self.operators = [
