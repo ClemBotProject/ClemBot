@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+import typing as t
 
 import discord
 import discord.ext.commands as commands
@@ -19,10 +20,10 @@ HELP_EMBED_SIZE = 15
 class HelpCog(commands.Cog):
     def __init__(self, bot: ClemBot):
         self.bot = bot
-        self.commands = []
+        self.commands: list[ext.ClemBotCommand] = []
 
     @ext.command()
-    async def help(self, ctx: ext.ClemBotCtx, *, command_name=None):
+    async def help(self, ctx: ext.ClemBotCtx, *, command_name: str | None = None) -> None:
         if command_name:
             command = self.find_command(self.bot, command_name.lower())
             if isinstance(command, ext.ClemBotCommand):
@@ -36,9 +37,10 @@ class HelpCog(commands.Cog):
         else:
             await self.send_default_help(ctx)
 
-    async def send_group_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotGroup):
-        if command.hidden and not await self.bot.is_owner(ctx.author):
-            return await self.send_default_help(ctx, f"Command: {command.name} not found.")
+    async def send_group_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotGroup) -> None:
+        if command.hidden and not await self.bot.is_owner(t.cast(discord.abc.User, ctx.author)):
+            await self.send_default_help(ctx, f"Command: {command.name} not found.")
+            return
 
         prefix = await self.bot.current_prefix(ctx)
 
@@ -66,7 +68,7 @@ class HelpCog(commands.Cog):
             self.get_commands_repr(
                 command.commands,
                 f"{prefix}{command.qualified_name} ",
-                await self.bot.is_owner(ctx.author),
+                await self.bot.is_owner(t.cast(discord.abc.User, ctx.author)),
             )
         )
         embed.add_field(name="Subcommands", value=com_repr or "No example provided", inline=False)
@@ -84,9 +86,10 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    async def send_command_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotCommand):
-        if command.hidden and not await self.bot.is_owner(ctx.author):
-            return await self.send_default_help(ctx, f"Command {command.name} not found.")
+    async def send_command_help(self, ctx: ext.ClemBotCtx, command: ext.ClemBotCommand) -> None:
+        if command.hidden and not await self.bot.is_owner(t.cast(discord.abc.User, ctx.author)):
+            await self.send_default_help(ctx, f"Command {command.name} not found.")
+            return
 
         prefix = await self.bot.current_prefix(ctx)
 
@@ -120,7 +123,7 @@ class HelpCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    def find_command(self, parent: commands.Command, command_name: str):
+    def find_command(self, parent: commands.Command[t.Any, t.Any, t.Any] | commands.Bot, command_name: str) -> ext.ClemBotCommand | None:
         """
         Recursively searches the command tree to find a given command, if none found then returns None
         """
@@ -132,7 +135,7 @@ class HelpCog(commands.Cog):
             return found
 
         if command_name in (parent.qualified_name, *parent.aliases):
-            return parent
+            return t.cast(ext.ClemBotCommand, parent)
 
         if isinstance(parent, ext.ClemBotGroup):
             for c in parent.commands:
@@ -140,13 +143,13 @@ class HelpCog(commands.Cog):
                     return result
         return None
 
-    async def send_default_help(self, ctx: ext.ClemBotCtx, title=None):
+    async def send_default_help(self, ctx: ext.ClemBotCtx, title: str | None = None) -> None:
 
         prefix = await self.bot.current_prefix(ctx)
 
         cog_embeds = []
         commands_str = self.get_commands_repr(
-            self.bot.commands, prefix, await self.bot.is_owner(ctx.author)
+            self.bot.commands, prefix, await self.bot.is_owner(t.cast(discord.abc.User, ctx.author))
         )
 
         for command in chunk_sequence(commands_str, HELP_EMBED_SIZE):
@@ -178,13 +181,13 @@ class HelpCog(commands.Cog):
             timeout=360,
         )
 
-    def get_commands_repr(self, commands, prefix, is_owner: bool = False):
+    def get_commands_repr(self, commands: t.Any, prefix: str, is_owner: bool = False) -> list[str]:
         commands_repr = []
         for command in commands:
             # check to see if a command has been hidden from the public help command
             if command.hidden and not is_owner:
                 continue
-            if not isinstance(command, ext.ExtBase):
+            if not isinstance(command, (ext.ClemBotCommand, ext.ClemBotGroup)):
                 log.warning(
                     f"Help command invoked but none Clembot ext command found name: {command.name}, skipping command help"
                 )
@@ -196,7 +199,7 @@ class HelpCog(commands.Cog):
         commands_repr.sort()
         return commands_repr
 
-    def get_example(self, ex, prefix, qualified_name: str = None):
+    def get_example(self, ex: Iterable[str] | str, prefix: str) -> str | None:
         if isinstance(ex, str):
             return f"`{prefix}{ex}`"
         elif isinstance(ex, Iterable):

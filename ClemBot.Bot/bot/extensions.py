@@ -165,11 +165,11 @@ class ExtBase:
         self.chainable_input = kwargs.get("chainable_input", False) or getattr(
             func, "chainable_input", False
         )
-        self.long_help = kwargs.get("long_help") or getattr(func, "long_help", None)
-        self.short_help = kwargs.get("short_help") or getattr(func, "short_help", None)
-        self.example = kwargs.get("example") or getattr(func, "example", None)
+        self.long_help: str = t.cast(str, kwargs.get("long_help") or getattr(func, "long_help", None))
+        self.short_help: str = t.cast(str, kwargs.get("short_help") or getattr(func, "short_help", None))
+        self.example: str | t.Iterable[str] = t.cast(str, kwargs.get("example") or getattr(func, "example", None))
         self.claims: set[str] = kwargs.get("claims") or getattr(func, "claims", None) or set()
-        self.ignore_claims_pre_invoke = getattr(func, "ignore_claims_pre_invoke", False)
+        self.ignore_claims_pre_invoke: bool = getattr(func, "ignore_claims_pre_invoke", False)
 
     def claims_check(self, claims: list[str | Claims]) -> bool:
         """

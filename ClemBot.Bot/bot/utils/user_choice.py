@@ -34,12 +34,13 @@ class UserChoice:
             )
 
         try:
+            assert embed
             return bool(await self._send(embed, {1: "✅", 0: "❌"}))
         except asyncio.TimeoutError:
             return False
 
     async def _send(
-        self, embed: discord.Embed, choices: dict[(int | str), (discord.Emoji | str)]
+        self, embed: discord.Embed, choices: dict[(int | str), (discord.Emoji | discord.PartialEmoji | str)]
     ) -> int | str:
 
         msg = await self.ctx.send(embed=embed)
@@ -60,15 +61,15 @@ class UserChoice:
 
         try:
             reaction: discord.Reaction
-            reaction, _ = await self.ctx.cog.bot.wait_for(
+            reaction, _ = await self.ctx.bot.wait_for(
                 "reaction_add", timeout=self.timeout, check=check
             )
             return ret_dict[reaction.emoji]
         except asyncio.TimeoutError:
             embed.add_field(
                 name="Request Timeout:",
-                value="User failed to respond in the alloted time",
-                inline="false",
+                value="User failed to respond in the allotted time",
+                inline=False,
             )
             await msg.edit(embed=embed)
             raise
