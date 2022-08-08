@@ -12,7 +12,8 @@ from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
 
 
-async def main() -> None:
+async def main() \
+        -> None:
     bot_log = logging.getLogger()
 
     # check if this is a prod or a dev instance

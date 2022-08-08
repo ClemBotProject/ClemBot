@@ -58,11 +58,11 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Static type linting failed  on commit `{{ github.sha }} \n\n Please see CI error output for details and fix the PRs typing'
+            body: `Static type linting failed  on commit \`${github.sha}\` \n\n Please see CI error output for details and fix the PRs typing'
           })
 
     - name: Check if Black would make any changes
@@ -81,11 +81,11 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Black linting failed  on commit `{{ github.sha }} \n\n Please run ```poetry run black bot``` from the `ClemBot.Bot` folder'
+            body: 'Black linting failed  on commit \`${github.sha}\` \n\n Please run ```poetry run black bot``` from the `ClemBot.Bot` folder'
           })
 
     - uses: actions/github-script@v3
@@ -94,11 +94,11 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Isort linting failed on commit `{{ github.sha }} \n\n Please run ```poetry run isort .``` from the `ClemBot.Bot` folder'
+            body: 'Isort linting failed on commit \`${github.sha}\` \n\n Please run ```poetry run isort .``` from the `ClemBot.Bot` folder'
           })
 
     - name: Fail PR if linting failed
