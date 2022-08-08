@@ -31,9 +31,9 @@ from bot.utils.scheduler import Scheduler
 log = get_logger(__name__)
 
 if t.TYPE_CHECKING:
+    from bot.services.fuzzy_matching_service import FuzzyMatchingService
     import bot.services.base_service as base_service
     import bot.api.base_route as base_route
-    from bot.services.fuzzy_matching_service import FuzzyMatchingService
 
 BotT = t.TypeVar('BotT', bound=commands.Bot | commands.AutoShardedBot)
 
@@ -396,7 +396,7 @@ class ClemBot(commands.Bot):
         prefix = ctx.clean_prefix or await self.current_prefix(ctx)
         cmd_name = ctx.message.content.removeprefix(prefix).strip().split()[0]
 
-        matcher = t.cast(FuzzyMatchingService, self.active_services.get("FuzzyMatchingService"))
+        matcher = t.cast("FuzzyMatchingService", self.active_services.get("FuzzyMatchingService"))
         if not matcher:
             return None
 
