@@ -2,7 +2,7 @@ import asyncio
 import json
 import random
 import time
-import typing
+import typing as t
 from datetime import datetime
 
 import aiohttp
@@ -127,7 +127,7 @@ class RandomCog(commands.Cog):
     @ext.short_help('Create giveaways!')
     @ext.example(('raffle 1h this is fun', 'raffle 1d a whole day raffle!'))
     async def raffle(self, ctx: ext.ClemBotCtx, time: FutureDuration, *, reason: str) -> None:
-        wait = (time - datetime.utcnow()).total_seconds()
+        wait = (t.cast(datetime, time) - datetime.utcnow()).total_seconds()
 
         description = f"Raffle for {reason}\nReact with :tickets: to enter the raffle"
         embed = discord.Embed(title="RAFFLE", color=Colors.ClemsonOrange, description=description)
@@ -165,7 +165,7 @@ class RandomCog(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with await session.get(url="https://c.xkcd.com/random/comic/") as resp:
                 if resp.status == 200:
-                    msg = await ctx.send(resp.url)
+                    msg = await ctx.send(str(resp.url))
                     await self.bot.messenger.publish(
                         Events.on_set_deletable, msg=msg, author=ctx.author, timeout=60
                     )

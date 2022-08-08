@@ -25,7 +25,7 @@ class DefineCog(commands.Cog):
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
-    def get_pate_data(self, json_data) -> list[str]:
+    def get_pate_data(self, json_data: t.Any) -> list[str]:
         pages = []
 
         # If the word is not found and there are no suggestions.

@@ -115,14 +115,14 @@ class StarboardService(BaseService):
         )
 
     @BaseService.listener(Events.on_designated_message_sent)
-    async def get_starboard_post(self, dc_id: uuid.UUID, messages) -> None:
+    async def get_starboard_post(self, dc_id: uuid.UUID, messages: list[discord.Message]) -> None:
         if dc_id in self.call_back_ids:
             star_message_id = self.call_back_ids[dc_id]
 
             self.curr_posts[star_message_id].star_posts = messages
             del self.call_back_ids[dc_id]
 
-    async def updateStarboardEntry(self, user: discord.User, reaction: discord.Reaction) -> None:
+    async def update_starboard_entry(self, user: discord.User, reaction: discord.Reaction) -> None:
         msg = reaction.message
         curr_post = self.curr_posts[msg.id]
 
@@ -146,7 +146,7 @@ class StarboardService(BaseService):
             if reaction.message.id not in self.curr_posts:
                 await self.add_to_starboard(user, reaction)
             else:
-                await self.updateStarboardEntry(user, reaction)
+                await self.update_starboard_entry(user, reaction)
 
     async def load_service(self) -> None:
         pass

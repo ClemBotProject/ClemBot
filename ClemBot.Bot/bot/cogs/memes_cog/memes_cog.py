@@ -80,14 +80,14 @@ class MemesCog(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.command()
+    @ext.command()
     @ext.long_help(
         "A fun command to generate a wheres waldo effect in discord, see if you can find him first!"
         "Optionally takes a size parameter to make it easier or harder"
     )
     @ext.short_help("Can you find him?")
     @ext.example(("waldo", "waldo 10"))
-    async def waldo(self, ctx: ext.ClemBotCtx, size: int = MAX_WALDO_GRID_SIZE):
+    async def waldo(self, ctx: ext.ClemBotCtx, size: int = MAX_WALDO_GRID_SIZE) -> None:
         """
         Play Where's Waldo!
 
@@ -176,7 +176,7 @@ class MemesCog(commands.Cog):
     @ext.short_help("Generates a crab rave gif")
     @ext.chainable_input()
     @ext.example("crab hello from crab world")
-    async def crab(self, ctx: ext.ClemBotCtx, *, args: str = "Bottom text\n is dead"):
+    async def crab(self, ctx: ext.ClemBotCtx, *, args: str = "Bottom text\n is dead") -> None:
         """
         Create your own crab rave.
         Usage: <prefix>crab [text=Bottom text\\n is dead]
@@ -217,7 +217,7 @@ class MemesCog(commands.Cog):
         os.remove(f"bot/cogs/memes_cog/assets/out_{timestamp}.gif")
 
     @ext.command(hidden=True, aliases=["ctray", "trayforjay"])
-    async def cookouttray(self, ctx: ext.ClemBotCtx, input: str):
+    async def cookouttray(self, ctx: ext.ClemBotCtx, input: str) -> None:
         """
         For those who do finances with cookout trays, we proudly present the command for you
             Simply type one of the following:

@@ -170,12 +170,12 @@ class SlotsCog(commands.Cog):
             scores_str = "No scores found"
 
         for i, score in enumerate(scores):
-            user = self.bot.get_user(score["userId"])
+            user = self.bot.get_user(score.user_id)
 
             if not user:
                 continue
 
-            scores_str += f'{i+1: >3}. {user.name}: {score["highScore"]}\n'
+            scores_str += f'{i+1: >3}. {user.name}: {score.high_score}\n'
 
         embed = discord.Embed(
             title="💩 ClemBot Slot Machine Loserboard 💩", colour=Colors.ClemsonOrange
