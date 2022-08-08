@@ -402,7 +402,8 @@ class ClemBot(commands.Bot):
             await self.global_error_handler(e, traceback=tb)
 
     async def publish_with_error(
-        self, event: str, *args: t.Any, **kwargs: dict[str, t.Any]) -> None:
+        self, event: str, *args: t.Any, **kwargs: dict[str, t.Any]
+    ) -> None:
         try:
             if not self.is_starting_up:
                 await self.messenger.publish(event, *args, **kwargs)
