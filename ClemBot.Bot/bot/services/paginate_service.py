@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 import discord
 from discord.ext.commands.errors import BadArgument
-from bot.clem_bot import ClemBot
 
+from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService

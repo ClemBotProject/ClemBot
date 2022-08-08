@@ -2,9 +2,9 @@ import typing as t
 
 import discord
 
+import bot.models.user_models as models
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-import bot.models.user_models as models
 from bot.models.reminder_models import Reminder
 
 

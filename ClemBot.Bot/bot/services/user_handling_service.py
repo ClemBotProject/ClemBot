@@ -2,9 +2,9 @@ import dataclasses
 from datetime import datetime
 
 import discord
-from bot.clem_bot import ClemBot
 
 import bot.utils.log_serializers as serializers
+from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService

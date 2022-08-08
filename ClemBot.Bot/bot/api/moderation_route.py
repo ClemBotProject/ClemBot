@@ -1,5 +1,5 @@
-from datetime import datetime
 import typing as t
+from datetime import datetime
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute

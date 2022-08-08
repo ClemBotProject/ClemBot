@@ -2,9 +2,9 @@ import discord
 import discord.ext.commands as commands
 
 import bot.extensions as ext
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.utils.logging_utils import get_logger
-from bot.clem_bot import ClemBot
 
 log = get_logger(__name__)
 

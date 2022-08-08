@@ -2,8 +2,8 @@
 # Date: 12/15/2020
 
 import re
-import unicodedata
 import typing as t
+import unicodedata
 
 import aiohttp
 import discord

@@ -1,8 +1,9 @@
+import discord
+
 from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
-import discord
 
 log = get_logger(__name__)
 

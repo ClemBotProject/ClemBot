@@ -7,9 +7,9 @@ from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
 from discord.ext.commands.errors import UserInputError
 
+import bot.extensions as ext
 from bot.consts import Claims
 from bot.errors import ConversionError
-import bot.extensions as ext
 
 """
 This converter code was copied from the python discord bot

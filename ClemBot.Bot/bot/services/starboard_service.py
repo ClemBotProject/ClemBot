@@ -4,8 +4,8 @@ import typing as t
 import uuid
 
 import discord
-from bot.clem_bot import ClemBot
 
+from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService

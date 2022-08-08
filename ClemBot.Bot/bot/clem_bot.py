@@ -18,23 +18,23 @@ import bot.extensions as ext
 import bot.services as services
 import bot.utils.log_serializers as serializers
 from bot.api import (
-    guild_route,
-    user_route,
-    role_route,
     channel_route,
-    message_route,
-    tag_route,
-    designated_channel_route,
-    welcome_message_route,
-    custom_tag_prefix_route,
-    custom_prefix_route,
-    moderation_route,
     claim_route,
     commands_route,
-    thread_route,
-    slots_score_route,
+    custom_prefix_route,
+    custom_tag_prefix_route,
+    designated_channel_route,
+    guild_route,
     health_check_route,
+    message_route,
+    moderation_route,
     reminder_route,
+    role_route,
+    slots_score_route,
+    tag_route,
+    thread_route,
+    user_route,
+    welcome_message_route,
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
@@ -47,9 +47,9 @@ from bot.utils.scheduler import Scheduler
 log = get_logger(__name__)
 
 if t.TYPE_CHECKING:
-    from bot.services.fuzzy_matching_service import FuzzyMatchingService
-    import bot.services.base_service as base_service
     import bot.api.base_route as base_route
+    import bot.services.base_service as base_service
+    from bot.services.fuzzy_matching_service import FuzzyMatchingService
 
 BotT = t.TypeVar("BotT", bound=commands.Bot | commands.AutoShardedBot)
 

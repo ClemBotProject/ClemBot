@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands
 
 import bot.extensions as ext
-
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 

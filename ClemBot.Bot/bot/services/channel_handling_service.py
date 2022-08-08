@@ -1,7 +1,7 @@
 import discord
-from bot.clem_bot import ClemBot
 
 import bot.utils.log_serializers as serializers
+from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger

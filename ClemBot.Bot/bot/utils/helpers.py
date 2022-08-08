@@ -1,5 +1,6 @@
-from typing import Generator, Sequence, TypeVar
 from datetime import datetime
+from typing import Generator, Sequence, TypeVar
+
 import arrow
 from dateutil.relativedelta import relativedelta
 

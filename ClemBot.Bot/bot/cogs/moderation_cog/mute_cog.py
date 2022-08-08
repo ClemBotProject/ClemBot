@@ -8,9 +8,9 @@ from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors, DesignatedChannels, Moderation
 from bot.messaging.events import Events
 from bot.utils.converters import FutureDuration
+from bot.utils.helpers import format_duration
 from bot.utils.logging_utils import get_logger
 from bot.utils.user_choice import UserChoice
-from bot.utils.helpers import format_duration
 
 log = get_logger(__name__)
 

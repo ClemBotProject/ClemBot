@@ -1,11 +1,11 @@
 from discord.ext import commands
-from bot.clem_bot import ClemBot
 
+import bot.extensions as ext
 import bot.utils.log_serializers as serializers
+from bot.clem_bot import ClemBot
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
-import bot.extensions as ext
 
 log = get_logger(__name__)
 

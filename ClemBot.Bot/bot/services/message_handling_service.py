@@ -2,16 +2,16 @@ import datetime
 import json
 import re
 from typing import Iterable
-from bot.clem_bot import ClemBot
 
 import discord
 
 import bot.utils.log_serializers as serializers
+from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
+from bot.models.message_models import SingleBatchMessage, SingleBatchMessageEdit
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
-from bot.models.message_models import SingleBatchMessage, SingleBatchMessageEdit
 
 log = get_logger(__name__)
 

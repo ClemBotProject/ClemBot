@@ -1,5 +1,6 @@
-from bot.models.clem_bot_model import ClemBotModel
 from datetime import datetime
+
+from bot.models.clem_bot_model import ClemBotModel
 
 
 class SingleBatchMessage(ClemBotModel):

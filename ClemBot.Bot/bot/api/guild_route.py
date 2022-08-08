@@ -1,6 +1,7 @@
+import typing as t
+
 import discord
 import pandas as pd
-import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute

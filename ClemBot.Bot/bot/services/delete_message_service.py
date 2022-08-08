@@ -2,8 +2,8 @@ import asyncio
 import typing as t
 
 import discord
-from bot.clem_bot import ClemBot
 
+from bot.clem_bot import ClemBot
 from bot.consts import Claims
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService

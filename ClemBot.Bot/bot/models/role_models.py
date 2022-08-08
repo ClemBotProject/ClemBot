@@ -1,4 +1,5 @@
 from typing import Optional
+
 from bot.models.clem_bot_model import ClemBotModel
 
 

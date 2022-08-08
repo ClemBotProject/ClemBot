@@ -2,6 +2,7 @@
 # This file is just for dev debugging stuff and doesn't need to be fully typed
 
 from __future__ import annotations
+
 import typing as t
 from pathlib import Path
 
