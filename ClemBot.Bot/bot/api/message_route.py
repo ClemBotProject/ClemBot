@@ -75,8 +75,13 @@ class MessageRoute(BaseRoute):
 
         await self._client.patch("bot/messages", data=json, **kwargs)
 
-    async def get_message(self, message_id: int) -> Message:
-        return Message(**await self._client.get(f"bot/messages/{message_id}"))
+    async def get_message(self, message_id: int) -> Message | None:
+        resp = await self._client.get(f"bot/messages/{message_id}")
+
+        if not resp:
+            return None
+
+        return Message(**resp)
 
     async def range_count_messages(self, user_id: int, guild_id: int, days: int) -> int:
         json = {"UserId": user_id, "GuildId": guild_id, "Days": days}
