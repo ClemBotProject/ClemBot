@@ -106,7 +106,7 @@ jobs:
       uses: actions/github-script@v3
       with:
         script: |
-            core.setFailed('Linting failed, please see comment for details')
+            core.setFailed('Linting failed, please see PR comment for details')
 
     - name: Lint with pylint
       run: |
