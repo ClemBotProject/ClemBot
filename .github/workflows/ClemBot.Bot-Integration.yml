@@ -29,11 +29,23 @@ jobs:
       with:
         python-version: "3.10"
         
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install
+    - name: install poetry
+      uses: snok/install-poetry@v1.0.0
+      with:
+        version: 1.1.14
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install
 
     - name: Validate static typing
       id: static-typing-ci
@@ -89,7 +101,7 @@ jobs:
             body: 'Isort linting failed \n\n Please run ```poetry run isort .``` from the `ClemBot.Bot` folder'
           })
 
-    - name: Check coverage tolerance
+    - name: Fail PR if linting failed
       if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success') && github.event_name == 'pull_request'
       uses: actions/github-script@v3
       with:
