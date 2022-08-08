@@ -311,7 +311,7 @@ class TriviaCog(commands.Cog):
 
         pages_length = len(pages)
         footer = ""
-        if not pages[0].footer.text == discord.Embed.Empty:
+        if not pages[0].footer.text is None:
             footer = pages[0].footer.text
 
         message = Message(pages, 0, author.id if author else None, footer=footer)
