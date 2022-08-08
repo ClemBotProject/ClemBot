@@ -1,8 +1,9 @@
 [tool.poetry]
 name = "clembot.bot"
-version = "0.0.0"
+version = "3.0.0"
 description = "A Discord bot for server management with an emphasis on modularity and configuration. We are a community focused on learning and acceptance and anyone is welcome. If you have an idea or a feature you would like to contribute feel free to open an issue and we as a community can begin discussion."
-authors = []
+authors = ["Jay Madden <jaymaddencox@gmail.com>"]
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
