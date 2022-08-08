@@ -24,5 +24,7 @@ RUN python -m poetry install --no-dev
 WORKDIR /ClemBot.Bot
 ADD . /ClemBot.Bot
 
+RUN python -m poetry shell
+
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "-m", "poetry", "run", "python3", "-m", "bot"]
+CMD ["python", "-m", "bot"]
