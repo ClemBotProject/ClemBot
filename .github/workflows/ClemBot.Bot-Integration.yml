@@ -15,6 +15,7 @@ on:
   workflow_dispatch:
   
 permissions:
+  id-token: read
   pull-requests: write
   
 jobs:
