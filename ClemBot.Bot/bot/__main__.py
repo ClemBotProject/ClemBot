@@ -49,7 +49,7 @@ async def main() -> None:
     # enable privileged member gateway intents
     intents = discord.Intents.default()  # pylint: disable=assigning-non-slot
     intents.members = True  # pylint: disable=assigning-non-slot
-    intents.message_content = True
+    intents.message_content = True  # pylint: disable=assigning-non-slot
 
     # Create the scheduler for injection into the bot instance
     scheduler = Scheduler()
