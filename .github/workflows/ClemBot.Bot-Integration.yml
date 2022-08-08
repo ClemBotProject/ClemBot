@@ -89,6 +89,13 @@ jobs:
             body: 'Isort linting failed \n\n Please run ```poetry run isort .``` from the `ClemBot.Bot` folder'
           })
 
+    - name: Check coverage tolerance
+      if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success') && github.event_name == 'pull_request'
+      uses: actions/github-script@v3
+      with:
+        script: |
+            core.setFailed('Linting failed, please see comment for details')
+
     - name: Lint with pylint
       run: |
         poetry run python -m pylint bot -E -r y
