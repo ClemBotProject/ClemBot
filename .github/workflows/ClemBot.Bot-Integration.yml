@@ -36,7 +36,7 @@ jobs:
         poetry install
 
     - name: Check if Black would make any changes
-      run: poetry run black bot --check .
+      run: poetry run black bot --check 
 
     - name: Check if isort would make any changes
       run: poetry run isort --check-only .
