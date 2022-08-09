@@ -10,7 +10,7 @@ on:
       - "ClemBot.Bot/**"
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
-    branches: [ master ]
+    branches: 'master'
     paths: 
       - "ClemBot.Bot/**"
   workflow_dispatch:
