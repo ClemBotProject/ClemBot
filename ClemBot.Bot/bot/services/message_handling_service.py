@@ -341,7 +341,7 @@ class MessageHandlingService(BaseService):
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(int(matches["channel_id"]))
 
-        assert isinstance(link_channel, discord.TextChannel)
+        assert isinstance(link_channel, discord.TextChannel) or isinstance(link_channel, discord.Thread)
 
         try:
             link_message = await link_channel.fetch_message(int(matches["message_id"]))
@@ -368,8 +368,6 @@ class MessageHandlingService(BaseService):
                 Events.on_set_deletable, msg=msg, author=message.author, timeout=60
             )
             return
-
-        assert isinstance(link_channel, discord.abc.GuildChannel)
 
         embed = discord.Embed(
             title=f"Message linked from #{link_channel}", color=Colors.ClemsonOrange
@@ -405,9 +403,11 @@ class MessageHandlingService(BaseService):
         elif raw_text and not has_reply:
             reply_to = message
 
-        assert reply_to is not None
+        if reply_to is None:
+            msg = await source_channel.send(embed=embed)
+        else:
+            msg = await source_channel.send(embed=embed, reference=reply_to)
 
-        msg = await source_channel.send(embed=embed, reference=reply_to)
         if not raw_text:
             await message.delete()
         await self.bot.messenger.publish(
