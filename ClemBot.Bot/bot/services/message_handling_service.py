@@ -341,7 +341,9 @@ class MessageHandlingService(BaseService):
         source_channel = message.channel
         link_channel = await self.bot.fetch_channel(int(matches["channel_id"]))
 
-        assert isinstance(link_channel, discord.TextChannel) or isinstance(link_channel, discord.Thread)
+        assert isinstance(link_channel, discord.TextChannel) or isinstance(
+            link_channel, discord.Thread
+        )
 
         try:
             link_message = await link_channel.fetch_message(int(matches["message_id"]))
