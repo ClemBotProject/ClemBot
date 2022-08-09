@@ -68,9 +68,7 @@ class StarboardService(BaseService):
 
         title = f'{RANKINGS.get(math.floor((stars - MIN_REACTIONS) / MIN_REACTIONS), 5)} | {stars} Star{"s" if stars > 1 else ""}'
 
-        assert isinstance(message.channel, discord.TextChannel) or isinstance(
-            message.channel, discord.Thread
-        )
+        assert isinstance(message.channel, (discord.TextChannel, discord.Thread))
 
         embed = discord.Embed(
             title=title,
