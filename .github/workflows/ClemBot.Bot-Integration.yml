@@ -9,6 +9,7 @@ on:
     paths: 
       - "ClemBot.Bot/**"
   pull_request_target:
+    types: [opened, synchronize, reopened, edited]
     branches: [ master ]
     paths: 
       - "ClemBot.Bot/**"
