@@ -11,21 +11,6 @@ on:
       - "ClemBot.Bot/**"
   workflow_dispatch:
 
-permissions:
-  actions: read
-  checks: read
-  contents: read
-  deployments: none
-  id-token: none
-  issues: none
-  discussions: none
-  packages: none
-  pages: none
-  pull-requests: write
-  repository-projects: none
-  security-events: none
-  statuses: none
- 
 jobs:
   build: 
     runs-on: ubuntu-latest
