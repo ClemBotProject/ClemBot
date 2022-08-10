@@ -1,0 +1,14 @@
+on:
+  workflow_run:
+    workflows: [ ClemBot.Bot-integration ]
+    types: [ completed ]
+  workflow_dispatch:
+
+jobs:
+  on-lint-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: |
+          echo "First workflow was a failure"
+          exit 1

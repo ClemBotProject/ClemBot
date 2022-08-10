@@ -1,4 +1,4 @@
-name: ClemBot.Api Prod Deployment
+name: ClemBot.Api-deployment
 
 on:
   push:
