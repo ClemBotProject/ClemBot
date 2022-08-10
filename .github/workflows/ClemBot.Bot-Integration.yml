@@ -5,9 +5,8 @@ on:
     branches: [ master ]
     paths: 
       - "ClemBot.Bot/**"
-  pull_request_target:
-    types: [opened, synchronize, reopened, edited]
-    branches: 'master'
+  pull_request:
+    branches: [ master ]
     paths: 
       - "ClemBot.Bot/**"
   workflow_dispatch:
