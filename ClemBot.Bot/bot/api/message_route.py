@@ -81,7 +81,6 @@ class MessageRoute(BaseRoute):
         if not resp:
             return None
 
-
         return Message(**resp)
 
     async def range_count_messages(self, user_id: int, guild_id: int, days: int) -> int:
