@@ -11,4 +11,12 @@ jobs:
     steps:
       - run: |
           echo "First workflow was a failure"
-          exit 1
+      
+      - name: Download lint errors
+        uses: actions/download-artifact@v3
+        with:
+          name: lint-errors.txt
+
+      - shell: bash
+        run: |
+          cat lint-errors.txt
