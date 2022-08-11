@@ -40,7 +40,7 @@ jobs:
             } catch (error) {
               console.log(error);
             }
-            request(headers.location)
+            github.request(headers.location)
               .pipe(fs.createWriteStream('lint-errors.zip'))
               .on('close', function () {
                 console.log('File written!');
