@@ -13,27 +13,27 @@ jobs:
         id: set-result
         with:
           script: |
-          const {
-            data: { artifacts },
-          } = await octokit.request("GET /repos/{owner}/{repo}/actions/artifacts", {
-            ClemBotProject,
-            ClemBot,
-          });
+            const {
+              data: { artifacts },
+            } = await octokit.request("GET /repos/{owner}/{repo}/actions/artifacts", {
+              ClemBotProject,
+              ClemBot,
+            });
 
-          try {
-            let { headers } = await octokit.request(
-              "HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
-              {
-                ClemBotProject,
-                ClemBot,
-                artifact_id: artifacts[0].id,
-                archive_format: "zip",
-              }
-            );
-            console.log(headers.location);
-          } catch (error) {
-            console.log(error);
-          }
+            try {
+              let { headers } = await octokit.request(
+                "HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
+                {
+                  ClemBotProject,
+                  ClemBot,
+                  artifact_id: artifacts[0].id,
+                  archive_format: "zip",
+                }
+              );
+              console.log(headers.location);
+            } catch (error) {
+              console.log(error);
+            }
       - shell: bash
         run: |
           echo ${{ github.event.workflow_run.artifacts_url}}
