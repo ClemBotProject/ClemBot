@@ -41,6 +41,7 @@ class CalculatorCog(commands.Cog):
             $calc (-10-4)/5
         """
 
+        i: int = ''
         expression = " ".join(args)
         # issue parsing ,'s. Better to remove them
         expression = expression.replace(",", "")
