@@ -39,6 +39,7 @@ class CalculatorCog(commands.Cog):
             $calc 3(5+4)
             $calc -4*-3^5
             $calc (-10-4)/5
+
         """
 
         i: int = ''
