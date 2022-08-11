@@ -16,6 +16,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           name: lint-errors
+          workflow: ClemBot.Bot-Integration.yml
           search_artifacts: true
 
 
