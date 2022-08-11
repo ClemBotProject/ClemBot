@@ -43,7 +43,9 @@ jobs:
 
     - name: install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install 
+      #run: poetry install 
+      run: exit 1
+      continue-on-error: true
 
     - name: Validate static typing
       id: static-typing-ci
@@ -54,7 +56,9 @@ jobs:
       shell: bash
       if: steps.static-typing-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|Static type linting failed \n\n Please see CI error output for details and fix the PRs typing;" >> lint-errors.txt
+        mkdir lint_errors
+        echo "${{github.event.number}}|Static type linting failed \n\n Please see CI error output for details and fix the PRs typing;" >> lint_errors/mypy-error.txt
+        pwd
 
     - name: Check if Black would make any changes
       id: black-ci
@@ -70,20 +74,22 @@ jobs:
       shell: bash
       if: steps.black-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|Black linting failed \n\n Please run ```poetry run black bot``` from the `ClemBot.Bot` folder;" >> lint-errors.txt
+        echo "${{github.event.number}}|Black linting failed \n\n Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder;" >> lint_errors/black-error.txt
+      continue-on-error: true
 
     - name: Isort lint failure comment
       shell: bash
       if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|Isort linting failed \n\n Please run ```poetry run isort .``` from the `ClemBot.Bot` folder;" >> lint-errors.txt
+        echo "${{github.event.number}}|Isort linting failed \n\n Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder;" >> lint_errors/isort-error.txt
+      continue-on-error: true
 
     - name: Upload lint errors 
       uses: actions/upload-artifact@v3
       if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success' || steps.static-typing-ci.outcome != 'success') && github.event_name == 'pull_request'
       with:
         name: lint-errors
-        path: lint-errors.txt
+        path: ClemBot.Bot/lint_errors
 
     - name: Fail PR if linting failed
       uses: actions/github-script@v3

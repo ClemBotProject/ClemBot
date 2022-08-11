@@ -15,8 +15,9 @@ jobs:
       - name: Download lint errors
         uses: actions/download-artifact@v3
         with:
-          name: lint-errors.txt
+          name: lint-errors
 
       - shell: bash
         run: |
-          cat lint-errors.txt
+          ls
+          ls lint_errors
