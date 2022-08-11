@@ -14,6 +14,7 @@ jobs:
         with:
           name: lint-errors
           workflow: ClemBot.Bot-integration
+          github_token: ${{secrets.GITHUB_TOKEN}}
           #search_artifacts: true
 
       - shell: bash
