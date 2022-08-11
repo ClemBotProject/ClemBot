@@ -39,10 +39,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const path = require('path')
             const fs = require('fs');
             const all = fs.readdirSync('.');
+            
 
-            for (const f of all) {
+            for (const f of all.filter(x => path.extname(x) === '.txt')) {
               const data = fs.readFileSync(f, 'utf8');
               console.log(data);
               const vals = data.split('|');
