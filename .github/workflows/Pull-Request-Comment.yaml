@@ -31,7 +31,7 @@ jobs:
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/lint-errors.zip`, Buffer.from(download.data));
       - shell: bash
         run: |
-          apt-get install unzip
+          ls
           unzip lint-errors.zip
           echo ${{ github.event.workflow_run.artifacts_url}}
           ls
