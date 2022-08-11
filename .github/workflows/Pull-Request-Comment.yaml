@@ -31,6 +31,9 @@ jobs:
                   repo,
                   artifact_id: artifacts[0].id,
                   archive_format: "zip",
+                  request: {
+                    redirect: "manual",
+                  },
                 }
               );
               console.log(headers.location);
