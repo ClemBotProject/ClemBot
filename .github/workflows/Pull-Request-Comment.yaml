@@ -15,13 +15,13 @@ jobs:
           script: |
             const {
               data: { artifacts },
-            } = await octokit.request("GET /repos/{owner}/{repo}/actions/artifacts", {
+            } = await github.request("GET /repos/{owner}/{repo}/actions/artifacts", {
               ClemBotProject,
               ClemBot,
             });
 
             try {
-              let { headers } = await octokit.request(
+              let { headers } = await github.request(
                 "HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
                 {
                   ClemBotProject,
