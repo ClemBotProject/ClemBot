@@ -45,13 +45,13 @@ jobs:
             for (const f of all) {
               const data = fs.readFileSync(f, 'utf8');
               console.log(data);
-              data.split('|');
+              const vals = data.split('|');
 
               github.rest.issues.createComment({
-                issue_number: data[0],
+                issue_number: vals[0],
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: data[1]
+                body: vals[1]
               });
             }
 
