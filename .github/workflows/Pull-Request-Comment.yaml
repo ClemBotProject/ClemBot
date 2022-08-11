@@ -43,7 +43,7 @@ jobs:
             const all = fs.readdirSync('.');
 
             for (const f of all) {
-              const data = fs.readFileSync(f);
+              const data = fs.readFileSync(f, 'utf8');
               console.log(data);
               data.split('|');
 
