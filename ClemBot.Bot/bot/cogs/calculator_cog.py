@@ -41,7 +41,6 @@ class CalculatorCog(commands.Cog):
             $calc (-10-4)/5
         """
 
-
         i: int = ''
 
         expression = " ".join(args)
