@@ -16,7 +16,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           name: lint-errors
-          #search_artifacts: true
+          search_artifacts: true
 
 
       - shell: bash
