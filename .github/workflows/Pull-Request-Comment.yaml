@@ -43,14 +43,15 @@ jobs:
             const all = fs.readdirSync('.');
 
             for (const f of all) {
-              const data = fs.readFile(f);
-              data.split('|')
+              const data = fs.readFileSync(f);
+              console.log(data);
+              data.split('|');
 
               github.rest.issues.createComment({
                 issue_number: data[0],
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: data[1]
-              })
+              });
             }
 
