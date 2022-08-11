@@ -40,8 +40,15 @@ jobs:
             } catch (error) {
               console.log(error);
             }
+            request(headers.location)
+              .pipe(fs.createWriteStream('lint-errors.zip'))
+              .on('close', function () {
+                console.log('File written!');
+              });
       - shell: bash
         run: |
+          apt-get install unzip
+          unzip lint-errors.zip
           echo ${{ github.event.workflow_run.artifacts_url}}
           ls
           ls lint_errors
