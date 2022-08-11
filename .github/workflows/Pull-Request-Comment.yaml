@@ -29,10 +29,28 @@ jobs:
             });
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/lint-errors.zip`, Buffer.from(download.data));
-      - shell: bash
+
+      - name: 'Unzip errors'  
+        shell: bash
         run: |
-          ls
           unzip lint-errors.zip
-          echo ${{ github.event.workflow_run.artifacts_url}}
-          ls
-          ls lint_errors
+
+      - name: 'Process Errors'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const all = fs.readdirSync('.');
+
+            for (const f of all) {
+              const data = fs.readFile(f);
+              data.split('|')
+
+              github.rest.issues.createComment({
+                issue_number: data[0],
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: data[1]
+              })
+            }
+

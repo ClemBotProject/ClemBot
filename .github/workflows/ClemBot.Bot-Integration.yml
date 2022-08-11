@@ -57,7 +57,7 @@ jobs:
       if: steps.static-typing-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
         mkdir lint_errors
-        echo "${{github.event.number}}|Static type linting failed \n\n Please see CI error output for details and fix the PRs typing;" >> lint_errors/mypy-error.txt
+        echo "${{github.event.number}}|Static type linting failed \n\n Please see CI error output for details and fix the PRs typing" >> lint_errors/mypy-error.txt
         pwd
 
     - name: Check if Black would make any changes
@@ -74,14 +74,14 @@ jobs:
       shell: bash
       if: steps.black-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|Black linting failed \n\n Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder;" >> lint_errors/black-error.txt
+        echo "${{github.event.number}}|Black linting failed \n\n Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/black-error.txt
       continue-on-error: true
 
     - name: Isort lint failure comment
       shell: bash
       if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|Isort linting failed \n\n Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder;" >> lint_errors/isort-error.txt
+        echo "${{github.event.number}}|Isort linting failed \n\n Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/isort-error.txt
       continue-on-error: true
 
     - name: Upload lint errors 
