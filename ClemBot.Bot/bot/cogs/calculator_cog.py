@@ -43,6 +43,7 @@ class CalculatorCog(commands.Cog):
 
         i: int = ''
 
+
         expression = " ".join(args)
         # issue parsing ,'s. Better to remove them
         expression = expression.replace(",", "")
