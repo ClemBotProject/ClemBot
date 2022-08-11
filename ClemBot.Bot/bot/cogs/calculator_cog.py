@@ -40,6 +40,8 @@ class CalculatorCog(commands.Cog):
             $calc -4*-3^5
             $calc (-10-4)/5
         """
+        
+        i: int = '3'
 
         expression = " ".join(args)
         # issue parsing ,'s. Better to remove them
