@@ -14,10 +14,10 @@ jobs:
         with:
           script: |
             const {
-              data: { artifacts },
+              data: { artifacts }
             } = await github.request("GET /repos/{owner}/{repo}/actions/artifacts", {
               ClemBotProject,
-              ClemBot,
+              ClemBot
             });
 
             try {
@@ -27,7 +27,7 @@ jobs:
                   "ClemBotProject",
                   "ClemBot",
                   artifact_id: artifacts[0].id,
-                  archive_format: "zip",
+                  archive_format: "zip"
                 }
               );
               console.log(headers.location);
