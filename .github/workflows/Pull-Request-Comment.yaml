@@ -15,8 +15,8 @@ jobs:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
-          name: lint-error
-          search_artifacts: true
+          name: lint-errors
+          #search_artifacts: true
 
 
       - shell: bash
