@@ -43,9 +43,7 @@ jobs:
 
     - name: install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      #run: poetry install 
-      run: exit 1
-      continue-on-error: true
+      run: poetry install 
 
     - name: Validate static typing
       id: static-typing-ci
@@ -75,14 +73,12 @@ jobs:
       if: steps.black-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
         echo "${{github.event.number}}|**Black linting failed:** Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/black-error.txt
-      continue-on-error: true
 
     - name: Isort lint failure comment
       shell: bash
       if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
         echo "${{github.event.number}}|**isort linting failed:** Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/isort-error.txt
-      continue-on-error: true
 
     - name: Upload lint errors 
       uses: actions/upload-artifact@v3
