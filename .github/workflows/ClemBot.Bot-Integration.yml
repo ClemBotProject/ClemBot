@@ -56,7 +56,6 @@ jobs:
       run: |
         mkdir lint_errors
         echo "${{github.event.number}}|**Static type linting failed:** Please see CI error output for details and fix the PRs typing" >> lint_errors/mypy-error.txt
-        pwd
 
     - name: Check if Black would make any changes
       id: black-ci
