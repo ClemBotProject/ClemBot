@@ -1,7 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: ClemBot.Bot Master integration
+name: ClemBot.Bot-integration
 
 on:
   push:
@@ -13,7 +10,7 @@ on:
     paths: 
       - "ClemBot.Bot/**"
   workflow_dispatch:
-  
+
 jobs:
   build: 
     runs-on: ubuntu-latest
@@ -29,29 +26,36 @@ jobs:
       with:
         python-version: "3.10"
         
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install
+    - name: install poetry
+      uses: snok/install-poetry@v1.0.0
+      with:
+        version: 1.1.14
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        virtualenvs-path: .venv
+
+    - name: load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ClemBot.Bot/.venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/ClemBot.Bot-Integration.yml') }}
+
+    - name: install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install 
 
     - name: Validate static typing
       id: static-typing-ci
       continue-on-error: true
       run: poetry run mypy
 
-    - uses: actions/github-script@v3
-      name: Static typing lint failure comment
+    - name: Static typing lint failure comment
+      shell: bash
       if: steps.static-typing-ci.outcome != 'success' && github.event_name == 'pull_request'
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `Static type linting failed \n\n Please see CI error output for details and fix the PRs typing`
-          })
+      run: |
+        mkdir lint_errors
+        echo "${{github.event.number}}|**Static type linting failed:** Please see CI error output for details and fix the PRs typing" >> lint_errors/mypy-error.txt
 
     - name: Check if Black would make any changes
       id: black-ci
@@ -63,35 +67,28 @@ jobs:
       continue-on-error: true
       run: poetry run isort --check-only .
 
-    - uses: actions/github-script@v3
-      name: Black lint failure comment
+    - name: Black lint failure comment
+      shell: bash
       if: steps.black-ci.outcome != 'success' && github.event_name == 'pull_request'
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `Black linting failed \n\n Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder`
-          })
+      run: |
+        echo "${{github.event.number}}|**Black linting failed:** Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/black-error.txt
 
-    - uses: actions/github-script@v3
-      name: Isort lint failure comment
+    - name: Isort lint failure comment
+      shell: bash
       if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
+      run: |
+        echo "${{github.event.number}}|**isort linting failed:** Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/isort-error.txt
+
+    - name: Upload lint errors 
+      uses: actions/upload-artifact@v3
+      if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success' || steps.static-typing-ci.outcome != 'success') && github.event_name == 'pull_request'
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `Isort linting failed \n\n Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder`
-          })
+        name: lint-errors
+        path: ClemBot.Bot/lint_errors
 
     - name: Fail PR if linting failed
-      if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success') && github.event_name == 'pull_request'
       uses: actions/github-script@v3
+      if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success' || steps.static-typing-ci.outcome != 'success') && github.event_name == 'pull_request'
       with:
         script: |
             core.setFailed('Linting failed, please see PR comment for details')

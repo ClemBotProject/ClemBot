@@ -1,0 +1,59 @@
+on:
+  workflow_run:
+    workflows: [ ClemBot.Bot-integration ]
+    types: [ completed ]
+  workflow_dispatch:
+
+jobs:
+  on-lint-failure:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'pull_request'
+    steps:
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "lint-errors"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/lint-errors.zip`, Buffer.from(download.data));
+
+      - name: 'Unzip errors'  
+        shell: bash
+        run: |
+          unzip lint-errors.zip
+
+      - name: 'Process Errors'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const path = require('path')
+            const fs = require('fs');
+            const all = fs.readdirSync('.');
+            
+
+            for (const f of all.filter(x => path.extname(x) === '.txt')) {
+              const data = fs.readFileSync(f, 'utf8');
+              console.log(data);
+              const vals = data.split('|');
+
+              github.rest.issues.createComment({
+                issue_number: vals[0],
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: vals[1]
+              });
+            }
+

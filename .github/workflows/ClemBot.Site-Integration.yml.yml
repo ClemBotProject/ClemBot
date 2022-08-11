@@ -1,4 +1,4 @@
-name: ClemBot.Site Master integration
+name: ClemBot.Site-integraion
 
 on:
   push:
