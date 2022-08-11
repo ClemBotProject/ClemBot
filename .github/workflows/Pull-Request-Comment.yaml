@@ -24,8 +24,8 @@ jobs:
               let { headers } = await github.request(
                 "HEAD /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
                 {
-                  ClemBotProject,
-                  ClemBot,
+                  "ClemBotProject",
+                  "ClemBot",
                   artifact_id: artifacts[0].id,
                   archive_format: "zip",
                 }
