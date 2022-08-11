@@ -9,16 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - run: |
-          echo "First workflow was a failure"
-      
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
           name: lint-errors
-          workflow: ClemBot.Bot-Integration.yml
-          search_artifacts: true
-
+          workflow: ClemBot.Bot-integration
+          #search_artifacts: true
 
       - shell: bash
         run: |
