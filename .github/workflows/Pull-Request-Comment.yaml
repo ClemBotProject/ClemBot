@@ -15,7 +15,9 @@ jobs:
           name: lint-errors
           workflow: ClemBot.Bot-integration
           github_token: ${{secrets.GITHUB_TOKEN}}
-          #search_artifacts: true
+          workflow_conclusion: failure
+          commit: ${{github.event.pull_request.head.sha}}
+
 
       - shell: bash
         run: |
