@@ -37,23 +37,23 @@ class ClaimsAuthorizationCog(commands.Cog):
     async def _send_role_claims(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
         claims = await self.bot.claim_route.get_claims_role(role.id)
 
-        embed = self._build_claims_embed(ctx, t.cast(list[str], claims), role)
+        embed = self._build_claims_embed(ctx, claims, role)
         await ctx.send(embed=embed)
 
     async def _send_user_claims(self, ctx: ext.ClemBotCtx, user: discord.Member) -> None:
         claims = await self.bot.claim_route.get_claims_user(user)
 
-        embed = self._build_claims_embed(ctx, t.cast(list[str], claims), user)
+        embed = self._build_claims_embed(ctx, claims, user)
         await ctx.send(embed=embed)
 
     def _build_claims_embed(
         self,
         ctx: ext.ClemBotCtx,
-        claims: list[str],
+        claims: list[Claims],
         subject: (discord.Role | discord.Member),
     ) -> discord.Embed:
 
-        claims_str = "\n".join(sorted(claims)) if claims else "No current claims"
+        claims_str = "\n".join(sorted([c.name for c in claims])) if claims else "No current claims"
 
         embed = discord.Embed(
             title="Current Valid Claims",
