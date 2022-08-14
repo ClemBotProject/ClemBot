@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Authorization;
 
 public class GetSiteUser
 {
-    public class Query : IRequest<IAuthorizeResult<Model>>
+    public class Query : IRequest<AuthorizeResult<Model>>
     {
     }
 
@@ -28,7 +28,7 @@ public class GetSiteUser
         public SiteUser User { get; set; } = null!;
     }
 
-    public class Handler : IRequestHandler<Query, IAuthorizeResult<Model>>
+    public class Handler : IRequestHandler<Query, AuthorizeResult<Model>>
     {
         private readonly ClemBotContext _context;
 
@@ -53,7 +53,7 @@ public class GetSiteUser
             _mediator = mediator;
         }
 
-        public async Task<IAuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationTokeln)
+        public async Task<AuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationTokeln)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.LogInformation("Site User Request Initialized from Url: {Origin}", origin);

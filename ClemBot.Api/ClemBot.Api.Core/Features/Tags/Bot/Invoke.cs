@@ -27,7 +27,7 @@ public class Invoke
         public string? Name { get; init; }
     }
 
-    public class Command : IRequest<IQueryResult<Model>>
+    public class Command : IRequest<QueryResult<Model>>
     {
         public string Name { get; set; } = null!;
 
@@ -38,9 +38,9 @@ public class Invoke
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = await _context.Tags
                 .FirstOrDefaultAsync(g => g.GuildId == request.GuildId && g.Name == request.Name);

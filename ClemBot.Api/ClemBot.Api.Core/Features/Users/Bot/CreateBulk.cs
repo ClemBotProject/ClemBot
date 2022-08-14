@@ -20,14 +20,14 @@ public class CreateBulk
         public string Name { get; set; } = null!;
     }
 
-    public class Command : IRequest<IQueryResult<IEnumerable<ulong>>>
+    public class Command : IRequest<QueryResult<IEnumerable<ulong>>>
     {
         public List<UserDto> Users { get; set; } = new();
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
     {
-        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             var dbUsers = await _context.Users.ToListAsync();
 

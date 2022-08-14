@@ -33,12 +33,12 @@ public class Details
         public ulong UserId { get; set; }
     }
 
-    public class Query : IRequest<IQueryResult<ReminderDto>>
+    public class Query : IRequest<QueryResult<ReminderDto>>
     {
         public int Id { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, IQueryResult<ReminderDto>>
+    public class Handler : IRequestHandler<Query, QueryResult<ReminderDto>>
     {
 
         private readonly ClemBotContext _context;
@@ -48,7 +48,7 @@ public class Details
             _context = context;
         }
 
-        public async Task<IQueryResult<ReminderDto>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ReminderDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             var reminder = await _context.Reminders
                 .Where(r => r.Id == request.Id)

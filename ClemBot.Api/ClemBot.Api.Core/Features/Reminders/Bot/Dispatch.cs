@@ -15,12 +15,12 @@ public class Dispatch
         }
     }
 
-    public class Query : IRequest<IQueryResult<int>>
+    public class Query : IRequest<QueryResult<int>>
     {
         public int Id { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, IQueryResult<int>>
+    public class Handler : IRequestHandler<Query, QueryResult<int>>
     {
 
         private readonly ClemBotContext _context;
@@ -30,7 +30,7 @@ public class Dispatch
             _context = context;
         }
 
-        public async Task<IQueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
         {
             var reminder = await _context.Reminders
                 .FirstOrDefaultAsync(r => r.Id == request.Id);

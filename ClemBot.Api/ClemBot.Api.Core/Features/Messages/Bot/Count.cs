@@ -15,7 +15,7 @@ namespace ClemBot.Api.Core.Features.Messages.Bot;
 
 public class Count
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong UserId { get; set;  }
         public ulong GuildId { get; set; }
@@ -27,9 +27,9 @@ public class Count
         public int MessageCount { get; set; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request,
+        public async Task<QueryResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var dayOffset = DateTime.Now.Subtract(new TimeSpan(days: request.Days, hours: 0, minutes: 0, seconds: 0));

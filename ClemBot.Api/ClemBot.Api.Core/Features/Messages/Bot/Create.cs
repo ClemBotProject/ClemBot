@@ -32,15 +32,15 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Command : IRequest<IQueryResult<IEnumerable<ulong>>>
+    public class Command : IRequest<QueryResult<IEnumerable<ulong>>>
     {
         public List<MessageDto> Messages { get; set; } = null!;
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
+        : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
     {
-        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             List<ulong> createdMessageIds = new();
 

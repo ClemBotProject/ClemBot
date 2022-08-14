@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class DesignatedChannels
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
+    public class Query : IRequest<QueryResult<IEnumerable<Model>>>
     {
         public ulong Id { get; set; }
     }
@@ -24,9 +24,9 @@ public class DesignatedChannels
     }
 
     public record Handler(ClemBotContext _context) :
-        IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
+        IRequestHandler<Query, QueryResult<IEnumerable<Model>>>
     {
-        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<IEnumerable<Model>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var designatedChannels = await _context.DesignatedChannelMappings
                 .Where(x => x.Channel.Guild.Id == request.Id)

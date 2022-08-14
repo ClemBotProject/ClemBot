@@ -22,16 +22,16 @@ public class UpdateRoles
         }
     }
 
-    public record Command : IRequest<IQueryResult<IEnumerable<ulong>>>
+    public record Command : IRequest<QueryResult<IEnumerable<ulong>>>
     {
         public ulong Id { get; set; }
 
         public List<ulong> Roles { get; set; } = new();
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<IEnumerable<ulong>>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
     {
-        public async Task<IQueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
             var roleMappings = await _context.RoleUser
                 .Select(ru => new { ru, ru.Role.GuildId })

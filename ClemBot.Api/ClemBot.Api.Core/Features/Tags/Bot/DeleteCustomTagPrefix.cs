@@ -21,16 +21,16 @@ public class DeleteCustomTagPrefix
         }
     }
 
-    public class Command : IRequest<IQueryResult<ulong>>
+    public class Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; set; }
 
         public string TagPrefix { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, IQueryResult<ulong>>
+    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
                 .Include(x => x.CustomTagPrefixes)

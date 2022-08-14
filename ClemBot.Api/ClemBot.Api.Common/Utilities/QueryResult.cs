@@ -1,6 +1,6 @@
 namespace ClemBot.Api.Common.Utilities;
 
-public class QueryResult<T> : IQueryResult<T>
+public class QueryResult<T> : IResult<T, QueryStatus>
 {
     public T? Value { get; }
     public QueryStatus Status { get; }
@@ -16,18 +16,18 @@ public class QueryResult<T> : IQueryResult<T>
         Status = status;
     }
 
-    public static IQueryResult<T> Success(T? val = default)
-        => new QueryResult<T>(val, QueryStatus.Success);
+    public static QueryResult<T> Success(T? val = default)
+        => new(val, QueryStatus.Success);
 
-    public static IQueryResult<T> Invalid(T? val = default)
-        => new QueryResult<T>(val, QueryStatus.Invalid);
+    public static QueryResult<T> Invalid(T? val = default)
+        => new(val, QueryStatus.Invalid);
 
-    public static IQueryResult<T> NotFound()
-        => new QueryResult<T>(default, QueryStatus.NotFound);
+    public static QueryResult<T> NotFound()
+        => new(default, QueryStatus.NotFound);
 
-    public static IQueryResult<T> Conflict()
-        => new QueryResult<T>(default, QueryStatus.Conflict);
+    public static QueryResult<T> Conflict()
+        => new(default, QueryStatus.Conflict);
 
-    public static IQueryResult<T> Forbidden()
-        => new QueryResult<T>(default, QueryStatus.Forbidden);
+    public static QueryResult<T> Forbidden()
+        => new(default, QueryStatus.Forbidden);
 }

@@ -9,7 +9,7 @@ namespace ClemBot.Api.Core.Features.Roles.Bot;
 
 public class Delete
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong Id { get; set; }
     }
@@ -21,9 +21,9 @@ public class Delete
         public string? Name { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var role = await _context.Roles
                 .FirstOrDefaultAsync(g => g.Id == request.Id);

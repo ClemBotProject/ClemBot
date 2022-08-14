@@ -21,16 +21,16 @@ public class Register
         }
     }
 
-    public class Command : IRequest<IQueryResult<ulong>>
+    public class Command : IRequest<QueryResult<ulong>>
     {
         public ulong ChannelId { get; set; }
 
         public Common.Enums.DesignatedChannels Designation { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             var mapping = new DesignatedChannelMapping()
             {

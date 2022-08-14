@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Commands.Bot;
 
 public class AddInvocation
 {
-    public class Command : IRequest<IQueryResult<int>>
+    public class Command : IRequest<QueryResult<int>>
     {
         public string CommandName { get; set; } = null!;
 
@@ -24,9 +24,9 @@ public class AddInvocation
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Command, IQueryResult<int>>
+        : IRequestHandler<Command, QueryResult<int>>
     {
-        public async Task<IQueryResult<int>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<int>> Handle(Command request, CancellationToken cancellationToken)
         {
             var invocationEntity = new CommandInvocation
             {

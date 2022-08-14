@@ -35,7 +35,7 @@ public class Edit
         public int UseCount { get; set; }
     }
 
-    public class Command : IRequest<IQueryResult<TagDto>>
+    public class Command : IRequest<QueryResult<TagDto>>
     {
         public ulong GuildId { get; set; }
 
@@ -46,9 +46,9 @@ public class Edit
         public ulong? UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<TagDto>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<TagDto>>
     {
-        public async Task<IQueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<TagDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = await _context.Tags
                 .FirstOrDefaultAsync(g => g.GuildId == request.GuildId && g.Name == request.Name);

@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Details
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong Id { get; set; }
     }
@@ -25,9 +25,9 @@ public class Details
         public string? WelcomeMessage { get; set; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
                 .FirstOrDefaultAsync(x => x.Id == request.Id);

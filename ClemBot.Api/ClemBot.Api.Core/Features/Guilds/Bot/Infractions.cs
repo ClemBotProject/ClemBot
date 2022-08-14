@@ -14,7 +14,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Infractions
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
+    public class Query : IRequest<QueryResult<IEnumerable<Model>>>
     {
         public ulong Id { get; init; }
     }
@@ -42,9 +42,9 @@ public class Infractions
 
 
     public record QueryHandler(ClemBotContext _context)
-        : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
+        : IRequestHandler<Query, QueryResult<IEnumerable<Model>>>
     {
-        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
+        public async Task<QueryResult<IEnumerable<Model>>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var infractions = await _context.Infractions

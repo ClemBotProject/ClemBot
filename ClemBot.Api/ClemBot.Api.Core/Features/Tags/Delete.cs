@@ -9,7 +9,7 @@ namespace ClemBot.Api.Core.Features.Tags;
 
 public class Delete
 {
-    public class Command : IRequest<IQueryResult<Model>>
+    public class Command : IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; set; }
 
@@ -25,9 +25,9 @@ public class Delete
         public string? Content { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tag = await _context.Tags
                 .FirstOrDefaultAsync(g => g.GuildId == request.GuildId && g.Name == request.Name);

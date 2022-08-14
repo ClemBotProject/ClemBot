@@ -9,14 +9,14 @@ namespace ClemBot.Api.Core.Features.Infractions.Bot;
 
 public class Deactivate
 {
-    public class Query : IRequest<IQueryResult<int>>
+    public class Query : IRequest<QueryResult<int>>
     {
         public int Id { get; set; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<int>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<int>>
     {
-        public async Task<IQueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
         {
             var infraction = await _context.Infractions
                 .FirstOrDefaultAsync(x => x.Id == request.Id);

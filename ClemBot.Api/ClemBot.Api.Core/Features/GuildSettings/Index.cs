@@ -5,7 +5,7 @@ namespace ClemBot.Api.Core.Features.GuildSettings;
 
 public class Index
 {
-    public class Query : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public class Query : IGuildSandboxModel, IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; init; }
 
@@ -17,7 +17,7 @@ public class Index
         public Dictionary<ConfigSettings, object> Settings { get; init; } = null!;
     }
 
-    public class QueryHandler : IRequestHandler<Query, IQueryResult<Model>>
+    public class QueryHandler : IRequestHandler<Query, QueryResult<Model>>
     {
         private readonly IGuildSettingsService _settingsService;
 
@@ -26,7 +26,7 @@ public class Index
             _settingsService = settingsService;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var settings = await _settingsService.GetAllSettingsAsync(request.GuildId);
 

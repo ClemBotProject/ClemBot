@@ -22,16 +22,16 @@ public class RemoveUser
         }
     }
 
-    public class Command : IRequest<IQueryResult<ulong>>
+    public class Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; set; }
 
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             await _context.RoleUser
                 .Where(u => u.UserId == request.UserId && u.Role.GuildId == request.GuildId)

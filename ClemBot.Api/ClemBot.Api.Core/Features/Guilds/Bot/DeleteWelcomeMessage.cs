@@ -19,14 +19,14 @@ public class DeleteWelcomeMessage
         }
     }
 
-    public record Command : IRequest<IQueryResult<ulong>>
+    public record Command : IRequest<QueryResult<ulong>>
     {
         public ulong Id { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds.FirstOrDefaultAsync(x => x.Id == request.Id);
 

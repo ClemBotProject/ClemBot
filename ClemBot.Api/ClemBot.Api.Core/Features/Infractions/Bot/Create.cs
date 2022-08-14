@@ -34,7 +34,7 @@ public class Create
         public InfractionType Type { get; set; }
     }
 
-    public class Command : IRequest<IQueryResult<InfractionDto>>
+    public class Command : IRequest<QueryResult<InfractionDto>>
     {
         public ulong GuildId { get; set; }
 
@@ -51,9 +51,9 @@ public class Create
         public bool? Active { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<InfractionDto>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<InfractionDto>>
     {
-        public async Task<IQueryResult<InfractionDto>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<InfractionDto>> Handle(Command request, CancellationToken cancellationToken)
         {
             var infraction = new Infraction()
             {

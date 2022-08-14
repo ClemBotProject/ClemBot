@@ -10,7 +10,7 @@ namespace ClemBot.Api.Core.Features.Channels.Bot;
 
 public class Details
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong Id { get; init; }
     }
@@ -24,9 +24,9 @@ public class Details
         public ulong GuildId { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var channel = await _context.Channels
                 .Where(x => x.Id == request.Id && !x.IsThread)

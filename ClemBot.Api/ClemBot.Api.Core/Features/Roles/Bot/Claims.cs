@@ -14,14 +14,14 @@ namespace ClemBot.Api.Core.Features.Roles.Bot;
 
 public class Claims
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<BotAuthClaims>>>
+    public class Query : IRequest<QueryResult<IEnumerable<BotAuthClaims>>>
     {
         public ulong Id { get; init; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<IEnumerable<BotAuthClaims>>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<IEnumerable<BotAuthClaims>>>
     {
-        public async Task<IQueryResult<IEnumerable<BotAuthClaims>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<IEnumerable<BotAuthClaims>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var role = await _context.Roles
                 .Where(x => x.Id == request.Id)

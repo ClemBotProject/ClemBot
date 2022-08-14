@@ -17,7 +17,7 @@ public class SetWelcomeMessage
         }
     }
 
-    public record Command : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public record Command : IGuildSandboxModel, IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; init; }
 
@@ -29,9 +29,9 @@ public class SetWelcomeMessage
         public ulong Id { get; init; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds.FirstOrDefaultAsync(x => x.Id == request.GuildId);
 
