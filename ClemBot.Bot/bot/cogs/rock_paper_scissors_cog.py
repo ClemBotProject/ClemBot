@@ -108,7 +108,7 @@ class RockPaperScissorsCog(commands.Cog):
             )
         except asyncio.TimeoutError:
             msg: discord.Message = await msg.edit(
-                (
+                content=(
                     f"Timed-out while waiting for {user_2.mention} to accept..."
                     if user_2
                     else f"Timed-out while waiting for someone to accept..."
@@ -146,7 +146,7 @@ class RockPaperScissorsCog(commands.Cog):
                 )
             except discord.HTTPException:
                 await msg.edit(
-                    "Unable to send both users a direct message, which is required to play rock paper scissors.",
+                    content="Unable to send both users a direct message, which is required to play rock paper scissors.",
                     embed=None,
                 )
                 await self.bot.messenger.publish(
