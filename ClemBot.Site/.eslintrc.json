@@ -1,0 +1,84 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "tsconfig.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:prettier/recommended"
+      ],
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        // =====================================
+        // Do not change this setting under any circumstances,
+        // TS's type system is turing complete, it can assuredly express whatever you need
+        // if you need `any` and for some horrid reason `unknown` will
+        // not suffice you can disable the lint with a comment at the call site,
+        // preferably do that with a type guard https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates
+        "@typescript-eslint/no-explicit-any": [
+          "error"
+        ],
+        // =====================================
+        // Set this as a warning locally, we will error on this in CI
+        "@typescript-eslint/no-unused-vars": "warn",
+        // It's ok to be a little redundant in declaring types on classes and func signatures
+        "@typescript-eslint/no-inferrable-types": [
+          "error",
+          {
+            "ignoreParameters": true,
+            "ignoreProperties": true
+          }
+        ],
+        "semi": [
+          2,
+          "always"
+        ]
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {}
+    },
+    {
+      "files": ["*.html"],
+      "excludedFiles": ["*inline-template-*.component.html"],
+      "extends": ["plugin:prettier/recommended"],
+      "rules": {
+        // NOTE: WE ARE OVERRIDING THE DEFAULT CONFIG TO ALWAYS SET THE PARSER TO ANGULAR (SEE BELOW)
+        "prettier/prettier": ["error", { "parser": "angular" }]
+      }
+    }
+  ]
+}
