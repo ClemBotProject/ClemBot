@@ -32,7 +32,7 @@ class GuildRoute(BaseRoute):
         await self._client.delete(f"bot/guilds/{guild_id}")
 
     async def get_guild(self, guild_id: int) -> Guild | None:
-        guild = await self._client.get(f"bot/guilds/{guild_id}")
+        guild = Guild(**await self._client.get(f"bot/guilds/{guild_id}"))
         return guild if not None else None
 
     async def get_all_guilds(self) -> list[Guild]:
