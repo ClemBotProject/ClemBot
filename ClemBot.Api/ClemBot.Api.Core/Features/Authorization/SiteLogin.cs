@@ -16,7 +16,7 @@ namespace ClemBot.Api.Core.Features.Authorization;
 
 public class SiteLogin
 {
-    public class Query : IRequest<IAuthorizeResult<Model>>
+    public class Query : IRequest<AuthorizeResult<Model>>
     {
         public string Bearer { get; set; } = null!;
     }
@@ -26,7 +26,7 @@ public class SiteLogin
         public string Token { get; set; } = null!;
     }
 
-    public class Handler : IRequestHandler<Query, IAuthorizeResult<Model>>
+    public class Handler : IRequestHandler<Query, AuthorizeResult<Model>>
     {
         private readonly ClemBotContext _context;
 
@@ -55,7 +55,7 @@ public class SiteLogin
             _discordAuthManager = discordAuthManager;
         }
 
-        public async Task<IAuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<AuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
             _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", origin);

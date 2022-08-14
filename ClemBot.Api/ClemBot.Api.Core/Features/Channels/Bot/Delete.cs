@@ -10,7 +10,7 @@ namespace ClemBot.Api.Core.Features.Channels.Bot;
 
 public class Delete
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong Id { get; set; }
     }
@@ -22,7 +22,7 @@ public class Delete
         public string? Name { get; init; }
     }
 
-    public class QueryHandler : IRequestHandler<Query, IQueryResult<Model>>
+    public class QueryHandler : IRequestHandler<Query, QueryResult<Model>>
     {
         public ClemBotContext _context { get; init; }
 
@@ -34,7 +34,7 @@ public class Delete
             _mediatr = mediatr;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var channel = await _context.Channels
                 .FirstOrDefaultAsync(g => g.Id == request.Id);

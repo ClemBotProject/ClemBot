@@ -23,7 +23,7 @@ public class UpdateChannels
         public string? Name { get; set; }
     }
 
-    public record Command : IRequest<IQueryResult<ulong>>
+    public record Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; init; }
 
@@ -31,9 +31,9 @@ public class UpdateChannels
     }
 
     public record Handler(ClemBotContext _context)
-        : IRequestHandler<Command, IQueryResult<ulong>>
+        : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             using var csvReader = new CsvReader(new StringReader(request.ChannelCsv), CultureInfo.InvariantCulture);
             var channels = csvReader.GetRecords<ChannelDto>().ToList();

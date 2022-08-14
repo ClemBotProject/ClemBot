@@ -26,7 +26,7 @@ public class BotAuthorize
         }
     }
 
-    public record Query : IRequest<IAuthorizeResult<Model>>
+    public record Query : IRequest<AuthorizeResult<Model>>
     {
         public string Key { get; set; } = null!;
     }
@@ -41,10 +41,10 @@ public class BotAuthorize
         IHttpContextAccessor _httpContextAccessor,
         IJwtAuthManager _jwtAuthManager,
         JwtTokenConfig _jwtTokenConfig,
-        ApiKey _apiKey) : IRequestHandler<Query, IAuthorizeResult<Model>>
+        ApiKey _apiKey) : IRequestHandler<Query, AuthorizeResult<Model>>
     {
 
-        public Task<IAuthorizeResult<Model>> Handle(Query request,
+        public Task<AuthorizeResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);

@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Commands.Bot;
 
 public class AddScore
 {
-    public class Command : IRequest<IQueryResult<int>>
+    public class Command : IRequest<QueryResult<int>>
     {
         public ulong Score { get; set; }
 
@@ -22,9 +22,9 @@ public class AddScore
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Command, IQueryResult<int>>
+        : IRequestHandler<Command, QueryResult<int>>
     {
-        public async Task<IQueryResult<int>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<int>> Handle(Command request, CancellationToken cancellationToken)
         {
             var score = new SlotScore
             {

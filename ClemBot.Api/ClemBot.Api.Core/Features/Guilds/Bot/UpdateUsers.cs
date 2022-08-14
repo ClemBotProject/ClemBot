@@ -28,7 +28,7 @@ public class UpdateUsers
         public string? Name { get; set; }
     }
 
-    public record Command : IRequest<IQueryResult<ulong>>
+    public record Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; init; }
 
@@ -36,9 +36,9 @@ public class UpdateUsers
     }
 
     public record Handler(ClemBotContext _context, ILogger<UpdateUsers> _logger)
-        : IRequestHandler<Command, IQueryResult<ulong>>
+        : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Beginning UpdateUsers CSV Deserialization");
 

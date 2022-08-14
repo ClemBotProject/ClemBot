@@ -6,7 +6,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot;
 
 public class GetSlotsScores
 {
-    public record Query : IRequest<IQueryResult<Model>>
+    public record Query : IRequest<QueryResult<Model>>
     {
         public ulong UserId { get; init; }
 
@@ -20,7 +20,7 @@ public class GetSlotsScores
         public IEnumerable<ulong> Scores { get; init; } = null!;
     }
 
-    public class QueryHandler : IRequestHandler<Query, IQueryResult<Model>>
+    public class QueryHandler : IRequestHandler<Query, QueryResult<Model>>
     {
         private readonly ClemBotContext _context;
 
@@ -29,7 +29,7 @@ public class GetSlotsScores
             _context = context;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var scores = await _context.SlotScores
                 .Where(x => x.UserId == request.UserId && x.GuildId == request.GuildId)

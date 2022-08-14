@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
 public class Index
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
+    public class Query : IRequest<QueryResult<IEnumerable<Model>>>
     {
     }
 
@@ -24,9 +24,9 @@ public class Index
         public string? WelcomeMessage { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<IEnumerable<Model>>>
     {
-        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
+        public async Task<QueryResult<IEnumerable<Model>>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var guilds = await _context.Guilds.ToListAsync();

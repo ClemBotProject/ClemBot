@@ -19,7 +19,7 @@ public class Search
         }
     }
 
-    public class Command : IRequest<IQueryResult<Model>>
+    public class Command : IRequest<QueryResult<Model>>
     {
         public string Query { get; init; } = null!;
 
@@ -50,9 +50,9 @@ public class Search
         public IEnumerable<Tag> Tags { get; init; } = null!;
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var tags = await _context.Tags
                 .Where(t => t.GuildId == request.GuildId)

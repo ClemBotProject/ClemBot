@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.DesignatedChannels.Bot;
 
 public class Details
 {
-    public class Command : IRequest<IQueryResult<Model>>
+    public class Command : IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; init; }
 
@@ -23,9 +23,9 @@ public class Details
         public IEnumerable<ulong> Mappings { get; set; } = null!;
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var channels = await _context.DesignatedChannelMappings
                 .Where(x => x.Channel.Guild.Id == request.GuildId && x.Type == request.Designation)

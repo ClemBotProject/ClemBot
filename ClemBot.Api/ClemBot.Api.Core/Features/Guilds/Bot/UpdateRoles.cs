@@ -26,7 +26,7 @@ public class UpdateRoles
         public bool Admin { get; set; }
     }
 
-    public record Command : IRequest<IQueryResult<ulong>>
+    public record Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; init; }
 
@@ -34,9 +34,9 @@ public class UpdateRoles
     }
 
     public record Handler(ClemBotContext _context, ILogger<Handler> _logger)
-        : IRequestHandler<Command, IQueryResult<ulong>>
+        : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Beginning UpdateRoles CSV Deserialization");
 

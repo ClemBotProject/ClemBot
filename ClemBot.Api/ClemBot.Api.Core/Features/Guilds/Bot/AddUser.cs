@@ -16,16 +16,16 @@ public class AddUser
         }
     }
 
-    public class Command : IRequest<IQueryResult<ulong>>
+    public class Command : IRequest<QueryResult<ulong>>
     {
         public ulong GuildId { get; set; }
 
         public ulong UserId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<ulong>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
     {
-        public async Task<IQueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
             if (!await _context.Guilds.AnyAsync(x => x.Id == request.GuildId))
             {

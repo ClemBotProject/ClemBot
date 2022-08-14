@@ -27,7 +27,7 @@ public class Create
         public LocalDateTime Time { get; set; }
     }
 
-    public class Model : IRequest<IQueryResult<ReminderDto>>
+    public class Model : IRequest<QueryResult<ReminderDto>>
     {
         public string Link { get; set; } = null!;
 
@@ -38,7 +38,7 @@ public class Create
         public ulong UserId { get; set; }
     }
 
-    public class Handler : IRequestHandler<Model, IQueryResult<ReminderDto>>
+    public class Handler : IRequestHandler<Model, QueryResult<ReminderDto>>
     {
         private readonly ClemBotContext _context;
 
@@ -47,7 +47,7 @@ public class Create
             _context = context;
         }
 
-        public async Task<IQueryResult<ReminderDto>> Handle(Model request, CancellationToken cancellationToken)
+        public async Task<QueryResult<ReminderDto>> Handle(Model request, CancellationToken cancellationToken)
         {
             var reminder = new Reminder
             {

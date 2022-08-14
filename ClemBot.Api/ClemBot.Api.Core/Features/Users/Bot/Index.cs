@@ -11,7 +11,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot;
 
 public class Index
 {
-    public class Query : IRequest<IQueryResult<IEnumerable<Model>>>
+    public class Query : IRequest<QueryResult<IEnumerable<Model>>>
     {
     }
 
@@ -22,9 +22,9 @@ public class Index
         public string Name { get; set; } = null!;
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<IEnumerable<Model>>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<IEnumerable<Model>>>
     {
-        public async Task<IQueryResult<IEnumerable<Model>>> Handle(Query request,
+        public async Task<QueryResult<IEnumerable<Model>>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var users = await _context.Users.ToListAsync();

@@ -7,7 +7,7 @@ namespace ClemBot.Api.Core.Features.Guilds;
 
 public class GetCustomTagPrefixes
 {
-    public class Query : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public class Query : IGuildSandboxModel, IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; init; }
     }
@@ -18,9 +18,9 @@ public class GetCustomTagPrefixes
     }
 
     public record QueryHandler(ClemBotContext _context, IMediator _mediator)
-        : IRequestHandler<Query, IQueryResult<Model>>
+        : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request,
+        public async Task<QueryResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var tagprefixes = await _mediator.Send(new GetCustomTagPrefixRequest { Id = request.GuildId });

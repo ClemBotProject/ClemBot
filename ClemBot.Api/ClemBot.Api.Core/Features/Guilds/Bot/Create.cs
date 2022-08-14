@@ -21,7 +21,7 @@ public class Create
         }
     }
 
-    public class Command : IRequest<IQueryResult<Guild>>
+    public class Command : IRequest<QueryResult<Guild>>
     {
         public ulong Id { get; set; }
 
@@ -30,9 +30,9 @@ public class Create
         public ulong OwnerId { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, IQueryResult<Guild>>
+    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Guild>>
     {
-        public async Task<IQueryResult<Guild>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Guild>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = new Guild
             {

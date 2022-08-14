@@ -7,7 +7,7 @@ namespace ClemBot.Api.Core.Features.Users.Bot;
 
 public class Details
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
         public ulong Id { get; set; }
     }
@@ -21,9 +21,9 @@ public class Details
         public List<ulong> Guilds { get; set; } = new();
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, IQueryResult<Model>>
+    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .Where(x => x.Id == request.Id)

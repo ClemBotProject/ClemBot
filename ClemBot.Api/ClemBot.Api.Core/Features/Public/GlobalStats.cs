@@ -12,7 +12,7 @@ namespace ClemBot.Api.Core.Features.Public;
 
 public class GlobalStats
 {
-    public class Query : IRequest<IQueryResult<Model>>
+    public class Query : IRequest<QueryResult<Model>>
     {
     }
 
@@ -25,9 +25,9 @@ public class GlobalStats
         public int Commands { get; set;  }
     }
 
-    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Query, IQueryResult<Model>>
+    public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Query, QueryResult<Model>>
     {
-        public async Task<IQueryResult<Model>> Handle(Query request,
+        public async Task<QueryResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var guildsCount = await _mediator.Send(new GlobalGuildStatsRequest());

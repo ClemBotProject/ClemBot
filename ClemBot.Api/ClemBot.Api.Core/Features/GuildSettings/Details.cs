@@ -6,7 +6,7 @@ namespace ClemBot.Api.Core.Features.GuildSettings;
 
 public class Details
 {
-    public class Query : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public class Query : IGuildSandboxModel, IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; init; }
 
@@ -20,7 +20,7 @@ public class Details
         public object? Value { get; init; }
     }
 
-    public class QueryHandler : IRequestHandler<Query, IQueryResult<Model>>
+    public class QueryHandler : IRequestHandler<Query, QueryResult<Model>>
     {
         private readonly IGuildSettingsService _settingsService;
 
@@ -29,7 +29,7 @@ public class Details
             _settingsService = settingsService;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             var setting = await _settingsService.GetPropertyAsync(request.Setting, request.GuildId);
 

@@ -21,7 +21,7 @@ public class Set
         }
     }
 
-    public record Command : IGuildSandboxModel, IRequest<IQueryResult<Model>>
+    public record Command : IGuildSandboxModel, IRequest<QueryResult<Model>>
     {
         [FromRoute]
         public ulong GuildId { get; init; }
@@ -37,7 +37,7 @@ public class Set
     {
     }
 
-    public class Handler : IRequestHandler<Command, IQueryResult<Model>>
+    public class Handler : IRequestHandler<Command, QueryResult<Model>>
     {
         private readonly IGuildSettingsService _settingsService;
 
@@ -46,7 +46,7 @@ public class Set
             _settingsService = settingsService;
         }
 
-        public async Task<IQueryResult<Model>> Handle(Command request, CancellationToken cancellationToken) =>
+        public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken) =>
             await _settingsService.SetPropertyAsync(request.Setting, request.GuildId, request.Value) switch
             {
                 true => QueryResult<Model>.Success(),
