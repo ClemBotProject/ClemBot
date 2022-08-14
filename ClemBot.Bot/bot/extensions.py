@@ -192,8 +192,17 @@ class ExtBase:
         if len(self.claims) == 0:
             return True
 
+        # Convert all values we got as Claims to their string name
+        # so we can intersect them with the commands internal auth values
+        str_claims: list[str] = []
+        for c in claims:
+            if isinstance(c, Claims):
+                str_claims.append(c.name)
+            else:
+                str_claims.append(c)
+
         # check for intersection of two sets of claims, if there is one we have a valid user
-        return len(set(claims).intersection(self.claims)) > 0
+        return len(set(str_claims).intersection(self.claims)) > 0
 
 
 class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase):
