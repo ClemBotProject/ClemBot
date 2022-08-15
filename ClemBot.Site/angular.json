@@ -69,10 +69,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ClemBot.Site:build:production"
+              "browserTarget": "ClemBotSite:build:production"
             },
             "development": {
-              "browserTarget": "ClemBot.Site:build:development"
+              "browserTarget": "ClemBotSite:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -80,7 +80,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ClemBot.Site:build"
+            "browserTarget": "ClemBotSite:build"
           }
         },
         "test": {
