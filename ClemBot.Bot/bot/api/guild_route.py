@@ -36,9 +36,8 @@ class GuildRoute(BaseRoute):
 
         if not guild:
             return None
-        
-        return Guild(**guild)
 
+        return Guild(**guild)
 
     async def get_all_guilds(self) -> list[Guild]:
         return [Guild(**i) for i in await self._client.get("bot/guilds")]
