@@ -13,6 +13,7 @@ from bot.messaging.events import Events
 from bot.utils.converters import HonorsConverter
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
+from bot.utils.trigrams import make_search_bank, query_search_bank, T_SEARCH_BANK, find_best_match
 
 log = get_logger(__name__)
 
@@ -28,7 +29,10 @@ class GradesCog(commands.Cog):
 
         self.all_profs: list[discord.Embed] = []
         self.all_courses: list[discord.Embed] = []
-
+        
+        self.grades_df: pd.DataFrame
+        self.prof_search_bank: T_SEARCH_BANK
+        self.class_search_bank: T_SEARCH_BANK
         self.load_data()
 
     def load_data(self) -> None:
@@ -40,6 +44,18 @@ class GradesCog(commands.Cog):
 
         self.all_profs = self.get_profs()
         self.all_courses = self.get_courses()
+
+        self.prof_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["Instructor"].to_list()))))
+        self.class_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["CourseId"].to_list()))))
+
+    def fuzzy_find_professors(self, prof: str) -> list[str]:
+        return [e.item for e in query_search_bank(self.prof_search_bank, prof.lower()) if e.similarity > 0.3]
+
+    def fuzzy_find_course(self, course_name: str) -> str | None:
+        best_match = find_best_match(self.class_search_bank, course_name.lower())
+
+        if best_match.similarity > 0.3:
+            return best_match.item
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
     @ext.long_help(
@@ -90,7 +106,12 @@ class GradesCog(commands.Cog):
             error_message = f"Are you sure you used the correct format? See `{await self.bot.current_prefix(ctx)}help grades` for info."
         elif not self.grades_df.CourseId.str.contains(course).any():
             error_title = "Course doesn't exist"
-            error_message = "Are you sure you used the proper notation (ex: cpsc-2120)?"
+
+            best_match = self.fuzzy_find_course(course)
+            if best_match:
+                error_message = f"Are you sure you used the proper notation (ex: cpsc-2120) or did you mean {best_match}?"
+            else:
+                error_message = "Are you sure you used the proper notation (ex: cpsc-2120)?"
         elif self.grades_df[(self.grades_df.CourseId == course)].Year.max() < year:
             error_title = f"No data for year {year}"
             error_message = "There is no grade data for your course for this year onward; please extend the range and try again."
@@ -217,14 +238,21 @@ class GradesCog(commands.Cog):
     ) -> None:
         if not self.grades_df.Instructor.str.contains(prof, case=False).any():
             embed = discord.Embed(title="Professors", color=Colors.Error)
-            result = f'"{prof}" is not a known Professor\n'
+            result = f'"{prof}" is not a known professor'
+
+            matcher_results = self.fuzzy_find_professors(prof)[:5]
+            if matcher_results:
+                result += ", did you mean one of these professors?\n" + "\n".join([f"`{p}`" for p in matcher_results])
+    
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
             embed.add_field(
                 name="Help:",
                 value=f"Run `{await self.bot.current_prefix(ctx)}prof list` to find what professors are available",
                 inline=False,
             )
-            return await ctx.send(embed=embed)
+
+            await ctx.send(embed=embed)
+            return
 
         # check for if there is a 0% A rate, that means it was a pass fail class and we dont handle those
         df = self.grades_df[
