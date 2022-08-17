@@ -5,7 +5,7 @@ import typing as t
 import discord
 import discord.ext.commands as commands
 import pandas as pd
-
+from collections import Counter
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
@@ -33,6 +33,7 @@ class GradesCog(commands.Cog):
         self.grades_df: pd.DataFrame
         self.prof_search_bank: T_SEARCH_BANK
         self.class_search_bank: T_SEARCH_BANK
+        self.prof_class_counts: Counter
         self.load_data()
 
     def load_data(self) -> None:
@@ -47,6 +48,8 @@ class GradesCog(commands.Cog):
 
         self.prof_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["Instructor"].to_list()))))
         self.class_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["CourseId"].to_list()))))
+
+        self.prof_class_counts = Counter(map(str.lower, self.grades_df["Instructor"].to_list()))
 
     def fuzzy_find_professors(self, prof: str) -> list[str]:
         return [e.item for e in query_search_bank(self.prof_search_bank, prof.lower()) if e.similarity > 0.3]
@@ -240,7 +243,7 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known professor'
 
-            matcher_results = self.fuzzy_find_professors(prof)[:5]
+            matcher_results = sorted(self.fuzzy_find_professors(prof)[:5], key=(lambda p: self.prof_class_counts[p]), reverse=True)
             if matcher_results:
                 result += ", did you mean one of these professors?\n" + "\n".join([f"`{p}`" for p in matcher_results])
     
