@@ -1,4 +1,3 @@
-# type: ignore
 import json
 import re
 import typing as t
@@ -18,8 +17,7 @@ from bot.utils.logging_utils import get_logger
 log = get_logger(__name__)
 
 MAX_RELATED_TOPICS = 5
-IMAGE_URL = "https://duckduckgo.com"
-SEARCH_URL = "https://api.duckduckgo.com/"
+URL = "https://duckduckgo.com"
 ICON_URL = "https://i.imgur.com/Knq2kVa.png"
 RELATED_TOPICS_PATTERN = re.compile("(https://duckduckgo.com/)([acdne]/)?(\\S+)", re.IGNORECASE)
 CATEGORIES = {"A": "Article", "C": "Category", "D": "Disambiguation", "N": "Name", "E": "Exclusive"}
@@ -33,10 +31,10 @@ class SearchResult:
         return len(self.json_response["Heading"]) > 0
 
     def title(self) -> str:
-        return self.json_response["Heading"]
+        return str(self.json_response["Heading"])
 
     def abstract(self) -> str:
-        return markdownify(self.json_response["Abstract"])
+        return str(markdownify(self.json_response["Abstract"]))
 
     def category(self) -> str:
         return category_from_code(self.json_response["Type"])
@@ -47,9 +45,9 @@ class SearchResult:
     def thumbnail(self) -> str:
         # surprisingly 'Image' in the JSON returns the latter half of the URL,
         # so we need to concat the other half, i.e., https://duckduckgo.com
-        return IMAGE_URL + self.json_response["Image"]
+        return URL + str(self.json_response["Image"])
 
-    def related_topics(self) -> list:
+    def related_topics(self) -> list[dict[str, t.Any]]:
         # related topics can return topics that we don't actually want,
         # so we're taking the subset of data that we can use and returning it
         topics = list()
@@ -73,17 +71,18 @@ class SearchResult:
                 break
 
             url = val["FirstURL"]
-            title = RELATED_TOPICS_PATTERN.match(url).group(3).replace("_", " ")
-            title = unquote_plus(title)
+            match = RELATED_TOPICS_PATTERN.match(url)
+            assert match is not None
+            title = unquote_plus(match.group(3).replace("_", " "))
             related_topics_formatted.append(f"[{title}]({url})")
 
         return "\n".join(related_topics_formatted)
 
     def url(self) -> str:
-        return self.json_response["AbstractURL"]
+        return str(self.json_response["AbstractURL"])
 
     def source(self) -> str:
-        return self.json_response["AbstractSource"]
+        return str(self.json_response["AbstractSource"])
 
 
 class SearchCog(commands.Cog):
@@ -111,11 +110,11 @@ class SearchCog(commands.Cog):
         data = urlencode(
             {"q": query, "format": "json", "pretty": 1, "skip_disambig": 1, "t": "ClemBot"}
         )
-        log.debug(f"Search URL: {SEARCH_URL}?{data}")
+        log.debug(f"Search URL: {URL}?{data}")
 
         async with aiohttp.ClientSession() as session:
             # redirects should never happen so it's gonna be off by default just in case
-            async with session.get(url=f"{SEARCH_URL}?{data}", allow_redirects=False) as resp:
+            async with session.get(url=f"{URL}?{data}", allow_redirects=False) as resp:
                 response = json.loads(await resp.text())
 
         log.debug(response)
