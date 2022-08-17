@@ -50,11 +50,15 @@ jobs:
       continue-on-error: true
       run: poetry run mypy
 
+    - name: Create lint error folder
+      shell: bash
+      run: |
+        mkdir lint_errors
+
     - name: Static typing lint failure comment
       shell: bash
       if: steps.static-typing-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        mkdir lint_errors
         echo "${{github.event.number}}|**Static type linting failed:** Please see CI error output for details and fix the PRs typing" >> lint_errors/mypy-error.txt
 
     - name: Check if Black would make any changes
