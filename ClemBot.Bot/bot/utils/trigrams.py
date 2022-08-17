@@ -60,7 +60,13 @@ def make_search_bank(items: list[str]) -> T_SEARCH_BANK:
 def query_search_bank(bank: T_SEARCH_BANK, query: str) -> list[BankSearchEntry]:
     query_trgrms = make_trigrams(query)
 
-    return sorted((BankSearchEntry(item, similarity(query_trgrms, item_trgrms)) for item, item_trgrms in bank), reverse=True)
+    return sorted(
+        (
+            BankSearchEntry(item, similarity(query_trgrms, item_trgrms))
+            for item, item_trgrms in bank
+        ),
+        reverse=True,
+    )
 
 
 def find_best_match(bank: T_SEARCH_BANK, query: str) -> BankSearchEntry:

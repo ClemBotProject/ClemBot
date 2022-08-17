@@ -1,11 +1,12 @@
 # type: ignore
 import os
 import typing as t
+from collections import Counter
 
 import discord
 import discord.ext.commands as commands
 import pandas as pd
-from collections import Counter
+
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
@@ -13,7 +14,7 @@ from bot.messaging.events import Events
 from bot.utils.converters import HonorsConverter
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
-from bot.utils.trigrams import make_search_bank, query_search_bank, T_SEARCH_BANK, find_best_match
+from bot.utils.trigrams import T_SEARCH_BANK, find_best_match, make_search_bank, query_search_bank
 
 log = get_logger(__name__)
 
@@ -29,7 +30,7 @@ class GradesCog(commands.Cog):
 
         self.all_profs: list[discord.Embed] = []
         self.all_courses: list[discord.Embed] = []
-        
+
         self.grades_df: pd.DataFrame
         self.prof_search_bank: T_SEARCH_BANK
         self.class_search_bank: T_SEARCH_BANK
@@ -46,13 +47,21 @@ class GradesCog(commands.Cog):
         self.all_profs = self.get_profs()
         self.all_courses = self.get_courses()
 
-        self.prof_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["Instructor"].to_list()))))
-        self.class_search_bank = make_search_bank(list(map(str.lower, set(self.grades_df["CourseId"].to_list()))))
+        self.prof_search_bank = make_search_bank(
+            list(map(str.lower, set(self.grades_df["Instructor"].to_list())))
+        )
+        self.class_search_bank = make_search_bank(
+            list(map(str.lower, set(self.grades_df["CourseId"].to_list())))
+        )
 
         self.prof_class_counts = Counter(map(str.lower, self.grades_df["Instructor"].to_list()))
 
     def fuzzy_find_professors(self, prof: str) -> list[str]:
-        return [e.item for e in query_search_bank(self.prof_search_bank, prof.lower()) if e.similarity > 0.3]
+        return [
+            e.item
+            for e in query_search_bank(self.prof_search_bank, prof.lower())
+            if e.similarity > 0.3
+        ]
 
     def fuzzy_find_course(self, course_name: str) -> str | None:
         best_match = find_best_match(self.class_search_bank, course_name.lower())
@@ -243,10 +252,16 @@ class GradesCog(commands.Cog):
             embed = discord.Embed(title="Professors", color=Colors.Error)
             result = f'"{prof}" is not a known professor'
 
-            matcher_results = sorted(self.fuzzy_find_professors(prof)[:5], key=(lambda p: self.prof_class_counts[p]), reverse=True)
+            matcher_results = sorted(
+                self.fuzzy_find_professors(prof)[:5],
+                key=(lambda p: self.prof_class_counts[p]),
+                reverse=True,
+            )
             if matcher_results:
-                result += ", did you mean one of these professors?\n" + "\n".join([f"`{p}`" for p in matcher_results])
-    
+                result += ", did you mean one of these professors?\n" + "\n".join(
+                    [f"`{p}`" for p in matcher_results]
+                )
+
             embed.add_field(name="ERROR: Professor doesn't exist", value=result, inline=False)
             embed.add_field(
                 name="Help:",
