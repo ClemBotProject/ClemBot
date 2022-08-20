@@ -335,7 +335,6 @@ class TagCog(commands.Cog):
             await self._transfer_tag(ctx, tag, user)
             return
         await self._error_embed(ctx, f"You do not own the tag `{name}`.")
-        return
 
     # Tag prefix functions
     @tag.group(invoke_without_command=True, case_insensitive=True)
