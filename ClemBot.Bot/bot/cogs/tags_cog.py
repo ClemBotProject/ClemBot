@@ -307,9 +307,10 @@ class TagCog(commands.Cog):
         )
 
     @tag.command(aliases=["give"])
-    @ext.required_claims(Claims.tag_add)
+    @ext.required_claims(Claims.tag_transfer)
+    @ext.ignore_claims_pre_invoke()
     @ext.short_help("Gives your tag to someone else.")
-    @ext.long_help("Transfers the tag to the given user")
+    @ext.long_help("Transfers the tag to the given user.")
     @ext.example(["tag transfer tagname @user", "tag give tagname @user"])
     async def transfer(self, ctx: ext.ClemBotCtx, name: str, user: discord.User) -> None:
         # check if user is a bot
@@ -325,24 +326,16 @@ class TagCog(commands.Cog):
             desc += f"Run command `tag claim {name}` to claim the tag."
             await self._error_embed(ctx, desc)
             return
-        # check if author of message owns the tag
-        if author.id != tag.user_id:
-            await self._error_embed(ctx, f"You do not own the tag `{name}`.")
-            return
         # check if mentioned user already owns tag
         if user.id == tag.user_id:
             await self._error_embed(ctx, f"{user.mention} already owns the tag `{name}`.")
             return
-        # transfer tag to new owner
-        await self.bot.tag_route.edit_tag_owner(ctx.guild.id, name, user.id, raise_on_error=True)
-        embed = discord.Embed(
-            title=":white_check_mark: Tag Transferred", color=Colors.ClemsonOrange
-        )
-        embed.add_field(name="From", value=f"{author.mention} :arrow_right:")
-        embed.add_field(name="To", value=user.mention)
-        embed.add_field(name="Name", value=tag.name, inline=False)
-        embed.set_footer(text=str(author), icon_url=author.display_avatar.url)
-        await ctx.send(embed=embed)
+        # make sure the author owns the tag or the author has the tag_transfer claim
+        if author.id == tag.user_id or await self.bot.claims_check(ctx):
+            await self._transfer_tag(ctx, tag, user)
+            return
+        await self._error_embed(ctx, f"You do not own the tag `{name}`.")
+        return
 
     # Tag prefix functions
     @tag.group(invoke_without_command=True, case_insensitive=True)
@@ -404,6 +397,19 @@ class TagCog(commands.Cog):
             title=":white_check_mark: Tag Prefix Reset", color=Colors.ClemsonOrange
         )
         embed.add_field(name="New Tag Prefix", value=f"```{DEFAULT_TAG_PREFIX}```")
+        await ctx.send(embed=embed)
+
+    async def _transfer_tag(self, ctx: ext.ClemBotCtx, tag: Tag, to: discord.User) -> None:
+        user = ctx.guild.get_member(tag.user_id)
+        assert user is not None
+        await self.bot.tag_route.edit_tag_owner(ctx.guild.id, tag.name, to.id, raise_on_error=True)
+        embed = discord.Embed(
+            title=":white_check_mark: Tag Transferred", color=Colors.ClemsonOrange
+        )
+        embed.add_field(name="From", value=f"{user.mention} :arrow_right:")
+        embed.add_field(name="To", value=to.mention)
+        embed.add_field(name="Name", value=tag.name, inline=False)
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
     async def _delete_tag(self, name: str, ctx: ext.ClemBotCtx) -> None:

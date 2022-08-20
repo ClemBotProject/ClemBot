@@ -167,6 +167,10 @@ Transfers a given owned tag to a new owner in the same server.
 !tag transfer MyTag @MyBestFriend
 ```
 
+:::note
+If a user has the `tag_transfer` [claim](./Claims.md), they can transfer tags they do not own.
+:::
+
 ### Unclaimed
 Lists all unclaimed tags in the server.
 
