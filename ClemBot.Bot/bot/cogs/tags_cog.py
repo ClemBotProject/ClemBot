@@ -448,7 +448,7 @@ class TagCog(commands.Cog):
         return discord.utils.escape_mentions(content)
 
     async def _error_embed(self, ctx: ext.ClemBotCtx, desc: str) -> None:
-        """Short-hand for sending an error message w/ consistent formatting."""
+        """Shorthand for sending an error message w/ consistent formatting."""
         embed = discord.Embed(title="Error", color=Colors.Error, description=desc)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         msg = await ctx.send(embed=embed)

@@ -29,4 +29,24 @@ public class CommandsController : ControllerBase
             { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpGet("bot/[controller]/{GuildId}/{ChannelId}/{CommandName}/status")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Status([FromRoute] Status.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpGet("bot/[controller]/{GuildId}/{ChannelId}/{CommandName}/details")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Details([FromRoute] Details.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
 }

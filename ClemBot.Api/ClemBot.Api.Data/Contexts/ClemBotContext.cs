@@ -22,6 +22,7 @@ public class ClemBotContext : DbContext
 
     public DbSet<Channel> Channels { get; set; }
     public DbSet<ClaimsMapping> ClaimsMappings { get; set; }
+    public DbSet<CommandRestriction> CommandRestrictions { get; set; }
     public DbSet<CustomPrefix> CustomPrefixs { get; set; }
     public DbSet<CustomTagPrefix> CustomTagPrefixs { get; set; }
     public DbSet<CommandInvocation> CommandInvocations { get; set; }

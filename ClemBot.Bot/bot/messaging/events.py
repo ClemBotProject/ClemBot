@@ -498,6 +498,16 @@ class EventsMeta(type):
         return "on_member_ban"
 
     @property
+    def on_before_command_invoke(self) -> str:
+        """
+        Published before a command has successfully completed
+
+        Args:
+            context (commands.Context): context of the command that was invoked
+        """
+        return "on_before_command_invoke"
+
+    @property
     def on_after_command_invoke(self) -> str:
         """
         Published when after a command has successfully completed
