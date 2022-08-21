@@ -1,4 +1,5 @@
 # type: ignore
+"""
 import math
 
 import discord
@@ -239,3 +240,4 @@ class DotCog(commands.Cog):
 
 async def setup(bot: ClemBot) -> None:
     await bot.add_cog(DotCog(bot))
+"""

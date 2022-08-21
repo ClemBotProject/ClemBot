@@ -1,0 +1,3 @@
+import typing as t
+
+def markdownify(html: str, **options: t.Any) -> str: ...
