@@ -419,7 +419,14 @@ class TagCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx: ext.ClemBotCtx, name: str, *, do_fuzzy: bool = False, do_suggestions: bool = False) -> Tag | None:
+    async def _check_tag_exists(
+        self,
+        ctx: ext.ClemBotCtx,
+        name: str,
+        *,
+        do_fuzzy: bool = False,
+        do_suggestions: bool = False,
+    ) -> Tag | None:
         """
         Checks if the given tag exists.
         If so, returns the tag.
@@ -431,8 +438,12 @@ class TagCog(commands.Cog):
         if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name, do_fuzzy=do_fuzzy)):
             body = f"Requested tag `{name}` does not exist."
 
-            if do_suggestions and (suggestions := await self.bot.tag_route.search_tags(ctx.guild.id, name)):
-                body += "\n\nDid you mean one of these?\n" + "\n".join([f"`{s.name}`" for s in suggestions])
+            if do_suggestions and (
+                suggestions := await self.bot.tag_route.search_tags(ctx.guild.id, name)
+            ):
+                body += "\n\nDid you mean one of these?\n" + "\n".join(
+                    [f"`{s.name}`" for s in suggestions]
+                )
 
             await self._error_embed(ctx, body)
 
