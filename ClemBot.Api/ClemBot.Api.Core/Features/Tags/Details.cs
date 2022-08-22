@@ -11,11 +11,15 @@ namespace ClemBot.Api.Core.Features.Tags;
 
 public class Details
 {
+    private const float _minimumNameSimilarity = 0.6f;
+
     public class Query : IRequest<QueryResult<Model>>
     {
         public ulong GuildId { get; set; }
 
         public string Name { get; set; } = null!;
+
+        public bool DoFuzzy { get; set; } = false;
     }
 
     public class Model
@@ -42,9 +46,39 @@ public class Details
                 .Include(y => y.TagUses)
                 .FirstOrDefaultAsync();
 
-            if (tag is null)
+            if (tag is not null)
             {
-                return QueryResult<Model>.NotFound();
+                return QueryResult<Model>.Success(new Model()
+                {
+                    Name = tag.Name,
+                    Content = tag.Content,
+                    CreationDate = tag.Time.ToDateTimeUnspecified().ToLongDateString(),
+                    GuildId = tag.GuildId,
+                    UserId = tag.UserId,
+                    UseCount = tag.TagUses.Count
+                });
+            }
+
+            {
+                if (request.DoFuzzy)
+                {
+                    var fuzzyTags = await _context.Tags
+                        .Where(t => t.GuildId == request.GuildId &&
+                                    EF.Functions.TrigramsSimilarity(request.Name, t.Name) > _minimumNameSimilarity)
+                        .Include(y => y.TagUses)
+                        .ToListAsync();
+
+                    if (fuzzyTags.Count != 1)
+                    {
+                        return QueryResult<Model>.NotFound();
+                    }
+
+                    tag = fuzzyTags[0];
+                }
+                else
+                {
+                    return QueryResult<Model>.NotFound();
+                }
             }
 
             return QueryResult<Model>.Success(new Model()

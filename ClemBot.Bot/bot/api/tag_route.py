@@ -50,10 +50,11 @@ class TagRoute(BaseRoute):
 
         return models.Tag(**tag_dict)
 
-    async def get_tag(self, guild_id: int, name: str) -> models.Tag | None:
+    async def get_tag(self, guild_id: int, name: str, *, do_fuzzy: bool = False) -> models.Tag | None:
         json = {
             "GuildId": guild_id,
             "Name": name,
+            "DoFuzzy": do_fuzzy,
         }
 
         tag_dict = await self._client.get("bot/tags", data=json)

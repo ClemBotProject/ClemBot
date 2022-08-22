@@ -38,7 +38,7 @@ class TagCog(commands.Cog):
         # check if a tag name was given
         if tag_name:
             tag_name = tag_name.lower()
-            if not (tag := await self._check_tag_exists(ctx, tag_name)):
+            if not (tag := await self._check_tag_exists(ctx, tag_name, do_suggestions=True)):
                 return
             await self.bot.tag_route.add_tag_use(
                 ctx.guild.id, tag_name, ctx.channel.id, ctx.author.id
@@ -161,7 +161,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Deletes a tag")
     @ext.example("tag delete mytagname")
     async def delete(self, ctx: ext.ClemBotCtx, name: str) -> None:
-        if not (tag := await self._check_tag_exists(ctx, name)):
+        if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
 
         if tag.user_id == ctx.author.id:
@@ -187,8 +187,9 @@ class TagCog(commands.Cog):
     @ext.short_help("Provides info about tag")
     @ext.example("tag info mytagname")
     async def info(self, ctx: ext.ClemBotCtx, name: str) -> None:
-        if not (tag := await self._check_tag_exists(ctx, name)):
+        if not (tag := await self._check_tag_exists(ctx, name, do_fuzzy=True, do_suggestions=True)):
             return
+
         owner = ctx.guild.get_member(tag.user_id)
         description = ":warning: This tag is unclaimed." if owner is None else ""
         embed = discord.Embed(
@@ -233,7 +234,7 @@ class TagCog(commands.Cog):
     @ext.long_help("Edits the content of a tag")
     @ext.example("tag edit mytagname mynewtagcontent")
     async def edit(self, ctx: ext.ClemBotCtx, name: str, *, content: str) -> None:
-        if not (tag := await self._check_tag_exists(ctx, name)):
+        if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
         # check that author is tag owner
         author = ctx.author
@@ -256,7 +257,7 @@ class TagCog(commands.Cog):
     @ext.long_help("Claims a tag with the given name as your own")
     @ext.example("tag claim mytagname")
     async def claim(self, ctx: ext.ClemBotCtx, name: str) -> None:
-        if not (tag := await self._check_tag_exists(ctx, name)):
+        if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
         # make sure tag is unclaimed
         if owner := ctx.guild.get_member(tag.user_id):
@@ -316,7 +317,7 @@ class TagCog(commands.Cog):
         if user.bot:
             await self._error_embed(ctx, f"Cannot transfer tag `{name}` to a bot.")
             return
-        if not (tag := await self._check_tag_exists(ctx, name)):
+        if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
         author = ctx.author
         # check if tag is unclaimed
@@ -418,16 +419,25 @@ class TagCog(commands.Cog):
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    async def _check_tag_exists(self, ctx: ext.ClemBotCtx, name: str) -> Tag | None:
+    async def _check_tag_exists(self, ctx: ext.ClemBotCtx, name: str, *, do_fuzzy: bool = False, do_suggestions: bool = False) -> Tag | None:
         """
         Checks if the given tag exists.
         If so, returns the tag.
         If not, sends message and returns None.
         """
+
         name = name.lower()
-        if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name)):
-            await self._error_embed(ctx, f"Requested tag `{name}` does not exist.")
+
+        if not (tag := await self.bot.tag_route.get_tag(ctx.guild.id, name, do_fuzzy=do_fuzzy)):
+            body = f"Requested tag `{name}` does not exist."
+
+            if do_suggestions and (suggestions := await self.bot.tag_route.search_tags(ctx.guild.id, name)):
+                body += "\n\nDid you mean one of these?\n" + "\n".join([f"`{s.name}`" for s in suggestions])
+
+            await self._error_embed(ctx, body)
+
             return None
+
         return tag
 
     async def _check_tag_content(self, ctx: ext.ClemBotCtx, content: str) -> str | None:
