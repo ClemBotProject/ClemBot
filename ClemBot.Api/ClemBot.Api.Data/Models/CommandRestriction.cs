@@ -3,6 +3,8 @@
 public class CommandRestriction
 {
 
+    public int Id { get; set; }
+
     public string CommandName { get; set; }
 
     public bool SilentlyFail { get; set; }

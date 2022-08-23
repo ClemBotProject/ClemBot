@@ -158,7 +158,6 @@ def required_claims(*claims: Claims) -> T_EXTBASE_DECO_WRAP:
 
 
 def allow_disable(allow: bool = True) -> T_EXTBASE_DECO_WRAP:
-
     def wrapper(func: T_EXTBASE) -> T_EXTBASE:
         if isinstance(func, ExtBase):
             func.allow_disable = allow

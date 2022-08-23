@@ -13,7 +13,7 @@ public class Details
     {
         public Validator()
         {
-            RuleFor(c => c.CommandName).NotNull();
+            RuleFor(c => c.CommandName).NotNull().NotEmpty();
             RuleFor(c => c.GuildId).NotNull();
             RuleFor(c => c.ChannelId).NotNull();
         }
@@ -66,14 +66,14 @@ public class Details
                 return QueryResult<CommandRestrictionDto>.NotFound();
             }
 
-            var list = await _mediator.Send(new GetCommandRestrictionRequest
+            var commandRestrictions = await _mediator.Send(new GetCommandRestrictionRequest
             {
                 CommandName = request.CommandName,
                 Id = request.GuildId
             });
 
             var channelIds = new List<ulong>();
-            foreach (var restriction in list)
+            foreach (var restriction in commandRestrictions)
             {
                 if (restriction.Channel != null)
                 {
@@ -84,7 +84,7 @@ public class Details
             return QueryResult<CommandRestrictionDto>.Success(new CommandRestrictionDto
             {
                 CommandName = request.CommandName,
-                Disabled = list.Count != 0,
+                Disabled = commandRestrictions.Count != 0,
                 GuildId = request.GuildId,
                 ChannelIds = channelIds
             });

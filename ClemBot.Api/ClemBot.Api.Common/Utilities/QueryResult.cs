@@ -30,4 +30,7 @@ public class QueryResult<T> : IResult<T, QueryStatus>
 
     public static QueryResult<T> Forbidden()
         => new(default, QueryStatus.Forbidden);
+
+    public static QueryResult<T> NoContent()
+        => new(null, QueryStatus.NoContent);
 }

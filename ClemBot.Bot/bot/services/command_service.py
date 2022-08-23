@@ -47,14 +47,18 @@ class CommandService(BaseService):
         channel_id = ctx.channel.id
         command_name = ctx.command.name
 
-        disabled, silently_fail = await self.bot.commands_route.get_status(guild_id, channel_id, command_name)
+        disabled, silently_fail = await self.bot.commands_route.get_status(
+            guild_id, channel_id, command_name
+        )
 
         if not disabled:
             return
 
         if not silently_fail:
-            raise CommandRestrictionError(f"The command `{command_name}` has been disabled.\n"
-                                          f"Type `{ctx.prefix}cmd {command_name}` to see where it's been disabled.")
+            raise CommandRestrictionError(
+                f"The command `{command_name}` has been disabled.\n"
+                f"Type `{ctx.prefix}cmd {command_name}` to see where it's been disabled."
+            )
 
     async def load_service(self) -> None:
         pass

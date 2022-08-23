@@ -49,4 +49,14 @@ public class CommandsController : ControllerBase
             { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpDelete("bot/[controller]/enable")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Enable([FromBody] Enable.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
 }

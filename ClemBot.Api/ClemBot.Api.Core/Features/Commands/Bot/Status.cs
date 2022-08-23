@@ -13,7 +13,7 @@ public class Status
     {
         public Validator()
         {
-            RuleFor(c => c.CommandName).NotNull();
+            RuleFor(c => c.CommandName).NotNull().NotEmpty();
             RuleFor(c => c.GuildId).NotNull();
             RuleFor(c => c.ChannelId).NotNull();
         }
@@ -62,7 +62,7 @@ public class Status
                 return QueryResult<CommandRestrictionDto>.NotFound();
             }
 
-            var list = await _mediator.Send(new GetCommandRestrictionRequest
+            var commandRestrictions = await _mediator.Send(new GetCommandRestrictionRequest
             {
                 CommandName = request.CommandName,
                 Id = request.GuildId
@@ -71,7 +71,7 @@ public class Status
             var disabled = false;
             var silentlyFail = false;
 
-            foreach (var restriction in list)
+            foreach (var restriction in commandRestrictions)
             {
                 if (restriction.Channel == null || restriction.ChannelId == request.ChannelId)
                 {
