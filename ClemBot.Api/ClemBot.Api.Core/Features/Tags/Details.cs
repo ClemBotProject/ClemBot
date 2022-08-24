@@ -59,26 +59,24 @@ public class Details
                 });
             }
 
+            if (request.DoFuzzy)
             {
-                if (request.DoFuzzy)
-                {
-                    var fuzzyTags = await _context.Tags
-                        .Where(t => t.GuildId == request.GuildId &&
-                                    EF.Functions.TrigramsSimilarity(request.Name, t.Name) > _minimumNameSimilarity)
-                        .Include(y => y.TagUses)
-                        .ToListAsync();
+                var fuzzyTags = await _context.Tags
+                    .Where(t => t.GuildId == request.GuildId &&
+                                EF.Functions.TrigramsSimilarity(request.Name, t.Name) > _minimumNameSimilarity)
+                    .Include(y => y.TagUses)
+                    .ToListAsync();
 
-                    if (fuzzyTags.Count != 1)
-                    {
-                        return QueryResult<Model>.NotFound();
-                    }
-
-                    tag = fuzzyTags[0];
-                }
-                else
+                if (fuzzyTags.Count != 1)
                 {
                     return QueryResult<Model>.NotFound();
                 }
+
+                tag = fuzzyTags[0];
+            }
+            else
+            {
+                return QueryResult<Model>.NotFound();
             }
 
             return QueryResult<Model>.Success(new Model()
