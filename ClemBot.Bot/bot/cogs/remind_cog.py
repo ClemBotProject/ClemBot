@@ -114,7 +114,9 @@ class RemindCog(commands.Cog):
             embed = discord.Embed(title="⏰ Reminder", color=Colors.ClemsonOrange)
             embed.add_field(name="Reminder ID", value=reminder.id)
             embed.add_field(name="Original Message", value=f"[Link]({reminder.link})")
-            embed.add_field(name="Alarm Time", value=reminder.time.strftime('%x at %X UTC'), inline=False)
+            embed.add_field(
+                name="Alarm Time", value=reminder.time.strftime("%x at %X UTC"), inline=False
+            )
             embed.add_field(name="Message", value=reminder.content)
             embed.set_footer(
                 text=f'To delete this reminder, type "{ctx.prefix}reminder delete {reminder.id}".'

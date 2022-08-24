@@ -91,7 +91,9 @@ class PaginateService(BaseService):
         msg = await channel.send(embed=embed)
 
         # stores the message info
-        message = Message(pages, 0, author.id, embed_name=embed_name, field_title=field_title, footers=[])
+        message = Message(
+            pages, 0, author.id, embed_name=embed_name, field_title=field_title, footers=[]
+        )
         self.messages[msg.id] = message
         await self.send_scroll_reactions(msg, author, timeout)
 
