@@ -19,7 +19,7 @@ public class Enable
         }
     }
 
-    public class Query : IRequest<QueryResult<int>>
+    public class Query : IRequest<QueryResult<Unit>>
     {
         public string CommandName { get; set; } = null!;
 
@@ -28,7 +28,7 @@ public class Enable
         public ulong? ChannelId { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, QueryResult<int>>
+    public class Handler : IRequestHandler<Query, QueryResult<Unit>>
     {
         private readonly IMediator _mediator;
         private readonly ClemBotContext _context;
@@ -39,7 +39,7 @@ public class Enable
             _mediator = mediator;
         }
 
-        public async Task<QueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Unit>> Handle(Query request, CancellationToken cancellationToken)
         {
             var guildExists = await _mediator.Send(new GuildExistsRequest
             {
@@ -57,7 +57,7 @@ public class Enable
 
             if (!guildExists || request.ChannelId.HasValue && !channelExists)
             {
-                return QueryResult<int>.NotFound();
+                return QueryResult<Unit>.NotFound();
             }
 
             var commandRestrictions = await _mediator.Send(new GetCommandRestrictionRequest
@@ -65,9 +65,10 @@ public class Enable
                 CommandName = request.CommandName, Id = request.GuildId
             });
 
+            // can't enable what isn't disabled
             if (commandRestrictions.Count == 0)
             {
-                return QueryResult<int>.NotFound();
+                return QueryResult<Unit>.NotFound();
             }
 
             if (request.ChannelId.HasValue)
@@ -84,7 +85,7 @@ public class Enable
 
                 if (cr == null)
                 {
-                    return QueryResult<int>.NotFound();
+                    return QueryResult<Unit>.NotFound();
                 }
 
                 _context.CommandRestrictions.Remove(cr);
@@ -93,7 +94,7 @@ public class Enable
                 {
                     CommandName = request.CommandName, Id = request.GuildId
                 });
-                return QueryResult<int>.Success(cr.Id);
+                return QueryResult<Unit>.NoContent();
             }
 
             _context.CommandRestrictions.RemoveRange(commandRestrictions);
@@ -102,7 +103,7 @@ public class Enable
             {
                 CommandName = request.CommandName, Id = request.GuildId
             });
-            return QueryResult<int>.Success(commandRestrictions[0].Id);
+            return QueryResult<Unit>.NoContent();
         }
     }
 }

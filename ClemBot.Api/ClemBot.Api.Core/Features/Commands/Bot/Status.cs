@@ -73,6 +73,7 @@ public class Status
 
             foreach (var restriction in commandRestrictions)
             {
+                // check for server-wide ban or if the command is banned in the requested channel
                 if (restriction.Channel == null || restriction.ChannelId == request.ChannelId)
                 {
                     disabled = true;

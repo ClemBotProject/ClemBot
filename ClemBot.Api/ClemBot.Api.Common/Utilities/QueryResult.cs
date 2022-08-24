@@ -32,5 +32,5 @@ public class QueryResult<T> : IResult<T, QueryStatus>
         => new(default, QueryStatus.Forbidden);
 
     public static QueryResult<T> NoContent()
-        => new(null, QueryStatus.NoContent);
+        => new(default, QueryStatus.NoContent);
 }

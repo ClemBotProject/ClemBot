@@ -1,4 +1,5 @@
 ﻿using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.Channels.Models;
 using ClemBot.Api.Services.Caching.Commands.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
@@ -19,7 +20,7 @@ public class Disable
         }
     }
 
-    public class Query : IRequest<QueryResult<int>>
+    public class Query : IRequest<QueryResult<Unit>>
     {
         public string CommandName { get; set; } = null!;
 
@@ -30,7 +31,7 @@ public class Disable
         public bool SilentlyFail { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, QueryResult<int>>
+    public class Handler : IRequestHandler<Query, QueryResult<Unit>>
     {
         private readonly IMediator _mediator;
         private readonly ClemBotContext _context;
@@ -41,7 +42,7 @@ public class Disable
             _mediator = mediator;
         }
 
-        public async Task<QueryResult<int>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Unit>> Handle(Query request, CancellationToken cancellationToken)
         {
             var guildExists = await _mediator.Send(new GuildExistsRequest
             {
@@ -59,7 +60,7 @@ public class Disable
 
             if (!guildExists || request.ChannelId.HasValue && !channelExists)
             {
-                return QueryResult<int>.NotFound();
+                return QueryResult<Unit>.NotFound();
             }
 
             var commandRestrictions = await _mediator.Send(new GetCommandRestrictionRequest
@@ -67,7 +68,57 @@ public class Disable
                 CommandName = request.CommandName, Id = request.GuildId
             });
 
+            if (request.ChannelId.HasValue)
+            {
+                foreach (var restriction in commandRestrictions)
+                {
+                    // check for an already-disabled command, server-wide or requested channel
+                    if (restriction.Channel == null || restriction.ChannelId == request.ChannelId.Value)
+                    {
+                        return QueryResult<Unit>.Conflict();
+                    }
+                }
 
+                await _context.CommandRestrictions.AddAsync(new CommandRestriction
+                {
+                    CommandName = request.CommandName,
+                    GuildId = request.GuildId,
+                    ChannelId = request.ChannelId.Value,
+                    SilentlyFail = request.SilentlyFail
+                });
+                await _context.SaveChangesAsync();
+                await _mediator.Send(new ClearCommandRestrictionRequest
+                {
+                    CommandName = request.CommandName, Id = request.GuildId
+                });
+                return QueryResult<Unit>.NoContent();
+            }
+
+            var channelRestrictions = new List<CommandRestriction>();
+
+            foreach (var restriction in commandRestrictions)
+            {
+                if (restriction.Channel == null)
+                {
+                    return QueryResult<Unit>.Conflict();
+                }
+                channelRestrictions.Add(restriction);
+            }
+
+            _context.RemoveRange(channelRestrictions);
+            await _context.AddAsync(new CommandRestriction
+            {
+                CommandName = request.CommandName,
+                GuildId = request.GuildId,
+                SilentlyFail = request.SilentlyFail
+            });
+            await _context.SaveChangesAsync();
+            await _mediator.Send(new ClearCommandRestrictionRequest
+            {
+                CommandName = request.CommandName,
+                Id = request.GuildId
+            });
+            return QueryResult<Unit>.NoContent();
         }
     }
 }
