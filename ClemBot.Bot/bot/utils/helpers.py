@@ -39,7 +39,7 @@ def format_duration(duration: FutureDuration | PastDuration) -> str:
     if delta.months > 0:
         s += f'{delta.months} Month{"s" if delta.months > 1 else ""} '
     if delta.weeks > 0:
-        s += f'{delta.weeks} Week{"s" if delta.weeks > 1 else ""}'
+        s += f'{delta.weeks} Week{"s" if delta.weeks > 1 else ""} '
     if delta.days > 0:
         s += f'{delta.days} Day{"s" if delta.days > 1 else ""} '
     if delta.hours > 0:
