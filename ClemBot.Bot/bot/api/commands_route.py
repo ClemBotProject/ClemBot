@@ -25,7 +25,9 @@ class CommandsRoute(BaseRoute):
     async def get_status(
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
     ) -> tuple[bool, bool]:
-        resp = await self._client.get(f"bot/commands/{guild_id}/{channel_id}/{command_name}/status", **kwargs)
+        resp = await self._client.get(
+            f"bot/commands/{guild_id}/{channel_id}/{command_name}/status", **kwargs
+        )
 
         if not resp:
             return False, False
@@ -44,13 +46,25 @@ class CommandsRoute(BaseRoute):
 
         return CommandModel(**resp)
 
-    async def enable_command(
-            self, name: str, guild_id: int, channel_id: t.Optional[int] = None, silent: bool = False, **kwargs: t.Any
+    async def disable_command(
+        self,
+        name: str,
+        guild_id: int,
+        channel_id: t.Optional[int] = None,
+        silent: bool = False,
+        **kwargs: t.Any,
     ) -> None:
-        json = {
+        json = {"CommandName": name, "GuildId": guild_id, "SilentlyFail": silent}
+        if channel_id:
+            json["ChannelId"] = channel_id
 
-        }
-        pass
+        await self._client.put("bot/commands/disable", data=json, **kwargs)
 
-    async def disable_command(self) -> None:
-        pass
+    async def enable_command(
+        self, name: str, guild_id: int, channel_id: t.Optional[int] = None, **kwargs: t.Any
+    ) -> None:
+        json = {"CommandName": name, "GuildId": guild_id}
+        if channel_id:
+            json["ChannelId"] = channel_id
+
+        await self._client.delete("bot/commands/enable", data=json, **kwargs)

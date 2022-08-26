@@ -1,11 +1,7 @@
-import typing as t
-
-import discord
-
 import bot.extensions as ext
 import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
-from bot.consts import Colors
+from bot.consts import Claims
 from bot.errors import CommandRestrictionError
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
@@ -38,6 +34,11 @@ class CommandService(BaseService):
     async def on_before_command_invoke(self, ctx: ext.ClemBotCtx) -> None:
         assert ctx.command is not None
         if not ctx.command.allow_disable:
+            return
+
+        user_claims = await self.bot.claim_route.get_claims_user(ctx.author)
+
+        if Claims.bypass_disabled_commands in user_claims:
             return
 
         assert ctx.guild is not None
