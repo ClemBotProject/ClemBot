@@ -75,9 +75,9 @@ public class Details
             var channelIds = new List<ulong>();
             foreach (var restriction in commandRestrictions)
             {
-                if (restriction.Channel != null)
+                if (restriction.ChannelId.HasValue)
                 {
-                    channelIds.Add(restriction.ChannelId);
+                    channelIds.Add(restriction.ChannelId.Value);
                 }
             }
 

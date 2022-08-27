@@ -114,7 +114,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ChannelId")
+                    b.Property<decimal?>("ChannelId")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("CommandName")
@@ -560,9 +560,7 @@ namespace ClemBot.Api.Data.Migrations
                 {
                     b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
                         .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChannelId");
 
                     b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
                         .WithMany()

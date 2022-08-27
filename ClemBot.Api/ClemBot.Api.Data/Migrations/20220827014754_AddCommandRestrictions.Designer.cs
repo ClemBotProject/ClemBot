@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClemBot.Api.Data.Migrations
 {
     [DbContext(typeof(ClemBotContext))]
-    [Migration("20220824030024_AddCommandRestrictions")]
+    [Migration("20220827014754_AddCommandRestrictions")]
     partial class AddCommandRestrictions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,7 +116,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ChannelId")
+                    b.Property<decimal?>("ChannelId")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("CommandName")
@@ -562,9 +562,7 @@ namespace ClemBot.Api.Data.Migrations
                 {
                     b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
                         .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChannelId");
 
                     b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
                         .WithMany()

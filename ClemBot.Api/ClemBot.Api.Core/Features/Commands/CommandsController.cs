@@ -60,7 +60,7 @@ public class CommandsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpPut("/bot/[controller]/disable")]
+    [HttpPut("bot/[controller]/disable")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Disable([FromBody] Disable.Query query) =>
         await _mediator.Send(query) switch

@@ -28,7 +28,7 @@ namespace ClemBot.Api.Data.Migrations
                     CommandName = table.Column<string>(type: "text", nullable: true),
                     SilentlyFail = table.Column<bool>(type: "boolean", nullable: false),
                     GuildId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
-                    ChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false)
+                    ChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -37,8 +37,7 @@ namespace ClemBot.Api.Data.Migrations
                         name: "FK_CommandRestrictions_Channels_ChannelId",
                         column: x => x.ChannelId,
                         principalTable: "Channels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CommandRestrictions_Guilds_GuildId",
                         column: x => x.GuildId,

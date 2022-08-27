@@ -73,7 +73,7 @@ public class Disable
                 foreach (var restriction in commandRestrictions)
                 {
                     // check for an already-disabled command, server-wide or requested channel
-                    if (restriction.Channel == null || restriction.ChannelId == request.ChannelId.Value)
+                    if (!restriction.ChannelId.HasValue || restriction.ChannelId == request.ChannelId.Value)
                     {
                         return QueryResult<Unit>.Conflict();
                     }
@@ -98,7 +98,7 @@ public class Disable
 
             foreach (var restriction in commandRestrictions)
             {
-                if (restriction.Channel == null)
+                if (!restriction.ChannelId.HasValue)
                 {
                     return QueryResult<Unit>.Conflict();
                 }

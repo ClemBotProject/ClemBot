@@ -12,7 +12,7 @@ public class CommandRestriction
     public ulong GuildId { get; set; }
     public Guild Guild { get; set; }
 
-    public ulong ChannelId { get; set; }
-    public Channel? Channel { get; set; } = null!;
+    public ulong? ChannelId { get; set; }
+    public Channel? Channel { get; set; }
 
 }

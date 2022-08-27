@@ -76,7 +76,7 @@ public class Enable
                 CommandRestriction? cr = null;
                 foreach (var restriction in commandRestrictions)
                 {
-                    if (restriction.Channel != null && restriction.ChannelId == request.ChannelId.Value)
+                    if (restriction.ChannelId.HasValue && restriction.ChannelId.Value == request.ChannelId.Value)
                     {
                         cr = restriction;
                         break;

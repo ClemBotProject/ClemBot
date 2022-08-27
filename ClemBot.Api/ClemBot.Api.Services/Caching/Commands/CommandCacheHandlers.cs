@@ -34,6 +34,7 @@ public class CommandCacheHandlers : RequestHandler<ClearCommandRestrictionReques
                 .Where(c => c.GuildId == request.Id && c.CommandName == request.CommandName)
                 .Select(item => new CommandRestriction
                 {
+                    Id = item.Id,
                     GuildId = item.GuildId,
                     CommandName = item.CommandName,
                     ChannelId = item.ChannelId,
