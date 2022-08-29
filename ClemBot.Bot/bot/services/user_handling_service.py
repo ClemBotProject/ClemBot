@@ -42,7 +42,7 @@ class UserHandlingService(BaseService):
 
         await self.bot.user_route.add_user_guild(user.id, user.guild.id, raise_on_error=True)
 
-        await self.bot.user_route.update_roles(user.id, [r.id for r in user.roles])
+        await self.bot.user_route.update_roles(user.id, user.guild.id, [r.id for r in user.roles])
 
         await self.notify_user_join(user)
 
@@ -93,7 +93,7 @@ class UserHandlingService(BaseService):
             self.user_id_cache.add(before.id)
 
         await self.bot.user_route.update_roles(
-            before.id, [r.id for r in after.roles], raise_on_error=False
+            before.id, before.guild.id, [r.id for r in after.roles], raise_on_error=False
         )
 
     async def notify_user_join(self, user: discord.Member) -> None:
