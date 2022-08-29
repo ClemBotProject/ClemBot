@@ -1,14 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Caching.Users.Models;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging;
 
 namespace ClemBot.Api.Core.Features.Users.Bot;
 
@@ -24,34 +18,40 @@ public class UpdateRoles
 
     public record Command : IRequest<QueryResult<IEnumerable<ulong>>>
     {
-        public ulong Id { get; set; }
+        public ulong Id { get; init; }
 
-        public List<ulong> Roles { get; set; } = new();
+        public ulong GuildId { get; init; }
+
+        public List<ulong> Roles { get; init; } = new();
     }
 
-    public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
+    public class Handler : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
     {
+        private ClemBotContext _context { get; }
+        private IMediator _mediator { get; }
+
+        public Handler(ClemBotContext context, IMediator mediator)
+        {
+            _context = context;
+            _mediator = mediator;
+        }
+
         public async Task<QueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var roleMappings = await _context.RoleUser
-                .Select(ru => new { ru, ru.Role.GuildId })
-                .Where(ru => ru.ru.UserId == request.Id)
-                .ToListAsync();
-
-            if (!roleMappings.Any())
+            if (!await _mediator.Send(new UserExistsRequest{ Id = request.Id }))
             {
                 return QueryResult<IEnumerable<ulong>>.NotFound();
             }
 
-            var guildId = roleMappings.First(ru => request.Roles.Contains(ru.ru.RoleId)).GuildId;
+            var roleMappings = await _context.RoleUser
+                .Where(ru => ru.UserId == request.Id && ru.Role.GuildId == request.GuildId)
+                .ToListAsync();
 
-            var oldRoleMappings = roleMappings
-                .Where(ru => ru.GuildId == guildId && !request.Roles.Contains(ru.ru.RoleId))
-                .Select(ru => ru.ru);
+            var oldRoleMappings = roleMappings.Where(ru => !request.Roles.Contains(ru.RoleId));
 
             var newRoleMappings = request.Roles
-                .Where(r => roleMappings.All(ru => ru.ru.RoleId != r))
-                .Select(r => new RoleUser() {RoleId = r, UserId = request.Id});
+                .Where(r => roleMappings.All(ru => ru.RoleId != r))
+                .Select(r => new RoleUser { RoleId = r, UserId = request.Id });
 
             _context.RoleUser.RemoveRange(oldRoleMappings);
             _context.RoleUser.AddRange(newRoleMappings);
