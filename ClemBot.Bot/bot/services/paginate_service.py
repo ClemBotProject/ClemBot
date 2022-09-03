@@ -40,9 +40,14 @@ class Message:
 
         page = self.curr_page
         if isinstance(page, discord.Embed):
-            page.set_footer(
-                text=f"{self.footers[self._curr_page_num]}\nPage {self.curr_page_num + 1} of {len(self.pages)}"
-            )
+            if len(self.footers) != 0:
+                page.set_footer(
+                    text=f"{self.footers[self._curr_page_num]}\nPage {self.curr_page_num + 1} of {len(self.pages)}"
+                )
+            else:
+                page.set_footer(
+                    text=f"Page {self.curr_page_num + 1} of {len(self.pages)}"
+                )
             return page
         elif not isinstance(page, str):
             raise BadArgument(
@@ -124,6 +129,8 @@ class PaginateService(BaseService):
 
         if len(footers) > 0:
             pages[0].set_footer(text=f"{footers[0]}\nPage 1 of {len(pages)}")
+        else:
+            pages[0].set_footer(text=f"Page 1 of {len(pages)}")
         # send the first initial embed
         msg = await channel.send(embed=pages[0])
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
