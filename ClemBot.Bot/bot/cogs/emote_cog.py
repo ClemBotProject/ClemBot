@@ -20,35 +20,42 @@ class EmoteCog(commands.Cog):
 
     @emote.command()
     @ext.required_claims(Claims.emote_add)
-    async def add(self, ctx: ext.ClemBotCtx, emote: discord.Emoji, name: str) -> None:
-        emote_id = emote.name.split(":")[2][:-1]
+    async def add(self, ctx: ext.ClemBotCtx, emote: discord.PartialEmoji, name: str) -> None:
+        slots = self._get_emote_count(ctx, emote.animated)
+        if ctx.guild.emoji_limit - slots == 0:
+            embed = discord.Embed(title="Error", color=Colors.Error)
+            embed.description = (
+                "**Could not add emoji:** all emoji slots for this server are filled."
+            )
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+            await ctx.send(embed=embed)
+            return
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://cdn.discordapp.com/emojis/{emote_id}.gif?v=1") as resp:
-                test_gif = await resp.read()
             async with session.get(
-                f"https://cdn.discordapp.com/emojis/{emote_id}.png?v=1"
-            ) as resp2:
-                test_png = await resp2.read()
+                f"https://cdn.discordapp.com/emojis/{emote.id}.{'gif' if emote.animated else 'png'}?v=1"
+            ) as resp:
+                image = await resp.read()
 
         assert ctx.guild is not None
 
-        try:
-            emote = await ctx.guild.create_custom_emoji(name=name, image=test_gif)
-        except:  # Exception as err:
-            emote = await ctx.guild.create_custom_emoji(name=name, image=test_png)
+        emoji = await ctx.guild.create_custom_emoji(name=name, image=image)
 
-        log.info(f"Emote added in guild: {ctx.guild.id}, name: {emote.name}, by: {ctx.author.id}")
+        log.info(f"Emote added in guild: {ctx.guild.id}, name: {emoji.name}, by: {ctx.author.id}")
 
-        embed = discord.Embed(
-            title="Emoji successfully created :white_check_mark:", color=Colors.ClemsonOrange
+        embed = discord.Embed(title="Emoji Created :white_check_mark:", color=Colors.ClemsonOrange)
+        embed.add_field(name="Name:", value=f"```{emoji.name}```")
+        embed.set_thumbnail(url=emoji.url)
+        embed.set_footer(
+            text=f"Created By: {str(ctx.author)}", icon_url=ctx.author.display_avatar.url
         )
-        embed.add_field(name="Name:", value=f"```{emote.name}```")
-
-        embed.set_thumbnail(url=emote.url)
-
-        fullName = f"{ctx.author.name}#{ctx.author.discriminator}"
-        embed.set_footer(text=f"Created By: {fullName}", icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
+
+    def _get_emote_count(self, ctx: ext.ClemBotCtx, animated: bool) -> int:
+        emotes = 0
+        for emote in ctx.guild.emojis:
+            if emote.animated == animated:
+                emotes += 1
+        return emotes
 
 
 async def setup(bot: ClemBot) -> None:
