@@ -45,9 +45,7 @@ class Message:
                     text=f"{self.footers[self._curr_page_num]}\nPage {self.curr_page_num + 1} of {len(self.pages)}"
                 )
             else:
-                page.set_footer(
-                    text=f"Page {self.curr_page_num + 1} of {len(self.pages)}"
-                )
+                page.set_footer(text=f"Page {self.curr_page_num + 1} of {len(self.pages)}")
             return page
         elif not isinstance(page, str):
             raise BadArgument(
