@@ -158,15 +158,20 @@ class MemesCog(commands.Cog):
 
         random.seed(time.time())
         args = args.replace('"', "'")
-
-        result = ""
-        for i in args:
-            helper = random.randint(0, 100)
-
-            if helper > 60:
-                result += str(i).upper()
+        
+        #for totally random UC/LC:
+        #result = ''.join(random.choice((str.upper, str.lower))(char) for char in args)
+        
+        #for alternating UC/LC after a random small(currently set to '1 to 3') span of characters:
+        i = 1
+        result = random.choice((str.upper, str.lower))(args[0])
+        while i < len(args):
+            helper = random.randint(1, 3)   
+            if result[i-1].isupper():
+                result += args[i : i+helper].lower()
             else:
-                result += str(i).lower()
+                result += args[i : i+helper].upper()
+            i += helper
 
         await ctx.send(result)
 
