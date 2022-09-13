@@ -9,6 +9,7 @@ public enum BotAuthClaims
     welcome_message_modify,
     tag_add,
     tag_delete,
+    tag_transfer,
     assignable_roles_add,
     assignable_roles_delete,
     delete_message,
