@@ -19,7 +19,7 @@ class Message:
     pages: t.Union[list[discord.Embed], list[str]]
     _curr_page_num: int
     author: int
-    footer: t.Optional[str] = None
+    footers: list[str]
     embed_name: t.Optional[str] = None
     field_title: t.Optional[str] = None
 
@@ -40,9 +40,12 @@ class Message:
 
         page = self.curr_page
         if isinstance(page, discord.Embed):
-            page.set_footer(
-                text=f"{self.footer}\nPage {self.curr_page_num + 1} of {len(self.pages)}"
-            )
+            if len(self.footers) != 0:
+                page.set_footer(
+                    text=f"{self.footers[self._curr_page_num]}\nPage {self.curr_page_num + 1} of {len(self.pages)}"
+                )
+            else:
+                page.set_footer(text=f"Page {self.curr_page_num + 1} of {len(self.pages)}")
             return page
         elif not isinstance(page, str):
             raise BadArgument(
@@ -91,7 +94,9 @@ class PaginateService(BaseService):
         msg = await channel.send(embed=embed)
 
         # stores the message info
-        message = Message(pages, 0, author.id, embed_name=embed_name, field_title=field_title)
+        message = Message(
+            pages, 0, author.id, embed_name=embed_name, field_title=field_title, footers=[]
+        )
         self.messages[msg.id] = message
         await self.send_scroll_reactions(msg, author, timeout)
 
@@ -113,13 +118,17 @@ class PaginateService(BaseService):
         if not all(isinstance(p, discord.Embed) for p in pages):
             raise BadArgument("All paginate embed pages need to be of type discord.Embed")
 
-        footer = ""
-        if not pages[0].footer.text is None:
-            footer = pages[0].footer.text
+        footers = []
+        for embed in pages:
+            if embed.footer is not None and embed.footer.text is not None:
+                footers.append(embed.footer.text)
 
-        message = Message(pages, 0, author.id, footer=footer)
+        message = Message(pages, 0, author.id, footers=footers)
 
-        pages[0].set_footer(text=f"{footer}\nPage 1 of {len(pages)}")
+        if len(footers) > 0:
+            pages[0].set_footer(text=f"{footers[0]}\nPage 1 of {len(pages)}")
+        else:
+            pages[0].set_footer(text=f"Page 1 of {len(pages)}")
         # send the first initial embed
         msg = await channel.send(embed=pages[0])
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=author)
