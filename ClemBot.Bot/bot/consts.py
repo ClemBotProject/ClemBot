@@ -53,6 +53,7 @@ class Claims(Enum):
     welcome_message_modify = auto()
     tag_add = auto()
     tag_delete = auto()
+    tag_transfer = auto()
     assignable_roles_add = auto()
     assignable_roles_delete = auto()
     delete_message = auto()

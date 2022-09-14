@@ -4,6 +4,7 @@ using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,16 +14,17 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClemBot.Api.Data.Migrations
 {
     [DbContext(typeof(ClemBotContext))]
-    partial class ClemBotContextModelSnapshot : ModelSnapshot
+    [Migration("20220821175300_AddTagTransferClaim")]
+    partial class AddTagTransferClaim
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "tag_transfer", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit", "custom_tag_prefix_set", "manage_commands", "bypass_disabled_commands" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "tag_transfer", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit", "custom_tag_prefix_set" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "config_settings", new[] { "allow_embed_links" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "designated_channels", new[] { "message_log", "moderation_log", "user_join_log", "user_leave_log", "starboard", "server_join_log", "bot_dm_log" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "infraction_type", new[] { "ban", "mute", "warn" });
@@ -104,35 +106,6 @@ namespace ClemBot.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CommandInvocations");
-                });
-
-            modelBuilder.Entity("ClemBot.Api.Data.Models.CommandRestriction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("ChannelId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<string>("CommandName")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<bool>("SilentlyFail")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChannelId");
-
-                    b.HasIndex("GuildId");
-
-                    b.ToTable("CommandRestrictions");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CustomPrefix", b =>
@@ -554,23 +527,6 @@ namespace ClemBot.Api.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("ClemBot.Api.Data.Models.CommandRestriction", b =>
-                {
-                    b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId");
-
-                    b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
-                        .WithMany()
-                        .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CustomPrefix", b =>
