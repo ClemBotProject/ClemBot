@@ -20,9 +20,9 @@ public class UpdateRoles
     {
         public ulong Id { get; init; }
 
-        public ulong GuildId { get; }
+        public ulong GuildId { get; init; }
 
-        public List<ulong> Roles { get; } = new();
+        public List<ulong> Roles { get; init; } = new();
     }
 
     public class Handler : IRequestHandler<Command, QueryResult<IEnumerable<ulong>>>
