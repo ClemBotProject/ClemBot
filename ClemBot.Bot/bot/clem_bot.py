@@ -201,7 +201,7 @@ class ClemBot(commands.Bot):
         try:
             await self.messenger.publish(Events.on_before_command_invoke, ctx)
         except SilentCommandRestrictionError:
-            return
+            return  # todo: i think i did this wrong
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do
