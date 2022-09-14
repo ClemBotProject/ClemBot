@@ -58,6 +58,12 @@ class CommandRestrictionError(CommandError):
         self.message = message
 
 
+class SilentCommandRestrictionError(CommandError):
+    """
+    Raised if a user attempts to use a command that is disabled silently
+    """
+
+
 class ConversionError(CommandError):
     def __init__(self, message: typing.Optional[str] = None):
         self.message = message

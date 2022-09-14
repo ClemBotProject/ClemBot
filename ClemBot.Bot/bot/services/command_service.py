@@ -2,7 +2,7 @@ import bot.extensions as ext
 import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
 from bot.consts import Claims
-from bot.errors import CommandRestrictionError
+from bot.errors import CommandRestrictionError, SilentCommandRestrictionError
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
 from bot.utils.logging_utils import get_logger
@@ -60,6 +60,8 @@ class CommandService(BaseService):
                 f"The command `{command_name}` has been disabled.\n"
                 f"Type `{ctx.prefix}cmd {command_name}` to see where it's been disabled."
             )
+
+        raise SilentCommandRestrictionError()
 
     async def load_service(self) -> None:
         pass

@@ -38,7 +38,7 @@ from bot.api import (
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
-from bot.errors import BotOnlyRequestError, ClaimsAccessError
+from bot.errors import BotOnlyRequestError, ClaimsAccessError, SilentCommandRestrictionError
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
 from bot.utils.logging_utils import get_logger
@@ -198,7 +198,10 @@ class ClemBot(commands.Bot):
             # If the command isn't an extension command let it through, we dont need to think about it
             return
 
-        await self.messenger.publish(Events.on_before_command_invoke, ctx)
+        try:
+            await self.messenger.publish(Events.on_before_command_invoke, ctx)
+        except SilentCommandRestrictionError:
+            return
 
         if command.ignore_claims_pre_invoke:
             # The command is going to check the claims in the command body, nothing else to do

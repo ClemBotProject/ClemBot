@@ -42,6 +42,8 @@ You decide how to set up your server!
 | tag_transfer                    | Allows for transferring of a [tag](./Tags.md) they do not own                                           |
 | welcome_message_view            | Allows for viewing the servers [welcome message](./WelcomeMessage.md)                                   |
 | welcome_message_modify          | Allows for setting the servers [welcome message](./WelcomeMessage.md)                                   |
+| disable_commands                | Allows for disabling commands server-wide or in specific channels                                       |
+| bypass_disabled_commands        | Allows for bypassing of disabled commands either server-wide or in a specific channel                   |
 
 ## Commands
 

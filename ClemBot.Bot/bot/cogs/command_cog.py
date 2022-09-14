@@ -26,17 +26,18 @@ class CommandCog(commands.Cog):
     @ext.allow_disable(False)
     @ext.long_help("Check if a command is enabled or disabled.")
     @ext.short_help("Check if a command is enabled.")
+    @ext.example(["command slots", "command help"])
     async def command(self, ctx: ext.ClemBotCtx, cmd: CommandConverter) -> None:
         if not cmd:
             await self._error_embed(ctx, f"Command not found.")
             return
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
-        (name, value, inline) = self._disabled_in_field(model)
+        (name, value) = self._disabled_in_field(model)
         embed = discord.Embed(title="⚙️ Command Details", color=Colors.ClemsonOrange)
         embed.add_field(name="Name", value=f"`{cmd.name}`")
-        embed.add_field(name="Allows Disabling", value=str(cmd.allow_disable))
-        embed.add_field(name=name, value=value, inline=inline)
+        embed.add_field(name="Allows Disabling", value=cmd.allow_disable, inline=False)
+        embed.add_field(name=name, value=value)
         if cmd.allow_disable:
             opp_mode = "enable" if model.disabled else "disable"
             embed.set_footer(
@@ -49,6 +50,7 @@ class CommandCog(commands.Cog):
     @ext.required_claims(Claims.manage_commands)
     @ext.long_help("Enable a command server-wide or in a specific channel.")
     @ext.short_help("Enable a command.")
+    @ext.example(["command enable search", "command enable slots #my-channel"])
     async def enable(
         self, ctx: ext.ClemBotCtx, cmd: CommandConverter, channel: t.Optional[TextChannel]
     ) -> None:
@@ -75,13 +77,23 @@ class CommandCog(commands.Cog):
         embed.add_field(
             name="Enabled" if channel is None else "Enabled In",
             value="Server-wide" if channel is None else channel.mention,
+            inline=False,
         )
         await ctx.send(embed=embed)
 
     @command.command(aliases=["off"])
     @ext.required_claims(Claims.manage_commands)
-    @ext.long_help("Disable a command server-wide or in a specific channel.")
+    @ext.long_help(
+        "Disable a command server-wide or in a specific channel with the option to fail silently."
+    )
     @ext.short_help("Disable a command.")
+    @ext.example(
+        [
+            "command disable slots",
+            "command disable eval #my-channel",
+            "command disable info #my-channel true",
+        ]
+    )
     async def disable(
         self,
         ctx: ext.ClemBotCtx,
@@ -115,22 +127,23 @@ class CommandCog(commands.Cog):
         embed.add_field(
             name="Disabled" if channel is None else "Disabled In",
             value="Server-wide" if channel is None else channel.mention,
+            inline=False,
         )
         embed.add_field(name="Silently Fail", value=silent)
         await ctx.send(embed=embed)
 
-    def _disabled_in_field(self, model: CommandModel) -> tuple[str, str, bool]:
+    def _disabled_in_field(self, model: CommandModel) -> tuple[str, str]:
         if not model.disabled:
-            return "Disabled", "False", True
+            return "Disabled", "False"
         if len(model.channel_ids) == 0:
-            return "Disabled", "Server-wide", True
+            return "Disabled", "Server-wide"
         list_of_channels = []
         for channel_id in model.channel_ids:
             channel = self.bot.get_channel(channel_id)
             if channel is None or isinstance(channel, discord.abc.PrivateChannel):
                 continue
             list_of_channels.append(channel.mention)
-        return "Disabled In", "\n".join(list_of_channels), False
+        return "Disabled In", "\n".join(list_of_channels)
 
     async def _error_embed(self, ctx: ext.ClemBotCtx, desc: str) -> None:
         """Shorthand for sending an error message w/ consistent formatting."""
