@@ -498,14 +498,14 @@ class EventsMeta(type):
         return "on_member_ban"
 
     @property
-    def on_before_command_invoke(self) -> str:
+    def on_restrictions_check(self) -> str:
         """
-        Published before a command has successfully completed
+        Published when a command is being checked for restrictions
 
         Args:
-            context (commands.Context): context of the command that was invoked
+            ctx (ext.ClemBotCtx): Context of the command that was invoked
         """
-        return "on_before_command_invoke"
+        return "on_restrictions_check"
 
     @property
     def on_after_command_invoke(self) -> str:
@@ -547,6 +547,38 @@ class EventsMeta(type):
             after (discord.Thread): The after of the thread
         """
         return "on_guild_thread_update"
+
+    @property
+    def on_add_claim_mapping(self) -> str:
+        """
+        Published when a role's claims are added to
+
+        Args:
+            claim (Claim): The claim to add
+            role_id (int): The role id to add the claim to
+        """
+        return "on_add_claim_mapping"
+
+    @property
+    def on_remove_claim_mapping(self) -> str:
+        """
+        Published when a role's claims are removed from
+
+        Args:
+            claim (Claim): The claim to remove
+            role_id (int): The role id to remove the claim from
+        """
+        return "on_remove_claim_mapping"
+
+    @property
+    def on_claims_check(self) -> str:
+        """
+        Published when a command is invoked
+
+        Args:
+            ctx (ext.ClemBotCtx): The ClemBot command context
+        """
+        return "on_claims_check"
 
 
 class Events(metaclass=EventsMeta):

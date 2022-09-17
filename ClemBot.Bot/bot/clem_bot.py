@@ -87,7 +87,7 @@ class ClemBot(commands.Bot):
         self.scheduler: Scheduler = scheduler
 
         # Register our before and after invoke hooks
-        self._before_invoke = self.command_claims_check
+        self._before_invoke = self.on_before_command_invoke
         self._after_invoke = self.on_after_command_invoke
 
         # pylint: disable=undefined-variable
@@ -188,38 +188,12 @@ class ClemBot(commands.Bot):
 
             await channel.send(embed=embed)
 
-    async def command_claims_check(self, ctx: ext.ClemBotCtx) -> None:
+    async def on_before_command_invoke(self, ctx: ext.ClemBotCtx) -> None:
         """
-        Before invoke hook to make sure a user has the correct claims to allow a command invocation
+        Before invoke hook to check for command restrictions & claims
         """
-        command = ctx.command
-
-        if not isinstance(command, ext.ExtBase):
-            # If the command isn't an extension command let it through, we dont need to think about it
-            return
-
-        try:
-            await self.messenger.publish(Events.on_before_command_invoke, ctx)
-        except SilentCommandRestrictionError:
-            return  # todo: i think i did this wrong
-
-        if command.ignore_claims_pre_invoke:
-            # The command is going to check the claims in the command body, nothing else to do
-            return
-
-        if await self.claims_check(ctx):
-            return
-
-        await self.raise_claims_access_error(command, ctx)
-
-    async def raise_claims_access_error(self, command: ext.ExtBase, ctx: ext.ClemBotCtx) -> None:
-        claims_str = "\n".join(command.claims)
-        raise ClaimsAccessError(
-            f"Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```"
-            f"\n **Help:** For more information on how claims work please visit my website [Link!]"
-            f"({bot_secrets.secrets.docs_url}/claims)\n"
-            f"or run the `{await self.current_prefix(ctx)}help claims` command"
-        )
+        await self.messenger.publish(Events.on_restrictions_check, ctx)
+        await self.messenger.publish(Events.on_claims_check, ctx)
 
     async def claims_check(self, ctx: ext.ClemBotCtx) -> bool:
         """
@@ -467,6 +441,9 @@ class ClemBot(commands.Bot):
                 return
 
         error = getattr(error, "original", error)
+
+        if isinstance(error, SilentCommandRestrictionError):  # silently ignore this
+            return
 
         embed = discord.Embed(title=f"ERROR: {type(error).__name__}", color=Colors.Error)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)

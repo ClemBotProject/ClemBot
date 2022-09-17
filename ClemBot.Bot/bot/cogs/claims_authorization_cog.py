@@ -6,6 +6,7 @@ import discord.ext.commands as commands
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
+from bot.messaging.events import Events
 from bot.utils.converters import ClaimsConverter
 
 
@@ -81,7 +82,7 @@ class ClaimsAuthorizationCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        await self.bot.claim_route.add_claim_mapping(claim, role.id, raise_on_error=True)
+        await self.bot.messenger.publish(Events.on_add_claim_mapping, claim, role.id)
 
         title = f'Claim: "{claim.name}" successfully added to role @{role.name} :white_check_mark:'
 
@@ -113,7 +114,7 @@ class ClaimsAuthorizationCog(commands.Cog):
             f'Claim: "{claim.name}" successfully removed from role @{role.name} :white_check_mark:'
         )
 
-        await self.bot.claim_route.remove_claim_mapping(claim, role.id, raise_on_error=True)
+        await self.bot.messenger.publish(Events.on_remove_claim_mapping, claim, role.id)
 
         claims = await self.bot.claim_route.get_claims_role(role.id)
         claims_str = "\n".join(c.name for c in claims) if claims else "No current claims"

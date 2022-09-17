@@ -25,9 +25,10 @@ class CommandsRoute(BaseRoute):
     async def get_status(
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
     ) -> tuple[bool, bool]:
-        resp = await self._client.get(
-            f"bot/commands/{guild_id}/{channel_id}/{command_name}/status", **kwargs
-        )
+
+        json = {"CommandName": command_name, "GuildId": guild_id, "ChannelId": channel_id}
+
+        resp = await self._client.get("bot/commands/status", data=json, **kwargs)
 
         if not resp:
             return False, False
@@ -37,9 +38,10 @@ class CommandsRoute(BaseRoute):
     async def get_details(
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
     ) -> CommandModel | None:
-        resp = await self._client.get(
-            f"bot/commands/{guild_id}/{channel_id}/{command_name}/details", **kwargs
-        )
+
+        json = {"CommandName": command_name, "GuildId": guild_id, "ChannelId": channel_id}
+
+        resp = await self._client.get("bot/commands/details", data=json, **kwargs)
 
         if not resp:
             return None
@@ -54,6 +56,7 @@ class CommandsRoute(BaseRoute):
         silent: bool = False,
         **kwargs: t.Any,
     ) -> None:
+
         json = {"CommandName": name, "GuildId": guild_id, "SilentlyFail": silent}
         if channel_id:
             json["ChannelId"] = channel_id
@@ -63,6 +66,7 @@ class CommandsRoute(BaseRoute):
     async def enable_command(
         self, name: str, guild_id: int, channel_id: t.Optional[int] = None, **kwargs: t.Any
     ) -> None:
+
         json = {"CommandName": name, "GuildId": guild_id}
         if channel_id:
             json["ChannelId"] = channel_id

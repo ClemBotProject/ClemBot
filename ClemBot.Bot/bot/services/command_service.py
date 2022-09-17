@@ -30,15 +30,13 @@ class CommandService(BaseService):
             ctx.command.qualified_name, ctx.guild.id, ctx.channel.id, ctx.author.id
         )
 
-    @BaseService.listener(Events.on_before_command_invoke)
-    async def on_before_command_invoke(self, ctx: ext.ClemBotCtx) -> None:
+    @BaseService.listener(Events.on_restrictions_check)
+    async def on_restrictions_check(self, ctx: ext.ClemBotCtx) -> None:
         assert ctx.command is not None
         if not ctx.command.allow_disable:
             return
 
-        user_claims = await self.bot.claim_route.get_claims_user(ctx.author)
-
-        if Claims.bypass_disabled_commands in user_claims:
+        if await self.bot.claim_route.check_claim_user(Claims.bypass_disabled_commands, ctx.author):
             return
 
         assert ctx.guild is not None
