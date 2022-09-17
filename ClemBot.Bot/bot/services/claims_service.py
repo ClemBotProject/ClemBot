@@ -1,14 +1,10 @@
-import discord
-
+import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
-import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
 from bot.consts import Claims
-from bot.errors import CommandRestrictionError, SilentCommandRestrictionError, ClaimsAccessError
+from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
-import bot.bot_secrets as bot_secrets
-from bot.utils.logging_utils import get_logger
 
 
 class ClaimsService(BaseService):
