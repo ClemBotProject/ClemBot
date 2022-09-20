@@ -434,6 +434,14 @@ class ClemBot(commands.Bot):
             error ([type]): The unhandled exception
         """
 
+        # this is for Command Restrictions: if CommandOnCooldown is thrown
+        # we want to ignore it if the command was disabled.
+        if isinstance(error, discord.ext.commands.CommandOnCooldown):
+            try:
+                await self.messenger.publish(Events.on_restrictions_check, ctx)
+            except SilentCommandRestrictionError:
+                return
+
         ctx = t.cast(ext.ClemBotContext[BotT], ctx)
 
         if ctx.cog:

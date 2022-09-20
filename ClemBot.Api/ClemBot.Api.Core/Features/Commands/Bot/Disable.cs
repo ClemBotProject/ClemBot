@@ -58,7 +58,7 @@ public class Disable
                 });
             }
 
-            if (!guildExists || request.ChannelId.HasValue && !channelExists)
+            if (!guildExists || (request.ChannelId.HasValue && !channelExists))
             {
                 return QueryResult<Unit>.NotFound();
             }

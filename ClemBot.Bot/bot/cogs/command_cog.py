@@ -29,7 +29,7 @@ class CommandCog(commands.Cog):
     @ext.example(["command slots", "command help"])
     async def command(self, ctx: ext.ClemBotCtx, cmd: CommandConverter) -> None:
         if not cmd:
-            await self._error_embed(ctx, f"Command not found.")
+            await self._error_embed(ctx, "Command not found.")
             return
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
@@ -55,7 +55,7 @@ class CommandCog(commands.Cog):
         self, ctx: ext.ClemBotCtx, cmd: CommandConverter, channel: t.Optional[TextChannel]
     ) -> None:
         if not cmd:
-            await self._error_embed(ctx, f"Command not found.")
+            await self._error_embed(ctx, "Command not found.")
             return
         # not going to check if the command allows disabling in the off-chance it's been changed from
         # allowing disabling (and was disabled) to then disallowing disabling. this would soft-lock the cmd.
@@ -102,7 +102,7 @@ class CommandCog(commands.Cog):
         silent: bool = False,
     ) -> None:
         if not cmd:
-            await self._error_embed(ctx, f"Command not found.")
+            await self._error_embed(ctx, "Command not found.")
             return
         if not cmd.allow_disable:
             await self._error_embed(ctx, f"Command `{cmd.name}` cannot be disabled.")
