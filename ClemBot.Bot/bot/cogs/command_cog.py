@@ -77,7 +77,7 @@ class CommandCog(commands.Cog):
         embed.add_field(
             name="Enabled" if channel is None else "Enabled In",
             value="Server-wide" if channel is None else channel.mention,
-            inline=False,
+            inline=False
         )
         await ctx.send(embed=embed)
 
@@ -127,7 +127,7 @@ class CommandCog(commands.Cog):
         embed.add_field(
             name="Disabled" if channel is None else "Disabled In",
             value="Server-wide" if channel is None else channel.mention,
-            inline=False,
+            inline=False
         )
         embed.add_field(name="Silently Fail", value=silent)
         await ctx.send(embed=embed)
