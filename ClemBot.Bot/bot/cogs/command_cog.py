@@ -1,21 +1,15 @@
-# type: ignore
 import typing as t
 
 import discord
 import discord.ext.commands as commands
 from discord import TextChannel
-from discord.ext.commands import Context
 
 import bot.extensions as ext
-from bot.clem_bot import BotT, ClemBot
+from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.models.command_models import CommandModel
-
-
-class CommandConverter(commands.Converter[ext.ClemBotCommand | None]):
-    async def convert(self, ctx: Context[BotT], argument: str) -> ext.ClemBotCommand | None:
-        return ctx.bot.get_command(argument)
+from bot.utils.converters import CommandConverter
 
 
 class CommandCog(commands.Cog):
@@ -27,10 +21,17 @@ class CommandCog(commands.Cog):
     @ext.long_help("Check if a command is enabled or disabled.")
     @ext.short_help("Check if a command is enabled.")
     @ext.example(["command slots", "command help"])
-    async def command(self, ctx: ext.ClemBotCtx, cmd: CommandConverter) -> None:
-        if not cmd:
+    async def command(
+        self,
+        ctx: ext.ClemBotCtx,
+        command: t.Annotated[list[ext.ClemBotCommand], commands.Greedy[CommandConverter]],
+    ) -> None:
+        if not command:
             await self._error_embed(ctx, "Command not found.")
             return
+
+        cmd = command[-1]
+
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
         (name, value) = self._disabled_in_field(model)
@@ -52,11 +53,17 @@ class CommandCog(commands.Cog):
     @ext.short_help("Enable a command.")
     @ext.example(["command enable search", "command enable slots #my-channel"])
     async def enable(
-        self, ctx: ext.ClemBotCtx, cmd: CommandConverter, channel: t.Optional[TextChannel]
+        self,
+        ctx: ext.ClemBotCtx,
+        command: t.Annotated[list[ext.ClemBotCommand], commands.Greedy[CommandConverter]],
+        channel: t.Optional[TextChannel],
     ) -> None:
-        if not cmd:
+        if not command:
             await self._error_embed(ctx, "Command not found.")
             return
+
+        cmd = command[-1]
+
         # not going to check if the command allows disabling in the off-chance it's been changed from
         # allowing disabling (and was disabled) to then disallowing disabling. this would soft-lock the cmd.
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
@@ -97,16 +104,32 @@ class CommandCog(commands.Cog):
     async def disable(
         self,
         ctx: ext.ClemBotCtx,
-        cmd: CommandConverter,
+        command: t.Annotated[list[ext.ClemBotCommand], commands.Greedy[CommandConverter]],
         channel: t.Optional[TextChannel],
-        silent: bool = False,
+        silent: t.Annotated[bool, t.Optional[bool]] = False,
     ) -> None:
-        if not cmd:
+
+        if not command:
             await self._error_embed(ctx, "Command not found.")
             return
+
+        # If the parse view did not make it to the end of the argument list then we
+        # know that we failed to parse at least one of the inputted values
+        # EX: !command disable tag invalidcommand #some-channel true
+        # invalidcommand will fail to parse because it doesn't exist
+        if not ctx.view.eof:
+            await self._error_embed(
+                ctx, f"Argument parsing failed on input value `{ctx.current_argument}`"
+            )
+            return
+
+        # The greedy converter returns a list of all the valid commands, grab the last one as that is the full commmand inputted
+        cmd = command[-1]
+
         if not cmd.allow_disable:
             await self._error_embed(ctx, f"Command `{cmd.name}` cannot be disabled.")
             return
+
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
         if len(model.channel_ids) == 0 and model.disabled:
@@ -123,7 +146,7 @@ class CommandCog(commands.Cog):
             cmd.name, ctx.guild.id, channel.id if channel is not None else None, silent
         )
         embed = discord.Embed(title="⚙️ Command Disabled", color=Colors.ClemsonOrange)
-        embed.add_field(name="Command Name", value=f"`{cmd.name}`")
+        embed.add_field(name="Command Name", value=f"`{cmd.qualified_name}`")
         embed.add_field(
             name="Disabled" if channel is None else "Disabled In",
             value="Server-wide" if channel is None else channel.mention,

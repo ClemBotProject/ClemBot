@@ -5,6 +5,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import Context, Converter
+from discord.ext.commands._types import BotT
 from discord.ext.commands.errors import UserInputError
 
 import bot.extensions as ext
@@ -17,6 +18,28 @@ https://github.com/python-discord/bot/blob/master/bot/converters.py
 """
 
 T = t.TypeVar("T")
+
+
+class CommandConverter(Converter[ext.ClemBotCommand]):
+    """
+    Convert a space delineated string into a valid discord.py command, if combined with a Greedy converter
+    this converter can also parse out arbitrary sub commands from a string
+    """
+
+    def __init__(self) -> None:
+        self.accu: list[str] = []
+
+    async def convert(self, ctx: Context[BotT], argument: str) -> ext.ClemBotCommand:
+        self.accu.append(argument)
+
+        # Join the command accumulator on a space so that we get a valid command invocation to search on
+        command = ctx.bot.get_command(" ".join(self.accu))
+
+        if not command:
+            raise ConversionError()
+
+        # All Clembot commands should be ClemBotCommands by default so this should never fail
+        return t.cast(ext.ClemBotCommand, command)
 
 
 class DurationDelta(Converter[T]):
@@ -32,7 +55,7 @@ class DurationDelta(Converter[T]):
         r"((?P<seconds>\d+?) ?(seconds|second|sec|S|s))?"
     )
 
-    async def convert(self, ctx: t.Any, duration: str) -> T:
+    async def convert(self, ctx: Context[BotT], duration: str) -> T:
         """
         Converts a `duration` string to a relativedelta object.
         The converter supports the following symbols for each unit of time:
@@ -63,7 +86,7 @@ class FutureDuration(DurationDelta[relativedelta | datetime]):
     """Convert duration strings into UTC datetime.datetime objects represented in the future."""
 
     async def convert(
-        self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]
+        self, ctx: Context[BotT], duration: t.Union[str, relativedelta]
     ) -> relativedelta | datetime:
         delta = t.cast(
             relativedelta,
@@ -84,7 +107,7 @@ class PastDuration(DurationDelta[relativedelta | datetime]):
     """Converts duration strings into UTC datetime.datetime objects represented in the past."""
 
     async def convert(
-        self, ctx: Context[ext.BotT], duration: t.Union[str, relativedelta]
+        self, ctx: Context[BotT], duration: t.Union[str, relativedelta]
     ) -> relativedelta | datetime:
         delta = t.cast(
             relativedelta,
@@ -104,7 +127,7 @@ class PastDuration(DurationDelta[relativedelta | datetime]):
 class ClaimsConverter(Converter[Claims]):
     """Convert a given claim string into its enum representation"""
 
-    async def convert(self, ctx: Context[ext.BotT], claim: str) -> Claims:
+    async def convert(self, ctx: Context[BotT], claim: str) -> Claims:
         try:
             return Claims.__members__[claim]
         except KeyError:
@@ -114,7 +137,7 @@ class ClaimsConverter(Converter[Claims]):
 class HonorsConverter(Converter[str]):
     """Sanitize honors argument input for grades_cog"""
 
-    async def convert(self, ctx: Context[ext.BotT], argument: str) -> str:
+    async def convert(self, ctx: Context[BotT], argument: str) -> str:
         honors = None
 
         if argument in ("honors", "hon", "h"):

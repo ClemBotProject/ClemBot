@@ -11,6 +11,7 @@ from types import ModuleType
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from discord.ext.commands._types import BotT
 
 import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
@@ -38,7 +39,7 @@ from bot.api import (
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
-from bot.errors import BotOnlyRequestError, ClaimsAccessError, SilentCommandRestrictionError
+from bot.errors import BotOnlyRequestError, SilentCommandRestrictionError
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
 from bot.utils.logging_utils import get_logger
@@ -50,8 +51,6 @@ if t.TYPE_CHECKING:
     import bot.api.base_route as base_route
     import bot.services.base_service as base_service
     from bot.services.fuzzy_matching_service import FuzzyMatchingService
-
-BotT = t.TypeVar("BotT", bound=commands.Bot | commands.AutoShardedBot)
 
 
 class ClemBot(commands.Bot):

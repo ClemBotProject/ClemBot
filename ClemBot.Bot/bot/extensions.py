@@ -1,15 +1,13 @@
 import typing as t
 
 import discord
-import discord.ext.commands as commands
+from discord.ext.commands._types import BotT
 from discord.ext.commands.errors import BadArgument
 
 from bot.consts import Claims
 
 if t.TYPE_CHECKING:
     from bot.clem_bot import ClemBot
-
-BotT = t.TypeVar("BotT", bound=commands.Bot | commands.AutoShardedBot)
 
 
 def command(
