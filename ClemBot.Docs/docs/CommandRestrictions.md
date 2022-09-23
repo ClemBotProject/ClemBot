@@ -7,7 +7,7 @@ sidebar_position: 4
 ## Overview
 
 Command restrictions give the ability to block certain ClemBot commands either in a specific channel or server-wide.
-When attempting to run a disabled command, ClemBot can either let the user know that the command is disabled or will silently ignore the command.
+When attempting to run a disabled command, ClemBot can either respond to the user that the command is disabled or will silently ignore the command.
 This is a useful feature for letting admins and mods block certain commands they don't think are useful to that specific channel or do not want a certain command to be used anywhere.
 
 :::tip
@@ -33,6 +33,10 @@ Views the status (command name, if it can be disabled, and whether it is disable
 
 ```
 !command tags
+```
+
+```
+!command tag add
 ```
 
 ### Enable
@@ -72,6 +76,7 @@ Any user or role that has the `bypass_disabled_commands` [claim](./Claims.md) ca
 The following command(s) are currently not allowed to be disabled:
 - `help`
 - `command`
+- `command add`
 :::
 
 #### Required [Claims](./Claims.md)
@@ -87,13 +92,13 @@ The following command(s) are currently not allowed to be disabled:
 ```
 
 :::note
-By default, when disabling a command, it will tell the user the command is disabled if `silent` is not set to `true`.
+By default, when disabling a command, it will respont to the user that the command is disabled if `silent` is not set to `true`.
 :::
 
 #### Example
 
 ```txt title="Disable a command server-wide"
-!command disable slots
+!command disable tags
 ```
 
 ```txt title="Disable a command in a specific channel"
@@ -101,9 +106,13 @@ By default, when disabling a command, it will tell the user the command is disab
 ```
 
 ```txt title="Disable a command server-wide, silently"
-!command disable slots true
+!command disable tags true
 ```
 
 ```txt title="Disable a command in a specific channel, silently"
 !command disable tags #my-channel true
+```
+
+```txt title="Disable a sub-command in a specific channel, silently"
+!command disable tag add #my-channel true
 ```

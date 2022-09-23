@@ -32,11 +32,22 @@ class CommandConverter(Converter[ext.ClemBotCommand]):
     async def convert(self, ctx: Context[BotT], argument: str) -> ext.ClemBotCommand:
         self.accu.append(argument)
 
-        # Join the command accumulator on a space so that we get a valid command invocation to search on
-        command = ctx.bot.get_command(" ".join(self.accu))
+        command = ctx.bot.all_commands.get(self.accu[0])
 
         if not command:
             raise ConversionError()
+
+        for i, name in enumerate(self.accu[1:]):
+            # Check if the newly parsed command is a group which means we need to check the next
+            # value to see if it's a valid sub-command
+
+            if not isinstance(command, ext.ClemBotGroup):
+                raise ConversionError()
+
+            try:
+                command = command.all_commands[name]
+            except (AttributeError, KeyError):
+                raise ConversionError()
 
         # All Clembot commands should be ClemBotCommands by default so this should never fail
         return t.cast(ext.ClemBotCommand, command)
