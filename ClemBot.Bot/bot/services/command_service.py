@@ -21,7 +21,7 @@ class CommandService(BaseService):
 
         log.info(
             'Command "{command}" invoked in guild:{guild} by user:{user}',
-            command=ctx.command.name,
+            command=ctx.command.qualified_name,
             guild=serializers.log_guild(ctx.guild),
             user=serializers.log_user(ctx.author),
         )
