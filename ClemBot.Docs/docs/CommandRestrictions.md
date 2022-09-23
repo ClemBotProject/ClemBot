@@ -44,7 +44,7 @@ Views the status (command name, if it can be disabled, and whether it is disable
 Enables the given command either server-wide or in the specified channel.
 
 #### Required [Claims](./Claims.md)
-- `manage_commands`
+- `command_restrictions_edit`
 
 #### Aliases
 - `on`
@@ -80,7 +80,7 @@ The following command(s) are currently not allowed to be disabled:
 :::
 
 #### Required [Claims](./Claims.md)
-- `manage_commands`
+- `command_restrictions_edit`
 
 #### Aliases
 - `off`
