@@ -42,7 +42,7 @@ You decide how to set up your server!
 | tag_transfer                    | Allows for transferring of a [tag](./Tags.md) they do not own                                                     |
 | welcome_message_view            | Allows for viewing the servers [welcome message](./WelcomeMessage.md)                                             |
 | welcome_message_modify          | Allows for setting the servers [welcome message](./WelcomeMessage.md)                                             |
-| manage_commands                 | Allows for [disabling commands](./CommandRestrictions.md) server-wide or in specific channels                     |
+| command_restrictions_edit       | Allows for [disabling commands](./CommandRestrictions.md) server-wide or in specific channels                     |
 | bypass_disabled_commands        | Allows for bypassing of [disabled commands](./CommandRestrictions.md) either server-wide or in a specific channel |
 
 ## Commands
