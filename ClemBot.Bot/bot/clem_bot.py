@@ -11,6 +11,7 @@ from types import ModuleType
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from discord.ext.commands._types import BotT
 
 import bot.bot_secrets as bot_secrets
 import bot.cogs as cogs
@@ -38,7 +39,7 @@ from bot.api import (
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
-from bot.errors import BotOnlyRequestError, ClaimsAccessError
+from bot.errors import BotOnlyRequestError, SilentCommandRestrictionError
 from bot.messaging.events import Events
 from bot.messaging.messenger import Messenger
 from bot.utils.logging_utils import get_logger
@@ -50,8 +51,6 @@ if t.TYPE_CHECKING:
     import bot.api.base_route as base_route
     import bot.services.base_service as base_service
     from bot.services.fuzzy_matching_service import FuzzyMatchingService
-
-BotT = t.TypeVar("BotT", bound=commands.Bot | commands.AutoShardedBot)
 
 
 class ClemBot(commands.Bot):
@@ -87,7 +86,7 @@ class ClemBot(commands.Bot):
         self.scheduler: Scheduler = scheduler
 
         # Register our before and after invoke hooks
-        self._before_invoke = self.command_claims_check
+        self._before_invoke = self.on_before_command_invoke
         self._after_invoke = self.on_after_command_invoke
 
         # pylint: disable=undefined-variable
@@ -188,33 +187,12 @@ class ClemBot(commands.Bot):
 
             await channel.send(embed=embed)
 
-    async def command_claims_check(self, ctx: ext.ClemBotCtx) -> None:
+    async def on_before_command_invoke(self, ctx: ext.ClemBotCtx) -> None:
         """
-        Before invoke hook to make sure a user has the correct claims to allow a command invocation
+        Before invoke hook to check for command restrictions & claims
         """
-        command = ctx.command
-
-        if not isinstance(command, ext.ExtBase):
-            # If the command isn't an extension command let it through, we dont need to think about it
-            return
-
-        if command.ignore_claims_pre_invoke:
-            # The command is going to check the claims in the command body, nothing else to do
-            return
-
-        if await self.claims_check(ctx):
-            return
-
-        await self.raise_claims_access_error(command, ctx)
-
-    async def raise_claims_access_error(self, command: ext.ExtBase, ctx: ext.ClemBotCtx) -> None:
-        claims_str = "\n".join(command.claims)
-        raise ClaimsAccessError(
-            f"Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```"
-            f"\n **Help:** For more information on how claims work please visit my website [Link!]"
-            f"({bot_secrets.secrets.docs_url}/claims)\n"
-            f"or run the `{await self.current_prefix(ctx)}help claims` command"
-        )
+        await self.messenger.publish(Events.on_restrictions_check, ctx)
+        await self.messenger.publish(Events.on_claims_check, ctx)
 
     async def claims_check(self, ctx: ext.ClemBotCtx) -> bool:
         """
@@ -455,6 +433,20 @@ class ClemBot(commands.Bot):
             error ([type]): The unhandled exception
         """
 
+        # this is for Command Restrictions: if CommandOnCooldown is thrown
+        # we want to ignore it if the command was disabled.
+        if isinstance(error, discord.ext.commands.CommandOnCooldown):
+            try:
+                await self.messenger.publish(Events.on_restrictions_check, ctx)
+            except SilentCommandRestrictionError:
+                assert ctx.command is not None
+                log.info(
+                    "Silently ignored command {command_name} from user {user}",
+                    command_name=ctx.command.qualified_name,
+                    user=str(ctx.author),
+                )
+                return
+
         ctx = t.cast(ext.ClemBotContext[BotT], ctx)
 
         if ctx.cog:
@@ -462,6 +454,15 @@ class ClemBot(commands.Bot):
                 return
 
         error = getattr(error, "original", error)
+
+        if isinstance(error, SilentCommandRestrictionError):  # silently ignore this
+            assert ctx.command is not None
+            log.info(
+                "Silently ignored command {command_name} from user {user}",
+                command_name=ctx.command.qualified_name,
+                user=str(ctx.author),
+            )
+            return
 
         embed = discord.Embed(title=f"ERROR: {type(error).__name__}", color=Colors.Error)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)

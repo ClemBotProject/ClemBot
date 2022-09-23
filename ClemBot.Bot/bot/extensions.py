@@ -1,15 +1,13 @@
 import typing as t
 
 import discord
-import discord.ext.commands as commands
+from discord.ext.commands._types import BotT
 from discord.ext.commands.errors import BadArgument
 
 from bot.consts import Claims
 
 if t.TYPE_CHECKING:
     from bot.clem_bot import ClemBot
-
-BotT = t.TypeVar("BotT", bound=commands.Bot | commands.AutoShardedBot)
 
 
 def command(
@@ -157,6 +155,18 @@ def required_claims(*claims: Claims) -> T_EXTBASE_DECO_WRAP:
     return wrapper
 
 
+def ban_disabling() -> T_EXTBASE_DECO_WRAP:
+    def wrapper(func: T_EXTBASE) -> T_EXTBASE:
+        if isinstance(func, ExtBase):
+            func.allow_disable = False
+        else:
+            setattr(func, "allow_disable", False)
+
+        return func
+
+    return wrapper
+
+
 class ExtBase:
     def __init__(self, func: t.Any, **kwargs: t.Any) -> None:
         self.chainable_output = kwargs.get("chainable_output", False) or getattr(
@@ -176,6 +186,9 @@ class ExtBase:
         )
         self.claims: set[str] = kwargs.get("claims") or getattr(func, "claims", None) or set()
         self.ignore_claims_pre_invoke: bool = getattr(func, "ignore_claims_pre_invoke", False)
+        self.allow_disable = t.cast(
+            bool, kwargs.get("allow_disable") or getattr(func, "allow_disable", True)
+        )
 
     def claims_check(self, claims: t.Sequence[str | Claims]) -> bool:
         """

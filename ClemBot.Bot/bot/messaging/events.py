@@ -498,6 +498,16 @@ class EventsMeta(type):
         return "on_member_ban"
 
     @property
+    def on_restrictions_check(self) -> str:
+        """
+        Published when a command is being checked for restrictions
+
+        Args:
+            ctx (ext.ClemBotCtx): Context of the command that was invoked
+        """
+        return "on_restrictions_check"
+
+    @property
     def on_after_command_invoke(self) -> str:
         """
         Published when after a command has successfully completed
@@ -537,6 +547,16 @@ class EventsMeta(type):
             after (discord.Thread): The after of the thread
         """
         return "on_guild_thread_update"
+
+    @property
+    def on_claims_check(self) -> str:
+        """
+        Published when a command is invoked
+
+        Args:
+            ctx (ext.ClemBotCtx): The ClemBot command context
+        """
+        return "on_claims_check"
 
 
 class Events(metaclass=EventsMeta):

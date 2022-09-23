@@ -6,5 +6,6 @@ public enum QueryStatus
     Invalid,
     NotFound,
     Conflict,
-    Forbidden
+    Forbidden,
+    NoContent
 }

@@ -2,7 +2,6 @@ import uuid
 from datetime import datetime
 
 import discord
-import discord.ext.commands as commands
 
 from bot.clem_bot import ClemBot
 from bot.consts import Colors

@@ -28,4 +28,6 @@ public enum BotAuthClaims
     guild_settings_view,
     guild_settings_edit,
     custom_tag_prefix_set,
+    command_restrictions_edit,
+    bypass_disabled_commands,
 }
