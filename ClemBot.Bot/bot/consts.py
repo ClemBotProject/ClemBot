@@ -72,7 +72,7 @@ class Claims(Enum):
     guild_settings_view = auto()
     guild_settings_edit = auto()
     custom_tag_prefix_set = auto()
-    manage_commands = auto()
+    command_restrictions_edit = auto()
     bypass_disabled_commands = auto()
 
     @staticmethod

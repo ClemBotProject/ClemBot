@@ -39,9 +39,9 @@ class CommandsRoute(BaseRoute):
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
     ) -> CommandModel | None:
 
-        json = {"CommandName": command_name, "GuildId": guild_id, "ChannelId": channel_id}
-
-        resp = await self._client.get("bot/commands/details", data=json, **kwargs)
+        resp = await self._client.get(
+            f"bot/commands/details/{guild_id}/{channel_id}/{command_name}", **kwargs
+        )
 
         if not resp:
             return None

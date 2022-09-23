@@ -1,10 +1,13 @@
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Claims
 from bot.errors import ClaimsAccessError
 from bot.messaging.events import Events
 from bot.services.base_service import BaseService
+from bot.utils.log_serializers import log_guild, log_user
+from bot.utils.logging_utils import get_logger
+
+log = get_logger(__name__)
 
 
 class ClaimsService(BaseService):
@@ -13,7 +16,15 @@ class ClaimsService(BaseService):
 
     @BaseService.listener(Events.on_claims_check)
     async def on_claims_check(self, ctx: ext.ClemBotCtx) -> None:
-        assert ctx.command is not None
+
+        if not ctx.command:
+            log.error(
+                "Claims check handler received null command: {guild}, {user}",
+                guild=log_guild(ctx.guild),
+                user=log_user(ctx.author),
+            )
+            return
+
         if not isinstance(ctx.command, ext.ExtBase):
             # If the command isn't an extension command let it through, we don't need to think about it
             return
@@ -31,7 +42,7 @@ class ClaimsService(BaseService):
             f"Missing claims to run this operation, Need any of the following\n ```\n{claims_str}```"
             f"\n **Help:** For more information on how claims work please visit my website [Link!]"
             f"({bot_secrets.secrets.docs_url}/claims)\n"
-            f"or run the `{ctx.prefix}help claims` command"
+            f"or run the `{await self.bot.current_prefix(ctx)}help claims` command"
         )
 
     async def load_service(self) -> None:

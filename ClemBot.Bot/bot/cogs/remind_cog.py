@@ -119,7 +119,7 @@ class RemindCog(commands.Cog):
             )
             embed.add_field(name="Message", value=reminder.content)
             embed.set_footer(
-                text=f'To delete this reminder, type "{ctx.prefix}reminder delete {reminder.id}".'
+                text=f'To delete this reminder, type "{await self.bot.current_prefix(ctx)}reminder delete {reminder.id}".'
             )
             pages.append(embed)
         return pages
