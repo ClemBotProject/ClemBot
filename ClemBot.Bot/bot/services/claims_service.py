@@ -34,13 +34,5 @@ class ClaimsService(BaseService):
             f"or run the `{ctx.prefix}help claims` command"
         )
 
-    @BaseService.listener(Events.on_add_claim_mapping)
-    async def on_add_claim_mapping(self, claim: Claims, role_id: int) -> None:
-        await self.bot.claim_route.add_claim_mapping(claim, role_id, raise_on_error=True)
-
-    @BaseService.listener(Events.on_remove_claim_mapping)
-    async def on_remove_claim_mapping(self, claim: Claims, role_id: int) -> None:
-        await self.bot.claim_route.remove_claim_mapping(claim, role_id, raise_on_error=True)
-
     async def load_service(self) -> None:
         pass

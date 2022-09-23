@@ -38,11 +38,9 @@ public class Status
     public class Handler : IRequestHandler<Query, QueryResult<CommandRestrictionDto>>
     {
         private readonly IMediator _mediator;
-        private readonly ClemBotContext _context;
 
-        public Handler(ClemBotContext context, IMediator mediator)
+        public Handler(IMediator mediator)
         {
-            _context = context;
             _mediator = mediator;
         }
 
@@ -52,6 +50,7 @@ public class Status
             {
                 Id = request.GuildId
             });
+
             var channelExists = await _mediator.Send(new ChannelExistsRequest
             {
                 Id = request.ChannelId
@@ -74,7 +73,7 @@ public class Status
             foreach (var restriction in commandRestrictions)
             {
                 // check for server-wide ban or if the command is banned in the requested channel
-                if (!restriction.ChannelId.HasValue || restriction.ChannelId == request.ChannelId)
+                if (restriction.ChannelId is null || restriction.ChannelId == request.ChannelId)
                 {
                     disabled = true;
                     silentlyFail = restriction.SilentlyFail;

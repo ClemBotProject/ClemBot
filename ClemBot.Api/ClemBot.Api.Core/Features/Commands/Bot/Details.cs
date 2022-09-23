@@ -1,4 +1,5 @@
 ﻿using ClemBot.Api.Common;
+using ClemBot.Api.Common.Extensions;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.Channels.Models;
 using ClemBot.Api.Services.Caching.Commands.Models;
@@ -21,7 +22,7 @@ public class Details
 
     public class CommandRestrictionDto : IResponseModel
     {
-        public string CommandName { get; init; } = null!;
+        public string CommandName { get; set; } = null!;
 
         public bool Disabled { get; set; }
 
@@ -42,11 +43,9 @@ public class Details
     public class Handler : IRequestHandler<Command, QueryResult<CommandRestrictionDto>>
     {
         private readonly IMediator _mediator;
-        private readonly ClemBotContext _context;
 
-        public Handler(ClemBotContext context, IMediator mediator)
+        public Handler(IMediator mediator)
         {
-            _context = context;
             _mediator = mediator;
         }
 
@@ -56,6 +55,7 @@ public class Details
             {
                 Id = request.GuildId
             });
+
             var channelExists = await _mediator.Send(new ChannelExistsRequest
             {
                 Id = request.ChannelId
@@ -72,14 +72,10 @@ public class Details
                 Id = request.GuildId
             });
 
-            var channelIds = new List<ulong>();
-            foreach (var restriction in commandRestrictions)
-            {
-                if (restriction.ChannelId.HasValue)
-                {
-                    channelIds.Add(restriction.ChannelId.Value);
-                }
-            }
+            var channelIds = commandRestrictions
+                .Select(cr => cr.ChannelId)
+                .WhereNotNull()
+                .ToList();
 
             return QueryResult<CommandRestrictionDto>.Success(new CommandRestrictionDto
             {

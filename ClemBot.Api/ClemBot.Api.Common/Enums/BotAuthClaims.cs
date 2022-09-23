@@ -29,5 +29,5 @@ public enum BotAuthClaims
     guild_settings_edit,
     custom_tag_prefix_set,
     manage_commands,
-    bypass_disabled_commands
+    bypass_disabled_commands,
 }

@@ -23,7 +23,7 @@ class HelpCog(commands.Cog):
         self.commands: list[ext.ClemBotCommand] = []
 
     @ext.command()
-    @ext.allow_disable(False)
+    @ext.ban_disabling()
     async def help(self, ctx: ext.ClemBotCtx, *, command_name: str | None = None) -> None:
         if command_name:
             command = self.find_command(self.bot, command_name.lower())

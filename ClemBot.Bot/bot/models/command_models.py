@@ -7,3 +7,9 @@ class CommandModel(ClemBotModel):
     disabled: bool
     guild_id: int
     channel_ids: list[int]
+
+
+class CommandStatusModel(ClemBotModel):
+
+    disabled: bool
+    silently_fail: bool

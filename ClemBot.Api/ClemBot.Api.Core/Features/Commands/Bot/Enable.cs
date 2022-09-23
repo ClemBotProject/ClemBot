@@ -47,7 +47,7 @@ public class Enable
             });
 
             var channelExists = false;
-            if (request.ChannelId.HasValue)
+            if (request.ChannelId is not null)
             {
                 channelExists = await _mediator.Send(new ChannelExistsRequest
                 {
@@ -55,53 +55,51 @@ public class Enable
                 });
             }
 
-            if (!guildExists || (request.ChannelId.HasValue && !channelExists))
+            if (!guildExists || (request.ChannelId is not null && !channelExists))
             {
                 return QueryResult<Unit>.NotFound();
             }
 
             var commandRestrictions = await _mediator.Send(new GetCommandRestrictionRequest
             {
-                CommandName = request.CommandName, Id = request.GuildId
+                CommandName = request.CommandName,
+                Id = request.GuildId
             });
 
             // can't enable what isn't disabled
             if (commandRestrictions.Count == 0)
             {
-                return QueryResult<Unit>.NotFound();
+                return QueryResult<Unit>.Conflict();
             }
 
-            if (request.ChannelId.HasValue)
+            if (request.ChannelId is not null)
             {
-                CommandRestriction? cr = null;
-                foreach (var restriction in commandRestrictions)
-                {
-                    if (restriction.ChannelId.HasValue && restriction.ChannelId.Value == request.ChannelId.Value)
-                    {
-                        cr = restriction;
-                        break;
-                    }
-                }
+                var cr = commandRestrictions
+                    .FirstOrDefault(r => r?.ChannelId is not null && r.ChannelId.Value == request.ChannelId.Value, null);
 
-                if (cr == null)
+                if (cr is null)
                 {
                     return QueryResult<Unit>.NotFound();
                 }
 
                 _context.CommandRestrictions.Remove(cr);
                 await _context.SaveChangesAsync();
+
                 await _mediator.Send(new ClearCommandRestrictionRequest
                 {
-                    CommandName = request.CommandName, Id = request.GuildId
+                    CommandName = request.CommandName,
+                    Id = request.GuildId
                 });
                 return QueryResult<Unit>.NoContent();
             }
 
             _context.CommandRestrictions.RemoveRange(commandRestrictions);
             await _context.SaveChangesAsync();
+
             await _mediator.Send(new ClearCommandRestrictionRequest
             {
-                CommandName = request.CommandName, Id = request.GuildId
+                CommandName = request.CommandName,
+                Id = request.GuildId
             });
             return QueryResult<Unit>.NoContent();
         }

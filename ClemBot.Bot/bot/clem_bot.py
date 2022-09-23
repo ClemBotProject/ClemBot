@@ -439,6 +439,12 @@ class ClemBot(commands.Bot):
             try:
                 await self.messenger.publish(Events.on_restrictions_check, ctx)
             except SilentCommandRestrictionError:
+                assert ctx.command is not None
+                log.info(
+                    "Silently ignored command {command_name} from user {user}",
+                    command_name=ctx.command.qualified_name,
+                    user=str(ctx.author),
+                )
                 return
 
         ctx = t.cast(ext.ClemBotContext[BotT], ctx)
@@ -450,6 +456,12 @@ class ClemBot(commands.Bot):
         error = getattr(error, "original", error)
 
         if isinstance(error, SilentCommandRestrictionError):  # silently ignore this
+            assert ctx.command is not None
+            log.info(
+                "Silently ignored command {command_name} from user {user}",
+                command_name=ctx.command.qualified_name,
+                user=str(ctx.author),
+            )
             return
 
         embed = discord.Embed(title=f"ERROR: {type(error).__name__}", color=Colors.Error)

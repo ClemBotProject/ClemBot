@@ -2,7 +2,7 @@ import typing as t
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.models.command_models import CommandModel
+from bot.models.command_models import CommandModel, CommandStatusModel
 
 
 class CommandsRoute(BaseRoute):
@@ -24,16 +24,16 @@ class CommandsRoute(BaseRoute):
 
     async def get_status(
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
-    ) -> tuple[bool, bool]:
+    ) -> CommandStatusModel | None:
 
-        json = {"CommandName": command_name, "GuildId": guild_id, "ChannelId": channel_id}
-
-        resp = await self._client.get("bot/commands/status", data=json, **kwargs)
+        resp = await self._client.get(
+            f"bot/commands/status/{guild_id}/{channel_id}/{command_name}", **kwargs
+        )
 
         if not resp:
-            return False, False
+            return None
 
-        return bool(resp["disabled"]), bool(resp["silentlyFail"])
+        return CommandStatusModel(**resp)
 
     async def get_details(
         self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any

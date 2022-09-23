@@ -17,7 +17,7 @@ class CommandCog(commands.Cog):
         self.bot = bot
 
     @ext.group(aliases=["cmd"], case_insensitive=True, invoke_without_command=True)
-    @ext.allow_disable(False)
+    @ext.ban_disabling()
     @ext.long_help("Check if a command is enabled or disabled.")
     @ext.short_help("Check if a command is enabled.")
     @ext.example(["command slots", "command help"])
@@ -34,6 +34,7 @@ class CommandCog(commands.Cog):
 
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
+
         (name, value) = self._disabled_in_field(model)
         embed = discord.Embed(title="⚙️ Command Details", color=Colors.ClemsonOrange)
         embed.add_field(name="Name", value=f"`{cmd.name}`")
@@ -48,6 +49,7 @@ class CommandCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @command.command(aliases=["on"])
+    @ext.ban_disabling()
     @ext.required_claims(Claims.manage_commands)
     @ext.long_help("Enable a command server-wide or in a specific channel.")
     @ext.short_help("Enable a command.")
@@ -71,11 +73,13 @@ class CommandCog(commands.Cog):
         if not model.disabled:
             await self._error_embed(ctx, f"The command `{cmd.name}` is not disabled.")
             return
+
         if channel is not None and channel.id not in model.channel_ids:
             await self._error_embed(
                 ctx, f"The command `{cmd.name}` is not disabled in {channel.mention}."
             )
             return
+
         await self.bot.commands_route.enable_command(
             cmd.name, ctx.guild.id, channel.id if channel is not None else None
         )
@@ -132,16 +136,19 @@ class CommandCog(commands.Cog):
 
         model = await self.bot.commands_route.get_details(ctx.guild.id, ctx.channel.id, cmd.name)
         assert model is not None
+
         if len(model.channel_ids) == 0 and model.disabled:
             await self._error_embed(
                 ctx, f"The command `{cmd.name}` is already disabled server-wide."
             )
             return
+
         if channel is not None and channel.id in model.channel_ids:
             await self._error_embed(
                 ctx, f"The command `{cmd.name}` is already disabled in {channel.mention}."
             )
             return
+
         await self.bot.commands_route.disable_command(
             cmd.name, ctx.guild.id, channel.id if channel is not None else None, silent
         )
@@ -158,8 +165,10 @@ class CommandCog(commands.Cog):
     def _disabled_in_field(self, model: CommandModel) -> tuple[str, str]:
         if not model.disabled:
             return "Disabled", "False"
+
         if len(model.channel_ids) == 0:
             return "Disabled", "Server-wide"
+
         list_of_channels = []
         for channel_id in model.channel_ids:
             channel = self.bot.get_channel(channel_id)

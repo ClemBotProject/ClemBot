@@ -549,28 +549,6 @@ class EventsMeta(type):
         return "on_guild_thread_update"
 
     @property
-    def on_add_claim_mapping(self) -> str:
-        """
-        Published when a role's claims are added to
-
-        Args:
-            claim (Claim): The claim to add
-            role_id (int): The role id to add the claim to
-        """
-        return "on_add_claim_mapping"
-
-    @property
-    def on_remove_claim_mapping(self) -> str:
-        """
-        Published when a role's claims are removed from
-
-        Args:
-            claim (Claim): The claim to remove
-            role_id (int): The role id to remove the claim from
-        """
-        return "on_remove_claim_mapping"
-
-    @property
     def on_claims_check(self) -> str:
         """
         Published when a command is invoked

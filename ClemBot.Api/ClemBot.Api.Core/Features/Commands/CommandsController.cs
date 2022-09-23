@@ -30,9 +30,9 @@ public class CommandsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/status")]
+    [HttpGet("bot/[controller]/status/{GuildId}/{ChannelId}/{CommandName}")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Status([FromBody] Status.Query query) =>
+    public async Task<IActionResult> Status([FromRoute] Status.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
@@ -40,9 +40,9 @@ public class CommandsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/details")]
+    [HttpGet("bot/[controller]/details/{GuildId}/{ChannelId}/{CommandName}")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Details([FromBody] Details.Command command) =>
+    public async Task<IActionResult> Details([FromRoute] Details.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),
@@ -57,6 +57,7 @@ public class CommandsController : ControllerBase
         {
             { Status: QueryStatus.NoContent } => NoContent(),
             { Status: QueryStatus.NotFound } => NotFound(),
+            { Status: QueryStatus.Conflict } => Conflict(),
             _ => throw new InvalidOperationException()
         };
 

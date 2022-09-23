@@ -10,8 +10,8 @@ Command restrictions give the ability to block certain ClemBot commands either i
 When attempting to run a disabled command, ClemBot can either let the user know that the command is disabled or will silently ignore the command.
 This is a useful feature for letting admins and mods block certain commands they don't think are useful to that specific channel or do not want a certain command to be used anywhere.
 
-:::note
-Only top-level commands (such as `claims`) and not sub-commands (such as `claims add`) can be disabled.
+:::tip
+Both top-level commands (such as `claims`) and sub-commands (such as `claims add`) can be disabled.
 :::
 
 ## Commands
@@ -67,6 +67,11 @@ Disables the given command either server-wide or in the specified channel, with 
 
 :::caution
 Any user or role that has the `bypass_disabled_commands` [claim](./Claims.md) can run disabled commands.
+:::
+:::note
+The following command(s) are currently not allowed to be disabled:
+- `help`
+- `command`
 :::
 
 #### Required [Claims](./Claims.md)
