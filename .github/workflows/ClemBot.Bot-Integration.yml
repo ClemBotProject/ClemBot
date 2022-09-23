@@ -36,7 +36,7 @@ jobs:
 
     - name: load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ClemBot.Bot/.venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/ClemBot.Bot-Integration.yml') }}

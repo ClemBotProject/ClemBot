@@ -16,6 +16,7 @@ class ConfigAccessError(Exception):
 class PrimaryKeyError(Exception):
     """
     Raised if the primary key fails on insert
+
     """
 
     def __init__(self, message: str):
