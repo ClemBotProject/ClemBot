@@ -36,7 +36,7 @@ jobs:
 
     - name: load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ClemBot.Bot/.venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/ClemBot.Bot-Integration.yml') }}
@@ -48,7 +48,7 @@ jobs:
     - name: Validate static typing
       id: static-typing-ci
       continue-on-error: true
-      run: poetry run mypy
+      run: poetry run python -m mypy bot
 
     - name: Create lint error folder
       shell: bash
@@ -64,12 +64,12 @@ jobs:
     - name: Check if Black would make any changes
       id: black-ci
       continue-on-error: true
-      run: poetry run black bot --check 
+      run: poetry run python -m black bot --check 
 
     - name: Check if isort would make any changes
       id: isort-ci
       continue-on-error: true
-      run: poetry run isort --check-only .
+      run: poetry run python -m isort --check-only .
 
     - name: Black lint failure comment
       shell: bash
