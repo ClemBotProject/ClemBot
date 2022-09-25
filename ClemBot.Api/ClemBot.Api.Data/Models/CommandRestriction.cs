@@ -1,13 +1,16 @@
-﻿namespace ClemBot.Api.Data.Models;
+﻿using ClemBot.Api.Common.Enums;
+
+namespace ClemBot.Api.Data.Models;
 
 public class CommandRestriction
 {
-
     public int Id { get; set; }
 
     public string CommandName { get; set; }
 
-    public bool SilentlyFail { get; set; }
+    public bool? SilentlyFail { get; set; }
+
+    public CommandRestrictionType RestrictionType { get; set; }
 
     public ulong GuildId { get; set; }
     public Guild Guild { get; set; }

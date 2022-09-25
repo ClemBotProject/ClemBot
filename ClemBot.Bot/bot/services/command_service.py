@@ -36,8 +36,10 @@ class CommandService(BaseService):
         if not ctx.command.allow_disable:
             return
 
+        """
         if await self.bot.claim_route.check_claim_user(Claims.bypass_disabled_commands, ctx.author):
             return
+        """
 
         assert ctx.guild is not None
         assert ctx.channel is not None

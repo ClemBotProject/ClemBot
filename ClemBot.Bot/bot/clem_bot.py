@@ -446,6 +446,11 @@ class ClemBot(commands.Bot):
                     user=str(ctx.author),
                 )
                 return
+            except Exception as e:
+                # Catch and reassign any other exceptions that publishing
+                # the restrictions check throws so that we can
+                # report the error back to the user and log it
+                error = e
 
         ctx = t.cast(ext.ClemBotContext[BotT], ctx)
 

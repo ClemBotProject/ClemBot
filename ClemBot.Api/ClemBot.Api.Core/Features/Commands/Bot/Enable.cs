@@ -69,13 +69,49 @@ public class Enable
             // can't enable what isn't disabled
             if (commandRestrictions.Count == 0)
             {
-                return QueryResult<Unit>.Conflict();
+                return QueryResult<Unit>.NotFound();
             }
 
             if (request.ChannelId is not null)
             {
+                // Check if we have global restriction so that we know to
+                // Whitelist the command instead of removing a blacklist
+                var guildRestriction = commandRestrictions
+                    .FirstOrDefault(r => r.ChannelId is null);
+
+                if (guildRestriction is not null)
+                {
+                    // Check if we already have a white list for this channel
+                    if (commandRestrictions.Any(x => x.ChannelId == request.ChannelId &&
+                                                      x.RestrictionType == CommandRestrictionType.WhiteList))
+                    {
+                        return QueryResult<Unit>.Conflict();
+                    }
+
+                    var entity = new CommandRestriction
+                    {
+                        CommandName = request.CommandName,
+                        GuildId = request.GuildId,
+                        RestrictionType = CommandRestrictionType.WhiteList,
+                        ChannelId = request.ChannelId,
+                        SilentlyFail = null
+                    };
+
+                    _context.CommandRestrictions.Add(entity);
+                    await _context.SaveChangesAsync();
+
+                    await _mediator.Send(new ClearCommandRestrictionRequest
+                    {
+                        CommandName = request.CommandName,
+                        Id = request.GuildId
+                    });
+
+                    return QueryResult<Unit>.NoContent();
+                }
+
+                // Check if we have a single channel black list
                 var cr = commandRestrictions
-                    .FirstOrDefault(r => r?.ChannelId is not null && r.ChannelId.Value == request.ChannelId.Value, null);
+                    .FirstOrDefault(r => r.ChannelId is not null && r.ChannelId == request.ChannelId);
 
                 if (cr is null)
                 {
@@ -93,6 +129,7 @@ public class Enable
                 return QueryResult<Unit>.NoContent();
             }
 
+            // Remove all restrictions on this command
             _context.CommandRestrictions.RemoveRange(commandRestrictions);
             await _context.SaveChangesAsync();
 

@@ -23,7 +23,7 @@ public class Status
     {
         public bool Disabled { get; set; }
 
-        public bool SilentlyFail { get; set; }
+        public bool? SilentlyFail { get; set; }
     }
 
     public class Query : IRequest<QueryResult<CommandRestrictionDto>>
@@ -67,8 +67,20 @@ public class Status
                 Id = request.GuildId
             });
 
+            // Check if we have a white listed command restriction, always allow that
+            if (commandRestrictions.Any(x => x.ChannelId is not null &&
+                                             x.ChannelId == request.ChannelId &&
+                                             x.RestrictionType == CommandRestrictionType.WhiteList))
+            {
+                return QueryResult<CommandRestrictionDto>.Success(new CommandRestrictionDto
+                {
+                    Disabled = false,
+                    SilentlyFail = null
+                });
+            }
+
             var disabled = false;
-            var silentlyFail = false;
+            bool? silentlyFail = false;
 
             foreach (var restriction in commandRestrictions)
             {

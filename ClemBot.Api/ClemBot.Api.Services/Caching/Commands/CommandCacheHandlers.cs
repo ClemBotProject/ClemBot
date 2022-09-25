@@ -37,6 +37,7 @@ public class CommandCacheHandlers : RequestHandler<ClearCommandRestrictionReques
                     Id = item.Id,
                     GuildId = item.GuildId,
                     CommandName = item.CommandName,
+                    RestrictionType = item.RestrictionType,
                     ChannelId = item.ChannelId,
                     SilentlyFail = item.SilentlyFail
                 })

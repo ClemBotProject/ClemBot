@@ -40,7 +40,7 @@ public class CommandsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/details/{GuildId}/{ChannelId}/{CommandName}")]
+    [HttpGet("bot/[controller]/details/{GuildId}/{CommandName}")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Details([FromRoute] Details.Command command) =>
         await _mediator.Send(command) switch

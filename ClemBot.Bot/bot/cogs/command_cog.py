@@ -33,7 +33,7 @@ class CommandCog(commands.Cog):
         cmd = command[-1]
 
         model = await self.bot.commands_route.get_details(
-            ctx.guild.id, ctx.channel.id, cmd.qualified_name
+            ctx.guild.id, cmd.qualified_name
         )
         assert model is not None
 
@@ -42,10 +42,22 @@ class CommandCog(commands.Cog):
         embed.add_field(name="Name", value=f"`{cmd.qualified_name}`")
         embed.add_field(name="Allows Disabling", value=cmd.allow_disable, inline=False)
         embed.add_field(name=name, value=value)
+
+        if model.white_listed_channel_ids:
+            whitelisted_channels = []
+            for channel_id in model.white_listed_channel_ids:
+                channel = self.bot.get_channel(channel_id)
+
+                if channel is None or isinstance(channel, discord.abc.PrivateChannel):
+                    whitelisted_channels.append(str(channel_id))
+                else:
+                    whitelisted_channels.append(channel.mention)
+            embed.add_field(name="Enabled in", value="\n".join(whitelisted_channels))
+
         if cmd.allow_disable:
-            opp_mode = "enable" if model.disabled else "disable"
+            opp_mode = "enable" if model.guild_disabled else "disable"
             embed.set_footer(
-                text=f"You can {opp_mode} this command by typing "
+                text=f"You can {opp_mode} this command globally by typing "
                 f"`{await self.bot.current_prefix(ctx)}cmd {opp_mode} {cmd.name}`"
             )
         await ctx.send(embed=embed)
@@ -71,16 +83,19 @@ class CommandCog(commands.Cog):
         # not going to check if the command allows disabling in the off-chance it's been changed from
         # allowing disabling (and was disabled) to then disallowing disabling. this would soft-lock the cmd.
         model = await self.bot.commands_route.get_details(
-            ctx.guild.id, ctx.channel.id, cmd.qualified_name
+            ctx.guild.id, cmd.qualified_name
         )
         assert model is not None
-        if not model.disabled:
-            await self._error_embed(ctx, f"The command `{cmd.qualified_name}` is not disabled.")
+
+        # Check if the channel is already enabled globally
+        if not model.guild_disabled and not channel:
+            await self._error_embed(ctx, f"The command `{cmd.qualified_name}` is already enabled.")
             return
 
-        if channel is not None and channel.id not in model.channel_ids:
+        # Check if the channel is disabled guild wide or has a channel restriction
+        if model.guild_disabled and (channel and channel.id in model.white_listed_channel_ids):
             await self._error_embed(
-                ctx, f"The command `{cmd.qualified_name}` is not disabled in {channel.mention}."
+                ctx, f"The command `{cmd.qualified_name}` is already enabled in {channel.mention}."
             )
             return
 
@@ -139,23 +154,21 @@ class CommandCog(commands.Cog):
             return
 
         model = await self.bot.commands_route.get_details(
-            ctx.guild.id, ctx.channel.id, cmd.qualified_name
+            ctx.guild.id, cmd.qualified_name
         )
 
         if not model:
             await self._error_embed(ctx, "Retrieving Command restriction details failed")
             return
 
-        if len(model.channel_ids) == 0 and model.disabled:
-            await self._error_embed(
-                ctx, f"The command `{cmd.qualified_name}` is already disabled server-wide."
-            )
-            return
-
-        if channel is not None and channel.id in model.channel_ids:
-            await self._error_embed(
-                ctx, f"The command `{cmd.qualified_name}` is already disabled in {channel.mention}."
-            )
+        # Check if the channel is disabled guild wide or has a channel restriction
+        if model.guild_disabled and (channel and channel.id not in model.white_listed_channel_ids):
+            if not channel:
+                await self._error_embed(ctx, f"The command `{cmd.qualified_name}` is already disabled.")
+            else:
+                await self._error_embed(
+                    ctx, f"The command `{cmd.qualified_name}` is already disabled in {channel.mention}."
+                )
             return
 
         await self.bot.commands_route.disable_command(
@@ -172,19 +185,24 @@ class CommandCog(commands.Cog):
         await ctx.send(embed=embed)
 
     def _disabled_in_field(self, model: CommandModel) -> tuple[str, str]:
-        if not model.disabled:
+        if not model.guild_disabled and len(model.black_listed_channel_ids) == 0:
             return "Disabled", "False"
 
-        if len(model.channel_ids) == 0:
+        if not model.black_listed_channel_ids:
             return "Disabled", "Server-wide"
 
-        list_of_channels = []
-        for channel_id in model.channel_ids:
-            channel = self.bot.get_channel(channel_id)
+        blacklisted_channels = []
+        for blacklist in model.black_listed_channel_ids:
+
+            channel = self.bot.get_channel(blacklist.channel_id)
+
             if channel is None or isinstance(channel, discord.abc.PrivateChannel):
-                continue
-            list_of_channels.append(channel.mention)
-        return "Disabled In", "\n".join(list_of_channels)
+                blacklisted_channels.append(str(blacklist.channel_id))
+            else:
+                s = f"{channel.mention} Silently Fail: `{blacklist.silently_fail}`"
+                blacklisted_channels.append(s)
+
+        return "Disabled In", "\n".join(blacklisted_channels)
 
     async def _error_embed(self, ctx: ext.ClemBotCtx, desc: str) -> None:
         """Shorthand for sending an error message w/ consistent formatting."""
