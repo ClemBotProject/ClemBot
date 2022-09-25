@@ -32,9 +32,7 @@ class CommandCog(commands.Cog):
 
         cmd = command[-1]
 
-        model = await self.bot.commands_route.get_details(
-            ctx.guild.id, cmd.qualified_name
-        )
+        model = await self.bot.commands_route.get_details(ctx.guild.id, cmd.qualified_name)
         assert model is not None
 
         (name, value) = self._disabled_in_field(model)
@@ -82,9 +80,7 @@ class CommandCog(commands.Cog):
 
         # not going to check if the command allows disabling in the off-chance it's been changed from
         # allowing disabling (and was disabled) to then disallowing disabling. this would soft-lock the cmd.
-        model = await self.bot.commands_route.get_details(
-            ctx.guild.id, cmd.qualified_name
-        )
+        model = await self.bot.commands_route.get_details(ctx.guild.id, cmd.qualified_name)
         assert model is not None
 
         # Check if the channel is already enabled globally
@@ -153,9 +149,7 @@ class CommandCog(commands.Cog):
             await self._error_embed(ctx, f"Command `{cmd.qualified_name}` cannot be disabled.")
             return
 
-        model = await self.bot.commands_route.get_details(
-            ctx.guild.id, cmd.qualified_name
-        )
+        model = await self.bot.commands_route.get_details(ctx.guild.id, cmd.qualified_name)
 
         if not model:
             await self._error_embed(ctx, "Retrieving Command restriction details failed")
@@ -164,10 +158,13 @@ class CommandCog(commands.Cog):
         # Check if the channel is disabled guild wide or has a channel restriction
         if model.guild_disabled and (channel and channel.id not in model.white_listed_channel_ids):
             if not channel:
-                await self._error_embed(ctx, f"The command `{cmd.qualified_name}` is already disabled.")
+                await self._error_embed(
+                    ctx, f"The command `{cmd.qualified_name}` is already disabled."
+                )
             else:
                 await self._error_embed(
-                    ctx, f"The command `{cmd.qualified_name}` is already disabled in {channel.mention}."
+                    ctx,
+                    f"The command `{cmd.qualified_name}` is already disabled in {channel.mention}.",
                 )
             return
 

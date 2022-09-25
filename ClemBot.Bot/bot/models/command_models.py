@@ -2,7 +2,7 @@ from bot.models.clem_bot_model import ClemBotModel
 
 
 class BlackListCommandModel(ClemBotModel):
-    channel_id : int
+    channel_id: int
     silently_fail: bool
 
 
