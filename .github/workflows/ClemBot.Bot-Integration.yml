@@ -48,7 +48,7 @@ jobs:
     - name: Validate static typing
       id: static-typing-ci
       continue-on-error: true
-      run: poetry run python -m mypy
+      run: poetry run python -m mypy bot
 
     - name: Create lint error folder
       shell: bash
