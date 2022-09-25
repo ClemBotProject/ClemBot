@@ -72,6 +72,28 @@ public class Disable
             if (request.ChannelId is not null)
             {
                 // check for an already-disabled command, server-wide or requested channel
+                var whiteListed = commandRestrictions.FirstOrDefault(r => r.ChannelId == request.ChannelId
+                                                                          && r.RestrictionType ==
+                                                                          CommandRestrictionType.WhiteList);
+
+                // We found a white listed command for this channel,
+                // Remove the whitelist so that this command goes
+                // back to being disabled
+                if (whiteListed is not null)
+                {
+                    _context.CommandRestrictions.Remove(whiteListed);
+                    await _context.SaveChangesAsync();
+
+                    await _mediator.Send(new ClearCommandRestrictionRequest
+                    {
+                        CommandName = request.CommandName,
+                        Id = request.GuildId
+                    });
+
+                    return QueryResult<Unit>.NoContent();
+                }
+
+                // check for an already-disabled command, server-wide or requested channel
                 if (commandRestrictions.Any(r => r.ChannelId is null || r.ChannelId == request.ChannelId.Value))
                 {
                     return QueryResult<Unit>.Conflict();
@@ -82,6 +104,7 @@ public class Disable
                     CommandName = request.CommandName,
                     GuildId = request.GuildId,
                     ChannelId = request.ChannelId.Value,
+                    RestrictionType = CommandRestrictionType.BlackList,
                     SilentlyFail = request.SilentlyFail
                 });
                 await _context.SaveChangesAsync();
@@ -107,9 +130,11 @@ public class Disable
             {
                 CommandName = request.CommandName,
                 GuildId = request.GuildId,
+                RestrictionType = CommandRestrictionType.BlackList,
                 SilentlyFail = request.SilentlyFail
             });
             await _context.SaveChangesAsync();
+
             await _mediator.Send(new ClearCommandRestrictionRequest
             {
                 CommandName = request.CommandName,

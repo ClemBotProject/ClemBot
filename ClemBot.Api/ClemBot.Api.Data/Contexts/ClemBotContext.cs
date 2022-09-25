@@ -17,6 +17,7 @@ public class ClemBotContext : DbContext
         NpgsqlConnection.GlobalTypeMapper.MapEnum<BotAuthClaims>();
         NpgsqlConnection.GlobalTypeMapper.MapEnum<DesignatedChannels>();
         NpgsqlConnection.GlobalTypeMapper.MapEnum<InfractionType>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<CommandRestrictionType>();
         NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
     }
 
@@ -80,6 +81,7 @@ public class ClemBotContext : DbContext
         modelBuilder.HasPostgresEnum<BotAuthClaims>();
         modelBuilder.HasPostgresEnum<DesignatedChannels>();
         modelBuilder.HasPostgresEnum<InfractionType>();
+        modelBuilder.HasPostgresEnum<CommandRestrictionType>();
         modelBuilder.HasPostgresEnum<ConfigSettings>();
     }
 }

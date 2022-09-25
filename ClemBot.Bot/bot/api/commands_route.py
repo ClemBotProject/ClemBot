@@ -36,12 +36,10 @@ class CommandsRoute(BaseRoute):
         return CommandStatusModel(**resp)
 
     async def get_details(
-        self, guild_id: int, channel_id: int, command_name: str, **kwargs: t.Any
+        self, guild_id: int, command_name: str, **kwargs: t.Any
     ) -> CommandModel | None:
 
-        resp = await self._client.get(
-            f"bot/commands/details/{guild_id}/{channel_id}/{command_name}", **kwargs
-        )
+        resp = await self._client.get(f"bot/commands/details/{guild_id}/{command_name}", **kwargs)
 
         if not resp:
             return None
