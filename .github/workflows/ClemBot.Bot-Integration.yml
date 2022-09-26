@@ -24,7 +24,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: "3.10"
+        python-version: "3.10.6"
         
     - name: install poetry
       uses: snok/install-poetry@v1.0.0
@@ -48,7 +48,7 @@ jobs:
     - name: Validate static typing
       id: static-typing-ci
       continue-on-error: true
-      run: poetry run python -m mypy bot
+      run: poetry run python -m mypy
 
     - name: Create lint error folder
       shell: bash
