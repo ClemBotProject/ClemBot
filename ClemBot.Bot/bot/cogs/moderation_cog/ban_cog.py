@@ -1,3 +1,5 @@
+import typing as t
+
 import discord
 import discord.ext.commands as commands
 
@@ -33,7 +35,7 @@ class BanCog(commands.Cog):
         self,
         ctx: ext.ClemBotCtx,
         subject: discord.Member,
-        purge_days: int = 0,
+        purge_days: t.Annotated[int, t.Optional[int]] = 0,
         *,
         reason: str,
     ) -> None:
