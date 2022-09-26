@@ -6,7 +6,7 @@ authors = ["Jay Madden <jaymaddencox@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = "3.10.6"
 "discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "c35ff4cfc637907ad797617df485f964ff26c301" }
 aiohttp = "3.7.4"
 aiosqlite = "0.12.0"
