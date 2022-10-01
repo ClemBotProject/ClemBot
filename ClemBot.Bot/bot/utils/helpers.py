@@ -1,10 +1,11 @@
+import calendar
 from datetime import datetime
-from typing import Generator, Sequence, TypeVar
+from typing import Annotated, Generator, Literal, Sequence, TypeVar
 
 import arrow
 from dateutil.relativedelta import relativedelta
 
-from bot.utils.converters import DurationDelta, FutureDuration, PastDuration
+from bot.utils.converters import FutureDuration, PastDuration
 
 T = TypeVar("T")
 
@@ -24,28 +25,59 @@ def format_datetime(time: datetime) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S.%f")
 
 
-def format_duration(duration: FutureDuration | PastDuration) -> str:
+def format_duration(
+    duration: Annotated[datetime | relativedelta, FutureDuration | PastDuration]
+) -> str:
     """
     Formats the given datetime to a string.
     Uses relativedelta to calculate the difference between datetime.utcnow()
     and the given datetime and formats it as:
     A Year(s) B Month(s) C Week(s) D Day(s) E Hour(s) F Minute(s) G Second(s)
     """
-    now = datetime.utcnow()
-    delta = relativedelta(now, duration) if duration < now else relativedelta(duration, now)  # type: ignore
-    s = ""
-    if delta.years > 0:
-        s += f'{delta.years} Year{"s" if delta.years > 1 else ""} '
-    if delta.months > 0:
-        s += f'{delta.months} Month{"s" if delta.months > 1 else ""} '
-    if delta.weeks > 0:
-        s += f'{delta.weeks} Week{"s" if delta.weeks > 1 else ""} '
-    if delta.days > 0:
-        s += f'{delta.days} Day{"s" if delta.days > 1 else ""} '
-    if delta.hours > 0:
-        s += f'{delta.hours} Hour{"s" if delta.hours > 1 else ""} '
-    if delta.minutes > 0:
-        s += f'{delta.minutes} Minute{"s" if delta.minutes > 1 else ""} '
-    if delta.seconds > 0:
-        s += f'{delta.seconds} Second{"s" if delta.seconds > 1 else ""}'
-    return s
+    if isinstance(duration, datetime):
+        if duration < datetime.utcnow():
+            delta = relativedelta(datetime.utcnow(), duration)
+        else:
+            delta = relativedelta(duration, datetime.utcnow())
+    else:  # duration isinstance relativedelta
+        delta = duration
+        duration = datetime.utcnow() + duration
+    arrow_date = arrow.get(duration)
+    granularity = _get_timedelta_granularity(delta, 3)
+    print(granularity)
+    return arrow_date.humanize(only_distance=True, granularity=granularity)  # type: ignore
+
+
+def _get_timedelta_granularity(delta: relativedelta, granularity: int) -> list[str]:
+    def get_timedelta_granularity() -> Generator[str, relativedelta, None]:
+        if delta.years >= 1:
+            yield "year"
+
+        if delta.months >= 1:
+            yield "month"
+
+        if delta.weeks >= 1:
+            yield "week"
+
+        if delta.days >= 1:
+            yield "day"
+
+        if delta.hours >= 1:
+            yield "hour"
+
+        if delta.minutes >= 1:
+            yield "minute"
+
+        if delta.seconds >= 1:
+            yield "second"
+
+    return list(get_timedelta_granularity())[:granularity]
+
+
+def as_timestamp(date: datetime, /, style: Literal["f", "F", "d", "D", "t", "T", "R"] = "f") -> str:
+    """
+    Formats the given datetime to a Discord timestamp.
+    Used over discord.utils.format_dt due to incorrect timestamp output.
+    """
+    timestamp = calendar.timegm(date.utctimetuple())
+    return f"<t:{timestamp}:{style}>"
