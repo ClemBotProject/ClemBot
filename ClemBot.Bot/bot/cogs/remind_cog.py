@@ -62,8 +62,10 @@ class RemindCog(commands.Cog):
         except Exception as e:
             log.error("Failed to create reminder.", exc_info=e)
             return await self._error_embed(ctx, "Failed to create reminder.")
+        if isinstance(wait, relativedelta):
+            wait = datetime.utcnow() + wait
         embed = discord.Embed(title="⏰ Reminder Created", color=Colors.ClemsonOrange)
-        embed.add_field(name="Time", value=format_duration(wait))
+        embed.add_field(name="Time", value=as_timestamp(wait))
         embed.add_field(name="Message", value=f"{content or None}")
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
