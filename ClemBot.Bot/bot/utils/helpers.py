@@ -44,7 +44,6 @@ def format_duration(
         duration = datetime.utcnow() + duration
     arrow_date = arrow.get(duration)
     granularity = _get_timedelta_granularity(delta, 3)
-    print(granularity)
     return arrow_date.humanize(only_distance=True, granularity=granularity)  # type: ignore
 
 
