@@ -1,6 +1,6 @@
 import calendar
 from datetime import datetime
-from typing import Annotated, Generator, Literal, Sequence, TypeVar, Iterator
+from typing import Annotated, Generator, Iterator, Literal, Sequence, TypeVar
 
 import arrow
 from dateutil.relativedelta import relativedelta
