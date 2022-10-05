@@ -1,6 +1,6 @@
 import calendar
 from datetime import datetime
-from typing import Annotated, Generator, Literal, Sequence, TypeVar
+from typing import Annotated, Generator, Literal, Sequence, TypeVar, Iterator
 
 import arrow
 from dateutil.relativedelta import relativedelta
@@ -48,7 +48,7 @@ def format_duration(
 
 
 def _get_timedelta_granularity(delta: relativedelta, granularity: int) -> list[str]:
-    def get_timedelta_granularity() -> Generator[str, relativedelta, None]:
+    def get_timedelta_granularity() -> Iterator[str]:
         if delta.years >= 1:
             yield "year"
 
