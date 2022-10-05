@@ -1,7 +1,9 @@
 import typing as t
+from datetime import datetime
 
 import discord
 import discord.ext.commands as commands
+from dateutil.relativedelta import relativedelta
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
@@ -28,7 +30,7 @@ class MuteCog(commands.Cog):
         self,
         ctx: ext.ClemBotCtx,
         subject: discord.Member,
-        duration: FutureDuration,
+        duration: t.Annotated[relativedelta | datetime, FutureDuration],
         *,
         reason: str | None,
     ) -> None:

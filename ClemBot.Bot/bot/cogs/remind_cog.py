@@ -1,15 +1,18 @@
 import logging
+from datetime import datetime
+from typing import Annotated
 
 import discord
 import discord.ext.commands as commands
+from dateutil.relativedelta import relativedelta
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.messaging.events import Events
 from bot.models.reminder_models import Reminder
-from bot.utils import converters
-from bot.utils.helpers import format_duration
+from bot.utils.converters import FutureDuration
+from bot.utils.helpers import as_timestamp, format_duration
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +49,11 @@ class RemindCog(commands.Cog):
         )
     )
     async def reminder(
-        self, ctx: ext.ClemBotCtx, wait: converters.FutureDuration, *, content: str | None
+        self,
+        ctx: ext.ClemBotCtx,
+        wait: Annotated[relativedelta | datetime, FutureDuration],
+        *,
+        content: str | None,
     ) -> None:
         try:
             await self.bot.messenger.publish(
@@ -55,8 +62,10 @@ class RemindCog(commands.Cog):
         except Exception as e:
             log.error("Failed to create reminder.", exc_info=e)
             return await self._error_embed(ctx, "Failed to create reminder.")
+        if isinstance(wait, relativedelta):
+            wait = datetime.utcnow() + wait
         embed = discord.Embed(title="⏰ Reminder Created", color=Colors.ClemsonOrange)
-        embed.add_field(name="Time", value=format_duration(wait))
+        embed.add_field(name="Time", value=as_timestamp(wait))
         embed.add_field(name="Message", value=f"{content or None}")
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
@@ -114,9 +123,7 @@ class RemindCog(commands.Cog):
             embed = discord.Embed(title="⏰ Reminder", color=Colors.ClemsonOrange)
             embed.add_field(name="Reminder ID", value=reminder.id)
             embed.add_field(name="Original Message", value=f"[Link]({reminder.link})")
-            embed.add_field(
-                name="Alarm Time", value=reminder.time.strftime("%x at %X UTC"), inline=False
-            )
+            embed.add_field(name="Alarm Time", value=as_timestamp(reminder.time), inline=False)
             embed.add_field(name="Message", value=reminder.content)
             embed.set_footer(
                 text=f'To delete this reminder, type "{await self.bot.current_prefix(ctx)}reminder delete {reminder.id}".'
