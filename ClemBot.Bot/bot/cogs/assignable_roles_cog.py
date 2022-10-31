@@ -342,7 +342,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to remove a role as auto assigned in the current guild")
     @ext.short_help("Removes a role as auto assigned")
     @ext.example("roles auto remove @SomeExampleRole")
-    async def auto_remove(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
+    async def auto_remove(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
 
         roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
 
