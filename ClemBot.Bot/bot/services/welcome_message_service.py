@@ -12,7 +12,7 @@ class WelcomeMessageService(BaseService):
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
 
-    @BaseService.listener(Events.on_user_joined)
+    @BaseService.listener(Events.on_user_join_initialized)
     async def user_joined(self, user: discord.Member) -> None:
         message = await self.bot.welcome_message_route.get_welcome_message(user.guild.id)
 

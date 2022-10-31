@@ -9,9 +9,9 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
+from bot.models.role_models import Role
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
-from bot.models.role_models import Role
 
 log = get_logger(__name__)
 
@@ -279,7 +279,9 @@ class AssignableRolesCog(commands.Cog):
         roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
 
         if not roles:
-            embed = discord.Embed(title="No roles are currently auto assigned on join", color=Colors.ClemsonOrange)
+            embed = discord.Embed(
+                title="No roles are currently auto assigned on join", color=Colors.ClemsonOrange
+            )
             embed.add_field(name="Available:", value="No currently auto assigned roles.")
             await ctx.send(embed=embed)
             return
@@ -297,7 +299,9 @@ class AssignableRolesCog(commands.Cog):
                 mentions.append(d_role.mention)
 
             for chunk in chunk_sequence(mentions, ROLE_LIST_CHUNK_SIZE):
-                embed = discord.Embed(title="Roles auto assigned on join", color=Colors.ClemsonOrange)  # new
+                embed = discord.Embed(
+                    title="Roles auto assigned on join", color=Colors.ClemsonOrange
+                )  # new
                 embed.add_field(name="Auto roles:", value="\n".join(chunk), inline=True)
                 pages.append(embed)
 
@@ -350,7 +354,6 @@ class AssignableRolesCog(commands.Cog):
             return
 
         await self.bot.role_route.set_auto_assigned(role.id, False)
-
 
         title = f"Role @{role.name} Removed as an auto assigned on join role :white_check_mark:"
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
