@@ -214,15 +214,26 @@ class EventsMeta(type):
         return "on_guild_role_delete"
 
     @property
-    def on_user_joined(self) -> str:
+    def on_initial_user_join(self) -> str:
         """
         Published whenever a new user joins a guild
 
         Args:
 
-            user (User) – The user who joined or left.
+            user (User) – The user who joined a guild
         """
-        return "on_user_joined"
+        return "on_initial_user_join"
+
+    @property
+    def on_user_join_initialized(self) -> str:
+        """
+        Published after a new guild join has been fully initialized in the database
+
+        Args:
+
+            user (User) – The user who joined a guild
+        """
+        return "on_user_joined_initialized"
 
     @property
     def on_user_removed(self) -> str:
@@ -309,26 +320,6 @@ class EventsMeta(type):
             prefix (str): The prefix to be added
         """
         return "on_set_custom_prefix"
-
-    @property
-    def on_assignable_role_add(self) -> str:
-        """
-        Pulbished when a new role is marked as set to be marked as assignable
-
-        Args:
-            role (discord.Role) The role to mark as assignable
-        """
-        return "on_assignable_role_add"
-
-    @property
-    def on_assignable_role_remove(self) -> str:
-        """
-        Published when a role is marked as set to be removed as assignable
-
-        Args:
-            role (discord.Role) The role to remove as assignable
-        """
-        return "on_assignable_role_remove"
 
     @property
     def on_set_deletable(self) -> str:

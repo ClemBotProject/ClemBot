@@ -8,7 +8,9 @@ public class Role
 
     public string Name { get; set; }
 
-    public bool? IsAssignable { get; set; } = false;
+    public bool IsAssignable { get; set; }
+
+    public bool IsAutoAssigned { get; set; }
 
     public bool Admin { get; set; }
 

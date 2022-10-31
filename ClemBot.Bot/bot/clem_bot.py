@@ -328,7 +328,7 @@ class ClemBot(commands.Bot):
         )
 
     async def on_member_join(self, user: discord.Member) -> None:
-        await self.publish_to_queue_with_error(Events.on_user_joined, user.guild.id, user)
+        await self.publish_to_queue_with_error(Events.on_initial_user_join, user.guild.id, user)
 
     async def on_member_remove(self, user: discord.Member) -> None:
         await self.publish_to_queue_with_error(Events.on_user_removed, user.guild.id, user)

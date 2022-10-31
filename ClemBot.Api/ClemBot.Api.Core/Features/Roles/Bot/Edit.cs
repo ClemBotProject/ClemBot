@@ -27,6 +27,8 @@ public class Edit
         public bool? Admin { get; set; } = null;
 
         public bool? Assignable { get; set; } = null;
+
+        public bool? AutoAssigned { get; set; } = null;
     }
 
     public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
@@ -44,6 +46,7 @@ public class Edit
             role.Name = request.Name ?? role.Name;
             role.Admin = request.Admin ?? role.Admin;
             role.IsAssignable = request.Assignable ?? role.IsAssignable;
+            role.IsAutoAssigned = request.AutoAssigned ?? role.IsAutoAssigned;
 
             await _context.SaveChangesAsync();
 

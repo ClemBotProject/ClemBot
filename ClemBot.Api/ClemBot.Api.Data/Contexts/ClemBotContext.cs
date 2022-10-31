@@ -44,10 +44,6 @@ public class ClemBotContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Role>()
-            .Property(p => p.IsAssignable)
-            .HasDefaultValue(true);
-
         modelBuilder.Entity<Guild>()
             .HasMany(p => p.Users)
             .WithMany(p => p.Guilds)
