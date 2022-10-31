@@ -303,12 +303,12 @@ class ManageClassesCog(commands.Cog):
         try:
             # wait a split second to insert the role in the db
             await asyncio.sleep(0.25)
-            await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+            await self.bot.role_route.set_assignable(role.id, True, raise_on_error=True)
         except:
             # If the marking of the role as assignable fails
             # Wait a second for the api to finish inserting the role then try it again
             await asyncio.sleep(1)
-            await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+            await self.bot.role_route.set_assignable(role.id, True, raise_on_error=True)
 
         return role
 
@@ -321,7 +321,7 @@ class ManageClassesCog(commands.Cog):
 
             assert cleanup
 
-            await self.bot.messenger.publish(Events.on_assignable_role_add, cleanup)
+            await self.bot.role_route.set_assignable(cleanup.id, True, raise_on_error=True)
 
             # Upon detecting first time user, show embed showing how to use commands
             embed = discord.Embed(
