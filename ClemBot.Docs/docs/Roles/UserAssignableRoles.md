@@ -1,7 +1,7 @@
 ---
 sidebar_position: 6
 ---
-# Assignable Roles
+# User Assignable Roles
 
 ## Overview
 
@@ -47,7 +47,7 @@ If you would like to give yourself a role please see the above section on adding
 #### Aliases
 * `create`
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](../Claims.md)
 * `assignable_role_add`
 
 #### Format
@@ -72,7 +72,7 @@ If you would like to remove a role from yourself please see the above section on
 #### Aliases
 * `delete`
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](../Claims.md)
 * `assignable_role_delete`
 
 #### Format

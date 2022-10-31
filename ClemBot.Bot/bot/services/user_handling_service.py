@@ -28,7 +28,7 @@ class UserHandlingService(BaseService):
 
         super().__init__(bot)
 
-    @BaseService.listener(Events.on_user_joined)
+    @BaseService.listener(Events.on_initial_user_join)
     async def on_user_joined(self, user: discord.Member) -> None:
         log.info(
             '"{member}" has joined guild "{guild}"',
@@ -45,6 +45,10 @@ class UserHandlingService(BaseService):
         await self.bot.user_route.update_roles(user.id, user.guild.id, [r.id for r in user.roles])
 
         await self.notify_user_join(user)
+
+        # We have completed our setup steps, we can now broadcast
+        # this user to the rest of the bot for other handling steps
+        await self.messenger.publish(Events.on_user_join_initialized, user)
 
     @BaseService.listener(Events.on_user_removed)
     async def on_user_removed(self, user: discord.Member) -> None:

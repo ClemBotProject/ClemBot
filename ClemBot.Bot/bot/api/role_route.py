@@ -29,6 +29,11 @@ class RoleRoute(BaseRoute):
 
         await self._client.patch("bot/roles", data=json, **kwargs)
 
+    async def set_auto_assigned(self, role_id: int, auto_assigned: bool, **kwargs: t.Any) -> None:
+        json = {"Id": role_id, "AutoAssigned": auto_assigned}
+
+        await self._client.patch("bot/roles", data=json, **kwargs)
+
     async def remove_role(self, role_id: int, **kwargs: t.Any) -> None:
         await self._client.delete(f"bot/roles/{role_id}", **kwargs)
 
@@ -42,6 +47,14 @@ class RoleRoute(BaseRoute):
             return None
 
         return [Role(**r) for r in roles if r["isAssignable"]]
+
+    async def get_guilds_auto_assigned_roles(self, guild_id: int) -> list[Role]:
+        roles = await self._client.get(f"bot/guilds/{guild_id}/roles")
+
+        if not roles:
+            return []
+
+        return [Role(**r) for r in roles if r["isAutoAssigned"]]
 
     async def check_role_assignable(self, role_id: int) -> bool | None:
         roles = await self._client.get(f"bot/roles/{role_id}")

@@ -26,6 +26,8 @@ public class Details
         public bool Admin { get; init; }
 
         public bool IsAssignable { get; init; }
+
+        public bool IsAutoAssigned { get; init; }
     }
 
     public record QueryHandler(ClemBotContext _context) : IRequestHandler<Query, QueryResult<Model>>
@@ -34,19 +36,20 @@ public class Details
         {
             var role = await _context.Roles
                 .Where(x => x.Id == request.Id)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             if (role is null)
             {
                 return QueryResult<Model>.NotFound();
             }
 
-            return QueryResult<Model>.Success(new Model()
+            return QueryResult<Model>.Success(new Model
             {
                 Id = role.Id,
                 Name = role.Name,
                 GuildId = role.GuildId,
-                IsAssignable = role.IsAssignable ?? false,
+                IsAssignable = role.IsAssignable,
+                IsAutoAssigned = role.IsAutoAssigned,
                 Admin = role.Admin
             });
         }

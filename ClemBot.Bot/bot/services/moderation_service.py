@@ -165,7 +165,7 @@ class ModerationService(BaseService):
             Events.on_send_in_designated_channel, DesignatedChannels.moderation_log, guild.id, embed
         )
 
-    @BaseService.listener(Events.on_user_joined)
+    @BaseService.listener(Events.on_user_join_initialized)
     async def on_joined(self, user: discord.Member) -> None:
         mute_role = discord.utils.get(user.guild.roles, name=Moderation.mute_role_name)
 

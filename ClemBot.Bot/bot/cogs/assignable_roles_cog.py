@@ -9,6 +9,7 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
+from bot.models.role_models import Role
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
@@ -224,7 +225,7 @@ class AssignableRolesCog(commands.Cog):
 
     async def add_role(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
         assert isinstance(ctx.author, discord.Member)
-        await ctx.author.add_roles(t.cast(discord.abc.Snowflake, role))
+        await ctx.author.add_roles(role)
 
         embed = discord.Embed(title="Role Added  :white_check_mark:", color=Colors.ClemsonOrange)
         embed.add_field(name="Role: ", value=f"{role.mention} :arrow_right:")
@@ -235,7 +236,7 @@ class AssignableRolesCog(commands.Cog):
 
     async def remove_role(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
         assert isinstance(ctx.author, discord.Member)
-        await ctx.author.remove_roles(t.cast(discord.abc.Snowflake, role))
+        await ctx.author.remove_roles(role)
 
         embed = discord.Embed(title="Role Removed  :white_check_mark:", color=Colors.ClemsonOrange)
         embed.add_field(name="Role: ", value=f"{role.mention} :arrow_left:")
@@ -250,7 +251,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.short_help("Marks a role as user assignable")
     @ext.example("roles add @SomeExampleRole")
     async def add(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
-        await self.bot.messenger.publish(Events.on_assignable_role_add, role)
+        await self.bot.role_route.set_assignable(role.id, True, raise_on_error=True)
 
         title = f"Role @{role.name} Added as assignable :white_check_mark:"
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
@@ -263,9 +264,98 @@ class AssignableRolesCog(commands.Cog):
     @ext.short_help("Removes a role as user assignable")
     @ext.example("roles delete @SomeExampleRole")
     async def remove(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
-        await self.bot.messenger.publish(Events.on_assignable_role_remove, role)
+        await self.bot.role_route.set_assignable(role.id, False, raise_on_error=True)
 
         title = f"Role @{role.name} Removed as assignable :white_check_mark:"
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
+
+        await ctx.send(embed=embed)
+
+    @roles.group(invoke_without_command=True, case_insensitive=True)
+    @ext.long_help("Command to list all currently auto assigned roles in the guild")
+    @ext.short_help("Removes a role as auto assigned")
+    @ext.example("roles auto")
+    async def auto(self, ctx: ext.ClemBotCtx) -> None:
+        roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
+
+        if not roles:
+            embed = discord.Embed(
+                title="No roles are currently auto assigned on join", color=Colors.ClemsonOrange
+            )
+            embed.add_field(name="Available:", value="No currently auto assigned roles.")
+            await ctx.send(embed=embed)
+            return
+
+        pages = []
+        if roles:
+            mentions: list[str] = []
+            for role in roles:
+                d_role = ctx.guild.get_role(role.id)
+
+                if not d_role:
+                    mentions.append(role.name)
+                    continue
+
+                mentions.append(d_role.mention)
+
+            for chunk in chunk_sequence(mentions, ROLE_LIST_CHUNK_SIZE):
+                embed = discord.Embed(
+                    title="Roles auto assigned on join", color=Colors.ClemsonOrange
+                )  # new
+                embed.add_field(name="Auto roles:", value="\n".join(chunk), inline=True)
+                pages.append(embed)
+
+        # Call paginate service
+        await self.bot.messenger.publish(
+            Events.on_set_pageable_embed,
+            pages=pages,
+            author=ctx.author,
+            channel=ctx.channel,
+            timeout=360,
+        )
+
+    @auto.command(name="add", aliases=["create"])
+    @ext.required_claims(Claims.assignable_roles_add)
+    @ext.long_help("Command to add a role as auto assigned in the current guild")
+    @ext.short_help("Marks a role as auto assigned")
+    @ext.example("roles auto add @SomeExampleRole")
+    async def auto_add(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
+
+        roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
+
+        if role.id in [r.id for r in roles]:
+            embed = discord.Embed(
+                title=f"Error: @{role.name} already set as auto assigned", color=Colors.Error
+            )
+            await ctx.send(embed=embed)
+            return
+
+        await self.bot.role_route.set_auto_assigned(role.id, True)
+
+        title = f"Role @{role.name} Added as an auto assigned on join role :white_check_mark:"
+        embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
+
+        await ctx.send(embed=embed)
+
+    @auto.command(name="remove", aliases=["delete"])
+    @ext.required_claims(Claims.assignable_roles_delete)
+    @ext.long_help("Command to remove a role as auto assigned in the current guild")
+    @ext.short_help("Removes a role as auto assigned")
+    @ext.example("roles auto remove @SomeExampleRole")
+    async def auto_remove(self, ctx: ext.ClemBotCtx, role: discord.Role) -> None:
+
+        roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
+
+        if not role.id in [r.id for r in roles]:
+            embed = discord.Embed(
+                title=f"Error: @{role.name} not set as auto assigned", color=Colors.Error
+            )
+            await ctx.send(embed=embed)
+            return
+
+        await self.bot.role_route.set_auto_assigned(role.id, False)
+
+        title = f"Role @{role.name} Removed as an auto assigned on join role :white_check_mark:"
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
 
         await ctx.send(embed=embed)

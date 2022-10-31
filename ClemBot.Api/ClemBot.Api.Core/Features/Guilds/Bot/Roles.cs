@@ -23,6 +23,8 @@ public class Roles
         public string? Name { get; init; }
 
         public bool IsAssignable { get; init; }
+
+        public bool IsAutoAssigned { get; init; }
     }
 
     public record QueryHandler(ClemBotContext _context)
@@ -45,7 +47,8 @@ public class Roles
                 {
                     Id = role.Id,
                     Name = role.Name,
-                    IsAssignable = role.IsAssignable ?? false
+                    IsAssignable = role.IsAssignable,
+                    IsAutoAssigned = role.IsAutoAssigned
                 }));
         }
     }
