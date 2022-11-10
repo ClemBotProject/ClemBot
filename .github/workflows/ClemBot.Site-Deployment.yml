@@ -11,6 +11,10 @@ on:
         description: 'Manual ClemBot.Site workflow trigger'
         required: true
         default: 'Manual Deployment'
+
+permissions:
+  packages: write
+
 env:
   REGISTRY: ghcr.io
 
