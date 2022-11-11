@@ -161,7 +161,7 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "discord.py"
-version = "2.0.0a4441+g5527de68"
+version = "2.1.0a4630+ge92a6266"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
@@ -172,16 +172,16 @@ develop = false
 aiohttp = ">=3.7.4,<4"
 
 [package.extras]
-docs = ["sphinx (==4.4.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "typing-extensions"]
-speed = ["orjson (>=3.5.4)", "aiodns (>=1.1)", "brotli", "cchardet"]
-test = ["coverage", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]
+docs = ["sphinx (==4.4.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "typing-extensions (>=4.3,<5)"]
+speed = ["orjson (>=3.5.4)", "aiodns (>=1.1)", "brotli", "cchardet (==2.1.7)"]
+test = ["coverage", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "typing-extensions (>=4.3,<5)"]
 voice = ["PyNaCl (>=1.3.0,<1.6)"]
 
 [package.source]
 type = "git"
 url = "https://github.com/Rapptz/discord.py.git"
-reference = "5527de688afe789266d4c2b1f6c5373985232dff"
-resolved_reference = "5527de688afe789266d4c2b1f6c5373985232dff"
+reference = "e92a6266628d0cc99727c8eb88c2432a931138a0"
+resolved_reference = "e92a6266628d0cc99727c8eb88c2432a931138a0"
 
 [[package]]
 name = "exceptiongroup"
@@ -743,7 +743,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "e554bad04a2d5036d38cb10e82e1a325899cb2805954d90df2c59846fff8085a"
+content-hash = "278023893ecef2de1d9028489f2826983bba6757370f97c10a2e5541e8b7a759"
 
 [metadata.files]
 aiohttp = [
