@@ -7,6 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
+<<<<<<< HEAD
 "discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "e92a6266628d0cc99727c8eb88c2432a931138a0" }
 aiohttp = "3.7.4"
 aiosqlite = "0.12.0"
@@ -89,6 +90,13 @@ yarl = "1.7.2"
 zipp = "3.8.0"
 pydantic = "^1.9.1"
 humps = "^0.2.2"
+=======
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "5527de688afe789266d4c2b1f6c5373985232dff" }
+aiohttp = "^3.8.3"
+arrow = "^1.2.3"
+seqlog = "^0.3.20"
+pandas = "^1.5.1"
+>>>>>>> 83cd29a (First draft of update deps bot)
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
