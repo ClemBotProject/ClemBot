@@ -10,7 +10,7 @@ Make sure you can run these commands and install them if not present.
 * A python IDE/Text Editor: Anything will work but people generally use Visual Studio Code [Link](https://code.visualstudio.com/) or Jetbrains Pycharm [Link](https://www.jetbrains.com/pycharm/)
 
 ### ClemBot.Api
-* .Net 6 SDK [Link](https://dotnet.microsoft.com/download/dotnet/6.0)
+* .Net 7 SDK [Link](https://dotnet.microsoft.com/download/dotnet/7.0)
 * A C# IDE, Preferably [Visual Studio Community](https://visualstudio.microsoft.com/) (Windows only) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (Cross Platform, Free with a student email)
 
 ### ClemBot.Site
@@ -18,7 +18,7 @@ Make sure you can run these commands and install them if not present.
 * yarn [Link](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) (Find your operating system in the dropdown)
 
 ### Database
-* PostgresSQL 14 [Link](https://www.postgresql.org/download/)
+* PostgreSQL 14 [Link](https://www.postgresql.org/download/)
 * PgAdmin4 [Link](https://www.pgadmin.org/download/)
 
 ## Get a Discord bot token and enable intents
