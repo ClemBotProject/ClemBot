@@ -186,12 +186,6 @@ if (connectionString is null)
     throw new ConfigurationException("Failed to get database Connection String from config object");
 }
 
-NpgsqlConnection.GlobalTypeMapper.MapEnum<BotAuthClaims>();
-NpgsqlConnection.GlobalTypeMapper.MapEnum<DesignatedChannels>();
-NpgsqlConnection.GlobalTypeMapper.MapEnum<InfractionType>();
-NpgsqlConnection.GlobalTypeMapper.MapEnum<CommandRestrictionType>();
-NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
-
 // Set the db context for DI injection
 builder.Services.AddDbContext<ClemBotContext>(options =>
     options.UseNpgsql(connectionString, optionsBuilder => optionsBuilder.UseNodaTime()));

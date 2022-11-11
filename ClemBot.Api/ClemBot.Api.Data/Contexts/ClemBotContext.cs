@@ -12,6 +12,15 @@ public class ClemBotContext : DbContext
     {
     }
 
+    static ClemBotContext()
+    {
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<BotAuthClaims>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<DesignatedChannels>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<InfractionType>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<CommandRestrictionType>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
+    }
+
     public DbSet<Channel> Channels => Set<Channel>();
     public DbSet<ClaimsMapping> ClaimsMappings => Set<ClaimsMapping>();
     public DbSet<CommandRestriction> CommandRestrictions => Set<CommandRestriction>();
