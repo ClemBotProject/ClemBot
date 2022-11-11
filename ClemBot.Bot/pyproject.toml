@@ -7,11 +7,16 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "5527de688afe789266d4c2b1f6c5373985232dff" }
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "5527de688afe789266d4c2b1f6c5373985232dff" }
 aiohttp = "^3.8.3"
 arrow = "^1.2.3"
 seqlog = "^0.3.20"
 pandas = "^1.5.1"
+humps = "^0.2.2"
+pydantic = "^1.10.2"
+nltk = "^3.7"
+markdownify = "^0.11.6"
+Pillow = "^9.3.0"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
