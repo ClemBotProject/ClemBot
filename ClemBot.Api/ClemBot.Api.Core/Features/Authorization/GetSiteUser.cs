@@ -56,7 +56,8 @@ public class GetSiteUser
         public async Task<AuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationTokeln)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-            _logger.LogInformation("Site User Request Initialized from Url: {Origin}", origin);
+            // Cast to object here so that we dont get the string?[]? implicit Conversion on the StringValue type
+            _logger.LogInformation("Site User Request Initialized from Url: {Origin}", (object)origin);
 
             var token = _httpContextAccessor.HttpContext.User.FindFirst(Claims.DiscordBearer)?.Value;
 
@@ -90,10 +91,10 @@ public class GetSiteUser
             {
                 guild.IsAdded = addedGuilds.Contains(guild.Id);
 
-               if (userClaims.TryGetValue(ulong.Parse(guild.Id), out var claims))
-               {
-                   guild.Claims = claims.Select(x => x.ToString()).ToList();
-               }
+                if (userClaims.TryGetValue(ulong.Parse(guild.Id), out var claims))
+                {
+                    guild.Claims = claims.Select(x => x.ToString()).ToList();
+                }
             }
 
             var siteUser = new SiteUser {User = discordUser, Guilds = userGuilds};

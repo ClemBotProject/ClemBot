@@ -46,7 +46,7 @@ public class DeleteCustomTagPrefix
                 return QueryResult<ulong>.Success(request.GuildId);
             }
 
-            var tagPrefix = guild.CustomTagPrefixes.FirstOrDefault(x => x.TagPrefix == request.TagPrefix);
+            var tagPrefix = guild.CustomTagPrefixes.First(x => x.TagPrefix == request.TagPrefix);
 
             guild.CustomTagPrefixes.Remove(tagPrefix);
             await _context.SaveChangesAsync();

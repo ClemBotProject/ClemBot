@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "5527de688afe789266d4c2b1f6c5373985232dff" }
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git", branch = "e92a6266628d0cc99727c8eb88c2432a931138a0" }
 aiohttp = "^3.8.3"
 arrow = "^1.2.3"
 seqlog = "^0.3.20"

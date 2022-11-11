@@ -22,7 +22,7 @@ public class GuildSandboxAuthorizeService : IGuildSandboxAuthorizeService
 
     private readonly ILogger<GuildSandboxAuthorizeService> _logger;
 
-    private readonly ClaimsPrincipal User;
+    private readonly ClaimsPrincipal _user;
 
     private readonly ClemBotContext _context;
 
@@ -33,19 +33,19 @@ public class GuildSandboxAuthorizeService : IGuildSandboxAuthorizeService
         _logger = logger;
         _context = context;
         _contextAccessor = contextAccessor.ActionContext ?? throw new ArgumentNullException(nameof(contextAccessor));
-        User = _contextAccessor.HttpContext.User;
+        _user = _contextAccessor.HttpContext.User;
     }
 
     public async Task<bool> AuthorizeUser(IGuildSandboxModel model)
     {
         _logger.LogInformation("Auth Handler: {This} received request", GetType());
-        if (User.HasClaim(c => c.Type == Claims.BotApiKey))
+        if (_user.HasClaim(c => c.Type == Claims.BotApiKey))
         {
             _logger.LogInformation("Auth Handler: {This} received Bot request", GetType());
             return true;
         }
 
-        var claimId = User.FindFirst(Claims.DiscordUserId)?.Value;
+        var claimId = _user.FindFirst(Claims.DiscordUserId)?.Value;
         if (!ulong.TryParse(claimId, out var userId))
         {
            _logger.LogError("Invalid Claim: {Claim} found with value: {Value}", Claims.DiscordUserId, userId);

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using NodaTime;
 
 namespace ClemBot.Api.Data.Models;

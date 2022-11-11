@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using ClemBot.Api.Common;
+using ClemBot.Api.Common.Exceptions;
 using ClemBot.Api.Common.Security;
 using ClemBot.Api.Common.Security.JwtToken;
 using ClemBot.Api.Common.Security.OAuth;
@@ -11,6 +12,7 @@ using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Authorization;
 using ClemBot.Api.Services.GuildSettings;
 using ClemBot.Api.Services.Jobs;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,7 +38,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
 
-const int DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL = 24;
+const int discordMessageComplianceJobInterval = 24;
 
 
 // ****** Creating the WebHostBuilder ******
@@ -45,22 +47,18 @@ var builder = WebApplication.CreateBuilder(args);
 // ******
 
 // ****** Configure the host ******
-builder.Host.ConfigureAppConfiguration((_, config) => {
-    //Set our user secrets as optional so
-    config.AddUserSecrets<ClemBotContext>(true);
-    config.AddEnvironmentVariables();
-    if (args.Length == 0)
-    {
-        config.AddCommandLine(args);
-    }
-});
+
+//Set our user secrets as optional so
+builder.Configuration.AddUserSecrets<ClemBotContext>(true);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Host.UseSerilog((context, provider, config) => {
     if (context.HostingEnvironment.IsProduction())
     {
         config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
-            .WriteTo.Seq(context.Configuration["SeqUrl"], apiKey: context.Configuration["SeqApiKey"])
+            .WriteTo.Seq(context.Configuration["SeqUrl"] ?? throw new ConfigurationException("SeqUrl Not found"),
+                apiKey: context.Configuration["SeqApiKey"])
             .WriteTo.Console();
     }
     else
@@ -71,10 +69,10 @@ builder.Host.UseSerilog((context, provider, config) => {
     }
 });
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
 builder.Services.AddControllers()
-    .AddFluentValidation(s => {
-        s.RegisterValidatorsFromAssemblyContaining<Program>();
-    })
     .AddJsonOptions(options => {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -85,10 +83,20 @@ builder.Services.AddControllers()
 
 // Get Bots api key to check requests for from config
 var apiKey = builder.Configuration["BotApiKey"];
-builder.Services.AddSingleton(new ApiKey {Key = apiKey});
+if (apiKey is null)
+{
+    throw new ConfigurationException("Failed to get bot api key from config object");
+}
+
+builder.Services.AddSingleton(new ApiKey { Key = apiKey });
 
 // Generate JWT token with random access key
 var jwtTokenConfig = builder.Configuration.GetSection("JwtTokenConfig").Get<JwtTokenConfig>();
+if (jwtTokenConfig is null)
+{
+    throw new ConfigurationException($"Failed to get {nameof(JwtTokenConfig)} from config object");
+}
+
 jwtTokenConfig.Secret = Guid.NewGuid().ToString();
 builder.Services.AddSingleton(jwtTokenConfig);
 
@@ -152,7 +160,7 @@ builder.Services.AddQuartz(options => {
         .WithIdentity("MessageContentDeletion", "DiscordCompliance")
         .StartNow()
         .WithSimpleSchedule(x => x
-            .WithIntervalInHours(DISCORD_MESSAGE_COMPLIANCE_JOB_INTERVAL)
+            .WithIntervalInHours(discordMessageComplianceJobInterval)
             .RepeatForever())
         .WithDescription("Discord Compliance Message Content Deletion Job")
     );
@@ -173,6 +181,16 @@ builder.Services.AddCors(options => {
 
 // Grab connection string from config
 var connectionString = builder.Configuration["ClemBotConnectionString"];
+if (connectionString is null)
+{
+    throw new ConfigurationException("Failed to get database Connection String from config object");
+}
+
+NpgsqlConnection.GlobalTypeMapper.MapEnum<BotAuthClaims>();
+NpgsqlConnection.GlobalTypeMapper.MapEnum<DesignatedChannels>();
+NpgsqlConnection.GlobalTypeMapper.MapEnum<InfractionType>();
+NpgsqlConnection.GlobalTypeMapper.MapEnum<CommandRestrictionType>();
+NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
 
 // Set the db context for DI injection
 builder.Services.AddDbContext<ClemBotContext>(options =>
@@ -183,21 +201,21 @@ builder.Services.AddHttpContextAccessor();
 
 // Initialize the Authentication middleware
 builder.Services.AddAuthentication(options => {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(x => {
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = jwtTokenConfig.Issuer,
-            ValidateIssuer = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
-            ValidAudience = jwtTokenConfig.Audience,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-    });
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x => {
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = jwtTokenConfig.Issuer,
+        ValidateIssuer = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret)),
+        ValidAudience = jwtTokenConfig.Audience,
+        ValidateAudience = true,
+        ValidateLifetime = true
+    };
+});
 
 builder.Services.AddAuthorization(options => {
     options.AddPolicy(Policies.BotMaster, policy => {
@@ -243,10 +261,11 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints => endpoints.MapControllers());
+app.MapControllers();
 
 // Apply any new migrations
 context.Database.Migrate();
+
 
 // ensure pg_trgm is installed (needed for trigrams support)
 context.Database.ExecuteSqlRaw("CREATE EXTENSION IF NOT EXISTS pg_trgm");
@@ -255,16 +274,18 @@ context.Database.ExecuteSqlRaw("CREATE EXTENSION IF NOT EXISTS pg_trgm");
 LinqToDBForEFTools.Initialize();
 
 // Reload enum types after a migration
-using var conn = (NpgsqlConnection)context.Database.GetDbConnection();
-conn.Open();
-conn.ReloadTypes();
+await using (var conn = (NpgsqlConnection)context.Database.GetDbConnection())
+{
+    await conn.OpenAsync();
+    await conn.ReloadTypesAsync();
+}
 // ******
 
 
 // ****** Run the API ******
 try
 {
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {

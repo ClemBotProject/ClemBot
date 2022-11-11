@@ -12,35 +12,26 @@ public class ClemBotContext : DbContext
     {
     }
 
-    static ClemBotContext()
-    {
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<BotAuthClaims>();
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<DesignatedChannels>();
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<InfractionType>();
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<CommandRestrictionType>();
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
-    }
-
-    public DbSet<Channel> Channels { get; set; }
-    public DbSet<ClaimsMapping> ClaimsMappings { get; set; }
-    public DbSet<CommandRestriction> CommandRestrictions { get; set; }
-    public DbSet<CustomPrefix> CustomPrefixs { get; set; }
-    public DbSet<CustomTagPrefix> CustomTagPrefixs { get; set; }
-    public DbSet<CommandInvocation> CommandInvocations { get; set; }
-    public DbSet<DesignatedChannelMapping> DesignatedChannelMappings { get; set; }
-    public DbSet<Guild> Guilds { get; set; }
-    public DbSet<GuildSetting> GuildSettings { get; set; }
-    public DbSet<GuildUser> GuildUser { get; set; }
-    public DbSet<Infraction> Infractions { get; set; }
-    public DbSet<Message> Messages { get; set; }
-    public DbSet<MessageContent> MessageContents { get; set; }
-    public DbSet<Reminder> Reminders { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<RoleUser> RoleUser { get; set; }
-    public DbSet<Tag> Tags { get; set; }
-    public DbSet<TagUse> TagUses { get; set; }
-    public DbSet<SlotScore> SlotScores { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<Channel> Channels => Set<Channel>();
+    public DbSet<ClaimsMapping> ClaimsMappings => Set<ClaimsMapping>();
+    public DbSet<CommandRestriction> CommandRestrictions => Set<CommandRestriction>();
+    public DbSet<CustomPrefix> CustomPrefixs => Set<CustomPrefix>();
+    public DbSet<CustomTagPrefix> CustomTagPrefixs => Set<CustomTagPrefix>();
+    public DbSet<CommandInvocation> CommandInvocations => Set<CommandInvocation>();
+    public DbSet<DesignatedChannelMapping> DesignatedChannelMappings => Set<DesignatedChannelMapping>();
+    public DbSet<Guild> Guilds => Set<Guild>();
+    public DbSet<GuildSetting> GuildSettings => Set<GuildSetting>();
+    public DbSet<GuildUser> GuildUser => Set<GuildUser>();
+    public DbSet<Infraction> Infractions => Set<Infraction>();
+    public DbSet<Message> Messages => Set<Message>();
+    public DbSet<MessageContent> MessageContents => Set<MessageContent>();
+    public DbSet<Reminder> Reminders => Set<Reminder>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<RoleUser> RoleUser => Set<RoleUser>();
+    public DbSet<Tag> Tags => Set<Tag>();
+    public DbSet<TagUse> TagUses => Set<TagUse>();
+    public DbSet<SlotScore> SlotScores => Set<SlotScore>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -7,7 +7,6 @@ using ClemBot.Api.Common.Security;
 using ClemBot.Api.Common.Security.JwtToken;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Behaviors;
-using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -36,13 +35,26 @@ public class BotAuthorize
         public string Token { get; init; } = null!;
     }
 
-    public record Handler(ClemBotContext _context,
-        ILogger<Handler> _logger,
-        IHttpContextAccessor _httpContextAccessor,
-        IJwtAuthManager _jwtAuthManager,
-        JwtTokenConfig _jwtTokenConfig,
-        ApiKey _apiKey) : IRequestHandler<Query, AuthorizeResult<Model>>
+    public class Handler : IRequestHandler<Query, AuthorizeResult<Model>>
     {
+        public ILogger<Handler> _logger { get; init; }
+
+        public IHttpContextAccessor _httpContextAccessor { get; init; }
+
+        public IJwtAuthManager _jwtAuthManager { get; init; }
+
+        public ApiKey _apiKey { get; init; }
+
+        public Handler(ILogger<Handler> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IJwtAuthManager jwtAuthManager,
+            ApiKey apiKey)
+        {
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            _jwtAuthManager = jwtAuthManager;
+            _apiKey = apiKey;
+        }
 
         public Task<AuthorizeResult<Model>> Handle(Query request,
             CancellationToken cancellationToken)

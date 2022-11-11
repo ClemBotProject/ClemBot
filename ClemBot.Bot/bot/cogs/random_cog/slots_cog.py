@@ -205,7 +205,7 @@ class SlotsCog(commands.Cog):
             winning_groups.extend(groups[0])
 
         # Transpose the matrix to easily check for vertical groupings
-        flipped_arr = np.rot90(paylines)  # type: ignore
+        flipped_arr = np.rot90(paylines)
         vertical_score = 0
         for i, line in enumerate(flipped_arr):
             groups = self._calculate_line_score(

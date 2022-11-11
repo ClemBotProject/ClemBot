@@ -6,7 +6,7 @@ public class Role
 {
     public ulong Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public bool IsAssignable { get; set; }
 
@@ -15,10 +15,10 @@ public class Role
     public bool Admin { get; set; }
 
     public ulong GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 
-    public List<User> Users { get; set; }
-    public List<RoleUser> RoleUsers { get; set; }
+    public List<User> Users { get; set; } = null!;
+    public List<RoleUser> RoleUsers { get; set; } = null!;
 
-    public List<ClaimsMapping> Claims { get; set; }
+    public List<ClaimsMapping> Claims { get; set; } = null!;
 }
