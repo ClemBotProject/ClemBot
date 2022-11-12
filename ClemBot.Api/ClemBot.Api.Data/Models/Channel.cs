@@ -6,10 +6,10 @@ public class Channel
 {
     public ulong Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public ulong GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 
     public ulong? ParentId { get; set; }
     public Channel? Parent { get; set; }

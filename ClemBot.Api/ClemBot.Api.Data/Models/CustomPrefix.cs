@@ -4,8 +4,8 @@ public class CustomPrefix
 {
     public int Id { get; set; }
 
-    public string Prefix { get; set; }
+    public required string Prefix { get; set; }
 
     public ulong GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 }

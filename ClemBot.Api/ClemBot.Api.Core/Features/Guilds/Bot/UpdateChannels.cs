@@ -20,7 +20,7 @@ public class UpdateChannels
     {
         public ulong ChannelId { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
     }
 
     public record Command : IRequest<QueryResult<ulong>>

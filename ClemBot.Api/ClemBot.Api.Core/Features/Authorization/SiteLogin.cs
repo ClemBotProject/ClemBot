@@ -58,7 +58,7 @@ public class SiteLogin
         public async Task<AuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationToken)
         {
             _httpContextAccessor.HttpContext!.Request.Headers.TryGetValue("Origin", out var origin);
-            _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", origin);
+            _logger.LogInformation("Site Login Request Initialized from Url: {Origin}", (object)origin);
 
             var discordUser = await _discordAuthManager.GetDiscordUserAsync(request.Bearer);
             if (discordUser is null)

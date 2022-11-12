@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Common.Security.Policies.BotMaster;
-using ClemBot.Api.Common.Security.Policies.GuildSandbox;
-using ClemBot.Api.Common.Utilities;
-using ClemBot.Api.Core.Features.Roles.Bot;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClemBot.Api.Core.Features.CustomPrefixes;

@@ -8,7 +8,7 @@ public class Infraction
 {
     public int Id { get; set; }
 
-    public InfractionType Type { get; set; }
+    public required InfractionType Type { get; set; }
 
     public string? Reason { get; set; }
 
@@ -16,14 +16,14 @@ public class Infraction
 
     public LocalDateTime? Duration { get; set; }
 
-    public LocalDateTime Time { get; set; }
+    public required LocalDateTime Time { get; set; }
 
     public ulong GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 
     public ulong AuthorId { get; set; }
-    public User Author { get; set; }
+    public User Author { get; set; } = null!;
 
     public ulong SubjectId { get; set; }
-    public User Subject { get; set; }
+    public User Subject { get; set; } = null!;
 }

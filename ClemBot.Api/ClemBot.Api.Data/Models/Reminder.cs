@@ -6,7 +6,7 @@ public class Reminder
 {
     public int Id { get; set; }
 
-    public string Link { get; set; }
+    public required string Link { get; set; }
 
     public string? Content { get; set; }
 
@@ -15,5 +15,5 @@ public class Reminder
     public bool Dispatched { get; set; } = false;
 
     public ulong UserId { get; set; }
-    public User User { get; set; }
+    public virtual User User { get; set; } = null!;
 }

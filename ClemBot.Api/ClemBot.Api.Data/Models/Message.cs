@@ -11,11 +11,11 @@ public class Message
     public List<MessageContent> Contents { get; set; } = new();
 
     public ulong GuildId { get; set; }
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
 
     public ulong ChannelId { get; set; }
-    public Channel Channel { get; set; }
+    public Channel Channel { get; set; } = null!;
 
     public ulong UserId { get; set; }
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 }

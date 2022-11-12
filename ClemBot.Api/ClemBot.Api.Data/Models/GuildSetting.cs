@@ -8,8 +8,8 @@ public class GuildSetting
 
     public ConfigSettings Setting { get; set; }
 
-    public string Value { get; set; }
+    public string Value { get; set; } = null!;
 
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
     public ulong GuildId { get; set; }
 }

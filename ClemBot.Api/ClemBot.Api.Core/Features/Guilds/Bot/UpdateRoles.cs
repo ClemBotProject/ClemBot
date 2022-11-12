@@ -21,7 +21,7 @@ public class UpdateRoles
     {
         public ulong Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         public bool Admin { get; set; }
     }

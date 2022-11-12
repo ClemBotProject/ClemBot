@@ -46,7 +46,7 @@ public class Delete
                 return QueryResult<ulong>.Success(request.GuildId);
             }
 
-            var prefix = guild.CustomPrefixes.FirstOrDefault(x => x.Prefix == request.Prefix);
+            var prefix = guild.CustomPrefixes.First(x => x.Prefix == request.Prefix);
 
             guild.CustomPrefixes.Remove(prefix);
             await _context.SaveChangesAsync();

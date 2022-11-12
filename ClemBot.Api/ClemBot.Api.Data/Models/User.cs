@@ -6,13 +6,13 @@ public class User
 {
     public ulong Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public List<Guild> Guilds { get; set; } = new();
     public List<GuildUser> GuildUsers { get; set; } = new();
 
-    public List<Role> Roles { get; set; }
-    public List<RoleUser> RoleUsers { get; set; }
+    public List<Role> Roles { get; set; } = null!;
+    public List<RoleUser> RoleUsers { get; set; } = null!;
 
     public List<Tag> Tags { get; set; } = new();
 

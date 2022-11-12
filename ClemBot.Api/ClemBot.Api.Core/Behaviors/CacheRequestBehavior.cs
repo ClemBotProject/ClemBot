@@ -5,7 +5,7 @@ using LazyCache;
 namespace ClemBot.Api.Core.Behaviors;
 
 public class CacheRequestBehavior<TRequest, TResponse> :
-    IPipelineBehavior<TRequest, TResponse> where TRequest : ICacheRequest
+    IPipelineBehavior<TRequest, TResponse> where TRequest : ICacheRequest, IRequest<TResponse>
 {
     private readonly ILogger<CacheRequestBehavior<TRequest, TResponse>> _logger;
 
@@ -18,8 +18,8 @@ public class CacheRequestBehavior<TRequest, TResponse> :
     }
 
     public async Task<TResponse> Handle(TRequest request,
-        CancellationToken cancellationToken,
-        RequestHandlerDelegate<TResponse> next)
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation("Cache Request: {Request} for Id: {Id}", typeof(TRequest).Name, request.Id);
         var result = await next();

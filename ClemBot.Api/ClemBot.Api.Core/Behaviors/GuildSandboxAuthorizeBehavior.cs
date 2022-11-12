@@ -9,24 +9,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ClemBot.Api.Core.Behaviors;
 
-public class GuildSandboxAuthorizeBehavior<TRequest, TResponse> :
-    IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IGuildSandboxModel
+public class GuildSandboxAuthorizeBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IGuildSandboxModel, IRequest<TResponse>
 {
-    private readonly ILogger<GuildSandboxAuthorizeBehavior<TRequest, TResponse>> _logger;
-
     private readonly IGuildSandboxAuthorizeService _authorizeService;
 
-    public GuildSandboxAuthorizeBehavior(ILogger<GuildSandboxAuthorizeBehavior<TRequest, TResponse>> logger,
-        IGuildSandboxAuthorizeService authorizeService)
+    public GuildSandboxAuthorizeBehavior(IGuildSandboxAuthorizeService authorizeService)
     {
-        _logger = logger;
         _authorizeService = authorizeService;
     }
 
     public async Task<TResponse> Handle(TRequest request,
-        CancellationToken cancellationToken,
-        RequestHandlerDelegate<TResponse> next)
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         if (!await _authorizeService.AuthorizeUser(request))
         {

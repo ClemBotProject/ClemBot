@@ -25,7 +25,7 @@ public class UpdateUsers
     {
         public ulong UserId { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
     }
 
     public record Command : IRequest<QueryResult<ulong>>

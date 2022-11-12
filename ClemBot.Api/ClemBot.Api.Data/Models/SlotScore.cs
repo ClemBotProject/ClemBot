@@ -11,9 +11,9 @@ public class SlotScore
 
     public LocalDateTime Time { get; set; }
 
-    public Guild Guild { get; set; }
+    public Guild Guild { get; set; } = null!;
     public ulong GuildId { get; set; }
 
-    public User User { get; set; }
+    public User User { get; set; } = null!;
     public ulong UserId { get; set; }
 }

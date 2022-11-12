@@ -20,7 +20,7 @@ public class UpdateThreads
     {
         public ulong ThreadId { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         public ulong ParentId { get; set; }
     }
