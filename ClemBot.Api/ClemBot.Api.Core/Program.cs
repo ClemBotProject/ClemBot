@@ -57,8 +57,8 @@ builder.Host.UseSerilog((context, provider, config) => {
     {
         config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
-            .WriteTo.Seq(context.Configuration["SeqUrl"] ?? throw new ConfigurationException("SeqUrl Not found"),
-                apiKey: context.Configuration["SeqApiKey"])
+            .WriteTo.Seq(context.Configuration[ConfigurationKeys.SeqUrl] ?? throw new ConfigurationException("SeqUrl Not found"),
+                apiKey: context.Configuration[ConfigurationKeys.SeqApiKey])
             .WriteTo.Console();
     }
     else
@@ -82,7 +82,7 @@ builder.Services.AddControllers()
 // ****** Configure Services ******
 
 // Get Bots api key to check requests for from config
-var apiKey = builder.Configuration["BotApiKey"];
+var apiKey = builder.Configuration[ConfigurationKeys.BotApiKey];
 if (apiKey is null)
 {
     throw new ConfigurationException("Failed to get bot api key from config object");
@@ -180,7 +180,7 @@ builder.Services.AddCors(options => {
 });
 
 // Grab connection string from config
-var connectionString = builder.Configuration["ClemBotConnectionString"];
+var connectionString = builder.Configuration[ConfigurationKeys.DbConnectionString];
 if (connectionString is null)
 {
     throw new ConfigurationException("Failed to get database Connection String from config object");
