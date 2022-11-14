@@ -1,3 +1,4 @@
+using ClemBot.Api.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ public class ClemBotContextDesignFactory : IDesignTimeDbContextFactory<ClemBotCo
             .Build();
 
         var builder = new DbContextOptionsBuilder<ClemBotContext>();
-        builder.UseNpgsql(configuration["ClemBotConnectionString"],
+        builder.UseNpgsql(configuration[ConfigurationKeys.DbConnectionString],
             o => o.UseNodaTime());
 
         return new ClemBotContext(builder.Options);

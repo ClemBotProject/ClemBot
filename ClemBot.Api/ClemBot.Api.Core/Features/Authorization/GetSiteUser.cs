@@ -1,8 +1,6 @@
 using ClemBot.Api.Common;
-using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Common.Security.OAuth;
 using ClemBot.Api.Common.Security.OAuth.OAuthUser;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -38,19 +36,15 @@ public class GetSiteUser
 
         private readonly IDiscordAuthManager _discordAuthManager;
 
-        private readonly IMediator _mediator;
-
         public Handler(ClemBotContext context,
             ILogger<Handler> logger,
             IHttpContextAccessor httpContextAccessor,
-            IDiscordAuthManager discordAuthManager,
-            IMediator mediator)
+            IDiscordAuthManager discordAuthManager)
         {
             _context = context;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _discordAuthManager = discordAuthManager;
-            _mediator = mediator;
         }
 
         public async Task<AuthorizeResult<Model>> Handle(Query request, CancellationToken cancellationTokeln)

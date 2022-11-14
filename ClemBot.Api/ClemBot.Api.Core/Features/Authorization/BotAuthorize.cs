@@ -37,13 +37,13 @@ public class BotAuthorize
 
     public class Handler : IRequestHandler<Query, AuthorizeResult<Model>>
     {
-        public ILogger<Handler> _logger { get; init; }
+        private ILogger<Handler> _logger { get; init; }
 
-        public IHttpContextAccessor _httpContextAccessor { get; init; }
+        private IHttpContextAccessor _httpContextAccessor { get; init; }
 
-        public IJwtAuthManager _jwtAuthManager { get; init; }
+        private IJwtAuthManager _jwtAuthManager { get; init; }
 
-        public ApiKey _apiKey { get; init; }
+        private ApiKey _apiKey { get; init; }
 
         public Handler(ILogger<Handler> logger,
             IHttpContextAccessor httpContextAccessor,

@@ -21,26 +21,26 @@ public class ClemBotContext : DbContext
         NpgsqlConnection.GlobalTypeMapper.MapEnum<ConfigSettings>();
     }
 
-    public DbSet<Channel> Channels => Set<Channel>();
-    public DbSet<ClaimsMapping> ClaimsMappings => Set<ClaimsMapping>();
-    public DbSet<CommandRestriction> CommandRestrictions => Set<CommandRestriction>();
-    public DbSet<CustomPrefix> CustomPrefixs => Set<CustomPrefix>();
-    public DbSet<CustomTagPrefix> CustomTagPrefixs => Set<CustomTagPrefix>();
-    public DbSet<CommandInvocation> CommandInvocations => Set<CommandInvocation>();
-    public DbSet<DesignatedChannelMapping> DesignatedChannelMappings => Set<DesignatedChannelMapping>();
-    public DbSet<Guild> Guilds => Set<Guild>();
-    public DbSet<GuildSetting> GuildSettings => Set<GuildSetting>();
-    public DbSet<GuildUser> GuildUser => Set<GuildUser>();
-    public DbSet<Infraction> Infractions => Set<Infraction>();
-    public DbSet<Message> Messages => Set<Message>();
-    public DbSet<MessageContent> MessageContents => Set<MessageContent>();
-    public DbSet<Reminder> Reminders => Set<Reminder>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<RoleUser> RoleUser => Set<RoleUser>();
-    public DbSet<Tag> Tags => Set<Tag>();
-    public DbSet<TagUse> TagUses => Set<TagUse>();
-    public DbSet<SlotScore> SlotScores => Set<SlotScore>();
-    public DbSet<User> Users => Set<User>();
+    public DbSet<Channel> Channels { get; set; } = null!;
+    public DbSet<ClaimsMapping> ClaimsMappings { get; set; } = null!;
+    public DbSet<CommandRestriction> CommandRestrictions { get; set; } = null!;
+    public DbSet<CustomPrefix> CustomPrefixs { get; set; } = null!;
+    public DbSet<CustomTagPrefix> CustomTagPrefixs { get; set; } = null!;
+    public DbSet<CommandInvocation> CommandInvocations { get; set; } = null!;
+    public DbSet<DesignatedChannelMapping> DesignatedChannelMappings { get; set; } = null!;
+    public DbSet<Guild> Guilds { get; set; } = null!;
+    public DbSet<GuildSetting> GuildSettings { get; set; } = null!;
+    public DbSet<GuildUser> GuildUser { get; set; } = null!;
+    public DbSet<Infraction> Infractions { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<MessageContent> MessageContents { get; set; } = null!;
+    public DbSet<Reminder> Reminders { get; set; } = null!;
+    public DbSet<Role> Roles { get; set; } = null!;
+    public DbSet<RoleUser> RoleUser { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
+    public DbSet<TagUse> TagUses { get; set; } = null!;
+    public DbSet<SlotScore> SlotScores { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
