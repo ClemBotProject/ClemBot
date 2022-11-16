@@ -1,0 +1,40 @@
+---
+const loginUrl = "https://www.google.com"
+---
+
+<a href={loginUrl} class="button">Login With Discord</a>
+
+<style lang="scss">
+  @import "../styles/global";
+
+  a.button {
+    background-color: $primary;
+    appearance: button;
+    text-decoration: none;
+    color: white;
+    border: none;
+
+    padding: 10px;
+    border-radius: 50px;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    animation: scale-out 0.3s ease-in-out;
+    @keyframes scale-out {
+      from {
+        transform: scale(1.05);
+      }
+    }
+
+    &:hover {
+      animation: scale-in 0.3s ease-in-out;
+      animation-fill-mode: forwards;
+      @keyframes scale-in {
+        to {
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+</style>

@@ -1,12 +1,17 @@
 // Default global style sheet for ClemBot.Site
 
-$primary-background: #101010; 
+$primary-background: #272727;
 
 $text-color: #e2e2e2;
-$font: 'Ubuntu';
+$primary: #7937b8;
+$primary-light: #8e56c3;
+$info-color: #00cbff;
+$discord-color: #5865F2;
+
+$font: "Ubuntu";
 
 :root {
-    background: $primary-background;
-    color: $text-color;
-    font-family: $font, sans-serif;
+  background: $primary-background;
+  color: $text-color;
+  font-family: $font, sans-serif;
 }

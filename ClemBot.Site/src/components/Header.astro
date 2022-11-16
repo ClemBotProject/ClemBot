@@ -1,0 +1,38 @@
+---
+import Icon from "./Icon.astro";
+import LoginButton from "./LoginButton.astro";
+import Navigation from "./Navigation.astro"
+---
+
+<div class="header-links">
+  <div class="nav-links">
+    <Navigation />
+  </div>
+  <div class="right-nav">
+    <LoginButton />
+    <Icon icon="fa-brands fa-github" link="https://github.com/ClemBotProject/ClemBot" />
+    <Icon icon="fa-brands fa-discord" link="https://discord.gg/mhrVuyh" />
+  </div>
+</div>
+
+<style lang="scss">
+  @import "../styles/global";
+
+  .header-links {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+
+    .nav-links {
+      grid-column-start: 2;
+    }
+
+    .right-nav {
+      margin-left: auto;
+      margin-right: 1em;
+    }
+  }
+
+</style>

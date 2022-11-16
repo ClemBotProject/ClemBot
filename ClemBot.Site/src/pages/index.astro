@@ -1,16 +1,20 @@
 ---
 import "../styles/global.scss"
+import HomeLayout from "../layouts/HomeLayout.astro"
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>ClemBot</title>
-	</head>
-	<body>
-		<h1>ClemBot</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link href="/node_modules/@fortawesome/fontawesome-free/css/brands.css" rel="stylesheet" />
+    <link href="/node_modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>ClemBot</title>
+  </head>
+  <HomeLayout>
+    <body>
+    </body>
+  </HomeLayout>
 </html>

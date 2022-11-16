@@ -2,7 +2,7 @@
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
     //------ Under no circumstances change the following settings ------
-    "noImplicitAny": true,
+    "noImplicitAny": true
     //------------------------------------------------------------------
-  },
+  }
 }

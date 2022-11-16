@@ -1,0 +1,42 @@
+---
+interface Props {
+  icon: string
+  link: string
+}
+const { icon, link } = Astro.props
+---
+<a target="_blank" href={link}>
+  <i class={icon + " fa-2xl icon"}></i>
+</a>
+
+<style lang="scss">
+  @import "../styles/global";
+
+  @mixin scale-icon($name, $internal-color) {
+    animation: #{$name}-out 0.3s ease-in-out;
+    @keyframes #{$name}-out {
+      from {
+        transform: scale(1.15);
+        color: white;
+      }
+    }
+
+    &:hover {
+      animation: #{$name}-in 0.3s ease-in-out;
+      animation-fill-mode: forwards;
+      @keyframes #{$name}-in  {
+        to {
+          color: $internal-color;
+          transform: scale(1.15);
+        }
+      }
+    }
+  }
+
+  .icon {
+    padding-left: 10px;
+    color: rgb(185, 185, 185);
+    @include scale-icon("icon", white);
+  }
+
+</style>
