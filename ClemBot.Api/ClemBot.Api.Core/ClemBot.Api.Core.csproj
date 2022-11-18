@@ -17,7 +17,7 @@
         <PackageReference Include="LazyCache" Version="2.4.0" />
         <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
         <PackageReference Include="linq2db" Version="4.3.0" />
-        <PackageReference Include="linq2db.EntityFrameworkCore" Version="6.10.0" />
+        <PackageReference Include="linq2db.EntityFrameworkCore" Version="7.0.0-rc.9473" />
         <PackageReference Include="MediatR" Version="11.0.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" NoWarn="NU1605" />

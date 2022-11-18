@@ -13,8 +13,8 @@ class GuildRoute(BaseRoute):
     def __init__(self, api_client: ApiClient):
         super().__init__(api_client)
 
-    async def add_guild(self, guild_id: int, name: str, owner_id: int) -> None:
-        if await self._client.get(f"bot/guilds/{guild_id}"):
+    async def add_guild(self, guild_id: int, name: str, owner_id: int, **kwargs: t.Any) -> None:
+        if await self._client.get(f"bot/guilds/{guild_id}", **kwargs):
             return
 
         json = {"Id": guild_id, "Name": name, "OwnerId": owner_id}
@@ -28,8 +28,8 @@ class GuildRoute(BaseRoute):
 
         return [g["id"] for g in guilds]
 
-    async def leave_guild(self, guild_id: int) -> None:
-        await self._client.delete(f"bot/guilds/{guild_id}")
+    async def leave_guild(self, guild_id: int, **kwargs: t.Any) -> None:
+        await self._client.delete(f"bot/guilds/{guild_id}", **kwargs)
 
     async def get_guild(self, guild_id: int) -> Guild | None:
         guild = await self._client.get(f"bot/guilds/{guild_id}")

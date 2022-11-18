@@ -70,7 +70,7 @@ class UserHandlingService(BaseService):
             )
             self.user_id_cache.remove(user.id)
 
-        await self.bot.user_route.remove_user_guild(user.id, user.guild.id)
+        await self.bot.user_route.remove_user_guild(user.id, user.guild.id, raise_on_error=True)
 
         await self.notify_user_remove(user)
 
