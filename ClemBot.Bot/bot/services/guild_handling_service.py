@@ -22,7 +22,9 @@ class GuildHandlingService(BaseService):
 
         assert guild.owner is not None
 
-        await self.bot.guild_route.add_guild(guild.id, guild.name, guild.owner.id, raise_on_error=True)
+        await self.bot.guild_route.add_guild(
+            guild.id, guild.name, guild.owner.id, raise_on_error=True
+        )
         log.info(f"Finished Loading guild {guild.name}: {guild.id}")
 
         await self.bot.guild_route.update_guild_users(guild)
