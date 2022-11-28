@@ -1,0 +1,46 @@
+<div class="wave-bkg hero-layout">
+  <img class="landing-image" src="assets/ClemBotLogo.svg" />
+  <div class="landing-name">ClemBot</div>
+  <div class="landing-description">
+    The modular and configurable open source Discord bot for all your needs
+  </div>
+</div>
+
+<style lang="scss">
+  @import "../styles/global";
+
+  .wave-bkg {
+    background-image: url("/assets/SplashBkg.svg");
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: cover;
+    height: 26vw;
+    min-width: 100%;
+  }
+
+  .hero-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .landing-image {
+    height: 35%;
+    filter: drop-shadow(-2px 2px 1px $primary-background);
+  }
+
+  .landing-name {
+    font-size: 60px;
+    font-weight: 600;
+    filter: drop-shadow(-2px 2px 1px $primary-background)
+      drop-shadow(-3px 3px 1px $primary);
+  }
+
+  .landing-description {
+    font-weight: 500;
+    font-size: large;
+    letter-spacing: 1px;
+    filter: drop-shadow(-2px 2px 1px $primary-background);
+  }
+</style>

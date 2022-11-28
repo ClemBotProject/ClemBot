@@ -1,6 +1,6 @@
 ---
-import Icon from "./Icon.astro";
-import LoginButton from "./LoginButton.astro";
+import Icon from "./Icon.astro"
+import LoginButton from "./LoginButton.astro"
 import Navigation from "./Navigation.astro"
 ---
 
@@ -10,7 +10,10 @@ import Navigation from "./Navigation.astro"
   </div>
   <div class="right-nav">
     <LoginButton />
-    <Icon icon="fa-brands fa-github" link="https://github.com/ClemBotProject/ClemBot" />
+    <Icon
+      icon="fa-brands fa-github"
+      link="https://github.com/ClemBotProject/ClemBot"
+    />
     <Icon icon="fa-brands fa-discord" link="https://discord.gg/mhrVuyh" />
   </div>
 </div>
@@ -19,11 +22,16 @@ import Navigation from "./Navigation.astro"
   @import "../styles/global";
 
   .header-links {
-    margin-top: 20px;
+    padding-top: 15px;
+    padding-bottom: 10px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
     justify-items: center;
+
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 7px 6px;
+
+    background-color: $primary-background;
 
     .nav-links {
       grid-column-start: 2;
@@ -34,5 +42,4 @@ import Navigation from "./Navigation.astro"
       margin-right: 1em;
     }
   }
-
 </style>
