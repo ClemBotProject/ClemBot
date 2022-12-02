@@ -76,26 +76,21 @@ class GuildHandlingService(BaseService):
         try:
             assert guild.owner is not None
 
-            embed = discord.Embed(
-                title=f"{self.bot.user.name} added to a new guild", color=Colors.ClemsonOrange
-            )
-            embed.set_author(
-                name=f"Owner: {guild.owner.name}#{guild.owner.discriminator}",
-                icon_url=guild.owner.display_avatar.url,
-            )
+            guild_str = f"{self.bot.user.name} added to a new guild\n\n"
 
+            guild_str += f"Id: {guild.id}\n"
+            guild_str += f"Name: {guild.name}\n"
+            guild_str += f"Owner: {guild.owner.name}#{guild.owner.discriminator}\n"
+            guild_str += f"Created At: {guild.created_at}\n"
+            guild_str += f"User Count: {len([m for m in guild.members if not m.bot])}\n"
+            guild_str += f"Bot Count: {len([m for m in guild.members if m.bot])}\n"
             if guild.icon:
-                embed.set_thumbnail(url=guild.icon.url)
-
-            embed.add_field(name="Name", value=guild.name)
-            embed.add_field(name="Id", value=guild.id)
-            embed.add_field(name="Creation Date", value=guild.created_at, inline=False)
-            embed.add_field(name="User Count", value=guild.member_count)
+                guild_str += f"Server avatar: {guild.icon.url}\n"
 
             await self.bot.messenger.publish(
                 Events.on_broadcast_designated_channel,
                 OwnerDesignatedChannels.server_join_log,
-                embed,
+                guild_str,
             )
         except Exception as e:
             log.error(f"Sending new guild embed failed for guild: {guild.id} with error {e}")

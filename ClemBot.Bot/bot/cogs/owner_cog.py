@@ -23,7 +23,7 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot: ClemBot):
         self.bot: ClemBot = bot
 
-    @ext.group(hidden=True, case_insensitive=True)
+    @ext.group(invoke_without_command=True, hidden=True, case_insensitive=True)
     @commands.is_owner()
     async def owner(self, ctx):
         """For User by the bots owner to get errors and metrics"""
@@ -42,8 +42,11 @@ class OwnerCog(commands.Cog):
     @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def leave(self, ctx: ext.ClemBotCtx, id: int):
+        await ctx.send("Leaving guild")
         server = self.bot.get_guild(id)
+        await ctx.send(f"Leaving guild: {server.name}")
         await server.leave()
+        await ctx.send("Server left successfully")
 
     @ext.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
