@@ -77,7 +77,7 @@
                 </div>
               </div>
               <div id="nav-tile" class="tile is-parent is-vertical">
-                <a target="_blank" href="https://docs.clembot.io" />
+                <a target="_blank" href="https://docs.clembot.io">
                   <article
                     id="nav-child"
                     class="tile is-child notification is-primary"
