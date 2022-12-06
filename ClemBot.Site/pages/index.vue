@@ -77,7 +77,7 @@
                 </div>
               </div>
               <div id="nav-tile" class="tile is-parent is-vertical">
-                <nuxt-link :to="{ path: '/wiki/intro' }">
+                <a target="_blank" href="https://docs.clembot.io" />
                   <article
                     id="nav-child"
                     class="tile is-child notification is-primary"
@@ -99,7 +99,7 @@
                       </ul>
                     </div>
                   </article>
-                </nuxt-link>
+                </a>
               </div>
             </div>
           </div>
