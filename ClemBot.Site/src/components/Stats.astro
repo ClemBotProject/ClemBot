@@ -2,11 +2,15 @@
 import Card from "./Card.astro"
 ---
 
-<Card class="stats-card">
-  <div>
-    Currently running <b id="guilds" class="stat-element"></b> guilds and watching
-    <b id="users" class="stat-element"></b> with <br /><br />
-    <b id="commands" class="stat-element"></b> commands run
+<Card>
+  <div class="stats-card">
+    Currently running <span class="stat-element"
+      ><b id="guilds"></b> Guilds</span
+    > and helping
+    <span class="stat-element"><b id="users"></b> Users</span> with <br /><br />
+    <span class="stat-element"
+      ><b id="commands" class="stat-element"></b> Commands</span
+    > run
   </div>
 </Card>
 
@@ -46,12 +50,20 @@ import Card from "./Card.astro"
 </script>
 
 <style lang="scss">
+  @import "../styles/global.scss";
+
   .stat-element {
     font-weight: 800;
     font-size: larg;
   }
 
+  span {
+    background-color: $landing-background;
+    padding: 3px;
+    border-radius: 3px;
+  }
+
   .stats-card {
-    opacity: 15%;
+    margin: 1em;
   }
 </style>
