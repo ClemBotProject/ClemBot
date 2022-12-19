@@ -1,0 +1,57 @@
+---
+import Card from "./Card.astro"
+---
+
+<Card class="stats-card">
+  <div>
+    Currently running <b id="guilds" class="stat-element"></b> guilds and watching
+    <b id="users" class="stat-element"></b> with <br /><br />
+    <b id="commands" class="stat-element"></b> commands run
+  </div>
+</Card>
+
+<script>
+  interface Stats {
+    guilds: number
+    users: number
+    commands: number
+  }
+
+  let stats_resp = await fetch("https://clembot.io/api/public/globalstats")
+  let stats: Stats = await stats_resp.json()
+
+  let guilds_doc = document.getElementById("guilds")
+
+  if (guilds_doc === null) {
+    console.error("Could not get guilds DOM Element")
+  } else {
+    guilds_doc.innerHTML = stats.guilds.toString()
+  }
+
+  let users_doc = document.getElementById("users")
+
+  if (users_doc === null) {
+    console.error("Could not get users DOM Element")
+  } else {
+    users_doc.innerHTML = stats.users.toString()
+  }
+
+  let commands_doc = document.getElementById("commands")
+
+  if (commands_doc === null) {
+    console.error("Could not get commands DOM Element")
+  } else {
+    commands_doc.innerHTML = stats.commands.toString()
+  }
+</script>
+
+<style lang="scss">
+  .stat-element {
+    font-weight: 800;
+    font-size: larg;
+  }
+
+  .stats-card {
+    opacity: 15%;
+  }
+</style>

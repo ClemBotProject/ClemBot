@@ -1,9 +1,14 @@
+---
+import Stats from "./Stats.astro"
+---
+
 <div class="wave-bkg hero-layout">
   <img class="landing-image" src="assets/ClemBotLogo.svg" />
   <div class="landing-name">ClemBot</div>
   <div class="landing-description">
     The modular and configurable open source Discord bot for all your needs
   </div>
+  <Stats />
 </div>
 
 <style lang="scss">
@@ -41,6 +46,7 @@
     font-weight: 500;
     font-size: large;
     letter-spacing: 1px;
+    padding-bottom: 10px;
     filter: drop-shadow(-2px 2px 1px $primary-background);
   }
 </style>

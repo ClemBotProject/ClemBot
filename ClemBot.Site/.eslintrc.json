@@ -1,10 +1,15 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:astro/recommended", 
+    "plugin:astro/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
+  "parserOptions": {
+    "project": [
+      "tsconfig.json"
+    ]
+  },
   "overrides": [
     {
       "files": [
@@ -15,8 +20,7 @@
         "parser": "@typescript-eslint/parser",
         "extraFileExtensions": [
           ".astro"
-        ],
-        "project": ["tsconfig.json"] 
+        ]
       },
       "rules": {
         "@typescript-eslint/no-explicit-any": [
@@ -31,6 +35,7 @@
             "ignoreProperties": true
           }
         ],
+        "@typescript-eslint/await-thenable": "off",
         "prettier/prettier": "off",
         "astro/no-set-html-directive": "error"
       }
