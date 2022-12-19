@@ -10,10 +10,7 @@ import Navigation from "./Navigation.astro"
   </div>
   <div class="right-nav">
     <LoginButton />
-    <Icon
-      icon="bi:github"
-      link="https://github.com/ClemBotProject/ClemBot"
-    />
+    <Icon icon="bi:github" link="https://github.com/ClemBotProject/ClemBot" />
     <Icon icon="bi:discord" link="https://discord.gg/mhrVuyh" />
   </div>
 </div>
@@ -38,6 +35,9 @@ import Navigation from "./Navigation.astro"
     }
 
     .right-nav {
+      display: flex;
+      align-items: center;
+      justify-items: center;
       margin-left: auto;
       margin-right: 1em;
     }
