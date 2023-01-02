@@ -17,7 +17,7 @@
     "discord-oauth2": "^2.7.1",
     "fibers": "^5.0.1",
     "node-sass": "npm:sass@^1.45.0",
-    "nuxt": "^2.15.3",
+    "nuxt": "^3.0.0",
     "nuxt-buefy": "^0.4.4",
     "sass": "^1.32.0",
     "vuex-module-decorators": "^1.0.1"
