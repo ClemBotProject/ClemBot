@@ -110,12 +110,6 @@ class BotSecrets:
         self._bot_prefix = value
 
     @property
-    def gif_me_token(self) -> str:
-        if not self._gifMe_token:
-            raise ConfigAccessError("gif_me has not been initialized")
-        return self._gifMe_token
-
-    @property
     def github_url(self) -> str:
         if not self._github_url:
             return "https://github.com/ClemsonCPSC-Discord/ClemBot"
