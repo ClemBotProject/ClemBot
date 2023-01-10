@@ -6,6 +6,7 @@ from typing import Iterable
 import discord
 
 import bot.utils.log_serializers as serializers
+import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
@@ -89,6 +90,11 @@ class MessageHandlingService(BaseService):
         # Check if the message is a discord message link and check if this server has
         # Enabled embed message links
         await self.handle_message_links(message)
+
+        # Check if author is bot and is in our allowed bot input ids
+        if message.author.bot and message.author.id in bot_secrets.secrets.allow_bot_input_ids:
+            ctx = await self.bot.get_context(message)
+            await self.bot.invoke(ctx)
 
         # Primary entry point for handling commands
         await self.bot.process_commands(message)
