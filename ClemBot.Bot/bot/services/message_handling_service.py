@@ -5,8 +5,8 @@ from typing import Iterable
 
 import discord
 
-import bot.utils.log_serializers as serializers
 import bot.bot_secrets as bot_secrets
+import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
 from bot.messaging.events import Events
