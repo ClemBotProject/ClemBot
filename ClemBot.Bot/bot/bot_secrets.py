@@ -258,7 +258,9 @@ class BotSecrets:
         self.api_key = os.environ.get("API_KEY")  # type: ignore
         self.site_url = os.environ.get("SITE_URL")  # type: ignore
         self.docs_url = os.environ.get("DOCS_URL")  # type: ignore
-        self.allow_bot_input_ids = os.environ.get("ALLOW_BOT_INPUT_IDS")  # type: ignore
+        self.allow_bot_input_ids = [
+            int(n) for n in os.environ.get("ALLOW_BOT_INPUT_IDS").split(",")  # type: ignore
+        ]
 
         log.info("Production keys loaded")
 
