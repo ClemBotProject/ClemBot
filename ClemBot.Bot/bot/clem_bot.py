@@ -201,6 +201,10 @@ class ClemBot(commands.Bot):
         command = ctx.command
         author = ctx.author
 
+        # For bots that are allowed to run commands
+        if ctx.author.bot:
+            return True
+
         if isinstance(author, discord.abc.User) and await self.is_owner(author):
             # if the author owns the bot, authorize the command no matter what
             return True
