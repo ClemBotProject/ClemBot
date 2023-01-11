@@ -23,6 +23,7 @@ class BotSecrets:
         self._error_log_channel_ids: list[int] | None = None
         self._site_url: str | None = None
         self._docs_url: str | None = None
+        self._allow_bot_input_ids: list[int] | None = None
 
     @property
     def client_token(self) -> str:
@@ -205,6 +206,18 @@ class BotSecrets:
             raise ConfigAccessError("docs_url has already been initialized")
         self._docs_url = value
 
+    @property
+    def allow_bot_input_ids(self) -> list[int]:
+        if not self._allow_bot_input_ids:
+            raise ConfigAccessError("allow_bot_input_ids has not been initialized")
+        return self._allow_bot_input_ids
+
+    @allow_bot_input_ids.setter
+    def allow_bot_input_ids(self, value: list[int] | None) -> None:
+        if self._allow_bot_input_ids:
+            raise ConfigAccessError("allow_bot_input_ids has already been initialized")
+        self._allow_bot_input_ids = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
 
@@ -221,6 +234,7 @@ class BotSecrets:
         self.api_key = secrets["ApiKey"]
         self.site_url = secrets["SiteUrl"]
         self.docs_url = secrets["DocsUrl"]
+        self.allow_bot_input_ids = secrets["AllowBotInputIds"]
 
         log.info("Bot Secrets Loaded")
 
@@ -244,6 +258,9 @@ class BotSecrets:
         self.api_key = os.environ.get("API_KEY")  # type: ignore
         self.site_url = os.environ.get("SITE_URL")  # type: ignore
         self.docs_url = os.environ.get("DOCS_URL")  # type: ignore
+        self.allow_bot_input_ids = [
+            int(n) for n in os.environ.get("ALLOW_BOT_INPUT_IDS").split(",")  # type: ignore
+        ]
 
         log.info("Production keys loaded")
 
