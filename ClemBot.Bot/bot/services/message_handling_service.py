@@ -92,17 +92,19 @@ class MessageHandlingService(BaseService):
         await self.handle_message_links(message)
 
         # Check if author is bot and is in our allowed bot input ids
-        if message.author.bot and message.author.id in bot_secrets.secrets.allow_bot_input_ids:
-            ctx = await self.bot.get_context(message)
-            await self.bot.invoke(ctx)
+        if not message.author.bot:
+            # Primary entry point for handling commands
+            await self.bot.process_commands(message)
 
-        # Primary entry point for handling commands
-        await self.bot.process_commands(message)
+            if not message.content:
+                return
 
-        if not message.content:
-            return
-
-        await self.batch_send_message(message)
+            await self.batch_send_message(message)
+        else:
+            # Only allow bots that have been configured to run commands
+            if message.author.id in bot_secrets.secrets.allow_bot_input_ids:
+                ctx = await self.bot.get_context(message)
+                await self.bot.invoke(ctx)
 
     @BaseService.listener(Events.on_dm_message_received)
     async def on_dm_message_received(self, message: discord.Message) -> None:
