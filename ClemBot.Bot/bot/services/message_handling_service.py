@@ -124,7 +124,7 @@ class MessageHandlingService(BaseService):
             Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed
         )
         await message.author.send(
-            "Hello there, I dont currently support DM commands. Please run my commands in a server"
+            """Hello there, I dont currently support DM commands. Please run my commands in a server.\nFor more information on interacting with me in servers, visit my Wiki here: <https://docs.clembot.io>"""
         )  # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.listener(Events.on_message_edit)
