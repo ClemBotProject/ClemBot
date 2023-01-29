@@ -68,6 +68,12 @@ jobs:
           cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
           cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
           cp ~/ClemBot.Site_env.env ./ClemBot.Site/ClemBot.Site_env.env
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy updated images
         run: |
           docker-compose pull clembot.api
