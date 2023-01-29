@@ -51,11 +51,7 @@ A Discord bot for server and community management with a focus on school/program
    - <b>Expression Evaluator:</b>  Clembot implements the shunting yard algorithim to allow for rapid mathematical expression evaluation right in discord. just run `!calc 1+1` to get your result
    
    - <b>Meme Generator:</b>  SpongeBob text, Crab raves, wheres waldo and more. only one way to find all of them!!
-   
-   - <b>Weather Forecasts:</b> Clembot supports weather forecasts from anywhere in the world, simply run `!weather <location>` to get a full 7 day forecast for your area
-  
-   - <b>Translation:</b> Leveraging Azure translation services Clembot supports over 50 languages world wide for instant translation!
-     
+          
    and so much more
    
    Clembot is in current active development so check back often to see whats new!!

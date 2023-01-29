@@ -5,6 +5,7 @@ from typing import Iterable
 
 import discord
 
+import bot.bot_secrets as bot_secrets
 import bot.utils.log_serializers as serializers
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, OwnerDesignatedChannels
@@ -90,7 +91,15 @@ class MessageHandlingService(BaseService):
         # Enabled embed message links
         await self.handle_message_links(message)
 
-        # Primary entry point for handling commands
+        # Check if author is bot and is in our allowed bot input ids
+        if message.author.id in bot_secrets.secrets.allow_bot_input_ids:
+            ctx = await self.bot.get_context(message)
+            await self.bot.invoke(ctx)
+            return
+
+        if message.author.bot:
+            return
+
         await self.bot.process_commands(message)
 
         if not message.content:
@@ -115,7 +124,7 @@ class MessageHandlingService(BaseService):
             Events.on_broadcast_designated_channel, OwnerDesignatedChannels.bot_dm_log, embed
         )
         await message.author.send(
-            "Hello there, I dont currently support DM commands. Please run my commands in a server"
+            """Hello there, I dont currently support DM commands. Please run my commands in a server.\nFor more information on interacting with me in servers, visit my Wiki here: <https://docs.clembot.io>"""
         )  # https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-send-a-dm
 
     @BaseService.listener(Events.on_message_edit)
