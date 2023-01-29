@@ -1,6 +1,5 @@
 import json
 import os
-import typing as t
 
 from bot.errors import ConfigAccessError
 from bot.utils.logging_utils import get_logger
@@ -17,10 +16,6 @@ class BotSecrets:
         self._gifMe_token: str | None = None
         self._repl_url: str | None = None
         self._github_url: str | None = None
-        self._merriam_key: str | None = None
-        self._weather_key: str | None = None
-        self._geocode_key: str | None = None
-        self._azure_translate_key: str | None = None
         self._api_url: str | None = None
         self._api_key: str | None = None
         self._bot_only: bool | None = None
@@ -28,6 +23,7 @@ class BotSecrets:
         self._error_log_channel_ids: list[int] | None = None
         self._site_url: str | None = None
         self._docs_url: str | None = None
+        self._allow_bot_input_ids: list[int] | None = None
 
     @property
     def client_token(self) -> str:
@@ -115,18 +111,6 @@ class BotSecrets:
         self._bot_prefix = value
 
     @property
-    def gif_me_token(self) -> str:
-        if not self._gifMe_token:
-            raise ConfigAccessError("gif_me has not been initialized")
-        return self._gifMe_token
-
-    @gif_me_token.setter
-    def gif_me_token(self, value: str | None) -> None:
-        if self._gifMe_token:
-            raise ConfigAccessError("gif_me_token has already been initialized")
-        self._gifMe_token = value
-
-    @property
     def github_url(self) -> str:
         if not self._github_url:
             return "https://github.com/ClemsonCPSC-Discord/ClemBot"
@@ -151,30 +135,6 @@ class BotSecrets:
         self._repl_url = value
 
     @property
-    def merriam_key(self) -> str:
-        if not self._merriam_key:
-            raise ConfigAccessError("merriam_key has not been intialized")
-        return self._merriam_key
-
-    @merriam_key.setter
-    def merriam_key(self, value: str | None) -> None:
-        if self._merriam_key:
-            raise ConfigAccessError("merriam_key has already been initialized")
-        self._merriam_key = value
-
-    @property
-    def weather_key(self) -> str:
-        if not self._weather_key:
-            raise ConfigAccessError("weather_key has not been initialized")
-        return self._weather_key
-
-    @weather_key.setter
-    def weather_key(self, value: str | None) -> None:
-        if self._weather_key:
-            raise ConfigAccessError("weather_key has already been initialized")
-        self._weather_key = value
-
-    @property
     def startup_log_channel_ids(self) -> list[int]:
         if not self._startup_log_channel_ids:
             raise ConfigAccessError("startup_log_channel_ids has not been initialized")
@@ -197,30 +157,6 @@ class BotSecrets:
         if self._error_log_channel_ids:
             raise ConfigAccessError("error_log_channel_ids has already been initialized")
         self._error_log_channel_ids = value
-
-    @property
-    def geocode_key(self) -> str:
-        if not self._geocode_key:
-            raise ConfigAccessError("geocode_key has not been initialized")
-        return self._geocode_key
-
-    @geocode_key.setter
-    def geocode_key(self, value: str | None) -> None:
-        if self._geocode_key:
-            raise ConfigAccessError("geocode_key has already been initialized")
-        self._geocode_key = value
-
-    @property
-    def azure_translate_key(self) -> str:
-        if not self._azure_translate_key:
-            raise ConfigAccessError("azure_translate_key has not been initialized")
-        return self._azure_translate_key
-
-    @azure_translate_key.setter
-    def azure_translate_key(self, value: str | None) -> None:
-        if self._azure_translate_key:
-            raise ConfigAccessError("azure_translate_key has already been initialized")
-        self._azure_translate_key = value
 
     @property
     def api_url(self) -> str:
@@ -270,6 +206,18 @@ class BotSecrets:
             raise ConfigAccessError("docs_url has already been initialized")
         self._docs_url = value
 
+    @property
+    def allow_bot_input_ids(self) -> list[int]:
+        if not self._allow_bot_input_ids:
+            raise ConfigAccessError("allow_bot_input_ids has not been initialized")
+        return self._allow_bot_input_ids
+
+    @allow_bot_input_ids.setter
+    def allow_bot_input_ids(self, value: list[int] | None) -> None:
+        if self._allow_bot_input_ids:
+            raise ConfigAccessError("allow_bot_input_ids has already been initialized")
+        self._allow_bot_input_ids = value
+
     def load_development_secrets(self, lines: str) -> None:
         secrets = json.loads(lines)
 
@@ -280,17 +228,13 @@ class BotSecrets:
         self.bot_only = secrets["BotOnly"]
         self.startup_log_channel_ids = secrets["StartupLogChannelIds"]
         self.error_log_channel_ids = secrets["ErrorLogChannelIds"]
-        self.gif_me_token = secrets["GifMeToken"]
         self.repl_url = secrets["ReplUrl"]
         self.github_url = secrets["GithubSourceUrl"]
-        self.merriam_key = secrets["MerriamKey"]
-        self.weather_key = secrets["WeatherKey"]
-        self.geocode_key = secrets["GeocodeKey"]
-        self.azure_translate_key = secrets["AzureTranslateKey"]
         self.api_url = secrets["ApiUrl"]
         self.api_key = secrets["ApiKey"]
         self.site_url = secrets["SiteUrl"]
         self.docs_url = secrets["DocsUrl"]
+        self.allow_bot_input_ids = secrets["AllowBotInputIds"]
 
         log.info("Bot Secrets Loaded")
 
@@ -308,17 +252,15 @@ class BotSecrets:
             int(n) for n in os.environ.get("ERROR_LOG_CHANNEL_IDS").split(",")  # type: ignore
         ]
         self.bot_only = os.environ.get("BOT_ONLY")  # type: ignore
-        self.gif_me_token = os.environ.get("GIF_ME_TOKEN")  # type: ignore
         self.repl_url = os.environ.get("REPL_URL")  # type: ignore
         self.github_url = os.environ.get("GITHUB_URL")  # type: ignore
-        self.merriam_key = os.environ.get("MERRIAM_KEY")  # type: ignore
-        self.weather_key = os.environ.get("WEATHER_KEY")  # type: ignore
-        self.geocode_key = os.environ.get("GEOCODE_KEY")  # type: ignore
-        self.azure_translate_key = os.environ.get("AZURE_TRANSLATE_KEY  # type: ignore")  # type: ignore
         self.api_url = os.environ.get("API_URL")  # type: ignore
         self.api_key = os.environ.get("API_KEY")  # type: ignore
         self.site_url = os.environ.get("SITE_URL")  # type: ignore
         self.docs_url = os.environ.get("DOCS_URL")  # type: ignore
+        self.allow_bot_input_ids = [
+            int(n) for n in os.environ.get("ALLOW_BOT_INPUT_IDS").split(",")  # type: ignore
+        ]
 
         log.info("Production keys loaded")
 
