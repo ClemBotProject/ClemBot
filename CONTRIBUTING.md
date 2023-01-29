@@ -78,10 +78,6 @@ ClemBot.Api uses `dotnet user-secrets` [Docs](https://docs.microsoft.com/en-us/a
 * `GifMeToken`:(Optional) GifMe api token
 * `ReplUrl`:(Optional) The url of the Snekbox container that allows for sandboxed evals
 * `GitHubSourceUrl`:(Optional) Url that the !source command uses to link source code
-* `MerriamKey`:(Optional) Merriam api token
-* `WeatherKey`:(Optional) Weather forecast api token
-* `GeocodeKey`:(Optional) Geocode weather service api token
-* `AzureTranslateKey`:(Optional) Azure translation api token
 * `BotOnly`: (optional) If set to true, puts ClemBot.Bot into Bot only mode which deactivates the api and allows for limited functionality. Mainly used when a feature only requires discord and needs no persistence/database
 * `MessageApiBatchSize` (Optional: Defaults to 5) Sets the max cache size for clembots internal message catch before it is flushed to the api
 
