@@ -1,4 +1,5 @@
 import asyncio
+import dataclasses
 import typing as t
 
 import discord
@@ -12,6 +13,13 @@ from bot.utils.logging_utils import get_logger
 log = get_logger(__name__)
 
 
+@dataclasses.dataclass
+class DeletableMessage:
+    message_to_delete: list[discord.Message]
+    author: int | None
+    roles: list[discord.Role]
+
+
 class DeleteMessageService(BaseService):
     """
     This service allows for messages sent by the bot to be deleted
@@ -20,42 +28,44 @@ class DeleteMessageService(BaseService):
 
     def __init__(self, *, bot: ClemBot):
         super().__init__(bot)
-        self.messages = dict[int, dict[str, t.Any]]()
+        self.messages: dict[int, DeletableMessage] = {}
 
     # Called When a cog would like to be able to delete a message or messages
     @BaseService.listener(Events.on_set_deletable)
     async def set_message_deletable(
         self,
         *,
-        msg: list[discord.Message],
-        roles: list[discord.Role] = [],
-        author: t.Optional[discord.Member] = None,
-        timeout: t.Optional[int] = None
+        msg: discord.Message | list[discord.Message],
+        roles: discord.Role | list[discord.Role] | None = None,
+        author: discord.Member | None = None,
+        timeout: int | None = None
     ) -> None:
 
-        if not isinstance(msg, list):
-            msg = [msg]
+        msg_to_delete = [msg] if not isinstance(msg, list) else msg
+
+        if roles is None:
+            roles = []
         if not isinstance(roles, list):
             roles = [roles]
 
-        # stores the message info
-        self.messages[msg[-1].id] = {
-            "MessagesToDelete": msg,
-            "Roles": roles,
-            "Author": author.id if author else None,
-        }
+        self.messages[msg_to_delete[-1].id] = DeletableMessage(
+            message_to_delete=msg_to_delete, roles=roles, author=author.id if author else None
+        )
 
         # the emoji is placed on the last message in the list
-        await msg[-1].add_reaction("🗑️")
-        if timeout:
-            await asyncio.sleep(timeout)
+        await msg_to_delete[-1].add_reaction("🗑️")
+
+        async def message_delete_timeout() -> None:
             try:
-                await msg[-1].clear_reaction("🗑️")
-                del self.messages[msg[-1].id]
+                await msg_to_delete[-1].clear_reaction("🗑️")
+                del self.messages[msg_to_delete[-1].id]
             except:
                 pass
             finally:
-                log.info("Message: {message} timed out as deletable", message=msg[-1].id)
+                log.info("Message: {message} timed out as deletable", message=msg_to_delete[-1].id)
+
+        if timeout:
+            self.bot.scheduler.schedule_in(message_delete_timeout(), time=timeout)
 
     @BaseService.listener(Events.on_reaction_add)
     async def delete_message(
@@ -70,18 +80,18 @@ class DeleteMessageService(BaseService):
             Claims.delete_message, t.cast(discord.Member, user)
         ):
             delete = True
-        elif user.id == self.messages[reaction.message.id]["Author"]:
+        elif user.id == self.messages[reaction.message.id].author:
             delete = True
         elif isinstance(user, discord.Member):
             if user.guild_permissions.administrator:
                 delete = True
             elif any(
-                True for role in self.messages[reaction.message.id]["Roles"] if role.id in role_ids
+                True for role in self.messages[reaction.message.id].roles if role.id in role_ids
             ):
                 delete = True
 
         if delete:
-            for msg in self.messages[reaction.message.id]["MessagesToDelete"]:
+            for msg in self.messages[reaction.message.id].message_to_delete:
                 log.info("Message {message} deleted by delete message service", message=msg.id)
                 await msg.delete()
             del self.messages[reaction.message.id]
