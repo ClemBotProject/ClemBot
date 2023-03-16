@@ -69,7 +69,7 @@ export default {
         clientId: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
         scope: ['identify', 'guilds'],
-        codeChallengeMethod: '',
+        codeChallengeMethod: 'plain',
         grantType: 'authorization_code',
       },
     },
