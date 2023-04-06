@@ -88,7 +88,7 @@ class MessageHandlingService(BaseService):
                 "Message edit: {id}:{content} received in guild: {guild_id} that does not have a message log set",
                 id=id,
                 content=content,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
             return
 
@@ -217,7 +217,9 @@ class MessageHandlingService(BaseService):
                     after=payload.data["content"],
                 )
 
-                await self.batch_send_message_edit(message.id, message.guild_id, payload.data["content"])
+                await self.batch_send_message_edit(
+                    message.id, message.guild_id, payload.data["content"]
+                )
 
                 embed = discord.Embed(
                     title=f":repeat: **Uncached message edited in #{channel}**",
