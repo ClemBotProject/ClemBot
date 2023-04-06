@@ -38,7 +38,7 @@ public class UpdateRoles
 
         public async Task<QueryResult<IEnumerable<ulong>>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!await _mediator.Send(new UserExistsRequest{ Id = request.Id }))
+            if (!await _mediator.Send(new UserExistsRequest { Id = request.Id }))
             {
                 return QueryResult<IEnumerable<ulong>>.NotFound();
             }

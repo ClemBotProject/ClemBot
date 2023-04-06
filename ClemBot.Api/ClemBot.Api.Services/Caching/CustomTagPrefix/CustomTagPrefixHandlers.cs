@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClemBot.Api.Services.Caching.CustomTagPrefix;
 
 public class CustomTagPrefixHandlers :
-    RequestHandler<ClearCustomTagPrefixRequest>,
+    IRequestHandler<ClearCustomTagPrefixRequest>,
     IRequestHandler<GetCustomTagPrefixRequest, IEnumerable<string>>
 {
     private readonly IAppCache _cache;
@@ -33,8 +33,11 @@ public class CustomTagPrefixHandlers :
                 .ToListAsync(),
             TimeSpan.FromHours(12));
 
-    protected override void Handle(ClearCustomTagPrefixRequest request)
-        => _cache.Remove(GetCacheKey(request.Id));
+    public Task<Unit> Handle(ClearCustomTagPrefixRequest request, CancellationToken cancellationToken)
+    {
+        _cache.Remove(GetCacheKey(request.Id));
+        return Unit.Task;
+    }
 
     private static string GetCacheKey(ulong id)
         => $"{nameof(GetCustomTagPrefixRequest)}:{id}";

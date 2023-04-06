@@ -59,7 +59,7 @@ public class Create
         {
             if (await _context.Tags.FirstOrDefaultAsync(x => x.Guild.Id == request.GuildId && x.Name == request.Name) is not null)
             {
-               return QueryResult<TagDto>.Conflict();
+                return QueryResult<TagDto>.Conflict();
             }
 
             var tag = new Tag

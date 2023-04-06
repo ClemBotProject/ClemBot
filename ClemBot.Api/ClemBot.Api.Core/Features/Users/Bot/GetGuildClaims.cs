@@ -17,8 +17,8 @@ public class GetGuildClaims
     {
         public async Task<QueryResult<IEnumerable<BotAuthClaims>>> Handle(Query request, CancellationToken cancellationToken)
         {
-           var claims = await _context.Users.GetUserGuildClaimsAsync(request.GuildId, request.UserId);
-           return QueryResult<IEnumerable<BotAuthClaims>>.Success(claims);
+            var claims = await _context.Users.GetUserGuildClaimsAsync(request.GuildId, request.UserId);
+            return QueryResult<IEnumerable<BotAuthClaims>>.Success(claims);
         }
     }
 }

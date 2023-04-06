@@ -11,15 +11,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Services.Caching.CustomPrefix;
 
-public class CustomPrefixHandlers :
-    RequestHandler<ClearCustomPrefixRequest>,
+public class CustomPrefixHandler :
+    IRequestHandler<ClearCustomPrefixRequest>,
     IRequestHandler<GetCustomPrefixRequest, IEnumerable<string>>
 {
     private readonly IAppCache _cache;
 
     private readonly ClemBotContext _context;
 
-    public CustomPrefixHandlers(IAppCache cache, ClemBotContext context)
+    public CustomPrefixHandler(IAppCache cache, ClemBotContext context)
     {
         _cache = cache;
         _context = context;
@@ -33,8 +33,11 @@ public class CustomPrefixHandlers :
                 .ToListAsync(),
             TimeSpan.FromHours(12));
 
-    protected override void Handle(ClearCustomPrefixRequest request)
-        => _cache.Remove(GetCacheKey(request.Id));
+    public Task<Unit> Handle(ClearCustomPrefixRequest request, CancellationToken cancellationToken)
+    {
+        _cache.Remove(GetCacheKey(request.Id));
+        return Unit.Task;
+    }
 
     private static string GetCacheKey(ulong id)
         => $"{nameof(GetCustomPrefixRequest)}:{id}";

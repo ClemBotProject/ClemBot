@@ -128,7 +128,8 @@ builder.Services.AddSwaggerGen(o => {
             }
         });
     o.CustomSchemaIds(type => type.ToString());
-    o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+    o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
         In = ParameterLocation.Header,
         Description = "Please insert JWT with Bearer into field",
         Name = "Authorization",
@@ -166,18 +167,14 @@ builder.Services.AddQuartz(options => {
     );
 });
 
-builder.Services.AddQuartzServer(options => {
-    options.WaitForJobsToComplete = true;
-});
+builder.Services.AddQuartzServer(options => options.WaitForJobsToComplete = true);
 
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(
+builder.Services.AddCors(options => options.AddDefaultPolicy(
         policyBuilder => {
             policyBuilder.AllowAnyOrigin();
             policyBuilder.AllowAnyHeader();
             policyBuilder.AllowAnyMethod();
-        });
-});
+        }));
 
 // Grab connection string from config
 var connectionString = builder.Configuration[ConfigurationKeys.DbConnectionString];
@@ -211,11 +208,7 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy(Policies.BotMaster, policy => {
-        policy.RequireClaim(Claims.BotApiKey);
-    });
-});
+builder.Services.AddAuthorization(options => options.AddPolicy(Policies.BotMaster, policy => policy.RequireClaim(Claims.BotApiKey)));
 // Add authorization policy providers
 builder.Services.AddScoped<IAuthorizationHandler, BotMasterAuthHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, GuildSandboxPolicyProvider>();
