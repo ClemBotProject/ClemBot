@@ -58,7 +58,9 @@ public class Tags
                 return QueryResult<Model>.NotFound();
             }
 
-            return QueryResult<Model>.Success(new Model{ Tags = tags
+            return QueryResult<Model>.Success(new Model
+            {
+                Tags = tags
                 .Select(tag => new Tag
                 {
                     Name = tag.Name,

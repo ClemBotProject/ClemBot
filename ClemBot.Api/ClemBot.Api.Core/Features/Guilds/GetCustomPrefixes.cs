@@ -25,7 +25,7 @@ public class GetCustomPrefixes
         {
             var prefixes = await _mediator.Send(new GetCustomPrefixRequest { Id = request.GuildId });
 
-            return QueryResult<Model>.Success(new Model{Prefixes = prefixes});
+            return QueryResult<Model>.Success(new Model { Prefixes = prefixes });
         }
     }
 }

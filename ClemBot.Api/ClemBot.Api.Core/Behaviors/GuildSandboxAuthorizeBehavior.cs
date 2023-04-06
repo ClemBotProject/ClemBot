@@ -27,7 +27,7 @@ public class GuildSandboxAuthorizeBehavior<TRequest, TResponse> : IPipelineBehav
         {
             var genericResultType = typeof(TResponse).GetGenericArguments().First();
             var resultType = typeof(QueryResult<>).MakeGenericType(genericResultType);
-            return (TResponse) Activator.CreateInstance(resultType, QueryStatus.Forbidden)!;
+            return (TResponse)Activator.CreateInstance(resultType, QueryStatus.Forbidden)!;
         }
 
         return await next();

@@ -21,8 +21,8 @@ public class AuthorizeController : ControllerBase
     public async Task<IActionResult> Authorize([FromQuery] BotAuthorize.Query query) =>
         await _mediator.Send(query) switch
         {
-            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
-            {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            { Status: AuthorizeStatus.Success } result => Ok(result.Value),
+            { Status: AuthorizeStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
@@ -31,8 +31,8 @@ public class AuthorizeController : ControllerBase
     public async Task<IActionResult> Login([FromBody] SiteLogin.Query query) =>
         await _mediator.Send(query) switch
         {
-            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
-            {Status: AuthorizeStatus.Forbidden} => Forbid(),
+            { Status: AuthorizeStatus.Success } result => Ok(result.Value),
+            { Status: AuthorizeStatus.Forbidden } => Forbid(),
             _ => throw new InvalidOperationException()
         };
 
@@ -40,9 +40,9 @@ public class AuthorizeController : ControllerBase
     public async Task<IActionResult> GetUser() =>
         await _mediator.Send(new GetSiteUser.Query()) switch
         {
-            {Status: AuthorizeStatus.Success} result => Ok(result.Value),
-            {Status: AuthorizeStatus.Forbidden} => Forbid(),
-            {Status: AuthorizeStatus.Failure} => Problem(),
+            { Status: AuthorizeStatus.Success } result => Ok(result.Value),
+            { Status: AuthorizeStatus.Forbidden } => Forbid(),
+            { Status: AuthorizeStatus.Failure } => Problem(),
             _ => throw new InvalidOperationException()
         };
 }

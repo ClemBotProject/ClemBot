@@ -12,21 +12,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Services.Caching.Commands;
 
-public class CommandCacheHandlers : RequestHandler<ClearCommandRestrictionRequest>,
+public class CommandCacheHandler : IRequestHandler<ClearCommandRestrictionRequest>,
     IRequestHandler<GetCommandRestrictionRequest, List<CommandRestriction>>
 {
 
     private readonly IAppCache _cache;
     private readonly ClemBotContext _context;
 
-    public CommandCacheHandlers(IAppCache cache, ClemBotContext context)
+    public CommandCacheHandler(IAppCache cache, ClemBotContext context)
     {
         _cache = cache;
         _context = context;
     }
 
-    protected override void Handle(ClearCommandRestrictionRequest request) =>
+    public Task<Unit> Handle(ClearCommandRestrictionRequest request, CancellationToken cancellationToken)
+    {
         _cache.Remove(GetCacheKey(request.Id, request.CommandName));
+        return Unit.Task;
+    }
 
     public async Task<List<CommandRestriction>> Handle(GetCommandRestrictionRequest request, CancellationToken cancellationToken) =>
         await _cache.GetOrAddAsync(GetCacheKey(request.Id, request.CommandName),

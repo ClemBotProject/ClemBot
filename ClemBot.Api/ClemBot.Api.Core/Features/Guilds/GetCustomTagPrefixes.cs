@@ -25,7 +25,7 @@ public class GetCustomTagPrefixes
         {
             var tagprefixes = await _mediator.Send(new GetCustomTagPrefixRequest { Id = request.GuildId });
 
-            return QueryResult<Model>.Success(new Model{ TagPrefixes = tagprefixes });
+            return QueryResult<Model>.Success(new Model { TagPrefixes = tagprefixes });
         }
     }
 }

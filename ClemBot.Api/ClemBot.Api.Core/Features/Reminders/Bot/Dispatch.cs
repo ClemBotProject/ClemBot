@@ -1,4 +1,4 @@
-﻿using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 

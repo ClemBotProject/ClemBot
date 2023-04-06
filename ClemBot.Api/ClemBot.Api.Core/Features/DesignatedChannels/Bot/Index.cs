@@ -16,9 +16,16 @@ public class Index
         public Common.Enums.DesignatedChannels Designation { get; set; }
     }
 
-    public record Handler(ClemBotContext _context) :
+    public class QueryHandler :
         IRequestHandler<Query, QueryResult<IEnumerable<ulong>>>
     {
+        private ClemBotContext _context { get; init; }
+
+        public QueryHandler(ClemBotContext context)
+        {
+            _context = context;
+        }
+
         public async Task<QueryResult<IEnumerable<ulong>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var designatedChannels = await _context.DesignatedChannelMappings
@@ -28,5 +35,6 @@ public class Index
 
             return QueryResult<IEnumerable<ulong>>.Success(designatedChannels);
         }
+
     }
 }

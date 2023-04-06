@@ -43,6 +43,16 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_create_message(batch_values, raise_on_error=False)
 
+        # We only want to save a message if a guild has the message log enabled
+        # otherwise its useless requests
+        if not await self.should_save_message(message.guild.id):
+            log.info(
+                "Message: {message} received in guild: {guild} that does not have a message log set",
+                message=serializers.log_message(message),
+                guild=serializers.log_guild(message.guild),
+            )
+            return
+
         self.message_batch[message.id] = SingleBatchMessage(
             id=message.id,
             content=message.content,
@@ -52,7 +62,7 @@ class MessageHandlingService(BaseService):
             time=datetime.datetime.utcnow(),
         )
 
-    async def batch_send_message_edit(self, id: int, content: str) -> None:
+    async def batch_send_message_edit(self, id: int, guild_id: int, content: str) -> None:
         """
         Batch the message edits to send them all at once to
         the api to avoid sending hundreds a second
@@ -71,9 +81,26 @@ class MessageHandlingService(BaseService):
 
             await self.bot.message_route.batch_edit_message(batch_values, raise_on_error=False)
 
+        # We only want to save a message if a guild has the message log enabled
+        # otherwise its useless requests
+        if not await self.should_save_message(guild_id):
+            log.info(
+                "Message edit: {id}:{content} received in guild: {guild_id} that does not have a message log set",
+                id=id,
+                content=content,
+                guild_id=guild_id,
+            )
+            return
+
         self.message_edit_batch.append(
             SingleBatchMessageEdit(id=id, content=content, time=datetime.datetime.utcnow())
         )
+
+    async def should_save_message(self, guild_id: int) -> bool:
+        channels = await self.bot.designated_channel_route.get_guild_designated_channel_ids(
+            guild_id, DesignatedChannels.message_log.name
+        )
+        return len(channels) > 0
 
     @BaseService.listener(Events.on_guild_message_received)
     async def on_guild_message_received(self, message: discord.Message) -> None:
@@ -133,6 +160,8 @@ class MessageHandlingService(BaseService):
         if before.content == after.content:
             return
 
+        assert after.guild is not None
+
         log.info(
             "Message edited in #{channel} By: {author} \nBefore: {before_content} \nAfter: {after_content}",
             channel=serializers.log_channel(before.channel),
@@ -141,7 +170,7 @@ class MessageHandlingService(BaseService):
             after_content=after.content,
         )
 
-        await self.batch_send_message_edit(after.id, after.content)
+        await self.batch_send_message_edit(after.id, after.guild.id, after.content)
 
         embed = discord.Embed(
             title=f":repeat: **Message Edited in #{before.channel}**",
@@ -188,7 +217,9 @@ class MessageHandlingService(BaseService):
                     after=payload.data["content"],
                 )
 
-                await self.batch_send_message_edit(message.id, payload.data["content"])
+                await self.batch_send_message_edit(
+                    message.id, message.guild_id, payload.data["content"]
+                )
 
                 embed = discord.Embed(
                     title=f":repeat: **Uncached message edited in #{channel}**",

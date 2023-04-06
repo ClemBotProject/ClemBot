@@ -18,6 +18,10 @@ def log_user(member: (discord.Member | discord.User | discord.ClientUser)) -> di
     )
 
 
+def log_message(message: discord.Message) -> dict[str, t.Any]:
+    return {"author": log_user(message.author), "content": message.content}
+
+
 def log_channel(channel: t.Any) -> dict[str, t.Any]:
     id = getattr(channel, "id", None)
     name = getattr(channel, "name", str(channel))

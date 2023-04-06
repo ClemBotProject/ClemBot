@@ -53,7 +53,7 @@ public class MessagesController : ControllerBase
     public async Task<IActionResult> Count(Bot.Count.Query query) =>
         await _mediator.Send(query) switch
         {
-            {Status: QueryStatus.Success} result => Ok(result.Value),
+            { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => NoContent()
         };
 }

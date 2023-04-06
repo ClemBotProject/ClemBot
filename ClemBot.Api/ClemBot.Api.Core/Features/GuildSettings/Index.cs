@@ -30,7 +30,7 @@ public class Index
         {
             var settings = await _settingsService.GetAllSettingsAsync(request.GuildId);
 
-            return QueryResult<Model>.Success(new Model{Settings = settings});
+            return QueryResult<Model>.Success(new Model { Settings = settings });
         }
     }
 }
