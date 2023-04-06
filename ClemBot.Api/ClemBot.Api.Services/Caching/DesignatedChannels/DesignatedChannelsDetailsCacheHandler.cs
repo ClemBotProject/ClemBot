@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Services.Caching.DesignatedChannels;
 
-public class DesignatedChannelsCacheHandler: IRequestHandler<ClearDesignatedChannelDetailRequest>, IRequestHandler<GetDesignatedChannelDetailRequest, List<DesignatedChannelMapping>>
+public class DesignatedChannelsCacheHandler : IRequestHandler<ClearDesignatedChannelDetailRequest>, IRequestHandler<GetDesignatedChannelDetailRequest, List<DesignatedChannelMapping>>
 {
     private readonly IAppCache _cache;
     private readonly ClemBotContext _context;
