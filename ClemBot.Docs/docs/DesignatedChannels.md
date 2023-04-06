@@ -23,7 +23,7 @@ A channel can also have multiple designations at once.
 :::note
 Enabling the message_log channel causes ClemBot to store the content of messages for a period of 30 days. After which
 they are deleted. This is to enable ClemBot to notify server staff of message edits or deletions that might not be stored
-in the bots short lived cache. Any edits or deletions that occur on messages that are older then 30 days will be sent in 
+in the bots short-lived cache. Any edits or deletions that occur on messages that are older then 30 days will be sent in 
 the designated channel but the content of the deletion or edit will not be known, just that it happened.
 :::
 
