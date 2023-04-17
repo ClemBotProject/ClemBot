@@ -44,7 +44,7 @@ public class GuildSettingsController : ControllerBase
         {
             { Status: QueryStatus.Success } => Ok(),
             { Status: QueryStatus.Forbidden } => Forbid(),
-            { Status: QueryStatus.Invalid} => BadRequest(),
+            { Status: QueryStatus.Invalid } => BadRequest(),
             _ => throw new InvalidOperationException()
         };
 }

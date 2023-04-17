@@ -1,4 +1,4 @@
-﻿using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.Channels.Models;
 using ClemBot.Api.Services.Caching.Commands.Models;

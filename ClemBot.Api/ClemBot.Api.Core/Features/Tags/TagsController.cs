@@ -94,7 +94,7 @@ public class TagsController : ControllerBase
     public async Task<IActionResult> SearchTags(Bot.Search.Command command) =>
         await _mediator.Send(command) switch
         {
-            {Status: QueryStatus.Success} result => Ok(result.Value),
+            { Status: QueryStatus.Success } result => Ok(result.Value),
             _ => throw new InvalidOperationException()
         };
 }

@@ -43,7 +43,7 @@ public class SetWelcomeMessage
             guild.WelcomeMessage = request.Message;
             await _context.SaveChangesAsync();
 
-            return QueryResult<Model>.Success(new Model { Id = guild.Id});
+            return QueryResult<Model>.Success(new Model { Id = guild.Id });
         }
     }
 }

@@ -56,7 +56,7 @@ public class Delete
             await _context.SaveChangesAsync();
 
             // Clear the channel from the cache so we dont try to insert a new message batch into it
-            await _mediatr.Send(new ClearChannelRequest {Id = request.Id});
+            await _mediatr.Send(new ClearChannelRequest { Id = request.Id });
 
             return QueryResult<Model>.Success(new Model()
             {

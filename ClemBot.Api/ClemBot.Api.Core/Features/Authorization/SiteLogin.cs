@@ -78,7 +78,7 @@ public class SiteLogin
             var token = _jwtAuthManager.GenerateToken(claims, DateTime.UtcNow.AddHours(4));
             _logger.LogInformation("JWT Access Token Successfully Generated");
 
-            return AuthorizeResult<Model>.Success(new Model {Token = token});
+            return AuthorizeResult<Model>.Success(new Model { Token = token });
         }
     }
 }

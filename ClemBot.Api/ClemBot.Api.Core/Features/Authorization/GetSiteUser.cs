@@ -91,10 +91,10 @@ public class GetSiteUser
                 }
             }
 
-            var siteUser = new SiteUser {User = discordUser, Guilds = userGuilds};
+            var siteUser = new SiteUser { User = discordUser, Guilds = userGuilds };
 
             _logger.LogInformation("Site Login Request Accepted");
-            return AuthorizeResult<Model>.Success(new Model {User = siteUser});
+            return AuthorizeResult<Model>.Success(new Model { User = siteUser });
         }
     }
 }

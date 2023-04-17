@@ -1,4 +1,4 @@
-﻿using ClemBot.Api.Common;
+using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
@@ -33,7 +33,8 @@ public class Index
         {
             var reminders = await _context.Reminders
                 .Where(r => !r.Dispatched)
-                .Select(item => new ReminderDto {
+                .Select(item => new ReminderDto
+                {
                     Id = item.Id,
                     Time = item.Time
                 })

@@ -1,4 +1,4 @@
-﻿using ClemBot.Api.Common.Security.Policies.BotMaster;
+using ClemBot.Api.Common.Security.Policies.BotMaster;
 using ClemBot.Api.Core.Features.Reminders.Bot;
 using Microsoft.AspNetCore.Mvc;
 using Index = ClemBot.Api.Core.Features.Reminders.Bot.Index;

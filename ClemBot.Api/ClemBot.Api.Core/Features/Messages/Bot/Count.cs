@@ -1,14 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Core.Features.Tags;
 using ClemBot.Api.Data.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using ClemBot.Api.Common.Utilities;
 using NodaTime.Extensions;
 
 namespace ClemBot.Api.Core.Features.Messages.Bot;
@@ -17,7 +17,7 @@ public class Count
 {
     public class Query : IRequest<QueryResult<Model>>
     {
-        public ulong UserId { get; set;  }
+        public ulong UserId { get; set; }
         public ulong GuildId { get; set; }
         public int Days { get; set; }
     }

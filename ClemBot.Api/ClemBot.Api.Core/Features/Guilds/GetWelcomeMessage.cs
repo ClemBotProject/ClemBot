@@ -22,7 +22,7 @@ public class GetWelcomeMessage
 
     public record Model : IResponseModel
     {
-       public string? Message { get; init; }
+        public string? Message { get; init; }
     }
 
     public record Handler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<Model>>
@@ -30,7 +30,7 @@ public class GetWelcomeMessage
         public async Task<QueryResult<Model>> Handle(Command request, CancellationToken cancellationToken)
         {
             var guild = await _context.Guilds
-                .Select(x => new{ x.Id, x.WelcomeMessage })
+                .Select(x => new { x.Id, x.WelcomeMessage })
                 .FirstOrDefaultAsync(x => x.Id == request.GuildId);
 
             if (guild is null)
@@ -38,7 +38,7 @@ public class GetWelcomeMessage
                 return QueryResult<Model>.NotFound();
             }
 
-            return QueryResult<Model>.Success(new Model{ Message = guild.WelcomeMessage });
+            return QueryResult<Model>.Success(new Model { Message = guild.WelcomeMessage });
         }
     }
 }

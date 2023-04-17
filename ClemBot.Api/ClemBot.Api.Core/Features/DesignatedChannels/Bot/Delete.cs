@@ -1,10 +1,6 @@
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Caching.DesignatedChannels.Models;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.DesignatedChannels.Bot;
@@ -27,8 +23,18 @@ public class Delete
         public Common.Enums.DesignatedChannels Designation { get; set; }
     }
 
-    public record QueryHandler(ClemBotContext _context) : IRequestHandler<Command, QueryResult<ulong>>
+    public class QueryHandler : IRequestHandler<Command, QueryResult<ulong>>
     {
+        private ClemBotContext _context { get; init; }
+
+        private IMediator _mediator { get; init; }
+
+        public QueryHandler(ClemBotContext context, IMediator mediator)
+        {
+            _context = context;
+            _mediator = mediator;
+        }
+
         public async Task<QueryResult<ulong>> Handle(Command request, CancellationToken cancellationToken)
         {
 
@@ -42,6 +48,15 @@ public class Delete
 
             _context.DesignatedChannelMappings.Remove(dcMappings);
             await _context.SaveChangesAsync();
+
+            var guildId = await _context.Channels
+                .Where(x => x.Id == request.ChannelId)
+                .Select(x => x.GuildId)
+                .FirstAsync();
+
+            // Clear the cached entry
+            await _mediator.Send(
+                new ClearDesignatedChannelDetailRequest { Id = guildId, Designation = request.Designation });
 
             return QueryResult<ulong>.Success(request.ChannelId);
         }

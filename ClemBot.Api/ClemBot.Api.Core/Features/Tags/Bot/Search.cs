@@ -1,4 +1,4 @@
-﻿using ClemBot.Api.Common;
+using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +56,7 @@ public class Search
         {
             var tags = await _context.Tags
                 .Where(t => t.GuildId == request.GuildId)
-                .Select(t => new {t, Similarity=EF.Functions.TrigramsSimilarity(t.Name, request.Query)})
+                .Select(t => new { t, Similarity = EF.Functions.TrigramsSimilarity(t.Name, request.Query) })
                 .Where(e => e.Similarity > _minimumNameSimilarity)
                 .OrderByDescending(e => e.Similarity)
                 .Select(e => e.t)

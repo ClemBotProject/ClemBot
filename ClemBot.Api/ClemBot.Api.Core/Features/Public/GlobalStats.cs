@@ -22,7 +22,7 @@ public class GlobalStats
 
         public int Users { get; set; }
 
-        public int Commands { get; set;  }
+        public int Commands { get; set; }
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator) : IRequestHandler<Query, QueryResult<Model>>
