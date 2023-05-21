@@ -9,6 +9,7 @@ import typing as t
 from types import ModuleType
 
 import discord
+from discord import RawReactionActionEvent
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 from discord.ext.commands._types import BotT
@@ -36,6 +37,7 @@ from bot.api import (
     thread_route,
     user_route,
     welcome_message_route,
+    emote_board_route,
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors
@@ -109,6 +111,7 @@ class ClemBot(commands.Bot):
         self.slots_score_route = slots_score_route.SlotsScoreRoute(self.api_client)
         self.health_check_route = health_check_route.HealthCheckRoute(self.api_client)
         self.reminder_route = reminder_route.ReminderRoute(self.api_client)
+        self.emote_board_route = emote_board_route.EmoteBoardRoute(self.api_client)
 
         self.active_services: dict[str, base_service.BaseService] = {}
 
@@ -345,8 +348,12 @@ class ClemBot(commands.Bot):
                 Events.on_reaction_add, reaction.message.guild.id, reaction, user
             )
 
-    async def on_raw_reaction_add(self, reaction: discord.Reaction) -> None:
-        pass
+    async def on_raw_reaction_add(self, reaction: RawReactionActionEvent) -> None:
+        if reaction.user_id != self.user.id:
+            assert reaction.guild_id is not None
+            await self.publish_to_queue_with_error(
+                Events.on_raw_reaction_add, reaction.guild_id, reaction
+            )
 
     async def on_reaction_remove(
         self, reaction: discord.Reaction, user: (discord.User | discord.Member)
