@@ -24,4 +24,15 @@ public class EmoteBoardsController : ControllerBase
             { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
+
+    [HttpPatch("bot/[controller]/edit")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Edit([FromBody] Bot.Edit.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.NoContent } => NoContent(),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            { Status: QueryStatus.Conflict } => Conflict(),
+            _ => throw new InvalidOperationException()
+        };
 }

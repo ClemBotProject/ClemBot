@@ -18,15 +18,19 @@ public class Index
 
     public class EmoteBoardDto : IResponseModel
     {
-        public ulong GuildId { get; set; }
+        public int Id { get; init; }
 
-        public string Name { get; set; } = null!;
+        public ulong GuildId { get; init; }
 
-        public string Emote { get; set; } = null!;
+        public string Name { get; init; } = null!;
 
-        public uint ReactionThreshold { get; set; }
+        public string Emote { get; init; } = null!;
 
-        public bool AllowBotPosts { get; set; }
+        public uint ReactionThreshold { get; init; }
+
+        public bool AllowBotPosts { get; init; }
+
+        public List<ulong> Channels { get; init; } = null!;
     }
 
     public class Query : IRequest<QueryResult<List<EmoteBoardDto>>>
@@ -61,16 +65,27 @@ public class Index
                 GuildId = request.GuildId
             });
 
-            var emoteBoardDtos = emoteBoards.Select(item => new EmoteBoardDto
-            {
-                GuildId = item.GuildId,
-                Name = item.Name,
-                Emote = item.Emote,
-                ReactionThreshold = item.ReactionThreshold,
-                AllowBotPosts = item.AllowBotPosts
-            }).ToList();
+            var dtos = new List<EmoteBoardDto>();
 
-            return QueryResult<List<EmoteBoardDto>>.Success(emoteBoardDtos);
+            foreach (var board in emoteBoards)
+            {
+                var channels = await _mediator.Send(new GetEmoteBoardChannelsRequest
+                {
+                    EmoteBoardId = board.Id
+                });
+                dtos.Add(new EmoteBoardDto
+                {
+                    Id = board.Id,
+                    GuildId = board.GuildId,
+                    Name = board.Name,
+                    Emote = board.Emote,
+                    ReactionThreshold = board.ReactionThreshold,
+                    AllowBotPosts = board.AllowBotPosts,
+                    Channels = channels
+                });
+            }
+
+            return QueryResult<List<EmoteBoardDto>>.Success(dtos);
         }
     }
 }

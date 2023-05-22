@@ -9,6 +9,4 @@ public class EmoteBoardChannelMapping
 
     public int EmoteBoardId { get; set; }
     public EmoteBoard EmoteBoard { get; set; } = null!;
-
-    public List<EmoteBoardMessage> Messages { get; set; } = new();
 }

@@ -6,18 +6,19 @@ from bot.models.clem_bot_model import ClemBotModel
 
 
 class EmoteBoard(ClemBotModel):
+    id: int
     guild_id: int
     name: str
     emote: str
     reaction_threshold: int
     allow_bot_posts: bool
+    channels: list[int]
 
 
 class EmoteBoardPost(ClemBotModel):
     user_id: int
     message_id: int
-    board_message_id: int
-    emote_board_id: int
+    channel_id: int
     reactions: list[int]
 
     def count_reaction(self, user: Union[int, discord.User, discord.Member]) -> bool:

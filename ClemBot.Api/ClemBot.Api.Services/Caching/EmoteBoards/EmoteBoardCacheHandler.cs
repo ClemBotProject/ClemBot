@@ -35,8 +35,7 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
         await _cache.GetOrAddAsync(GetCacheKey(request.GuildId),
             () => _context.EmoteBoards
                 .Where(item => item.GuildId == request.GuildId)
-                .ToListAsync(), TimeSpan.FromHours(12)
-        );
+                .ToListAsync(), TimeSpan.FromHours(12));
 
     private static string GetCacheKey(ulong guildId) => $"{typeof(EmoteBoardCacheHandler)}:{guildId}";
 }
