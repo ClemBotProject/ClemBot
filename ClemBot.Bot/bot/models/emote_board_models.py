@@ -24,3 +24,13 @@ class EmoteBoardPost(ClemBotModel):
     def count_reaction(self, user: Union[int, discord.User, discord.Member]) -> bool:
         user_id = user if isinstance(user, int) else user.id
         return user_id != self.user_id and user_id not in self.reactions
+
+    def as_link(self, guild: Union[int, discord.Guild]) -> str:
+        guild_id = guild if isinstance(guild, int) else guild.id
+        return f"https://discord.com/channels/{guild_id}/{self.channel_id}/{self.message_id}"
+
+
+class EmoteBoardReactDto(ClemBotModel):
+    update: bool
+    reactions: int
+    messages: dict[int, int]

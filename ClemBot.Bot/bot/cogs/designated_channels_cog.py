@@ -73,9 +73,9 @@ class DesignatedChannelsCog(commands.Cog):
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
                 f"""
-                    The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
-                    If you are the owner of the instance please reference owner_cog.py for more information
-                    """
+                The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
+                If you are the owner of the instance please reference owner_cog.py for more information
+                """
             )
             return
 
@@ -124,9 +124,9 @@ class DesignatedChannelsCog(commands.Cog):
         if OwnerDesignatedChannels.has(channel_type):
             await ctx.send(
                 f"""
-                    The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
-                    If you are the owner of the instance please reference owner_cog.py for more information
-                    """
+                The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
+                If you are the owner of the instance please reference owner_cog.py for more information
+                """
             )
             return
 

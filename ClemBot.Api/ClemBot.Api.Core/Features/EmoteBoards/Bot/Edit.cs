@@ -13,8 +13,8 @@ public class Edit
         {
             RuleFor(c => c.Id).NotNull();
             RuleFor(c => c.GuildId).NotNull();
-            RuleFor(c => c.Name).NotNull().NotEmpty();
-            RuleFor(c => c.Emote).NotNull().NotEmpty();
+            RuleFor(c => c.Name).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
+            RuleFor(c => c.Emote).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
             RuleFor(c => c.ReactionThreshold).NotNull().Must(t => t > 0);
             RuleFor(c => c.AllowBotPosts).NotNull();
             RuleFor(c => c.Channels).NotNull().Must(l => l.Count > 0);
@@ -62,6 +62,7 @@ public class Edit
                 return QueryResult<Unit>.NotFound();
             }
 
+            // find another emote board in the guild with either same name or emote
             var similar = _context.EmoteBoards
                 .Any(board => board.Id != request.Id && board.GuildId == request.GuildId
                               && (string.Equals(board.Name, request.Name, StringComparison.OrdinalIgnoreCase)

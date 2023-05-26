@@ -16,23 +16,6 @@ public class Index
         }
     }
 
-    public class EmoteBoardDto : IResponseModel
-    {
-        public int Id { get; init; }
-
-        public ulong GuildId { get; init; }
-
-        public string Name { get; init; } = null!;
-
-        public string Emote { get; init; } = null!;
-
-        public uint ReactionThreshold { get; init; }
-
-        public bool AllowBotPosts { get; init; }
-
-        public List<ulong> Channels { get; init; } = null!;
-    }
-
     public class Query : IRequest<QueryResult<List<EmoteBoardDto>>>
     {
         public ulong GuildId { get; set; }
@@ -65,27 +48,7 @@ public class Index
                 GuildId = request.GuildId
             });
 
-            var dtos = new List<EmoteBoardDto>();
-
-            foreach (var board in emoteBoards)
-            {
-                var channels = await _mediator.Send(new GetEmoteBoardChannelsRequest
-                {
-                    EmoteBoardId = board.Id
-                });
-                dtos.Add(new EmoteBoardDto
-                {
-                    Id = board.Id,
-                    GuildId = board.GuildId,
-                    Name = board.Name,
-                    Emote = board.Emote,
-                    ReactionThreshold = board.ReactionThreshold,
-                    AllowBotPosts = board.AllowBotPosts,
-                    Channels = channels
-                });
-            }
-
-            return QueryResult<List<EmoteBoardDto>>.Success(dtos);
+            return QueryResult<List<EmoteBoardDto>>.Success(emoteBoards);
         }
     }
 }

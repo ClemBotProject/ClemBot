@@ -3,7 +3,7 @@ import math
 import uuid
 
 import discord
-from discord import RawReactionActionEvent
+from discord import RawReactionActionEvent, RawMessageUpdateEvent, RawMessageDeleteEvent
 
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
@@ -15,14 +15,14 @@ from bot.utils.logging_utils import get_logger
 log = get_logger(__name__)
 
 # dictionary of rankings
-RANKINGS = {
-    0: "⭐ POPULAR",
-    1: "🌟 QUALITY",
-    2: "🥉 *THE PEOPLE HAVE SPOKEN*",
-    3: "🥈 *INCREDIBLE*",
-    4: "🥇 **LEGENDARY**",
-    5: "🏆 ***GOD-TIER***",
-}
+RANKINGS = [
+    "⭐ POPULAR",
+    "🌟 QUALITY",
+    "🥉 *THE PEOPLE HAVE SPOKEN*",
+    "🥈 *INCREDIBLE*",
+    "🥇 **LEGENDARY**",
+    "🏆 ***GOD-TIER***",
+]
 
 
 class EmoteBoardService(BaseService):
@@ -31,6 +31,25 @@ class EmoteBoardService(BaseService):
 
     @BaseService.listener(Events.on_raw_reaction_add)
     async def on_reaction_add(self, event: RawReactionActionEvent) -> None:
+        pass
+
+    @BaseService.listener(Events.on_raw_message_edit)
+    async def on_raw_message_edit(self, event: RawMessageUpdateEvent) -> None:
+        pass
+
+    @BaseService.listener(Events.on_message_edit)
+    async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
+        pass
+
+    @BaseService.listener(Events.on_raw_message_delete)
+    async def on_message_delete(self, event: RawMessageDeleteEvent) -> None:
+        pass
+
+    @BaseService.listener(Events.on_guild_channel_delete)
+    async def on_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
+        pass
+
+    async def _as_embed(self, message: discord.Message) -> discord.Embed:
         pass
 
     async def load_service(self) -> None:

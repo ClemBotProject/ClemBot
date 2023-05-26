@@ -56,7 +56,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Channels");
+                    b.ToTable("Channels", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.ClaimsMapping", b =>
@@ -77,7 +77,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("ClaimsMappings");
+                    b.ToTable("ClaimsMappings", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CommandInvocation", b =>
@@ -106,7 +106,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CommandInvocations");
+                    b.ToTable("CommandInvocations", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CommandRestriction", b =>
@@ -139,7 +139,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("GuildId");
 
-                    b.ToTable("CommandRestrictions");
+                    b.ToTable("CommandRestrictions", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CustomPrefix", b =>
@@ -161,7 +161,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("GuildId");
 
-                    b.ToTable("CustomPrefixs");
+                    b.ToTable("CustomPrefixs", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.CustomTagPrefix", b =>
@@ -183,7 +183,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("GuildId");
 
-                    b.ToTable("CustomTagPrefixs");
+                    b.ToTable("CustomTagPrefixs", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.DesignatedChannelMapping", b =>
@@ -204,7 +204,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("ChannelId");
 
-                    b.ToTable("DesignatedChannelMappings");
+                    b.ToTable("DesignatedChannelMappings", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Guild", b =>
@@ -225,7 +225,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guilds");
+                    b.ToTable("Guilds", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.GuildSetting", b =>
@@ -250,7 +250,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("GuildId");
 
-                    b.ToTable("GuildSettings");
+                    b.ToTable("GuildSettings", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.GuildUser", b =>
@@ -265,7 +265,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GuildUser");
+                    b.ToTable("GuildUser", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Infraction", b =>
@@ -308,7 +308,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Infractions");
+                    b.ToTable("Infractions", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Message", b =>
@@ -334,7 +334,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.MessageContent", b =>
@@ -359,7 +359,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("MessageContents");
+                    b.ToTable("MessageContents", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Reminder", b =>
@@ -390,7 +390,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reminders");
+                    b.ToTable("Reminders", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Role", b =>
@@ -419,7 +419,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("GuildId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.RoleUser", b =>
@@ -434,7 +434,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoleUser");
+                    b.ToTable("RoleUser", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.SlotScore", b =>
@@ -463,7 +463,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SlotScores");
+                    b.ToTable("SlotScores", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Tag", b =>
@@ -497,7 +497,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.TagUse", b =>
@@ -528,7 +528,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TagUses");
+                    b.ToTable("TagUses", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.User", b =>
@@ -543,7 +543,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Channel", b =>

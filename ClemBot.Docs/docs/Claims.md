@@ -44,6 +44,7 @@ You decide how to set up your server!
 | welcome_message_modify          | Allows for setting the servers [welcome message](./WelcomeMessage.md)                                             |
 | command_restrictions_edit       | Allows for [disabling commands](./CommandRestrictions.md) server-wide or in specific channels                     |
 | bypass_disabled_commands        | Allows for bypassing of [disabled commands](./CommandRestrictions.md) either server-wide or in a specific channel |
+| manage_emote_boards             | Allows for the management of [emote boards](./EmoteBoards.md) in a server                                         |
 
 ## Commands
 

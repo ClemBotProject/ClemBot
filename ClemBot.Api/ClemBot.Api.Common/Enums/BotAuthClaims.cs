@@ -30,4 +30,5 @@ public enum BotAuthClaims
     custom_tag_prefix_set,
     command_restrictions_edit,
     bypass_disabled_commands,
+    manage_emote_boards,
 }
