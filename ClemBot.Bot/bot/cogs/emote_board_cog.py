@@ -85,7 +85,7 @@ class EmoteBoardCog(commands.Cog):
     async def leaderboard(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE | None = None) -> None:
         pass
 
-    @emoteboard.group(name='set')
+    @emoteboard.group(name='set', aliases=['edit'])
     @ext.long_help('Edit your emote board.')
     @ext.short_help('Edit specific values of your emote board.')
     @ext.example('help emoteboard set')
@@ -98,7 +98,10 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help('Set the reaction threshold for an emote board.')
     @ext.example(['board set reactions starboard 4', 'board set reactions :star: 5'])
     async def set_threshold(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, threshold: int) -> None:
-        pass
+        embed = discord.Embed(title=':placard: Emote Board', color=Colors.ClemsonOrange)
+        embed.add_field(name='Emote Board', value=emoteboard)
+        embed.add_field(name='Threshold', value=threshold)
+        await ctx.send(embed=embed)
 
     @set_group.command(pass_context=True, name='bots', aliases=['bot', 'allow_bots'])
     @ext.required_claims(Claims.manage_emote_boards)
@@ -106,7 +109,10 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help('Set whether bots can post to an emote board.')
     @ext.example(['board set bots starboard false', 'board set bots :star: true'])
     async def set_bots(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, bots: bool) -> None:
-        pass
+        embed = discord.Embed(title=':placard: Emote Board', color=Colors.ClemsonOrange)
+        embed.add_field(name='Emote Board', value=emoteboard)
+        embed.add_field(name='Allow Bot Posts', value=str(bots))
+        await ctx.send(embed=embed)
 
     @set_group.command(pass_context=True, name='emote', aliases=['emoji'])
     @ext.required_claims(Claims.manage_emote_boards)
@@ -114,7 +120,10 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help('Sets the emote for a board.')
     @ext.example(['board set emote starboard :star:', 'board set emote starboard :a_custom_emote:'])
     async def set_emote(self, ctx: ext.ClemBotCtx, board_name: str, emote: discord.PartialEmoji) -> None:
-        pass
+        embed = discord.Embed(title=':placard: Emote Board', color=Colors.ClemsonOrange)
+        embed.add_field(name='Emote Board', value=board_name)
+        embed.add_field(name='Emote', value=emote)
+        await ctx.send(embed=embed)
 
     @emoteboard.group(name='channel')
     @ext.long_help('Add or remove a channel for ClemBot to post to for a specific emote board.')
@@ -129,7 +138,10 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help('Add a channel for an emote board.')
     @ext.example(['board channel add :star: #my-cool-channel', 'board channel add starboard #another-channel'])
     async def channel_add(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, channel: discord.TextChannel) -> None:
-        pass
+        embed = discord.Embed(title=':placard: Emote Board', color=Colors.ClemsonOrange)
+        embed.add_field(name='Emote Board', value=emoteboard)
+        embed.add_field(name='Channel', value=channel.mention)
+        await ctx.send(embed=embed)
 
     @channel_group.command(pass_context=True, name='remove', aliases=['delete'])
     @ext.required_claims(Claims.manage_emote_boards)
@@ -140,7 +152,10 @@ class EmoteBoardCog(commands.Cog):
                              ctx: ext.ClemBotCtx,
                              emoteboard: EMOTEBOARD_TYPE,
                              channel: discord.TextChannel) -> None:
-        pass
+        embed = discord.Embed(title=':placard: Emote Board', color=Colors.ClemsonOrange)
+        embed.add_field(name='Emote Board', value=emoteboard)
+        embed.add_field(name='Channel', value=channel.mention)
+        await ctx.send(embed=embed)
 
     async def _get_board(self, eb: EMOTEBOARD_TYPE, ctx: ext.ClemBotCtx, send_error: bool = False) -> EmoteBoard | None:
         """
@@ -148,9 +163,6 @@ class EmoteBoardCog(commands.Cog):
         Checks against both the emote board name and emote for consistency.
         Returns None if a board with the given name or emote does not exist in the guild.
         """
-        if not ctx.guild:
-            return None
-
         value = (eb if isinstance(eb, str) else str(eb)).casefold()
         for board in await self.bot.emote_board_route.get_emote_boards(ctx.guild):
             if board.name.casefold() == value or board.emote.casefold() == value:

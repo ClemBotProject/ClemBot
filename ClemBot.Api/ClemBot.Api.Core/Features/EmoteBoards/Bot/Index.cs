@@ -1,5 +1,4 @@
-﻿using ClemBot.Api.Common;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
+﻿using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 

@@ -5,8 +5,6 @@ namespace ClemBot.Api.Services.Caching.EmoteBoards.Models;
 
 public class EmoteBoardDto
 {
-    public int Id { get; init; }
-
     public ulong GuildId { get; init; }
 
     public string Name { get; init; }

@@ -30,34 +30,34 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
         return Unit.Task;
     }
 
-    public async Task<List<EmoteBoardDto>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken)
-    {
-        var boards = await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () => {
+    public async Task<List<EmoteBoardDto>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken) =>
+        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () => {
             var dtos = new List<EmoteBoardDto>();
             var boards = await _context.EmoteBoards
                 .Where(b => b.GuildId == request.GuildId)
                 .ToListAsync();
+            var boardIds = boards.Select(board => board.Id);
+            var channels = await _context.EmoteBoardChannelMappings
+                .Where(cm => boardIds.Contains(cm.EmoteBoardId))
+                .ToListAsync();
             foreach (var board in boards)
             {
-                var channels = await _context.EmoteBoardChannelMappings
+                var boardChannels = channels
                     .Where(cm => cm.EmoteBoardId == board.Id)
                     .Select(cm => cm.ChannelId)
-                    .ToListAsync();
+                    .ToList();
                 dtos.Add(new EmoteBoardDto
                 {
-                    Id = board.Id,
                     GuildId = board.GuildId,
                     Name = board.Name,
                     Emote = board.Emote,
                     ReactionThreshold = board.ReactionThreshold,
                     AllowBotPosts = board.AllowBotPosts,
-                    Channels = channels
+                    Channels = boardChannels
                 });
             }
             return dtos;
         }, TimeSpan.FromHours(12));
-        return boards;
-    }
 
     private static string GetCacheKey(ulong guildId) => $"{typeof(EmoteBoardCacheHandler)}:{guildId}";
 }

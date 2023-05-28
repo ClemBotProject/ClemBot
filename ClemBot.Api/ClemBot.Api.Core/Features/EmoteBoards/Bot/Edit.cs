@@ -1,4 +1,6 @@
 ﻿using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,6 @@ public class Edit
     {
         public Validator()
         {
-            RuleFor(c => c.Id).NotNull();
             RuleFor(c => c.GuildId).NotNull();
             RuleFor(c => c.Name).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
             RuleFor(c => c.Emote).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
@@ -24,8 +25,6 @@ public class Edit
 
     public class Command : IRequest<QueryResult<Unit>>
     {
-        public int Id { get; set; }
-
         public ulong GuildId { get; set; }
 
         public string Name { get; set; } = null!;
@@ -41,6 +40,7 @@ public class Edit
 
     public class Handler : IRequestHandler<Command, QueryResult<Unit>>
     {
+
         private readonly IMediator _mediator;
         private readonly ClemBotContext _context;
 
@@ -62,19 +62,9 @@ public class Edit
                 return QueryResult<Unit>.NotFound();
             }
 
-            // find another emote board in the guild with either same name or emote
-            var similar = _context.EmoteBoards
-                .Any(board => board.Id != request.Id && board.GuildId == request.GuildId
-                              && (string.Equals(board.Name, request.Name, StringComparison.OrdinalIgnoreCase)
-                                  || string.Equals(board.Emote, request.Emote, StringComparison.OrdinalIgnoreCase)));
-
-            if (similar)
-            {
-                return QueryResult<Unit>.Conflict();
-            }
-
             var emoteBoard = await _context.EmoteBoards
-                .Where(b => b.Id == request.Id)
+                .Where(b => b.GuildId == request.GuildId
+                            && string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefaultAsync();
 
             if (emoteBoard is null)
@@ -82,13 +72,58 @@ public class Edit
                 return QueryResult<Unit>.NotFound();
             }
 
-            emoteBoard.Name = request.Name;
+            // check for emote conflicts within the guild
+            var similar = await _context.EmoteBoards
+                .AnyAsync(eb => eb.GuildId == request.GuildId
+                                && string.Equals(eb.Emote, request.Emote, StringComparison.OrdinalIgnoreCase));
+
+            if (similar)
+            {
+                return QueryResult<Unit>.Conflict();
+            }
+
             emoteBoard.Emote = request.Emote;
             emoteBoard.ReactionThreshold = request.ReactionThreshold;
             emoteBoard.AllowBotPosts = request.AllowBotPosts;
 
-            
+            var currentChannels = await _context.EmoteBoardChannelMappings
+                .Where(cm => cm.EmoteBoardId == emoteBoard.Id)
+                .Select(cm => cm.ChannelId)
+                .ToListAsync();
 
+            var nonintersections = currentChannels.Except(request.Channels).Union(request.Channels.Except(currentChannels));
+
+            foreach (var channelId in nonintersections)
+            {
+                if (!request.Channels.Contains(channelId))
+                {
+                    // remove the channel id from our mappings
+                    var mapping = await _context.EmoteBoardChannelMappings
+                        .Where(cm => cm.EmoteBoardId == emoteBoard.Id && cm.ChannelId == channelId)
+                        .FirstOrDefaultAsync();
+
+                    if (mapping is null)
+                    {
+                        continue;
+                    }
+
+                    _context.EmoteBoardChannelMappings.Remove(mapping);
+                }
+                else
+                {
+                    await _context.EmoteBoardChannelMappings.AddAsync(new EmoteBoardChannelMapping
+                    {
+                        EmoteBoardId = emoteBoard.Id, ChannelId = channelId
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            await _mediator.Send(new ClearEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
 
             return QueryResult<Unit>.NoContent();
         }

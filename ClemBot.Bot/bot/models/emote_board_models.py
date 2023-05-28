@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from typing import Union
 
 import discord
@@ -6,7 +7,6 @@ from bot.models.clem_bot_model import ClemBotModel
 
 
 class EmoteBoard(ClemBotModel):
-    id: int
     guild_id: int
     name: str
     emote: str
@@ -34,3 +34,11 @@ class EmoteBoardReactDto(ClemBotModel):
     update: bool
     reactions: int
     messages: dict[int, int]
+
+
+class EmoteBoardLeaderboardType(Enum):
+
+    total_reactions_received = auto()
+    total_number_of_posts = auto()
+    highest_number_of_reactions = auto()
+
