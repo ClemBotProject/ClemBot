@@ -32,8 +32,8 @@ class EmoteBoardPost(ClemBotModel):
 
 class EmoteBoardReactDto(ClemBotModel):
     update: bool
-    reactions: int
-    messages: dict[int, int]
+    reactions: int | None
+    messages: dict[int, int] | None
 
 
 class EmoteBoardLeaderboardType(Enum):

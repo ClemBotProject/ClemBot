@@ -1,4 +1,6 @@
-﻿namespace ClemBot.Api.Data.Models;
+﻿using System.Collections.Generic;
+
+namespace ClemBot.Api.Data.Models;
 
 public class EmoteBoard
 {
@@ -14,4 +16,6 @@ public class EmoteBoard
     public uint ReactionThreshold { get; set; } = 4;
 
     public bool AllowBotPosts { get; set; }
+
+    public List<Channel> Channels { get; set; } = new();
 }

@@ -7,7 +7,7 @@ namespace ClemBot.Api.Data.Models;
 /// </summary>
 public class EmoteBoardPost
 {
-    public ulong Id { get; set; }
+    public int Id { get; set; }
 
     public ulong UserId { get; set; }
     public User User { get; set; } = null!;
@@ -19,4 +19,8 @@ public class EmoteBoardPost
 
     public int EmoteBoardId { get; set; }
     public EmoteBoard EmoteBoard { get; set; } = null!;
+
+    public List<ulong> Reactions { get; set; } = null!;
+
+    public List<EmoteBoardMessage> Messages { get; set; } = null!;
 }

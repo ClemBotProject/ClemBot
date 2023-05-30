@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using LazyCache;
 using MediatR;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClemBot.Api.Services.Caching.EmoteBoards;
 
 public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
-    IRequestHandler<GetEmoteBoardsRequest, List<EmoteBoardDto>>
+    IRequestHandler<GetEmoteBoardsRequest, List<EmoteBoard>>
 {
 
     private readonly IAppCache _cache;
@@ -30,34 +31,12 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
         return Unit.Task;
     }
 
-    public async Task<List<EmoteBoardDto>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken) =>
-        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () => {
-            var dtos = new List<EmoteBoardDto>();
-            var boards = await _context.EmoteBoards
+    public async Task<List<EmoteBoard>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken) =>
+        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () =>
+            await _context.EmoteBoards
+                .Include(b => b.Channels)
                 .Where(b => b.GuildId == request.GuildId)
-                .ToListAsync();
-            var boardIds = boards.Select(board => board.Id);
-            var channels = await _context.EmoteBoardChannelMappings
-                .Where(cm => boardIds.Contains(cm.EmoteBoardId))
-                .ToListAsync();
-            foreach (var board in boards)
-            {
-                var boardChannels = channels
-                    .Where(cm => cm.EmoteBoardId == board.Id)
-                    .Select(cm => cm.ChannelId)
-                    .ToList();
-                dtos.Add(new EmoteBoardDto
-                {
-                    GuildId = board.GuildId,
-                    Name = board.Name,
-                    Emote = board.Emote,
-                    ReactionThreshold = board.ReactionThreshold,
-                    AllowBotPosts = board.AllowBotPosts,
-                    Channels = boardChannels
-                });
-            }
-            return dtos;
-        }, TimeSpan.FromHours(12));
+                .ToListAsync(), TimeSpan.FromHours(12));
 
     private static string GetCacheKey(ulong guildId) => $"{typeof(EmoteBoardCacheHandler)}:{guildId}";
 }

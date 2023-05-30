@@ -27,6 +27,17 @@ public class EmoteBoardsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpPost("bot/[controller]/create")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Create([FromRoute] Create.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.NoContent } => NoContent(),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            { Status: QueryStatus.Conflict } => Conflict(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpPatch("bot/[controller]/edit")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Edit([FromBody] Edit.Command command) =>
@@ -35,6 +46,16 @@ public class EmoteBoardsController : ControllerBase
             { Status: QueryStatus.NoContent } => NoContent(),
             { Status: QueryStatus.NotFound } => NotFound(),
             { Status: QueryStatus.Conflict } => Conflict(),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpDelete("bot/[controller]/delete")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Delete([FromBody] Delete.Command command) =>
+        await _mediator.Send(command) switch
+        {
+            { Status: QueryStatus.NoContent } => NoContent(),
+            { Status: QueryStatus.NotFound } => NotFound(),
             _ => throw new InvalidOperationException()
         };
 }

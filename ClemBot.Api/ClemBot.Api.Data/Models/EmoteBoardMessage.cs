@@ -7,11 +7,11 @@ public class EmoteBoardMessage
 {
     public int Id { get; set; }
 
-    public int ChannelMappingId { get; set; }
-    public EmoteBoardChannelMapping ChannelMapping { get; set; } = null!;
+    public ulong MessageId { get; set; }
+
+    public ulong ChannelId { get; set; }
+    public Channel Channel { get; set; } = null!;
 
     public int EmoteBoardPostId { get; set; }
     public EmoteBoardPost EmoteBoardPost { get; set; } = null!;
-
-    public ulong MessageId { get; set; }
 }

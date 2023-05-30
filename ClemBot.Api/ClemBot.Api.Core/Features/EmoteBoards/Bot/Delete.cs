@@ -1,5 +1,5 @@
-﻿using ClemBot.Api.Common;
-using ClemBot.Api.Data.Contexts;
+﻿using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 
@@ -13,7 +13,7 @@ public class Delete
         public Validator()
         {
             RuleFor(c => c.GuildId).NotNull();
-            RuleFor(c => c.EmoteBoardName).NotNull().Must(s => !s.Any(char.IsWhiteSpace));
+            RuleFor(c => c.Name).NotNull().Must(s => !s.Any(char.IsWhiteSpace));
         }
     }
 
@@ -21,7 +21,7 @@ public class Delete
     {
         public ulong GuildId { get; set; }
 
-        public string EmoteBoardName { get; set; } = null!;
+        public string Name { get; set; } = null!;
     }
 
     public class Handler : IRequestHandler<Command, QueryResult<Unit>>
@@ -48,7 +48,25 @@ public class Delete
                 return QueryResult<Unit>.NotFound();
             }
 
+            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
 
+            var board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (board is null)
+            {
+                return QueryResult<Unit>.NotFound();
+            }
+
+            _context.EmoteBoards.Remove(board);
+            await _context.SaveChangesAsync();
+
+            await _mediator.Send(new ClearEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
 
             return QueryResult<Unit>.NoContent();
         }

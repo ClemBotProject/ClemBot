@@ -57,9 +57,9 @@ class EmoteBoardCog(commands.Cog):
     @ext.example(['board add :star: starboard #starboard', 'board add :a_custom_emote: myboard #my-board'])
     async def add_board(self,
                         ctx: ext.ClemBotCtx,
-                        emote: discord.PartialEmoji,
+                        emote: discord.PartialEmoji | str,  # todo: add converter
                         name: str,
-                        channel: discord.TextChannel) -> None:
+                        channels: list[discord.TextChannel]) -> None:
         if board := (await self._get_board(emote, ctx) or await self._get_board(name, ctx)):
             embed = discord.Embed(title='Error', color=Colors.Error)
             embed.description = f'Could not create emote board: {board.emote} **{board.name}** already exists.'

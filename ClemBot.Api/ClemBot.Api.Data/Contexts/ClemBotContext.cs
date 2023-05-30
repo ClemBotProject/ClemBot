@@ -29,10 +29,8 @@ public class ClemBotContext : DbContext
     public DbSet<CommandInvocation> CommandInvocations { get; set; } = null!;
     public DbSet<DesignatedChannelMapping> DesignatedChannelMappings { get; set; } = null!;
     public DbSet<EmoteBoard> EmoteBoards { get; set; } = null!;
-    public DbSet<EmoteBoardChannelMapping> EmoteBoardChannelMappings { get; set; } = null!;
     public DbSet<EmoteBoardMessage> EmoteBoardMessages { get; set; } = null!;
     public DbSet<EmoteBoardPost> EmoteBoardPosts { get; set; } = null!;
-    public DbSet<EmoteBoardReaction> EmoteBoardReactions { get; set; } = null!;
     public DbSet<Guild> Guilds { get; set; } = null!;
     public DbSet<GuildSetting> GuildSettings { get; set; } = null!;
     public DbSet<GuildUser> GuildUser { get; set; } = null!;
@@ -78,16 +76,6 @@ public class ClemBotContext : DbContext
         modelBuilder.Entity<Channel>()
             .Property(e => e.IsThread)
             .HasComputedColumnSql(@"""Channels"".""ParentId"" IS NOT null", stored: true);
-
-        modelBuilder.Entity<EmoteBoardReaction>().HasKey(r => new
-        {
-            r.UserId, r.EmoteBoardPostId
-        });
-
-        modelBuilder.Entity<EmoteBoardChannelMapping>().HasKey(cm => new
-        {
-            cm.ChannelId, cm.EmoteBoardId
-        });
 
         modelBuilder.HasPostgresEnum<BotAuthClaims>();
         modelBuilder.HasPostgresEnum<DesignatedChannels>();

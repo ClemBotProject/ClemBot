@@ -1,5 +1,5 @@
 ﻿using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Caching.Channels.Models;
 using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
@@ -18,8 +18,7 @@ public class Edit
             RuleFor(c => c.Emote).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
             RuleFor(c => c.ReactionThreshold).NotNull().Must(t => t > 0);
             RuleFor(c => c.AllowBotPosts).NotNull();
-            RuleFor(c => c.Channels).NotNull().Must(l => l.Count > 0);
-            RuleForEach(c => c.Channels).NotNull().Must(channel => channel > 0);
+            RuleFor(c => c.Channels).NotNull();
         }
     }
 
@@ -62,10 +61,26 @@ public class Edit
                 return QueryResult<Unit>.NotFound();
             }
 
-            var emoteBoard = await _context.EmoteBoards
-                .Where(b => b.GuildId == request.GuildId
-                            && string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefaultAsync();
+            foreach (var channelId in request.Channels)
+            {
+                var channelExists = await _mediator.Send(new ChannelExistsRequest
+                {
+                    Id = channelId
+                });
+
+                if (!channelExists)
+                {
+                    return QueryResult<Unit>.NotFound();
+                }
+            }
+
+            // this is where caching the boards in a guild comes in handy
+            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
+
+            var emoteBoard = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
             if (emoteBoard is null)
             {
@@ -73,9 +88,8 @@ public class Edit
             }
 
             // check for emote conflicts within the guild
-            var similar = await _context.EmoteBoards
-                .AnyAsync(eb => eb.GuildId == request.GuildId
-                                && string.Equals(eb.Emote, request.Emote, StringComparison.OrdinalIgnoreCase));
+            var similar = boards
+                .Any(b => b.Id != emoteBoard.Id && string.Equals(b.Emote, request.Emote, StringComparison.OrdinalIgnoreCase));
 
             if (similar)
             {
@@ -86,37 +100,11 @@ public class Edit
             emoteBoard.ReactionThreshold = request.ReactionThreshold;
             emoteBoard.AllowBotPosts = request.AllowBotPosts;
 
-            var currentChannels = await _context.EmoteBoardChannelMappings
-                .Where(cm => cm.EmoteBoardId == emoteBoard.Id)
-                .Select(cm => cm.ChannelId)
+            var channels = await _context.Channels
+                .Where(c => request.Channels.Contains(c.Id))
                 .ToListAsync();
 
-            var nonintersections = currentChannels.Except(request.Channels).Union(request.Channels.Except(currentChannels));
-
-            foreach (var channelId in nonintersections)
-            {
-                if (!request.Channels.Contains(channelId))
-                {
-                    // remove the channel id from our mappings
-                    var mapping = await _context.EmoteBoardChannelMappings
-                        .Where(cm => cm.EmoteBoardId == emoteBoard.Id && cm.ChannelId == channelId)
-                        .FirstOrDefaultAsync();
-
-                    if (mapping is null)
-                    {
-                        continue;
-                    }
-
-                    _context.EmoteBoardChannelMappings.Remove(mapping);
-                }
-                else
-                {
-                    await _context.EmoteBoardChannelMappings.AddAsync(new EmoteBoardChannelMapping
-                    {
-                        EmoteBoardId = emoteBoard.Id, ChannelId = channelId
-                    });
-                }
-            }
+            emoteBoard.Channels = channels;
 
             await _context.SaveChangesAsync();
 
