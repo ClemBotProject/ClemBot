@@ -26,6 +26,7 @@ from bot.api import (
     custom_prefix_route,
     custom_tag_prefix_route,
     designated_channel_route,
+    emote_board_route,
     guild_route,
     health_check_route,
     message_route,
@@ -37,7 +38,6 @@ from bot.api import (
     thread_route,
     user_route,
     welcome_message_route,
-    emote_board_route,
 )
 from bot.api.api_client import ApiClient
 from bot.consts import Colors

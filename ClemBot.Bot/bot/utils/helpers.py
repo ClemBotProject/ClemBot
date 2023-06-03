@@ -1,4 +1,5 @@
 import calendar
+import string
 from datetime import datetime
 from typing import Annotated, Generator, Iterator, Literal, Sequence, TypeVar
 
@@ -80,3 +81,12 @@ def as_timestamp(date: datetime, /, style: Literal["f", "F", "d", "D", "t", "T",
     """
     timestamp = calendar.timegm(date.utctimetuple())
     return f"<t:{timestamp}:{style}>"
+
+
+def contains_whitespace(s: str) -> bool:
+    """
+    Checks if the given string contains any whitespace characters.
+    Checks against `string.whitespace` to look for whitespace.
+    Returns True if the given string contains whitespace, False otherwise.
+    """
+    return True in [c in s for c in string.whitespace]

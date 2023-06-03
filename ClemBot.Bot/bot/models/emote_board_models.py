@@ -10,8 +10,8 @@ class EmoteBoard(ClemBotModel):
     guild_id: int
     name: str
     emote: str
-    reaction_threshold: int
-    allow_bot_posts: bool
+    reaction_threshold: int = 4
+    allow_bot_posts: bool = False
     channels: list[int]
 
 
@@ -41,4 +41,3 @@ class EmoteBoardLeaderboardType(Enum):
     total_reactions_received = auto()
     total_number_of_posts = auto()
     highest_number_of_reactions = auto()
-

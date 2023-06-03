@@ -25,15 +25,15 @@ public class Index
     {
         public ulong GuildId { get; init; }
 
-        public string Name { get; init; } = null!;
+        public required string Name { get; init; }
 
-        public string Emote { get; init; } = null!;
+        public required string Emote { get; init; }
 
         public uint ReactionThreshold { get; init; }
 
         public bool AllowBotPosts { get; init; }
 
-        public List<ulong> Channels { get; init; } = null!;
+        public required List<ulong> Channels { get; init; }
     }
 
     public class Handler : IRequestHandler<Query, QueryResult<List<EmoteBoardDto>>>

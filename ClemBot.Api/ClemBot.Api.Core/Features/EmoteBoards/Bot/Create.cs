@@ -1,6 +1,7 @@
 ﻿using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.Channels.Models;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,6 @@ public class Create
             RuleFor(c => c.ReactionThreshold).NotNull().Must(t => t > 0);
             RuleFor(c => c.AllowBotPosts).NotNull();
             RuleFor(c => c.Channels).NotNull().Must(l => l.Count > 0);
-            RuleForEach(c => c.Channels).NotNull();
         }
     }
 
@@ -91,6 +91,11 @@ public class Create
             });
 
             await _context.SaveChangesAsync();
+
+            await _mediator.Send(new ClearEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
 
             return QueryResult<Unit>.NoContent();
         }

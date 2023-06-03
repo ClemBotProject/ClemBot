@@ -29,7 +29,7 @@ public class EmoteBoardsController : ControllerBase
 
     [HttpPost("bot/[controller]/create")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Create([FromRoute] Create.Command command) =>
+    public async Task<IActionResult> Create([FromBody] Create.Command command) =>
         await _mediator.Send(command) switch
         {
             { Status: QueryStatus.NoContent } => NoContent(),

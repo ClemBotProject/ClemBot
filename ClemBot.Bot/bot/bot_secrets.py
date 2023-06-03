@@ -13,7 +13,6 @@ class BotSecrets:
         self._client_secret: str | None = None
         self._bot_token: str | None = None
         self._bot_prefix: str | None = None
-        self._gifMe_token: str | None = None
         self._repl_url: str | None = None
         self._github_url: str | None = None
         self._api_url: str | None = None

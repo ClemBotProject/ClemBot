@@ -9,9 +9,9 @@ public class EmoteBoard
     public ulong GuildId { get; set; }
     public Guild Guild { get; set; } = null!;
 
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
 
-    public string Emote { get; set; } = null!;
+    public required string Emote { get; set; }
 
     public uint ReactionThreshold { get; set; } = 4;
 

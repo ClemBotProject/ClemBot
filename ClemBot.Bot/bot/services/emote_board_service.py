@@ -3,7 +3,7 @@ import math
 import uuid
 
 import discord
-from discord import RawReactionActionEvent, RawMessageUpdateEvent, RawMessageDeleteEvent
+from discord import RawMessageDeleteEvent, RawMessageUpdateEvent, RawReactionActionEvent
 
 from bot.clem_bot import ClemBot
 from bot.consts import Colors, DesignatedChannels, DiscordLimits
