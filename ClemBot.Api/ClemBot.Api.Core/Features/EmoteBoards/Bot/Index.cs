@@ -1,4 +1,5 @@
 ﻿using ClemBot.Api.Common;
+using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
@@ -40,10 +41,12 @@ public class Index
     {
 
         private readonly IMediator _mediator;
+        private readonly ClemBotContext _context;
 
-        public Handler(IMediator mediator)
+        public Handler(IMediator mediator, ClemBotContext context)
         {
             _mediator = mediator;
+            _context = context;
         }
 
         public async Task<QueryResult<List<EmoteBoardDto>>> Handle(Query request, CancellationToken cancellationToken)

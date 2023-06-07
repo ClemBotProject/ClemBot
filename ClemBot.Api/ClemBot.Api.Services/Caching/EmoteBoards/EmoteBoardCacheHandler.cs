@@ -35,6 +35,7 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
         await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () =>
             await _context.EmoteBoards
                 .Include(b => b.Channels)
+                .ThenInclude(c => c.EmoteBoards)
                 .Where(b => b.GuildId == request.GuildId)
                 .ToListAsync(), TimeSpan.FromHours(12));
 

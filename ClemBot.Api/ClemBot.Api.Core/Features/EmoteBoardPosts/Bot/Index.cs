@@ -70,7 +70,7 @@ public class Index
                 return QueryResult<List<EmoteBoardPostDto>>.NotFound();
             }
 
-
+            // todo
 
             return QueryResult<List<EmoteBoardPostDto>>.NoContent();
         }

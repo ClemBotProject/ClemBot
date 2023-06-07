@@ -82,14 +82,14 @@ configured PostgreSQL with your desired username and password, you need to set t
 * Copy/paste the token from the Discord page into the `BotToken` empty string
 * Make the `ApiUrl` row `https://localhost:5001/`
 * Copy and paste the ClemBot.Api key value that you generated above into the `ApiKey` row
-* Copy and paste the channel Ids of the channels in the test server that you want to use for Connection Status updates
-  and Error Logging into the `ErrorLogChannelIds` and `StartupLogChannelIds`. If you don't want this. Leave the field as
-  an empty brackets, []
+* Copy and paste the channel IDs of the channels in the test server that you want to use for Connection Status updates
+  and Error Logging into the `ErrorLogChannelIds` and `StartupLogChannelIds`. If you don't want this, leave the field as
+  empty brackets, like so: `[]`
 * Set a custom bot prefix in the `BotPrefix` field that will invoke your commands
 
 ### All Config Variables
 
-| Name                   | Type        | Required | Project | Purpose/Use                                                                                                |
+| Name                   | Type        | Required | Project | Description                                                                                                |
 |------------------------|-------------|----------|---------|------------------------------------------------------------------------------------------------------------|
 | `BotToken`             | `str`       | Yes      | Bot     | Used to log into the bot account.                                                                          |
 | `ApiUrl`               | `str`       | Yes      | API     | URL of the API endpoints (defaults to `http://localhost:5001/`)                                            |
