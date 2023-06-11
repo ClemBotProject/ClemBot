@@ -32,12 +32,11 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
     }
 
     public async Task<List<EmoteBoard>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken) =>
-        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), async () =>
-            await _context.EmoteBoards
+        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), () => _context.EmoteBoards
                 .Include(b => b.Channels)
                 .ThenInclude(c => c.EmoteBoards)
                 .Where(b => b.GuildId == request.GuildId)
                 .ToListAsync(), TimeSpan.FromHours(12));
 
-    private static string GetCacheKey(ulong guildId) => $"{typeof(EmoteBoardCacheHandler)}:{guildId}";
+    private static string GetCacheKey(ulong guildId) => $"{nameof(EmoteBoardCacheHandler)}:{guildId}";
 }

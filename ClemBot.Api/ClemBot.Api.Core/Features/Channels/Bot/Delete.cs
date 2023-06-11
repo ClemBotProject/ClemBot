@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.Channels.Models;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,6 +58,12 @@ public class Delete
 
             // Clear the channel from the cache so we dont try to insert a new message batch into it
             await _mediatr.Send(new ClearChannelRequest { Id = request.Id });
+
+            // Clear the emote board cache for the guild in case the channel was part of an emote board
+            await _mediatr.Send(new ClearEmoteBoardsRequest
+            {
+                GuildId = channel.GuildId
+            });
 
             return QueryResult<Model>.Success(new Model()
             {

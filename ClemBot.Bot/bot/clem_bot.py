@@ -349,8 +349,7 @@ class ClemBot(commands.Bot):
             )
 
     async def on_raw_reaction_add(self, reaction: RawReactionActionEvent) -> None:
-        if reaction.user_id != self.user.id:
-            assert reaction.guild_id is not None
+        if reaction.user_id != self.user.id and reaction.guild_id:
             await self.publish_to_queue_with_error(
                 Events.on_raw_reaction_add, reaction.guild_id, reaction
             )

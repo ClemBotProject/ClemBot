@@ -26,15 +26,15 @@ public class Edit
     {
         public ulong GuildId { get; set; }
 
-        public string Name { get; set; } = null!;
+        public required string Name { get; set; }
 
-        public string Emote { get; set; } = null!;
+        public required string Emote { get; set; }
 
         public uint ReactionThreshold { get; set; }
 
         public bool AllowBotPosts { get; set; }
 
-        public List<ulong> Channels { get; set; } = null!;
+        public required List<ulong> Channels { get; set; }
     }
 
     public class Handler : IRequestHandler<Command, QueryResult<Unit>>

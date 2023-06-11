@@ -21,7 +21,7 @@ public class Delete
     {
         public ulong GuildId { get; set; }
 
-        public string Name { get; set; } = null!;
+        public required string Name { get; set; }
     }
 
     public class Handler : IRequestHandler<Command, QueryResult<Unit>>

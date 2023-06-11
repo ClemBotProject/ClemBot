@@ -1,7 +1,10 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.EmoteBoardPosts.Bot;
 
@@ -12,7 +15,7 @@ public class React
         public Validator()
         {
             RuleFor(c => c.GuildId).NotNull();
-            RuleFor(c => c.ChannelId).NotNull();
+            RuleFor(c => c.Name).NotNull().NotEmpty().Must(s => !s.Any(char.IsWhiteSpace));
             RuleFor(c => c.MessageId).NotNull();
             RuleFor(c => c.UserReactions).NotNull().Must(l => l.Count > 0);
         }
@@ -22,7 +25,7 @@ public class React
     {
         public bool Update { get; init; }
 
-        public uint? ReactionCount { get; init; }
+        public int? ReactionCount { get; init; }
 
         public Dictionary<ulong, ulong>? Messages { get; init; }
     }
@@ -31,7 +34,7 @@ public class React
     {
         public ulong GuildId { get; set; }
 
-        public ulong ChannelId { get; set; }
+        public required string Name { get; set; }
 
         public ulong MessageId { get; set; }
 
@@ -62,9 +65,58 @@ public class React
                 return QueryResult<EmoteBoardReactionDto>.NotFound();
             }
 
-            // todo
+            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            {
+                GuildId = request.GuildId
+            });
 
-            return QueryResult<EmoteBoardReactionDto>.NoContent();
+            var board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (board is null)
+            {
+                return QueryResult<EmoteBoardReactionDto>.NotFound();
+            }
+
+            var postExists = await _mediator.Send(new EmoteBoardPostExistsRequest
+            {
+                BoardId = board.Id,
+                MessageId = request.MessageId
+            });
+
+            if (!postExists)
+            {
+                return QueryResult<EmoteBoardReactionDto>.NotFound();
+            }
+
+            var post = _context.EmoteBoardPosts
+                .Include(p => p.Reactions)
+                .Include(p => p.Messages)
+                .FirstOrDefault(p => p.EmoteBoardId == board.Id && p.MessageId == request.MessageId);
+
+            if (post is null)
+            {
+                return QueryResult<EmoteBoardReactionDto>.Conflict();
+            }
+
+            var newReactions = request.UserReactions.Where(id => !post.Reactions.Contains(id)).ToList();
+
+            if (newReactions.Count == 0)
+            {
+                return QueryResult<EmoteBoardReactionDto>.Success(new EmoteBoardReactionDto
+                {
+                    Update = false
+                });
+            }
+
+            post.Reactions.AddRange(newReactions);
+            await _context.SaveChangesAsync();
+
+            return QueryResult<EmoteBoardReactionDto>.Success(new EmoteBoardReactionDto
+            {
+                Update = true,
+                ReactionCount = post.Reactions.Count,
+                Messages = post.Messages.ToDictionary(message => message.ChannelId, message => message.MessageId)
+            });
         }
     }
 }

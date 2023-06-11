@@ -41,12 +41,10 @@ public class Index
     {
 
         private readonly IMediator _mediator;
-        private readonly ClemBotContext _context;
 
-        public Handler(IMediator mediator, ClemBotContext context)
+        public Handler(IMediator mediator)
         {
             _mediator = mediator;
-            _context = context;
         }
 
         public async Task<QueryResult<List<EmoteBoardDto>>> Handle(Query request, CancellationToken cancellationToken)
