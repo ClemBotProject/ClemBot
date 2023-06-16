@@ -2,7 +2,7 @@
 
 namespace ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
 
-public class ClearEmoteBoardPostExistsRequest : IRequest<Unit>
+public class ClearEmoteBoardPostRequest : IRequest<Unit>
 {
     public int BoardId { get; init; }
 

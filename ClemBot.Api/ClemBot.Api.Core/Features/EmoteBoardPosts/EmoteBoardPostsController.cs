@@ -38,7 +38,7 @@ public class EmoteBoardPostsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{GuildId}/{Name}/{MessageId}")]
+    [HttpGet("bot/[controller]/{GuildId}/{Name?}/{MessageId}")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Details([FromRoute] Details.Query query) =>
         await _mediator.Send(query) switch
@@ -62,6 +62,16 @@ public class EmoteBoardPostsController : ControllerBase
     [HttpGet("bot/[controller]/leaderboard/{GuildId}/{Name?}/popular")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Popular([FromRoute] Popular.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
+
+    [HttpGet("bot/[controller]/leaderboard/{GuildId}/{Name?}/posts")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Posts([FromRoute] Posts.Query query) =>
         await _mediator.Send(query) switch
         {
             { Status: QueryStatus.Success } result => Ok(result.Value),

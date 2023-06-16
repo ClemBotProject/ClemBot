@@ -17,7 +17,7 @@ public class React
             RuleFor(c => c.GuildId).NotNull();
             RuleFor(c => c.Name).NotNull().NotEmpty().Must(s => !s.Any(char.IsWhiteSpace));
             RuleFor(c => c.MessageId).NotNull();
-            RuleFor(c => c.UserReactions).NotNull().Must(l => l.Count > 0);
+            RuleFor(c => c.UserReactions).NotNull().NotEmpty();
         }
     }
 

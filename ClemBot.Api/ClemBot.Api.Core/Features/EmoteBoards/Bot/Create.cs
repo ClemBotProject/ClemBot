@@ -20,7 +20,7 @@ public class Create
             RuleFor(c => c.Emote).NotNull().NotEmpty().Must(c => !c.Any(char.IsWhiteSpace));
             RuleFor(c => c.ReactionThreshold).NotNull().Must(t => t > 0);
             RuleFor(c => c.AllowBotPosts).NotNull();
-            RuleFor(c => c.Channels).NotNull().Must(l => l.Count > 0);
+            RuleFor(c => c.Channels).NotNull().NotEmpty();
         }
     }
 

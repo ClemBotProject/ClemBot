@@ -1,6 +1,8 @@
 ﻿using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
+using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
+using LinqToDB;
 
 namespace ClemBot.Api.Core.Features.EmoteBoardPosts.Bot;
 
@@ -36,7 +38,36 @@ public class Delete
 
         public async Task<QueryResult<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var guildExists = await _mediator.Send(new GuildExistsRequest
+            {
+                Id = request.GuildId
+            });
 
+            if (!guildExists)
+            {
+                return QueryResult<Unit>.NotFound();
+            }
+
+            var posts = await _context.EmoteBoardPosts
+                .Where(p => p.MessageId == request.MessageId)
+                .ToListAsync();
+
+            if (posts.Count == 0)
+            {
+                return QueryResult<Unit>.NotFound();
+            }
+
+            _context.EmoteBoardPosts.RemoveRange(posts);
+            await _context.SaveChangesAsync();
+
+            foreach (var post in posts)
+            {
+                await _mediator.Send(new ClearEmoteBoardPostRequest
+                {
+                    BoardId = post.EmoteBoardId,
+                    MessageId = request.MessageId
+                });
+            }
 
             return QueryResult<Unit>.NoContent();
         }

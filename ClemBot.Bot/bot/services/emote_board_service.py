@@ -32,6 +32,7 @@ class EmoteBoardService(BaseService):
 
     @BaseService.listener(Events.on_raw_message_edit)
     async def on_message_edit(self, event: RawMessageUpdateEvent) -> None:
+
         pass
 
     @BaseService.listener(Events.on_raw_message_delete)

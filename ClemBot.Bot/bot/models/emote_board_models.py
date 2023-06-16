@@ -1,9 +1,7 @@
-from enum import Enum, auto
 from typing import Union
 
 import discord
 
-from bot.clem_bot import ClemBot
 from bot.models.clem_bot_model import ClemBotModel
 
 
@@ -52,3 +50,21 @@ class PopularLeaderboardSlot(ClemBotModel):
     def format(self, index: int, guild_id: int) -> str:
         link = self.as_link(guild_id)
         return f"**{index + 1}. <@{self.user_id}> - {self.emote} {self.reaction_count} - [Link]({link})**"
+
+
+class PostLeaderboardSlot(ClemBotModel):
+    user_id: int
+    post_count: int
+
+    def format(self, index: int, board_name: str | None = None) -> str:
+        return f"**{index + 1}. <@{self.user_id}> - {self.post_count}{f' {board_name}' if board_name else ''} posts**"
+
+
+class ReactionLeaderboardSlot(ClemBotModel):
+    user_id: int
+    reaction_count: int
+
+    def format(self, index: int, emote: Union[str, discord.Emoji, None] = None) -> str:
+        if isinstance(emote, discord.Emoji):
+            emote = str(emote)
+        return f"**{index + 1}. <@{self.user_id} - {self.reaction_count} reactions**"

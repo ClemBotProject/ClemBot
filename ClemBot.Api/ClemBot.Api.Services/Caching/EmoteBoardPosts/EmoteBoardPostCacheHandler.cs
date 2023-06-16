@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClemBot.Api.Services.Caching.EmoteBoardPosts;
 
 public class EmoteBoardPostCacheHandler : IRequestHandler<EmoteBoardPostExistsRequest, bool>,
-    IRequestHandler<ClearEmoteBoardPostExistsRequest, Unit>
+    IRequestHandler<ClearEmoteBoardPostRequest, Unit>
 {
 
     private readonly IAppCache _cache;
@@ -23,7 +23,7 @@ public class EmoteBoardPostCacheHandler : IRequestHandler<EmoteBoardPostExistsRe
         _context = context;
     }
 
-    public Task<Unit> Handle(ClearEmoteBoardPostExistsRequest request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(ClearEmoteBoardPostRequest request, CancellationToken cancellationToken)
     {
         _cache.Remove(GetCacheKey(request.BoardId, request.MessageId));
         return Unit.Task;

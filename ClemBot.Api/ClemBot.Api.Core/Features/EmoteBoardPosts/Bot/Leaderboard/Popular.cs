@@ -1,6 +1,10 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
+using ClemBot.Api.Services.Caching.EmoteBoards.Models;
+using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.EmoteBoardPosts.Bot.Leaderboard;
 
@@ -14,6 +18,7 @@ public class Popular
         public Validator()
         {
             RuleFor(q => q.GuildId).NotNull();
+            RuleFor(q => q.Limit).NotNull().Must(l => l is > 0 and <= 50);
         }
     }
 
@@ -35,6 +40,8 @@ public class Popular
         public ulong GuildId { get; set; }
 
         public string? Name { get; set; }
+
+        public int Limit { get; set; } = 5;
     }
 
     public class Handler : IRequestHandler<Query, QueryResult<List<LeaderboardSlot>>>
@@ -51,7 +58,48 @@ public class Popular
 
         public async Task<QueryResult<List<LeaderboardSlot>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            return QueryResult<List<LeaderboardSlot>>.NoContent();
+            var guildExists = await _mediator.Send(new GuildExistsRequest
+            {
+                Id = request.GuildId
+            });
+
+            if (!guildExists)
+            {
+                return QueryResult<List<LeaderboardSlot>>.NotFound();
+            }
+
+            EmoteBoard? board = null;
+
+            if (request.Name is not null)
+            {
+                var boards = await _mediator.Send(new GetEmoteBoardsRequest
+                {
+                    GuildId = request.GuildId
+                });
+
+                board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (board is null)
+                {
+                    return QueryResult<List<LeaderboardSlot>>.NotFound();
+                }
+            }
+
+            var posts = await _context.EmoteBoardPosts
+                .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
+                .OrderBy(p => p.Reactions.Count)
+                .Take(request.Limit)
+                .Select(p => new LeaderboardSlot
+                {
+                    UserId = p.UserId,
+                    ChannelId = p.ChannelId,
+                    MessageId = p.MessageId,
+                    ReactionCount = p.Reactions.Count,
+                    Emote = (board ?? p.EmoteBoard).Emote
+                })
+                .ToListAsync();
+
+            return QueryResult<List<LeaderboardSlot>>.Success(posts);
         }
     }
 }
