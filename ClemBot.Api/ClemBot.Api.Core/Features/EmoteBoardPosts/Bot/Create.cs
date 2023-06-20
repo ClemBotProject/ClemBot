@@ -22,7 +22,7 @@ public class Create
             RuleFor(c => c.MessageId).NotNull();
             RuleFor(c => c.UserId).NotNull();
             RuleFor(c => c.Reactions).NotNull().NotEmpty();
-            RuleFor(c => c.MessageIds).NotNull().NotEmpty();
+            RuleFor(c => c.ChannelMessageIds).NotNull().NotEmpty();
         }
     }
 
@@ -40,7 +40,7 @@ public class Create
 
         public required List<ulong> Reactions { get; set; }
 
-        public required Dictionary<ulong, ulong> MessageIds { get; set; }
+        public required Dictionary<ulong, ulong> ChannelMessageIds { get; set; }
     }
 
     public class Handler : IRequestHandler<Command, QueryResult<Unit>>
@@ -125,7 +125,7 @@ public class Create
                 return QueryResult<Unit>.Conflict();
             }
 
-            var messages = request.MessageIds.Select(kvp => new EmoteBoardMessage
+            var messages = request.ChannelMessageIds.Select(kvp => new EmoteBoardMessage
             {
                 EmoteBoardPostId = board.Id,
                 ChannelId = kvp.Key,

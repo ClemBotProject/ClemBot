@@ -19,6 +19,7 @@ public class Posts
         {
             RuleFor(q => q.GuildId).NotNull();
             RuleFor(q => q.Limit).NotNull().Must(l => l is > 0 and <= 50);
+            RuleFor(q => q.Name).Must(s => s is null || !s.Any(char.IsWhiteSpace));
         }
     }
 

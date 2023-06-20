@@ -15,11 +15,12 @@ class EmoteBoard(ClemBotModel):
 
 
 class EmoteBoardPost(ClemBotModel):
-    user_id: int
-    message_id: int
+    name: str
     channel_id: int
-    board_name: str
+    message_id: int
+    user_id: int
     reactions: list[int]
+    channel_message_ids: dict[int, int]
 
     def count_reaction(self, user: Union[int, discord.User, discord.Member]) -> bool:
         user_id = user if isinstance(user, int) else user.id
@@ -33,7 +34,7 @@ class EmoteBoardPost(ClemBotModel):
 class EmoteBoardReaction(ClemBotModel):
     update: bool
     reactions: int | None
-    messages: dict[int, int] | None
+    channel_message_ids: dict[int, int] | None
 
 
 class PopularLeaderboardSlot(ClemBotModel):
@@ -67,4 +68,4 @@ class ReactionLeaderboardSlot(ClemBotModel):
     def format(self, index: int, emote: Union[str, discord.Emoji, None] = None) -> str:
         if isinstance(emote, discord.Emoji):
             emote = str(emote)
-        return f"**{index + 1}. <@{self.user_id} - {self.reaction_count} reactions**"
+        return f"**{index + 1}. <@{self.user_id} - {self.reaction_count}{f' {emote}' if emote else ''} reactions**"

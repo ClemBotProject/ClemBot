@@ -4,10 +4,20 @@ import discord
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
-from bot.models.emote_board_models import EmoteBoard, PopularLeaderboardSlot, PostLeaderboardSlot
+from bot.models.emote_board_models import (
+    EmoteBoard,
+    EmoteBoardPost,
+    EmoteBoardReaction,
+    PopularLeaderboardSlot,
+    PostLeaderboardSlot,
+    ReactionLeaderboardSlot,
+)
+from bot.utils.logging_utils import get_logger
 
 MIN_LIMIT = 1
 MAX_LIMIT = 50
+
+log = get_logger(__name__)
 
 
 class EmoteBoardRoute(BaseRoute):
@@ -57,6 +67,71 @@ class EmoteBoardRoute(BaseRoute):
 
         await self._client.patch("bot/emoteboards/edit", data=data, **kwargs)
 
+    async def create_post(
+        self, guild: Union[int, discord.Guild], post: EmoteBoardPost, **kwargs
+    ) -> None:
+        data = {
+            "GuildId": guild if isinstance(guild, int) else guild.id,
+            "Name": post.name,
+            "ChannelId": post.channel_id,
+            "MessageId": post.message_id,
+            "UserId": post.user_id,
+            "Reactions": post.reactions,
+            "ChannelMessageIds": post.channel_message_ids,
+        }
+
+        await self._client.post("bot/emoteboardposts/create", data=data, **kwargs)
+
+    async def get_post(
+        self,
+        guild: Union[int, discord.Guild],
+        message: Union[int, discord.Message],
+        board: Union[str, EmoteBoard, None] = None,
+    ) -> EmoteBoardPost:
+        guild_id = guild if isinstance(guild, int) else guild.id
+        message_id = message if isinstance(message, int) else message.id
+        board_name: str | None = None
+        if board:
+            board_name = board if isinstance(board, str) else board.name
+
+        url = f"bot/emoteboardposts/{guild_id}/"
+        url += f"{board_name}/{message_id}/details" if board_name else f"{message_id}/details"
+
+
+        pass
+
+    async def delete_post(
+        self, guild: Union[int, discord.Guild], message: Union[int, discord.Message], **kwargs
+    ) -> None:
+        data = {
+            "GuildId": guild if isinstance(guild, int) else guild.id,
+            "MessageId": message if isinstance(message, int) else message.id,
+        }
+
+        await self._client.delete("bot/emoteboardposts/delete", data=data, **kwargs)
+
+    async def post_reactions(
+        self,
+        guild: Union[int, discord.Guild],
+        board: Union[str, EmoteBoard],
+        message: Union[int, discord.Message],
+        reactions: list[int | discord.User | discord.Member],
+        **kwargs,
+    ) -> EmoteBoardReaction:
+        data = {
+            "GuildId": guild if isinstance(guild, int) else guild.id,
+            "Name": board if isinstance(board, str) else board.name,
+            "MessageId": message if isinstance(message, int) else message.id,
+            "UserReactions": [r if isinstance(r, int) else r.id for r in reactions],
+        }
+
+        resp = await self._client.patch("bot/emoteboardposts/react", data=data, **kwargs)
+
+        if not resp:
+            return EmoteBoardReaction(update=False)
+
+        return EmoteBoardReaction(**resp)
+
     async def get_popular_leaderboard(
         self,
         guild: Union[int, discord.Guild],
@@ -81,12 +156,12 @@ class EmoteBoardRoute(BaseRoute):
         return [PopularLeaderboardSlot(**d) for d in resp]
 
     async def get_posts_leaderboard(
-            self,
-            guild: Union[int, discord.Guild],
-            board: Union[str, EmoteBoard, None] = None,
-            *,
-            limit: int = 5,
-            **kwargs
+        self,
+        guild: Union[int, discord.Guild],
+        board: Union[str, EmoteBoard, None] = None,
+        *,
+        limit: int = 5,
+        **kwargs,
     ) -> list[PostLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -103,3 +178,27 @@ class EmoteBoardRoute(BaseRoute):
             return []
 
         return [PostLeaderboardSlot(**d) for d in resp]
+
+    async def get_reaction_leaderboard(
+        self,
+        guild: Union[int, discord.Guild],
+        board: Union[str, EmoteBoard, None] = None,
+        *,
+        limit: int = 5,
+        **kwargs,
+    ) -> list[ReactionLeaderboardSlot]:
+        limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
+        guild_id = guild if isinstance(guild, int) else guild.id
+        board_name: str | None = None
+
+        if board:
+            board_name = board if isinstance(board, str) else board.name
+
+        url = f"bot/emoteboardposts/leaderboard/{guild_id}/{f'{board_name}/reactions' if board_name else 'reactions'}"
+        params = {"Limit": limit}
+        resp = await self._client.get(url, params=params, **kwargs)
+
+        if not resp:
+            return []
+
+        return [ReactionLeaderboardSlot(**d) for d in resp]

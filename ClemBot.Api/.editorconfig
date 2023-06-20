@@ -1,3 +1,4 @@
+root = true
 ###############################################################################
 # EditorConfig is awesome: http://EditorConfig.org
 ###############################################################################
@@ -5,7 +6,6 @@
 ###############################################################################
 # Top-most EditorConfig file
 ###############################################################################
-root = true
 
 ###############################################################################
 # Set default behavior to:
@@ -22,6 +22,12 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
+
+# Microsoft .NET properties
+csharp_new_line_before_members_in_object_initializers = true
+
+# ReSharper properties
+resharper_wrap_object_and_collection_initializer_style = chop_always
 
 ###############################################################################
 # Set file behavior to:

@@ -27,7 +27,7 @@ public class React
 
         public int? ReactionCount { get; init; }
 
-        public Dictionary<ulong, ulong>? Messages { get; init; }
+        public Dictionary<ulong, ulong>? ChannelMessageIds { get; init; }
     }
 
     public class Command : IRequest<QueryResult<EmoteBoardReactionDto>>
@@ -115,7 +115,7 @@ public class React
             {
                 Update = true,
                 ReactionCount = post.Reactions.Count,
-                Messages = post.Messages.ToDictionary(message => message.ChannelId, message => message.MessageId)
+                ChannelMessageIds = post.Messages.ToDictionary(message => message.ChannelId, message => message.MessageId)
             });
         }
     }
