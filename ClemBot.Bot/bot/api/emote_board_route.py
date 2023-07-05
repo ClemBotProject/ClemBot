@@ -26,19 +26,38 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_emote_boards(
         self, guild: Union[int, discord.Guild], **kwargs: Any
-    ) -> list[EmoteBoard]:
+    ) -> dict[str, str]:
+        """
+        Returns the emote boards in the given guild as a dictionary
+        with the first element being the name of the emote board
+        and the second element being the emote of the board.
+        """
         guild_id = guild if isinstance(guild, int) else guild.id
 
         resp = await self._client.get(f"bot/emoteboards/{guild_id}", **kwargs)
 
         if not resp:
-            return []
+            return {}
 
-        return [EmoteBoard(**d) for d in resp]
+        return resp
 
-    async def create_emote_board(self, board: EmoteBoard, **kwargs: Any) -> None:
+    async def get_emote_board(
+        self, guild: Union[int, discord.Guild], name: str, **kwargs
+    ) -> EmoteBoard | None:
+        guild_id = guild if isinstance(guild, int) else guild.id
+
+        resp = await self._client.get(f"bot/emoteboards/{guild_id}/{name}", **kwargs)
+
+        if not resp:
+            return None
+
+        return EmoteBoard(**resp)
+
+    async def create_emote_board(
+        self, guild: Union[int, discord.Guild], board: EmoteBoard, **kwargs: Any
+    ) -> None:
         data = {
-            "GuildId": board.guild_id,
+            "GuildId": guild if isinstance(guild, int) else guild.id,
             "Name": board.name,
             "Emote": board.emote,
             "ReactionThreshold": board.reaction_threshold,
@@ -55,9 +74,11 @@ class EmoteBoardRoute(BaseRoute):
 
         await self._client.delete("bot/emoteboards/delete", data=data, **kwargs)
 
-    async def edit_emote_board(self, board: EmoteBoard, **kwargs: Any) -> None:
+    async def edit_emote_board(
+        self, guild: Union[int, discord.Guild], board: EmoteBoard, **kwargs: Any
+    ) -> None:
         data = {
-            "GuildId": board.guild_id,
+            "GuildId": guild if isinstance(guild, int) else guild.id,
             "Name": board.name,
             "Emote": board.emote,
             "ReactionThreshold": board.reaction_threshold,
@@ -87,7 +108,8 @@ class EmoteBoardRoute(BaseRoute):
         guild: Union[int, discord.Guild],
         message: Union[int, discord.Message],
         board: Union[str, EmoteBoard, None] = None,
-    ) -> EmoteBoardPost:
+        **kwargs,
+    ) -> list[EmoteBoardPost]:
         guild_id = guild if isinstance(guild, int) else guild.id
         message_id = message if isinstance(message, int) else message.id
         board_name: str | None = None
@@ -97,8 +119,12 @@ class EmoteBoardRoute(BaseRoute):
         url = f"bot/emoteboardposts/{guild_id}/"
         url += f"{board_name}/{message_id}/details" if board_name else f"{message_id}/details"
 
+        resp = await self._client.get(url, **kwargs)
 
-        pass
+        if not resp:
+            return []
+
+        return [EmoteBoardPost(**d) for d in resp]
 
     async def delete_post(
         self, guild: Union[int, discord.Guild], message: Union[int, discord.Message], **kwargs
@@ -146,7 +172,8 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/{f'{board_name}/popular' if board_name else 'popular'}"
+        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
+        url += f"{board_name}/popular" if board_name else "popular"
         params = {"Limit": limit}
         resp = await self._client.get(url, params=params, **kwargs)
 
@@ -170,7 +197,8 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/{f'{board_name}/posts' if board_name else 'posts'}"
+        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
+        url += f"{board_name}/posts" if board_name else "posts"
         params = {"Limit": limit}
         resp = await self._client.get(url, params=params, **kwargs)
 
@@ -194,7 +222,8 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/{f'{board_name}/reactions' if board_name else 'reactions'}"
+        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
+        url += f"{board_name}/reactions" if board_name else "reactions"
         params = {"Limit": limit}
         resp = await self._client.get(url, params=params, **kwargs)
 

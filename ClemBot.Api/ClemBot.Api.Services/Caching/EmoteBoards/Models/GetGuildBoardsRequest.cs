@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using ClemBot.Api.Data.Models;
 using MediatR;
 
 namespace ClemBot.Api.Services.Caching.EmoteBoards.Models;
 
-public class GetEmoteBoardsRequest : IRequest<List<EmoteBoard>>
+public class GetGuildBoardsRequest : IRequest<Dictionary<string, string>>
 {
     public ulong GuildId { get; init; }
 }

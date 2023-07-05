@@ -26,8 +26,6 @@ public class React
         public bool Update { get; init; }
 
         public int? ReactionCount { get; init; }
-
-        public Dictionary<ulong, ulong>? ChannelMessageIds { get; init; }
     }
 
     public class Command : IRequest<QueryResult<EmoteBoardReactionDto>>
@@ -65,12 +63,11 @@ public class React
                 return QueryResult<EmoteBoardReactionDto>.NotFound();
             }
 
-            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            var board = await _mediator.Send(new GetEmoteBoardRequest
             {
-                GuildId = request.GuildId
+                GuildId = request.GuildId,
+                Name = request.Name
             });
-
-            var board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
             if (board is null)
             {
@@ -98,7 +95,9 @@ public class React
                 return QueryResult<EmoteBoardReactionDto>.Conflict();
             }
 
-            var newReactions = request.UserReactions.Where(id => !post.Reactions.Contains(id)).ToList();
+            var newReactions = request.UserReactions
+                .Where(id => id != post.UserId && !post.Reactions.Contains(id))
+                .ToList();
 
             if (newReactions.Count == 0)
             {
@@ -114,8 +113,7 @@ public class React
             return QueryResult<EmoteBoardReactionDto>.Success(new EmoteBoardReactionDto
             {
                 Update = true,
-                ReactionCount = post.Reactions.Count,
-                ChannelMessageIds = post.Messages.ToDictionary(message => message.ChannelId, message => message.MessageId)
+                ReactionCount = post.Reactions.Count
             });
         }
     }

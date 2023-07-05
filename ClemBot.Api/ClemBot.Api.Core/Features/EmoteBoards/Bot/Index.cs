@@ -1,6 +1,4 @@
-﻿using ClemBot.Api.Common;
-using ClemBot.Api.Data.Contexts;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
+﻿using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 
@@ -17,27 +15,12 @@ public class Index
         }
     }
 
-    public class Query : IRequest<QueryResult<List<EmoteBoardDto>>>
+    public class Query : IRequest<QueryResult<Dictionary<string, string>>>
     {
         public ulong GuildId { get; set; }
     }
 
-    public class EmoteBoardDto : IResponseModel
-    {
-        public ulong GuildId { get; init; }
-
-        public required string Name { get; init; }
-
-        public required string Emote { get; init; }
-
-        public uint ReactionThreshold { get; init; }
-
-        public bool AllowBotPosts { get; init; }
-
-        public required List<ulong> Channels { get; init; }
-    }
-
-    public class Handler : IRequestHandler<Query, QueryResult<List<EmoteBoardDto>>>
+    public class Handler : IRequestHandler<Query, QueryResult<Dictionary<string, string>>>
     {
 
         private readonly IMediator _mediator;
@@ -47,7 +30,7 @@ public class Index
             _mediator = mediator;
         }
 
-        public async Task<QueryResult<List<EmoteBoardDto>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<QueryResult<Dictionary<string, string>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var guildExists = await _mediator.Send(new GuildExistsRequest
             {
@@ -56,25 +39,15 @@ public class Index
 
             if (!guildExists)
             {
-                return QueryResult<List<EmoteBoardDto>>.NotFound();
+                return QueryResult<Dictionary<string, string>>.NotFound();
             }
 
-            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            var boards = await _mediator.Send(new GetGuildBoardsRequest
             {
                 GuildId = request.GuildId
             });
 
-            var dtos = boards.Select(board => new EmoteBoardDto
-            {
-                GuildId = board.GuildId,
-                Name = board.Name,
-                Emote = board.Emote,
-                ReactionThreshold = board.ReactionThreshold,
-                AllowBotPosts = board.AllowBotPosts,
-                Channels = board.Channels.Select(c => c.Id).ToList()
-            }).ToList();
-
-            return QueryResult<List<EmoteBoardDto>>.Success(dtos);
+            return QueryResult<Dictionary<string, string>>.Success(boards);
         }
     }
 }

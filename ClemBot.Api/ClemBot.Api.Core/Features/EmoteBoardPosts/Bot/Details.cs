@@ -5,6 +5,7 @@ using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using ClemBot.Api.Services.Caching.Messages.Models;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.EmoteBoardPosts.Bot;
 
@@ -82,12 +83,11 @@ public class Details
 
             if (request.Name is not null)
             {
-                var boards = await _mediator.Send(new GetEmoteBoardsRequest
+                board = await _mediator.Send(new GetEmoteBoardRequest
                 {
-                    GuildId = request.GuildId
+                    GuildId = request.GuildId,
+                    Name = request.Name
                 });
-
-                board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (board is null)
                 {
@@ -96,6 +96,7 @@ public class Details
             }
 
             var posts = await _context.EmoteBoardPosts
+                .Include(p => p.Messages)
                 .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
                 .Where(p => p.MessageId == request.MessageId)
                 .Select(p => new EmoteBoardPostDto
@@ -103,10 +104,13 @@ public class Details
                     ChannelId = p.ChannelId,
                     MessageId = p.MessageId,
                     Name = p.EmoteBoard.Name,
-                    
+                    UserId = p.UserId,
+                    Reactions = p.Reactions,
+                    ChannelMessageIds = p.Messages.ToDictionary(msg => msg.ChannelId, msg => msg.MessageId)
                 })
+                .ToListAsync();
 
-            return QueryResult<List<EmoteBoardPostDto>>.NotFound();
+            return QueryResult<List<EmoteBoardPostDto>>.Success(posts);
         }
     }
 }

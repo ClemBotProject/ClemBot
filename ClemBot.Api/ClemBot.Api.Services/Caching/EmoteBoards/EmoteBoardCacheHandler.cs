@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ClemBot.Api.Data.Contexts;
@@ -12,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Services.Caching.EmoteBoards;
 
-public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
-    IRequestHandler<GetEmoteBoardsRequest, List<EmoteBoard>>
+public class EmoteBoardCacheHandler : IRequestHandler<GetEmoteBoardRequest, EmoteBoard>,
+    IRequestHandler<ClearEmoteBoardRequest, Unit>
 {
 
     private readonly IAppCache _cache;
@@ -25,18 +23,16 @@ public class EmoteBoardCacheHandler : IRequestHandler<ClearEmoteBoardsRequest>,
         _context = context;
     }
 
-    public Task<Unit> Handle(ClearEmoteBoardsRequest request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(ClearEmoteBoardRequest request, CancellationToken cancellationToken)
     {
-        _cache.Remove(GetCacheKey(request.GuildId));
+        _cache.Remove(GetCacheKey(request.GuildId, request.Name));
         return Unit.Task;
     }
 
-    public async Task<List<EmoteBoard>> Handle(GetEmoteBoardsRequest request, CancellationToken cancellationToken) =>
-        await _cache.GetOrAddAsync(GetCacheKey(request.GuildId), () => _context.EmoteBoards
-                .Include(b => b.Channels)
-                .ThenInclude(c => c.EmoteBoards)
-                .Where(b => b.GuildId == request.GuildId)
-                .ToListAsync(), TimeSpan.FromHours(12));
+    public async Task<EmoteBoard> Handle(GetEmoteBoardRequest request, CancellationToken cancellationToken) =>
+        await _context.EmoteBoards.FirstOrDefaultAsync(
+            b => b.GuildId == request.GuildId
+                 && string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
-    private static string GetCacheKey(ulong guildId) => $"{nameof(EmoteBoardCacheHandler)}:{guildId}";
+    private static string GetCacheKey(ulong guildId, string name) => $"{nameof(EmoteBoardCacheHandler)}:{guildId}:{name}";
 }

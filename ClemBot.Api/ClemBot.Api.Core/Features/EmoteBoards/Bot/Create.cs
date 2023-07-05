@@ -80,7 +80,7 @@ public class Create
                 .Where(c => request.Channels.Contains(c.Id))
                 .ToListAsync();
 
-            await _context.EmoteBoards.AddAsync(new EmoteBoard
+            _context.EmoteBoards.Add(new EmoteBoard
             {
                 GuildId = request.GuildId,
                 Name = request.Name,
@@ -92,9 +92,15 @@ public class Create
 
             await _context.SaveChangesAsync();
 
-            await _mediator.Send(new ClearEmoteBoardsRequest
+            await _mediator.Send(new ClearGuildBoardsRequest
             {
                 GuildId = request.GuildId
+            });
+
+            await _mediator.Send(new ClearEmoteBoardRequest
+            {
+                GuildId = request.GuildId,
+                Name = request.Name
             });
 
             return QueryResult<Unit>.NoContent();

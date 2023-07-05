@@ -48,12 +48,11 @@ public class Delete
                 return QueryResult<Unit>.NotFound();
             }
 
-            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            var board = await _mediator.Send(new GetEmoteBoardRequest
             {
-                GuildId = request.GuildId
+                GuildId = request.GuildId,
+                Name = request.Name
             });
-
-            var board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
             if (board is null)
             {
@@ -63,9 +62,15 @@ public class Delete
             _context.EmoteBoards.Remove(board);
             await _context.SaveChangesAsync();
 
-            await _mediator.Send(new ClearEmoteBoardsRequest
+            await _mediator.Send(new ClearGuildBoardsRequest
             {
                 GuildId = request.GuildId
+            });
+
+            await _mediator.Send(new ClearEmoteBoardRequest
+            {
+                GuildId = request.GuildId,
+                Name = request.Name
             });
 
             return QueryResult<Unit>.NoContent();

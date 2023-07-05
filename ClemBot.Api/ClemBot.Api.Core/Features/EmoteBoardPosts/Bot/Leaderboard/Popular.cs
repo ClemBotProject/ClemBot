@@ -73,12 +73,11 @@ public class Popular
 
             if (request.Name is not null)
             {
-                var boards = await _mediator.Send(new GetEmoteBoardsRequest
+                board = await _mediator.Send(new GetEmoteBoardRequest
                 {
-                    GuildId = request.GuildId
+                    GuildId = request.GuildId,
+                    Name = request.Name
                 });
-
-                board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (board is null)
                 {

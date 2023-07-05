@@ -6,7 +6,6 @@ from bot.models.clem_bot_model import ClemBotModel
 
 
 class EmoteBoard(ClemBotModel):
-    guild_id: int
     name: str
     emote: str
     reaction_threshold: int = 4
@@ -34,7 +33,6 @@ class EmoteBoardPost(ClemBotModel):
 class EmoteBoardReaction(ClemBotModel):
     update: bool
     reactions: int | None
-    channel_message_ids: dict[int, int] | None
 
 
 class PopularLeaderboardSlot(ClemBotModel):

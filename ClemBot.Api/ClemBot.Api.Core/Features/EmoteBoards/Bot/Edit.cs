@@ -74,43 +74,42 @@ public class Edit
                 }
             }
 
-            // this is where caching the boards in a guild comes in handy
-            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            var board = await _mediator.Send(new GetEmoteBoardRequest
             {
-                GuildId = request.GuildId
+                GuildId = request.GuildId,
+                Name = request.Name
             });
 
-            var emoteBoard = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (emoteBoard is null)
+            if (board is null)
             {
                 return QueryResult<Unit>.NotFound();
             }
 
-            // check for emote conflicts within the guild
-            var similar = boards
-                .Any(b => b.Id != emoteBoard.Id && string.Equals(b.Emote, request.Emote, StringComparison.OrdinalIgnoreCase));
-
-            if (similar)
+            // if the emote is being changed, invalidate the guild boards cache
+            if (!string.Equals(request.Emote, board.Emote, StringComparison.OrdinalIgnoreCase))
             {
-                return QueryResult<Unit>.Conflict();
+                await _mediator.Send(new ClearGuildBoardsRequest
+                {
+                    GuildId = request.GuildId
+                });
             }
 
-            emoteBoard.Emote = request.Emote;
-            emoteBoard.ReactionThreshold = request.ReactionThreshold;
-            emoteBoard.AllowBotPosts = request.AllowBotPosts;
+            board.Emote = request.Emote;
+            board.ReactionThreshold = request.ReactionThreshold;
+            board.AllowBotPosts = request.AllowBotPosts;
 
             var channels = await _context.Channels
                 .Where(c => request.Channels.Contains(c.Id))
                 .ToListAsync();
 
-            emoteBoard.Channels = channels;
+            board.Channels = channels;
 
             await _context.SaveChangesAsync();
 
-            await _mediator.Send(new ClearEmoteBoardsRequest
+            await _mediator.Send(new ClearEmoteBoardRequest
             {
-                GuildId = request.GuildId
+                GuildId = request.GuildId,
+                Name = request.Name
             });
 
             return QueryResult<Unit>.NoContent();

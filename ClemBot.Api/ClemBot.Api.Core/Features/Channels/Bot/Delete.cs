@@ -59,12 +59,6 @@ public class Delete
             // Clear the channel from the cache so we dont try to insert a new message batch into it
             await _mediatr.Send(new ClearChannelRequest { Id = request.Id });
 
-            // Clear the emote board cache for the guild in case the channel was part of an emote board
-            await _mediatr.Send(new ClearEmoteBoardsRequest
-            {
-                GuildId = channel.GuildId
-            });
-
             return QueryResult<Model>.Success(new Model()
             {
                 Id = channel.Id,

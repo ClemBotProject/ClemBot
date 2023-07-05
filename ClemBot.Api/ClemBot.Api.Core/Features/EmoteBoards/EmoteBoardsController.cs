@@ -49,6 +49,16 @@ public class EmoteBoardsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
+    [HttpGet("bot/[controller]/{GuildId}/{Name}")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Details([FromRoute] Details.Query query) =>
+        await _mediator.Send(query) switch
+        {
+            { Status: QueryStatus.Success } result => Ok(result.Value),
+            { Status: QueryStatus.NotFound } => NotFound(),
+            _ => throw new InvalidOperationException()
+        };
+
     [HttpDelete("bot/[controller]/delete")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Delete([FromBody] Delete.Command command) =>

@@ -133,6 +133,9 @@ class EmoteBoardCog(commands.Cog):
     async def leaderboard(
         self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE | None = None
     ) -> None:
+        if emoteboard and not (board := await self._get_board(emoteboard, ctx)):
+            return
+
         pass
 
     @emoteboard.group(name="set", aliases=["edit"])

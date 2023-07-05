@@ -97,21 +97,15 @@ public class Create
                 return QueryResult<Unit>.NotFound();
             }
 
-            var boards = await _mediator.Send(new GetEmoteBoardsRequest
+            var board = await _mediator.Send(new GetEmoteBoardRequest
             {
-                GuildId = request.GuildId
+                GuildId = request.GuildId,
+                Name = request.Name
             });
-
-            var board = boards.FirstOrDefault(b => string.Equals(b.Name, request.Name, StringComparison.OrdinalIgnoreCase));
 
             if (board is null)
             {
                 return QueryResult<Unit>.NotFound();
-            }
-
-            if (board.ReactionThreshold > request.Reactions.Count)
-            {
-                return QueryResult<Unit>.Conflict();
             }
 
             var postExists = await _mediator.Send(new EmoteBoardPostExistsRequest
@@ -145,7 +139,8 @@ public class Create
 
             await _mediator.Send(new ClearEmoteBoardPostRequest
             {
-                BoardId = board.Id, MessageId = request.MessageId
+                BoardId = board.Id,
+                MessageId = request.MessageId
             });
 
             return QueryResult<Unit>.NoContent();
