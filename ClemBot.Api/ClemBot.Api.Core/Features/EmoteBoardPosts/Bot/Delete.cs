@@ -1,6 +1,5 @@
 ﻿using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using LinqToDB;

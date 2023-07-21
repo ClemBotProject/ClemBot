@@ -1,7 +1,6 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -38,11 +37,11 @@ public class Popular
 
     public class Query : IRequest<QueryResult<List<LeaderboardSlot>>>
     {
-        public ulong GuildId { get; set; }
+        public ulong GuildId { get; init; }
 
-        public string? Name { get; set; }
+        public string? Name { get; init; }
 
-        public int Limit { get; set; } = 5;
+        public int Limit { get; init; }
     }
 
     public class Handler : IRequestHandler<Query, QueryResult<List<LeaderboardSlot>>>
@@ -73,11 +72,8 @@ public class Popular
 
             if (request.Name is not null)
             {
-                board = await _mediator.Send(new GetEmoteBoardRequest
-                {
-                    GuildId = request.GuildId,
-                    Name = request.Name
-                });
+                board = await _context.EmoteBoards
+                    .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
                 if (board is null)
                 {
@@ -95,7 +91,7 @@ public class Popular
                     ChannelId = p.ChannelId,
                     MessageId = p.MessageId,
                     ReactionCount = p.Reactions.Count,
-                    Emote = (board ?? p.EmoteBoard).Emote
+                    Emote = board != null ? board.Emote : p.EmoteBoard.Emote
                 })
                 .ToListAsync();
 

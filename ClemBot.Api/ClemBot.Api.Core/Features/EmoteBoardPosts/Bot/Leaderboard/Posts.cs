@@ -1,7 +1,6 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using LinqToDB;
@@ -32,11 +31,11 @@ public class Posts
 
     public class Query : IRequest<QueryResult<List<LeaderboardSlot>>>
     {
-        public ulong GuildId { get; set; }
+        public ulong GuildId { get; init; }
 
-        public string? Name { get; set; }
+        public string? Name { get; init; }
 
-        public int Limit { get; set; } = 5;
+        public int Limit { get; init; }
     }
 
     public class Handler : IRequestHandler<Query, QueryResult<List<LeaderboardSlot>>>
@@ -67,11 +66,8 @@ public class Posts
 
             if (request.Name is not null)
             {
-                board = await _mediator.Send(new GetEmoteBoardRequest
-                {
-                    GuildId = request.GuildId,
-                    Name = request.Name
-                });
+                board = await _context.EmoteBoards
+                    .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
                 if (board is null)
                 {

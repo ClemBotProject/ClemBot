@@ -2,6 +2,7 @@
 using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
+using LinqToDB;
 
 namespace ClemBot.Api.Core.Features.EmoteBoards.Bot;
 
@@ -48,11 +49,8 @@ public class Delete
                 return QueryResult<Unit>.NotFound();
             }
 
-            var board = await _mediator.Send(new GetEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
+            var board = await _context.EmoteBoards
+                .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
             if (board is null)
             {
@@ -65,12 +63,6 @@ public class Delete
             await _mediator.Send(new ClearGuildBoardsRequest
             {
                 GuildId = request.GuildId
-            });
-
-            await _mediator.Send(new ClearEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
             });
 
             return QueryResult<Unit>.NoContent();

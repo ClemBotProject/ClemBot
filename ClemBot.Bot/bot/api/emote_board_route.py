@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, cast
 
 import discord
 
@@ -15,6 +15,7 @@ from bot.models.emote_board_models import (
 from bot.utils.logging_utils import get_logger
 
 MIN_LIMIT = 1
+DEF_LIMIT = 5
 MAX_LIMIT = 50
 
 log = get_logger(__name__)
@@ -39,10 +40,10 @@ class EmoteBoardRoute(BaseRoute):
         if not resp:
             return {}
 
-        return resp
+        return cast(dict[str, str], resp)
 
     async def get_emote_board(
-        self, guild: Union[int, discord.Guild], name: str, **kwargs
+        self, guild: Union[int, discord.Guild], name: str, **kwargs: Any
     ) -> EmoteBoard | None:
         guild_id = guild if isinstance(guild, int) else guild.id
 
@@ -89,7 +90,7 @@ class EmoteBoardRoute(BaseRoute):
         await self._client.patch("bot/emoteboards/edit", data=data, **kwargs)
 
     async def create_post(
-        self, guild: Union[int, discord.Guild], post: EmoteBoardPost, **kwargs
+        self, guild: Union[int, discord.Guild], post: EmoteBoardPost, **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -103,31 +104,47 @@ class EmoteBoardRoute(BaseRoute):
 
         await self._client.post("bot/emoteboardposts/create", data=data, **kwargs)
 
-    async def get_post(
+    async def get_posts(
         self,
         guild: Union[int, discord.Guild],
         message: Union[int, discord.Message],
-        board: Union[str, EmoteBoard, None] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> list[EmoteBoardPost]:
         guild_id = guild if isinstance(guild, int) else guild.id
         message_id = message if isinstance(message, int) else message.id
-        board_name: str | None = None
-        if board:
-            board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/{guild_id}/"
-        url += f"{board_name}/{message_id}/details" if board_name else f"{message_id}/details"
-
-        resp = await self._client.get(url, **kwargs)
+        resp = await self._client.get(
+            f"bot/emoteboardposts/{guild_id}/{message_id}/details", **kwargs
+        )
 
         if not resp:
             return []
 
         return [EmoteBoardPost(**d) for d in resp]
 
+    async def get_post_from_board(
+        self,
+        guild: Union[int, discord.Guild],
+        message: Union[int, discord.Message],
+        board: Union[str, EmoteBoard],
+        **kwargs: Any,
+    ) -> EmoteBoardPost | None:
+        guild_id = guild if isinstance(guild, int) else guild.id
+        message_id = message if isinstance(message, int) else message.id
+
+        params = {"Name": board if isinstance(board, str) else board.name}
+
+        resp = await self._client.get(
+            f"bot/emoteboardposts/{guild_id}/{message_id}", params=params, **kwargs
+        )
+
+        if not resp:
+            return None
+
+        return EmoteBoardPost(**resp[0])
+
     async def delete_post(
-        self, guild: Union[int, discord.Guild], message: Union[int, discord.Message], **kwargs
+        self, guild: Union[int, discord.Guild], message: Union[int, discord.Message], **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -141,8 +158,8 @@ class EmoteBoardRoute(BaseRoute):
         guild: Union[int, discord.Guild],
         board: Union[str, EmoteBoard],
         message: Union[int, discord.Message],
-        reactions: list[int | discord.User | discord.Member],
-        **kwargs,
+        reactions: list[discord.User | discord.Member] | list[int],
+        **kwargs: Any,
     ) -> EmoteBoardReaction:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -163,8 +180,8 @@ class EmoteBoardRoute(BaseRoute):
         guild: Union[int, discord.Guild],
         board: Union[str, EmoteBoard, None] = None,
         *,
-        limit: int = 5,
-        **kwargs,
+        limit: int = DEF_LIMIT,
+        **kwargs: Any,
     ) -> list[PopularLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -172,10 +189,13 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
-        url += f"{board_name}/popular" if board_name else "popular"
-        params = {"Limit": limit}
-        resp = await self._client.get(url, params=params, **kwargs)
+        params: dict[str, str | int] = {"Limit": limit}
+        if board_name:
+            params["Name"] = board_name
+
+        resp = await self._client.get(
+            f"bot/emoteboardposts/leaderboard/{guild_id}/popular", params=params, **kwargs
+        )
 
         if not resp:
             return []
@@ -187,8 +207,8 @@ class EmoteBoardRoute(BaseRoute):
         guild: Union[int, discord.Guild],
         board: Union[str, EmoteBoard, None] = None,
         *,
-        limit: int = 5,
-        **kwargs,
+        limit: int = DEF_LIMIT,
+        **kwargs: Any,
     ) -> list[PostLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -197,10 +217,13 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
-        url += f"{board_name}/posts" if board_name else "posts"
-        params = {"Limit": limit}
-        resp = await self._client.get(url, params=params, **kwargs)
+        params: dict[str, str | int] = {"Limit": limit}
+        if board_name:
+            params["Name"] = board_name
+
+        resp = await self._client.get(
+            f"bot/emoteboardposts/leaderboard/{guild_id}/posts", params=params, **kwargs
+        )
 
         if not resp:
             return []
@@ -212,8 +235,8 @@ class EmoteBoardRoute(BaseRoute):
         guild: Union[int, discord.Guild],
         board: Union[str, EmoteBoard, None] = None,
         *,
-        limit: int = 5,
-        **kwargs,
+        limit: int = DEF_LIMIT,
+        **kwargs: Any,
     ) -> list[ReactionLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -222,10 +245,13 @@ class EmoteBoardRoute(BaseRoute):
         if board:
             board_name = board if isinstance(board, str) else board.name
 
-        url = f"bot/emoteboardposts/leaderboard/{guild_id}/"
-        url += f"{board_name}/reactions" if board_name else "reactions"
-        params = {"Limit": limit}
-        resp = await self._client.get(url, params=params, **kwargs)
+        params: dict[str, str | int] = {"Limit": limit}
+        if board_name:
+            params["Name"] = board_name
+
+        resp = await self._client.get(
+            f"bot/emoteboardposts/leaderboard/{guild_id}/reactions", params=params, **kwargs
+        )
 
         if not resp:
             return []

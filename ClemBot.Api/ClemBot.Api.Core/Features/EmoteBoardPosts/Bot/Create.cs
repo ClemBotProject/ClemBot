@@ -2,11 +2,10 @@
 using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.Channels.Models;
 using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
-using ClemBot.Api.Services.Caching.Messages.Models;
 using ClemBot.Api.Services.Caching.Users.Models;
 using FluentValidation;
+using LinqToDB;
 
 namespace ClemBot.Api.Core.Features.EmoteBoardPosts.Bot;
 
@@ -77,16 +76,6 @@ public class Create
                 return QueryResult<Unit>.NotFound();
             }
 
-            var messageExists = await _mediator.Send(new MessageExistsRequest
-            {
-                Id = request.MessageId
-            });
-
-            if (!messageExists)
-            {
-                return QueryResult<Unit>.NotFound();
-            }
-
             var userExists = await _mediator.Send(new UserExistsRequest
             {
                 Id = request.UserId
@@ -97,11 +86,8 @@ public class Create
                 return QueryResult<Unit>.NotFound();
             }
 
-            var board = await _mediator.Send(new GetEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
+            var board = await _context.EmoteBoards
+                .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
             if (board is null)
             {

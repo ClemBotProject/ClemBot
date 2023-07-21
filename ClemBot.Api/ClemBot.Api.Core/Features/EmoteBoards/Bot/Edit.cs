@@ -74,11 +74,9 @@ public class Edit
                 }
             }
 
-            var board = await _mediator.Send(new GetEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
+            var board = await _context.EmoteBoards
+                .Include(b => b.Channels)
+                .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
             if (board is null)
             {
@@ -105,12 +103,6 @@ public class Edit
             board.Channels = channels;
 
             await _context.SaveChangesAsync();
-
-            await _mediator.Send(new ClearEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
 
             return QueryResult<Unit>.NoContent();
         }

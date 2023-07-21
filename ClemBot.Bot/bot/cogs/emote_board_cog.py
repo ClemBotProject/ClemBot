@@ -10,7 +10,7 @@ from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.models.emote_board_models import EmoteBoard
 from bot.utils.converters import EmoteConverter
-from bot.utils.helpers import chunk_sequence, contains_whitespace
+from bot.utils.helpers import contains_whitespace, chunk_sequence
 
 EMOTEBOARD_TYPE = Union[str, discord.Emoji]
 
@@ -89,13 +89,12 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board = EmoteBoard(
-            guild_id=ctx.guild.id,
             name=name,
             emote=emote if isinstance(emote, str) else str(emote),
             channels=[channel.id],
         )
 
-        await self.bot.emote_board_route.create_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.create_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = f"Your new emote board **{emote} {name}** has been created."
@@ -133,10 +132,39 @@ class EmoteBoardCog(commands.Cog):
     async def leaderboard(
         self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE | None = None
     ) -> None:
+        board: EmoteBoard | None = None
+
         if emoteboard and not (board := await self._get_board(emoteboard, ctx)):
             return
 
-        pass
+        pop_lb = await self.bot.emote_board_route.get_popular_leaderboard(
+            ctx.guild, board, raise_on_error=True
+        )
+        post_lb = await self.bot.emote_board_route.get_posts_leaderboard(
+            ctx.guild, board, raise_on_error=True
+        )
+        react_lb = await self.bot.emote_board_route.get_reaction_leaderboard(
+            ctx.guild, board, raise_on_error=True
+        )
+
+        embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
+        embed.description = "Here is the leaderboard for "
+        embed.description += f"**{f'{board.emote} {board.name}' if board else ctx.guild.name}**"
+
+        popular = [lb.format(i, ctx.guild) for i, lb in enumerate(pop_lb)]
+        posts = [lb.format(i, board.name if board else None) for i, lb in enumerate(post_lb)]
+        reactions = [lb.format(i, board.emote if board else None) for i, lb in enumerate(react_lb)]
+
+        embed.add_field(name="Popular Posts", value="\n".join(popular) if popular else "None", inline=False)
+        embed.add_field(name="Number of Posts", value="\n".join(posts) if posts else "None", inline=False)
+        embed.add_field(
+            name="Number of Reactions", value="\n".join(reactions) if reactions else "None", inline=False
+        )
+
+        message = await ctx.send(embed=embed)
+        await self.bot.messenger.publish(
+            Events.on_set_deletable, msg=message, author=ctx.author, timeout=60
+        )
 
     @emoteboard.group(name="set", aliases=["edit"])
     @ext.long_help("Edit your emote board.")
@@ -165,7 +193,7 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board.reaction_threshold = threshold
-        await self.bot.emote_board_route.edit_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.edit_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = "The reaction threshold for your board has been updated."
@@ -185,7 +213,7 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board.allow_bot_posts = bots
-        await self.bot.emote_board_route.edit_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.edit_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = "The allowance of bot posts for your board has been updated."
@@ -220,7 +248,7 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board.emote = emote if isinstance(emote, str) else str(emote)
-        await self.bot.emote_board_route.edit_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.edit_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = "The emote for your board has been updated."
@@ -259,14 +287,14 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board.channels.append(channel.id)
-        await self.bot.emote_board_route.edit_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.edit_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = "The channels for your board have been updated."
         embed.add_field(name="Name", value=board.name)
         embed.add_field(name="Emote", value=board.emote)
         name, value = self._get_channels_values(ctx, board)
-        embed.add_field(name=name, value=value)
+        embed.add_field(name=name, value=value, inline=False)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
@@ -295,14 +323,14 @@ class EmoteBoardCog(commands.Cog):
             return
 
         board.channels.remove(channel.id)
-        await self.bot.emote_board_route.edit_emote_board(board, raise_on_error=True)
+        await self.bot.emote_board_route.edit_emote_board(ctx.guild, board, raise_on_error=True)
 
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = "The channels for your board have been updated."
         embed.add_field(name="Name", value=board.name)
         embed.add_field(name="Emote", value=board.emote)
         name, value = self._get_channels_values(ctx, board)
-        embed.add_field(name=name, value=value)
+        embed.add_field(name=name, value=value, inline=False)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
@@ -334,9 +362,12 @@ class EmoteBoardCog(commands.Cog):
         Returns None if a board with the given name or emote does not exist in the guild.
         """
         value = (eb if isinstance(eb, str) else str(eb)).casefold()
-        for board in await self.bot.emote_board_route.get_emote_boards(ctx.guild):
-            if board.name.casefold() == value or board.emote.casefold() == value:
-                return board
+        boards = await self.bot.emote_board_route.get_emote_boards(ctx.guild)
+        for name, emote in boards.items():
+            if name.casefold() == value or emote.casefold() == value:
+                return await self.bot.emote_board_route.get_emote_board(
+                    ctx.guild, name, raise_on_error=True
+                )
 
         if send_error:
             await self._error_embed(
@@ -357,23 +388,28 @@ class EmoteBoardCog(commands.Cog):
             Events.on_set_deletable, msg=message, author=ctx.author, timeout=60
         )
 
-    def _is_emoji(self, s: EMOTEBOARD_TYPE) -> bool:
+    def _is_emoji(self, s: Union[str, discord.Emoji, discord.PartialEmoji]) -> bool:
         """
         Checks if either the given type is `discord.Emoji`,
-        or if the type is `str`, check if it's a valid unicode emoji.
+        or if the type is `str`, check if it's a valid unicode emoji or starts and ends with `:`.
         """
-        return isinstance(s, discord.Emoji) or emoji.is_emoji(s)
+        return isinstance(s, discord.Emoji | discord.PartialEmoji) \
+            or emoji.is_emoji(s) \
+            or (s.startswith(':') and s.endswith(':'))
 
     def _chunked_boards(
-        self, boards: list[EmoteBoard], n: int, ctx: ext.ClemBotCtx, title: str
+        self, boards: dict[str, str], n: int, ctx: ext.ClemBotCtx, title: str
     ) -> list[discord.Embed]:
         """Chunks the given boards into a markdown-ed list of n-sized items (row * col)"""
         pages = []
-        for chunk in chunk_sequence(boards, n):
-            embed = discord.Embed(color=Colors.ClemsonOrange, title=title)
+        boards_list = [
+            (name, emote) for name, emote in boards.items()
+        ]  # flatten the dict into an index-based list
+        for chunk in chunk_sequence(boards_list, n):
+            embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.description = f"Here are the emote boards for **{ctx.guild.name}**"
-            for board in chunk:
-                embed.add_field(name=board.name, value=board.emote)
+            for name, emote in chunk:
+                embed.add_field(name=name, value=emote)
             pages.append(embed)
 
         return pages

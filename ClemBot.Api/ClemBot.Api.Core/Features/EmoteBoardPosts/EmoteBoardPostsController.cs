@@ -10,6 +10,8 @@ namespace ClemBot.Api.Core.Features.EmoteBoardPosts;
 public class EmoteBoardPostsController : ControllerBase
 {
 
+    private const int DefaultLimit = 5;
+
     private readonly IMediator _mediator;
 
     public EmoteBoardPostsController(IMediator mediator)
@@ -17,7 +19,7 @@ public class EmoteBoardPostsController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPut("bot/[controller]/create")]
+    [HttpPost("bot/[controller]/create")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Create([FromBody] Create.Command command) =>
         await _mediator.Send(command) switch
@@ -38,15 +40,20 @@ public class EmoteBoardPostsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{GuildId}/{Name?}/{MessageId}")]
+    [HttpGet("bot/[controller]/{GuildId}/{MessageId}")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Details([FromRoute] Details.Query query) =>
-        await _mediator.Send(query) switch
-        {
-            { Status: QueryStatus.Success } result => Ok(result.Value),
-            { Status: QueryStatus.NotFound } => NotFound(),
-            _ => throw new InvalidOperationException()
-        };
+    public async Task<IActionResult> Details([FromRoute] ulong guildId, [FromRoute] ulong messageId, [FromQuery] string? name) =>
+        await _mediator.Send(new Details.Query
+            {
+                GuildId = guildId,
+                MessageId = messageId,
+                Name = name
+            }) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
 
     [HttpPatch("bot/[controller]/react")]
     [BotMasterAuthorize]
@@ -59,23 +66,48 @@ public class EmoteBoardPostsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/leaderboard/{GuildId}/{Name?}/popular")]
+    [HttpGet("bot/[controller]/leaderboard/{GuildId}/popular")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Popular([FromRoute] Popular.Query query) =>
-        await _mediator.Send(query) switch
-        {
-            { Status: QueryStatus.Success } result => Ok(result.Value),
-            { Status: QueryStatus.NotFound } => NotFound(),
-            _ => throw new InvalidOperationException()
-        };
+    public async Task<IActionResult> Popular([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
+        await _mediator.Send(new Popular.Query
+            {
+                GuildId = guildId,
+                Name = name,
+                Limit = limit ?? DefaultLimit
+            }) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
 
-    [HttpGet("bot/[controller]/leaderboard/{GuildId}/{Name?}/posts")]
+    [HttpGet("bot/[controller]/leaderboard/{GuildId}/posts")]
     [BotMasterAuthorize]
-    public async Task<IActionResult> Posts([FromRoute] Posts.Query query) =>
-        await _mediator.Send(query) switch
-        {
-            { Status: QueryStatus.Success } result => Ok(result.Value),
-            { Status: QueryStatus.NotFound } => NotFound(),
-            _ => throw new InvalidOperationException()
-        };
+    public async Task<IActionResult> Posts([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
+        await _mediator.Send(new Posts.Query
+            {
+                GuildId = guildId,
+                Name = name,
+                Limit = limit ?? DefaultLimit
+            }) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
+
+    [HttpGet("bot/[controller]/leaderboard/{GuildId}/reactions")]
+    [BotMasterAuthorize]
+    public async Task<IActionResult> Reactions([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
+        await _mediator.Send(new Reactions.Query
+            {
+                GuildId = guildId,
+                Name = name,
+                Limit = limit ?? DefaultLimit
+            }) switch
+            {
+                { Status: QueryStatus.Success } result => Ok(result.Value),
+                { Status: QueryStatus.NotFound } => NotFound(),
+                _ => throw new InvalidOperationException()
+            };
 }

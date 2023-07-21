@@ -35,6 +35,9 @@ class EmoteBoardService(BaseService):
 
     @BaseService.listener(Events.on_raw_reaction_add)
     async def on_reaction_add(self, event: RawReactionActionEvent) -> None:
+        if not event.guild_id:
+            return
+
         if not (board := await self._get_board_from_emote(event.guild_id, event.emoji)):
             return
 
@@ -43,7 +46,11 @@ class EmoteBoardService(BaseService):
             return
 
         guild = self.bot.get_guild(event.guild_id)
+        assert guild is not None
+
         channel = guild.get_channel(event.channel_id)
+        assert channel is not None and isinstance(channel, discord.TextChannel | discord.Thread)
+
         message = await channel.fetch_message(event.message_id)
 
         # ignore if the author is a bot and the board does NOT allow bot posts
@@ -53,7 +60,7 @@ class EmoteBoardService(BaseService):
         reaction: Reaction | None = None
 
         for r in message.reactions:
-            if r.emoji == event.emoji:
+            if str(r.emoji) == str(event.emoji):
                 reaction = r
                 break
 
@@ -66,67 +73,74 @@ class EmoteBoardService(BaseService):
         if len(users) < board.reaction_threshold:
             return
 
-        if not (post := await self.bot.emote_board_route.get_post(guild, message, board)):
+        if not (
+            post := await self.bot.emote_board_route.get_post_from_board(guild, message, board)
+        ):
             await self._create_post(board, message, users)
         else:
+            if not post.count_reaction(event.user_id):
+                return
             await self._update_post(board, post, message, users)
 
     @BaseService.listener(Events.on_raw_message_edit)
     async def on_message_edit(self, event: RawMessageUpdateEvent) -> None:
-        # try and rule out the message as quick as possible with the least amount of work
-        if event.cached_message and not len(event.cached_message.reactions):
+        if not event.guild_id:
             return
+
         guild = self.bot.get_guild(event.guild_id)
+        assert guild is not None
+
         channel = guild.get_channel(event.channel_id)
+        assert channel is not None and isinstance(channel, discord.TextChannel | discord.Thread)
+
         message = await channel.fetch_message(event.message_id)
 
-        if not message.reactions:
-            return
+        posts = await self.bot.emote_board_route.get_posts(event.guild_id, event.message_id)
 
-        # get the boards that correspond to each reaction on the message
-        boards = await self.bot.emote_board_route.get_emote_boards(guild, raise_on_error=True)
-        emotes = {str(r.emoji): r.count for r in message.reactions}
-        boards_in_msg = [b for b in boards if b.emote in emotes]
+        post_boards = {}
 
-        if not boards_in_msg:
-            return
-
-        posts = await self.bot.emote_board_route.get_post(guild, message)
-        board_names = {b.name: b for b in boards_in_msg}
-        board_posts = {board_names[post.name]: post for post in posts if post.name in board_names}
-
-        for board, post in board_posts:
-            embed = await self._as_embed(
-                message, board.reaction_threshold, len(post.reactions), board.emote
+        for post in posts:
+            board = await self.bot.emote_board_route.get_emote_board(
+                guild, post.name, raise_on_error=True
             )
-            for channel_id, message_id in post.channel_message_ids:
-                try:
-                    post_message = await guild.get_channel(channel_id).fetch_message(message_id)
-                    await post_message.edit(embed=embed)
-                except NotFound:
+            if not board:
+                log.warning(
+                    "Fetching board via post linking to board {board} returned None",
+                    board=post.name,
+                )
+                continue
+            post_boards[post] = board
+
+        for post, board in post_boards.items():
+            for channel_id, message_id in post.channel_message_ids.items():
+                if not (channel := guild.get_channel(channel_id)):
                     continue
+
+                assert isinstance(channel, discord.TextChannel | discord.Thread)
+                embed_msg = await channel.fetch_message(message_id)
+                embed = await self._as_embed(
+                    message, board.reaction_threshold, len(post.reactions), board.emote
+                )
+                await embed_msg.edit(embed=embed)
 
     @BaseService.listener(Events.on_raw_message_delete)
     async def on_message_delete(self, event: RawMessageDeleteEvent) -> None:
-        # try and rule out the message as quick as possible with the least amount of work
-        if event.cached_message and not len(event.cached_message.reactions):
+        if not event.guild_id:
             return
 
-        if event.cached_message:
-            boards = await self.bot.emote_board_route.get_emote_boards(
-                event.guild_id, raise_on_error=True
-            )
-            emotes = {str(r.emoji): r.count for r in event.cached_message.reactions}
-            if not [b for b in boards if b.emote in emotes]:
-                return
-
         guild = self.bot.get_guild(event.guild_id)
-        posts = await self.bot.emote_board_route.get_post(event.guild_id, event.message_id)
+        assert guild is not None
+
+        posts = await self.bot.emote_board_route.get_posts(event.guild_id, event.message_id)
 
         for post in posts:
-            for channel_id, message_id in post.channel_message_ids:
+            for channel_id, message_id in post.channel_message_ids.items():
                 try:
-                    embed_msg = await guild.get_channel(channel_id).fetch_message(message_id)
+                    if not (channel := guild.get_channel(channel_id)):
+                        continue
+
+                    assert isinstance(channel, discord.TextChannel | discord.Thread)
+                    embed_msg = await channel.fetch_message(message_id)
                     await embed_msg.delete()
                 except NotFound:
                     continue
@@ -135,22 +149,25 @@ class EmoteBoardService(BaseService):
         self,
         board: EmoteBoard,
         message: discord.Message,
-        users: list[discord.User | discord.Member | int],
+        users: list[discord.User | discord.Member] | list[int],
     ) -> None:
         """
         Creates an EmoteBoardPost and sends embed(s) to the channel(s) the EmoteBoard is subbed to.
         Sends the post information to the API.
         This method does not do any preliminary checks and assumes the given params meet the reqs.
         """
-        post = EmoteBoardPost()
-        post.name = board.name
-        post.channel_id = message.channel.id
-        post.message_id = message.id
-        post.user_id = message.author.id
-        post.channel_message_ids = {}
-        post.reactions = [u if isinstance(u, int) else u.id for u in users]
+        post = EmoteBoardPost(
+            name=board.name,
+            channel_id=message.channel.id,
+            message_id=message.id,
+            user_id=message.author.id,
+            channel_message_ids={},
+            reactions=[u if isinstance(u, int) else u.id for u in users],
+        )
 
         guild = message.guild
+        assert guild is not None
+
         embed = await self._as_embed(
             message, board.reaction_threshold, len(post.reactions), board.emote
         )
@@ -169,28 +186,34 @@ class EmoteBoardService(BaseService):
         board: EmoteBoard,
         post: EmoteBoardPost,
         message: discord.Message,
-        users: list[discord.User | discord.Member | int],
+        users: list[discord.User | discord.Member] | list[int],
     ) -> None:
         """
         Attempts to update the given `post` that belongs to the given `board`.
         Checks against the API to verify an update is necessary before updating any messages.
         This method does not do any preliminary checks and assumes the given params meet the reqs.
         """
-        reaction_dto = await self.bot.emote_board_route.post_reactions(
-            message.guild, board, message, users
-        )
+        guild = message.guild
+        assert guild is not None
 
-        if not reaction_dto.update:
+        reaction_dto = await self.bot.emote_board_route.post_reactions(guild, board, message, users)
+
+        if not reaction_dto.update or reaction_dto.reactions is None:
             return
 
-        guild = message.guild
         embed = await self._as_embed(
             message, board.reaction_threshold, reaction_dto.reactions, board.emote
         )
 
-        for channel_id, message_id in post.channel_message_ids:
+        for channel_id, message_id in post.channel_message_ids.items():
             try:
-                embed_msg = await guild.get_channel(channel_id).fetch_message(message_id)
+                if not (channel := guild.get_channel(channel_id)):
+                    continue
+
+                if not isinstance(channel, discord.TextChannel | discord.Thread):
+                    continue
+
+                embed_msg = await channel.fetch_message(message_id)
                 await embed_msg.edit(embed=embed)
             except NotFound:
                 continue
@@ -207,8 +230,8 @@ class EmoteBoardService(BaseService):
         boards = await self.bot.emote_board_route.get_emote_boards(guild)
         emote_str = emote if isinstance(emote, str) else str(emote)
 
-        for name, emote in boards:
-            if emote_str == emote:
+        for name, board_emote in boards.items():
+            if emote_str == board_emote:
                 return await self.bot.emote_board_route.get_emote_board(
                     guild, name, raise_on_error=True
                 )

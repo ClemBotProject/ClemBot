@@ -1,9 +1,7 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Data.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
-using ClemBot.Api.Services.Caching.Messages.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -69,25 +67,12 @@ public class Details
                 return QueryResult<List<EmoteBoardPostDto>>.NotFound();
             }
 
-            var messageExists = await _mediator.Send(new MessageExistsRequest
-            {
-                Id = request.MessageId
-            });
-
-            if (!messageExists)
-            {
-                return QueryResult<List<EmoteBoardPostDto>>.NotFound();
-            }
-
             EmoteBoard? board = null;
 
             if (request.Name is not null)
             {
-                board = await _mediator.Send(new GetEmoteBoardRequest
-                {
-                    GuildId = request.GuildId,
-                    Name = request.Name
-                });
+                board = await _context.EmoteBoards
+                    .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
                 if (board is null)
                 {
@@ -96,21 +81,36 @@ public class Details
             }
 
             var posts = await _context.EmoteBoardPosts
-                .Include(p => p.Messages)
+                .Include(p => p.EmoteBoard)
                 .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
                 .Where(p => p.MessageId == request.MessageId)
-                .Select(p => new EmoteBoardPostDto
-                {
-                    ChannelId = p.ChannelId,
-                    MessageId = p.MessageId,
-                    Name = p.EmoteBoard.Name,
-                    UserId = p.UserId,
-                    Reactions = p.Reactions,
-                    ChannelMessageIds = p.Messages.ToDictionary(msg => msg.ChannelId, msg => msg.MessageId)
-                })
                 .ToListAsync();
 
-            return QueryResult<List<EmoteBoardPostDto>>.Success(posts);
+            var dtos = new List<EmoteBoardPostDto>();
+
+            foreach (var post in posts)
+            {
+                var channelMessageIds = _context.EmoteBoardMessages
+                    .Where(m => m.EmoteBoardPostId == post.Id)
+                    .Select(m => new
+                    {
+                        m.ChannelId,
+                        m.MessageId
+                    })
+                    .ToDictionary(kvp => kvp.ChannelId, kvp => kvp.MessageId);
+
+                dtos.Add(new EmoteBoardPostDto
+                {
+                    Name = post.EmoteBoard.Name,
+                    ChannelId = post.ChannelId,
+                    MessageId = post.MessageId,
+                    UserId = post.UserId,
+                    Reactions = post.Reactions,
+                    ChannelMessageIds = channelMessageIds
+                });
+            }
+
+            return QueryResult<List<EmoteBoardPostDto>>.Success(dtos);
         }
     }
 }

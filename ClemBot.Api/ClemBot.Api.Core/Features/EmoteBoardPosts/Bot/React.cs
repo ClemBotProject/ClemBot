@@ -1,7 +1,6 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -63,11 +62,8 @@ public class React
                 return QueryResult<EmoteBoardReactionDto>.NotFound();
             }
 
-            var board = await _mediator.Send(new GetEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
+            var board = await _context.EmoteBoards
+                .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
             if (board is null)
             {

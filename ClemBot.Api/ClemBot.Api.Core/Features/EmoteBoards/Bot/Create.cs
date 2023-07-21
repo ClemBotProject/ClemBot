@@ -97,12 +97,6 @@ public class Create
                 GuildId = request.GuildId
             });
 
-            await _mediator.Send(new ClearEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
-
             return QueryResult<Unit>.NoContent();
         }
     }

@@ -1,7 +1,8 @@
 ﻿using ClemBot.Api.Common;
-using ClemBot.Api.Services.Caching.EmoteBoards.Models;
+using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.EmoteBoards.Bot;
 
@@ -40,10 +41,12 @@ public class Details
     {
 
         private readonly IMediator _mediator;
+        private readonly ClemBotContext _context;
 
-        public Handler(IMediator mediator)
+        public Handler(IMediator mediator, ClemBotContext context)
         {
             _mediator = mediator;
+            _context = context;
         }
 
         public async Task<QueryResult<EmoteBoardDto>> Handle(Query request, CancellationToken cancellationToken)
@@ -58,11 +61,9 @@ public class Details
                 return QueryResult<EmoteBoardDto>.NotFound();
             }
 
-            var board = await _mediator.Send(new GetEmoteBoardRequest
-            {
-                GuildId = request.GuildId,
-                Name = request.Name
-            });
+            var board = await _context.EmoteBoards
+                .Include(b => b.Channels)
+                .FirstOrDefaultAsync(b => b.GuildId == request.GuildId && b.Name == request.Name);
 
             if (board is null)
             {
