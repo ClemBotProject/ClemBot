@@ -10,7 +10,7 @@ from bot.consts import Claims, Colors
 from bot.messaging.events import Events
 from bot.models.emote_board_models import EmoteBoard
 from bot.utils.converters import EmoteConverter
-from bot.utils.helpers import contains_whitespace, chunk_sequence
+from bot.utils.helpers import chunk_sequence, contains_whitespace
 
 EMOTEBOARD_TYPE = Union[str, discord.Emoji]
 
@@ -155,10 +155,16 @@ class EmoteBoardCog(commands.Cog):
         posts = [lb.format(i, board.name if board else None) for i, lb in enumerate(post_lb)]
         reactions = [lb.format(i, board.emote if board else None) for i, lb in enumerate(react_lb)]
 
-        embed.add_field(name="Popular Posts", value="\n".join(popular) if popular else "None", inline=False)
-        embed.add_field(name="Number of Posts", value="\n".join(posts) if posts else "None", inline=False)
         embed.add_field(
-            name="Number of Reactions", value="\n".join(reactions) if reactions else "None", inline=False
+            name="Popular Posts", value="\n".join(popular) if popular else "None", inline=False
+        )
+        embed.add_field(
+            name="Number of Posts", value="\n".join(posts) if posts else "None", inline=False
+        )
+        embed.add_field(
+            name="Number of Reactions",
+            value="\n".join(reactions) if reactions else "None",
+            inline=False,
         )
 
         message = await ctx.send(embed=embed)
@@ -393,9 +399,11 @@ class EmoteBoardCog(commands.Cog):
         Checks if either the given type is `discord.Emoji`,
         or if the type is `str`, check if it's a valid unicode emoji or starts and ends with `:`.
         """
-        return isinstance(s, discord.Emoji | discord.PartialEmoji) \
-            or emoji.is_emoji(s) \
-            or (s.startswith(':') and s.endswith(':'))
+        return (
+            isinstance(s, discord.Emoji | discord.PartialEmoji)
+            or emoji.is_emoji(s)
+            or (s.startswith(":") and s.endswith(":"))
+        )
 
     def _chunked_boards(
         self, boards: dict[str, str], n: int, ctx: ext.ClemBotCtx, title: str
