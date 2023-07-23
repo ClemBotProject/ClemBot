@@ -33,6 +33,7 @@ class EmoteBoardCog(commands.Cog):
         emote_boards = await self.bot.emote_board_route.get_emote_boards(
             ctx.guild, raise_on_error=True
         )
+
         if not emoteboard and not len(emote_boards):
             embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
             embed.description = "There are no emote boards for this server."
@@ -44,6 +45,7 @@ class EmoteBoardCog(commands.Cog):
                 Events.on_set_pageable_embed, pages=pages, author=ctx.author, channel=ctx.channel
             )
             return
+
         if not (board := await self._get_board(emoteboard, ctx)):
             return
         channel_mentions = []
@@ -180,7 +182,7 @@ class EmoteBoardCog(commands.Cog):
         return
 
     @set_group.command(
-        pass_context=True, name="threshold", aliases=["limit", "reactions", "emotes"]
+        pass_context=True, name="threshold", aliases=["limit", "reactions", "emotes", "emojis"]
     )
     @ext.required_claims(Claims.manage_emote_boards)
     @ext.long_help("Set the number of reactions a message must get in order for a post to be made.")
@@ -281,7 +283,7 @@ class EmoteBoardCog(commands.Cog):
         ]
     )
     async def channel_add(
-        self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, channel: discord.TextChannel
+        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EMOTEBOARD_TYPE
     ) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -317,7 +319,7 @@ class EmoteBoardCog(commands.Cog):
         ]
     )
     async def channel_remove(
-        self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, channel: discord.TextChannel
+        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EMOTEBOARD_TYPE
     ) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return

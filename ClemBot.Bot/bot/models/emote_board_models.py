@@ -49,7 +49,7 @@ class PopularLeaderboardSlot(ClemBotModel):
     def format(self, index: int, guild: Union[int, discord.Guild]) -> str:
         link = self.as_link(guild)
         return (
-            f"{index + 1}. **<@{self.user_id}> {self.emote} {self.reaction_count} [Link]({link})**"
+            f"{index + 1}. **<@{self.user_id}> {self.emote} {self.reaction_count}** [Link]({link})"
         )
 
 
