@@ -59,7 +59,7 @@ class EmoteBoardCog(commands.Cog):
         embed.add_field(
             name=f'Channel{"s" if len(board.channels) > 1 else ""}',
             value="\n".join(channel_mentions),
-            inline=False
+            inline=False,
         )
         await ctx.send(embed=embed)
 
