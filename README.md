@@ -36,9 +36,6 @@ A Discord bot for server and community management with a focus on school/program
 
 - <b>Role Management:</b> Easily manage you and your users roles with designated assignable roles
 
-- <b>Starboard:</b> Allow your server to highlight the best or funniest messages by members with a starboard, simply
-  assign the starboard channel and react with stars
-
 - <b>Customizable Prefix:</b> Whatever you want ClemBot to respond to, it can. Just set your servers preferred prefix
   with `!prefix <prefix>`.
 
