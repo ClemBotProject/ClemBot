@@ -103,7 +103,7 @@ Lists the emote boards in the server or the details for a specific emote board.
 ```
 
 ```
-!emoteboard #starboard
+!emoteboard starboard
 ```
 
 ```
