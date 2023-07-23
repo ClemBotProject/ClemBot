@@ -40,7 +40,7 @@ public class EmoteBoardPostsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/{GuildId}/{MessageId}")]
+    [HttpGet("bot/[controller]/{guildId}/{messageId}")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Details([FromRoute] ulong guildId, [FromRoute] ulong messageId, [FromQuery] string? name) =>
         await _mediator.Send(new Details.Query
@@ -66,7 +66,7 @@ public class EmoteBoardPostsController : ControllerBase
             _ => throw new InvalidOperationException()
         };
 
-    [HttpGet("bot/[controller]/leaderboard/{GuildId}/popular")]
+    [HttpGet("bot/[controller]/leaderboard/{guildId}/popular")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Popular([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
         await _mediator.Send(new Popular.Query
@@ -81,7 +81,7 @@ public class EmoteBoardPostsController : ControllerBase
                 _ => throw new InvalidOperationException()
             };
 
-    [HttpGet("bot/[controller]/leaderboard/{GuildId}/posts")]
+    [HttpGet("bot/[controller]/leaderboard/{guildId}/posts")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Posts([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
         await _mediator.Send(new Posts.Query
@@ -96,7 +96,7 @@ public class EmoteBoardPostsController : ControllerBase
                 _ => throw new InvalidOperationException()
             };
 
-    [HttpGet("bot/[controller]/leaderboard/{GuildId}/reactions")]
+    [HttpGet("bot/[controller]/leaderboard/{guildId}/reactions")]
     [BotMasterAuthorize]
     public async Task<IActionResult> Reactions([FromRoute] ulong guildId, [FromQuery] string? name, [FromQuery] int? limit) =>
         await _mediator.Send(new Reactions.Query

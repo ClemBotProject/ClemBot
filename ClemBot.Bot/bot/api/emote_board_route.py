@@ -114,7 +114,7 @@ class EmoteBoardRoute(BaseRoute):
         message_id = message if isinstance(message, int) else message.id
 
         resp = await self._client.get(
-            f"bot/emoteboardposts/{guild_id}/{message_id}/details", **kwargs
+            f"bot/emoteboardposts/{guild_id}/{message_id}", **kwargs
         )
 
         if not resp:

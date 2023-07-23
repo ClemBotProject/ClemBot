@@ -256,16 +256,14 @@ class ClemBot(commands.Bot):
 
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
         # if before.author.id != self.user.id and len(before.embeds) == 0:
-        if payload.cached_message is None:
-            await self.publish_with_error(Events.on_raw_message_edit, payload)
+        await self.publish_with_error(Events.on_raw_message_edit, payload)
 
     async def on_message_delete(self, message: discord.Message) -> None:
         if message.author.id != self.user.id:
             await self.publish_with_error(Events.on_message_delete, message)
 
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
-        if payload.cached_message is None:
-            await self.publish_with_error(Events.on_raw_message_delete, payload)
+        await self.publish_with_error(Events.on_raw_message_delete, payload)
 
     async def on_after_command_invoke(self, ctx: ext.ClemBotContext["ClemBot"]) -> None:
         await self.publish_with_error(Events.on_after_command_invoke, ctx)

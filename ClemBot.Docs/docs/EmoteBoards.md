@@ -37,10 +37,10 @@ These new features are explained in further detail below.
 
 ### Customization and Configuration of Emote Boards
 
-Although servers can create multiple emote boards per server/guild, each emote board can be configured differently.
-The following table shows what can be configured per emote board and the default values.
+Although each server/guild may have multiple emote boards, each emote board can be configured differently.
+The following table displays what can be configured per emote board and the default value for that setting, if any.
 
-| Title              | Details                                                                             | Command(s)                                                     | Default Value |
+| Setting            | Details                                                                             | Command(s)                                                     | Default Value |
 |--------------------|-------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------|
 | Allow Bot Posts    | Whether messages authored by bot accounts can be posted to the emote board.         | [Set Bots](#set-bots)                                          | `False`       |
 | Emote              | The emote associated with the emote board.                                          | [Set Emote](#set-emote)                                        | N/A           |
@@ -49,6 +49,12 @@ The following table shows what can be configured per emote board and the default
 
 :::note
 The name of an emote board cannot be changed after creation.
+:::
+
+:::caution
+Any editing of an emote board's configuration will only apply to future posts for that emote board.
+Messages/content/posts prior to a configuration change will not be bound to these changes.
+View the specific command documentation for more information.
 :::
 
 ### Reaction Multipliers
@@ -130,6 +136,10 @@ manage_emote_boards
 !emoteboard add <emote> <name> <channel>
 ```
 
+:::note
+The `name` of an emote board cannot contain any spaces.
+:::
+
 #### Example
 
 ```
@@ -146,6 +156,7 @@ Remove an existing emote board from the server/guild.
 
 :::warning
 All data retained by ClemBot for the given emote board will be deleted and cannot be recovered.
+This includes settings, messages/reposted content, and leaderboard entries.
 :::
 
 #### Aliases

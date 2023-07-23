@@ -25,6 +25,7 @@ example.
 | `<>`                | `<name>`                         | This parameter of the command is **required**.                    |
 | `[]`                | `[channel]`                      | This parameter of the command is **optional**.                    |
 | <code>&#124;</code> | <code>[name &#124; emoji]</code> | This **optional** parameter accepts **either** `name` or `emoji`. |
+| `!`                 | `!help`                          | This is the default [prefix](./CustomPrefix.md) for ClemBot.      |
 
 ## Getting Started
 
@@ -32,8 +33,8 @@ After ClemBot has been added to your server and initialized, it's time to do som
 The first thing to do is decide which command prefix you would like ClemBot to respond to.
 By default, ClemBot will respond to `!<command>` as well as ClemBot's mention.
 To change this, simply run the prefix command with the new prefix you would like ClemBot to respond to.
-If you are fine with `!` remaining the prefix, you may skip this step.
-For more information on this functionality please see the [Custom Prefix](./CustomPrefix.md) section of the docs.
+If you are fine with `!` remaining as the prefix, you may skip this step.
+For more information on this functionality, please see the [Custom Prefix](./CustomPrefix.md) section of the docs.
 
 #### Example
 

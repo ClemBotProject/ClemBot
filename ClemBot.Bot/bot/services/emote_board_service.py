@@ -30,6 +30,15 @@ RANKINGS = [
 
 
 class EmoteBoardService(BaseService):
+    """
+    The service that manages reactions, message edits, and message deletions for emote boards and posts.
+
+    This service uses the raw version of events to bypass automatic filtering of events.
+    For example, `Events.on_message_delete` will not be dispatched if the message's author is the bot.
+    This behavior is perfectly fine for most services but can cause unexpected behavior for this feature,
+    due to the optional configuration of allowing bot messages to be posted to an emote board.
+    """
+
     def __init__(self, bot: ClemBot):
         super().__init__(bot)
 
@@ -113,15 +122,18 @@ class EmoteBoardService(BaseService):
 
         for post, board in post_boards.items():
             for channel_id, message_id in post.channel_message_ids.items():
-                if not (channel := guild.get_channel(channel_id)):
-                    continue
+                try:
+                    if not (channel := guild.get_channel(channel_id)):
+                        continue
 
-                assert isinstance(channel, discord.TextChannel | discord.Thread)
-                embed_msg = await channel.fetch_message(message_id)
-                embed = await self._as_embed(
-                    message, board.reaction_threshold, len(post.reactions), board.emote
-                )
-                await embed_msg.edit(embed=embed)
+                    assert isinstance(channel, discord.TextChannel | discord.Thread)
+                    embed_msg = await channel.fetch_message(message_id)
+                    embed = await self._as_embed(
+                        message, board.reaction_threshold, len(post.reactions), board.emote
+                    )
+                    await embed_msg.edit(embed=embed)
+                except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
+                    continue
 
     @BaseService.listener(Events.on_raw_message_delete)
     async def on_message_delete(self, event: RawMessageDeleteEvent) -> None:
@@ -142,7 +154,7 @@ class EmoteBoardService(BaseService):
                     assert isinstance(channel, discord.TextChannel | discord.Thread)
                     embed_msg = await channel.fetch_message(message_id)
                     await embed_msg.delete()
-                except NotFound:
+                except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
                     continue
 
     async def _create_post(
@@ -259,7 +271,10 @@ class EmoteBoardService(BaseService):
                 embed.add_field(name="Continued" if i > 0 else "Message", value=chunk, inline=False)
 
         if message.attachments:
-            embed.set_image(url=message.attachments[0].url)
+            for attachment in message.attachments:
+                if attachment.content_type == "image":
+                    embed.set_image(url=attachment.url)
+                    break
 
         embed.set_thumbnail(url=message.author.display_avatar.url)
         embed.set_footer(text=f"Sent on {message.created_at.strftime('%m/%d/%Y')}")
@@ -271,7 +286,7 @@ class EmoteBoardService(BaseService):
     ) -> list[str]:
         """
         Chunks the given string into substrings of max size `chunk_size`.
-        Splits at whitespace, if possible, otherwise splits at the chunk size.
+        Splits at whitespace if possible, otherwise splits at the chunk size.
         """
         if len(string) <= chunk_size:
             return [string]
