@@ -29,35 +29,28 @@ For example, to mute someone for 12 hours you would use the string `12h`.
 To mute someone for twelve days and thirty minutes you would use the string `12d30m`...and so on in any combination you
 desire.
 
-**`Available Options`**
+### Available Options
 
-```
-- years: `Y`, `y`, `year`, `years`
-- months: `M`, `month`, `months`
-- weeks: `w`, `W`, `week`, `weeks`
-- days: `d`, `D`, `day`, `days`
-- hours: `H`, `h`, `hour`, `hours`
-- minutes: `m`, `min`, `minute`, `minutes`
-- seconds: `S`, `sec`, `s`, `second`, `seconds`
-```
+| Time Duration | Symbol or Phrase                     | Example(s)     |
+|---------------|--------------------------------------|----------------|
+| Year          | `Y`, `y`, `year`, `years`            | `2y`           |
+| Month         | `M`, `month`, `months`               | `2M`           |
+| Week          | `w`, `W`, `week`, `weeks`            | `2w`, `3W`     |
+| Day           | `d`, `D`, `day`, `days`              | `5D`, `2d`     |
+| Hour          | `H`, `h`, `hour`, `hours`            | `10h`, `20H`   |
+| Minute        | `m`, `min`, `minute`, `minutes`      | `30m`, `10min` |
+| Second        | `S`, `s`, `sec`, `second`, `seconds` | `45s`, `1sec`  |
 
 :::note
-The string needs to be in descending order, i.e., `1y4m1w2d5h2m30s`.
-This duration string translates to:
-- 1 year
-- 4 months
-- 1 week
-- 2 days
-- 5 hours
-- 2 minutes
-- 30 seconds
+The string needs to be in descending order, i.e., `1y4m1w2d5h2m30s`.<br />
+This duration string translates to `1 year, 4 months, 1 week, 2 days, 5 hours, 2 minutes, 30 seconds`.
 :::
 
 ## Commands
 
 ### Mute
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](./../Claims.md)
 
 * `moderation_mute`
 
