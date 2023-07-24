@@ -224,7 +224,7 @@ Up to 5 entries per category are displayed on the leaderboard.
 
 ### Set Threshold
 
-Sets the number of valid reactions a message must receive in order for ClemBot to repost the message to an emote board.
+Set the number of valid reactions a message must receive in order for ClemBot to repost the message to an emote board.
 
 #### Aliases
 
@@ -261,7 +261,7 @@ Although `reaction count` has no upper limit, it must be greater than `0`.
 
 ### Set Bots
 
-Sets whether messages authored by bot accounts can be reposted to a given emote board.
+Set whether messages authored by bot accounts can be reposted to a given emote board.
 
 #### Aliases
 
@@ -293,12 +293,14 @@ manage_emote_boards
 
 ### Set Emote
 
-Sets the emote that belongs to the given emote board.
+Set the emote that belongs to the given emote board.
 The name of an emote board is permanent, while the emote of a board can be changed at any time.
 Both unicode emojis and custom emotes uploaded to Discord are supported.
 
-:::caution
-Formatting errors may occur if the custom emote provided belongs to a server that ClemBot is not a member of.
+:::note
+Custom emotes uploaded to Discord must be accessible to ClemBot in order to set it as a board's emote.
+If provided a custom emote that belongs to a server ClemBot is not a member of, ClemBot will not recognize it as an
+emote.
 :::
 
 #### Aliases

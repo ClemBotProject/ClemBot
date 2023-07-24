@@ -7,22 +7,22 @@ sidebar_position: 8
 ## Overview
 
 Tags are custom commands that allow for users to create custom responses to a given tag name.
-Simply add a tag, and then invoke it with either command notation or inline notation and ClemBot will respond with that
-tags content in a given channel.
+Simply add a tag, invoke it with either command notation or inline notation, and ClemBot will respond with that
+tag's content in a given channel.
 
 ClemBot's tags support the idea of ownership.
 If a user creates a tag, that tag is owned by them until they either leave the server or transfer the tag to someone
 else.
 By owning the tag they are allowed to either edit or delete the tag.
-When a user leaves a server all their owned tags become unclaimed and are free to be claimed by anyone else in the
+When a user leaves a server, all of their owned tags become unclaimed and can be claimed by anyone else in the
 server.
 
 ClemBot also tracks what tags are popular and allows for you to access that information.
-You can view the total number of uses of a tag as well as its owner and creation date with the tag info command or on
-the dashboard.
+You can view the total number of uses of a tag as well as its owner and creation date with the [tag info command](#info)
+or on the dashboard.
 
 :::caution
-If you leave the server, all your tags will become unowned and be up for grabs for anyone else in the server.
+If you leave the server, all owned tags will become unowned and can be claimed by other users in that server.
 :::
 
 ### Inline Notation
@@ -38,19 +38,19 @@ See [Prefix](./Tags.md#prefix) on how to view, change, and reset the prefix.
 #### Example
 
 ```txt title="Discord Message"
-Hello there new person. Have you checked out $funstufftodo here yet?
+Hello there, new person. Have you checked out $funstufftodohere yet?
 ```
 
 ## Dashboard
 
-A guilds tags can be viewed from the tag tab on the dashboard.
-You can filter tags, create new tags or just view what tags have been created.
+A guild's tags can be viewed from the tag tab on the dashboard.
+You can filter tags, create new tags, or just view what tags have been created.
 
 ## Commands
 
 ### Tag
 
-If invoked with no tag name it will show all tags in the server.
+If invoked with no tag name, it will show all tags in the server.
 If a name is provided, it will attempt to invoke that tag.
 
 #### Aliases
@@ -144,7 +144,7 @@ Edit a tag in the server.
 #### Example
 
 ```
-!tag edit MyTag ClemBot is an super super super awesome bot!
+!tag edit MyTag ClemBot is a super duper cool bot!
 ```
 
 ### Info

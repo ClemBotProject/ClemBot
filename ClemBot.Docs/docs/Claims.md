@@ -6,12 +6,13 @@ sidebar_position: 3
 
 ## Overview
 
-By default, ClemBot allows for anyone with Admin permissions in Discord full access to ClemBot's functionality.
-If you want to grant people without server admin permissions access to individual parts of the Bot (a team of moderators
-for example) you can do that through "Claims".
+By default, ClemBot allows for anyone with administrator permissions in the guild/server full access to ClemBot's
+functionality.
+If you want to grant users without administrator permissions access to individual parts/features of ClemBot
+(a team of moderators, for example), you can do that through "Claims."
 
 :::info
-Server owners and users with administrator roles are automatically granted all claims regardless of what roles they
+Server owners and users with administrator roles are automatically granted all claims, regardless of what roles they
 possess.
 :::
 
@@ -85,7 +86,7 @@ If a role is given, the command will return the aggregate of all claims from all
 
 ### Add
 
-Adds a claim to a given role, everyone who has that role will be granted permissions to that functionality.
+Adds a claim to a given role. Everyone who has that role will be granted permission to that functionality.
 
 #### Aliases
 
