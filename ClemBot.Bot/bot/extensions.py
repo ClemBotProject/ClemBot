@@ -1,4 +1,5 @@
 import typing as t
+from urllib.parse import urljoin
 
 import discord
 from discord.ext.commands._types import BotT
@@ -245,10 +246,7 @@ class ExtBase:
         if not secrets.docs_url or not self.page:
             return None
 
-        return (
-            f"{secrets.docs_url}{'/' if not secrets.docs_url.endswith('/') else ''}"
-            f"{self.page}{f'#{self.header}' if self.header else ''}"
-        )
+        return f"{urljoin(secrets.docs_url, self.page)}{f'#{self.header}' if self.header else ''}"
 
 
 class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase):
