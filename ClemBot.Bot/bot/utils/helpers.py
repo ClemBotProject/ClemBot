@@ -89,4 +89,4 @@ def contains_whitespace(s: str) -> bool:
     Checks against `string.whitespace` to look for whitespace.
     Returns True if the given string contains whitespace, False otherwise.
     """
-    return True in [c in s for c in string.whitespace]
+    return any(c in s for c in string.whitespace)

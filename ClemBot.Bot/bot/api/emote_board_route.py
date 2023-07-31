@@ -1,4 +1,4 @@
-from typing import Any, Union, cast
+from typing import Any, cast
 
 import discord
 
@@ -25,9 +25,7 @@ class EmoteBoardRoute(BaseRoute):
     def __init__(self, client: ApiClient):
         super().__init__(client)
 
-    async def get_emote_boards(
-        self, guild: Union[int, discord.Guild], **kwargs: Any
-    ) -> dict[str, str]:
+    async def get_emote_boards(self, guild: int | discord.Guild, **kwargs: Any) -> dict[str, str]:
         """
         Returns the emote boards in the given guild as a dictionary
         with the first element being the name of the emote board
@@ -43,7 +41,7 @@ class EmoteBoardRoute(BaseRoute):
         return cast(dict[str, str], resp)
 
     async def get_emote_board(
-        self, guild: Union[int, discord.Guild], name: str, **kwargs: Any
+        self, guild: int | discord.Guild, name: str, **kwargs: Any
     ) -> EmoteBoard | None:
         guild_id = guild if isinstance(guild, int) else guild.id
 
@@ -55,7 +53,7 @@ class EmoteBoardRoute(BaseRoute):
         return EmoteBoard(**resp)
 
     async def create_emote_board(
-        self, guild: Union[int, discord.Guild], board: EmoteBoard, **kwargs: Any
+        self, guild: int | discord.Guild, board: EmoteBoard, **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -69,14 +67,14 @@ class EmoteBoardRoute(BaseRoute):
         await self._client.post("bot/emoteboards/create", data=data, **kwargs)
 
     async def delete_emote_board(
-        self, guild: Union[int, discord.Guild], name: str, **kwargs: Any
+        self, guild: int | discord.Guild, name: str, **kwargs: Any
     ) -> None:
         data = {"GuildId": guild if isinstance(guild, int) else guild.id, "Name": name}
 
         await self._client.delete("bot/emoteboards/delete", data=data, **kwargs)
 
     async def edit_emote_board(
-        self, guild: Union[int, discord.Guild], board: EmoteBoard, **kwargs: Any
+        self, guild: int | discord.Guild, board: EmoteBoard, **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -90,7 +88,7 @@ class EmoteBoardRoute(BaseRoute):
         await self._client.patch("bot/emoteboards/edit", data=data, **kwargs)
 
     async def create_post(
-        self, guild: Union[int, discord.Guild], post: EmoteBoardPost, **kwargs: Any
+        self, guild: int | discord.Guild, post: EmoteBoardPost, **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -106,8 +104,8 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_posts(
         self,
-        guild: Union[int, discord.Guild],
-        message: Union[int, discord.Message],
+        guild: int | discord.Guild,
+        message: int | discord.Message,
         **kwargs: Any,
     ) -> list[EmoteBoardPost]:
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -122,9 +120,9 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_post_from_board(
         self,
-        guild: Union[int, discord.Guild],
-        message: Union[int, discord.Message],
-        board: Union[str, EmoteBoard],
+        guild: int | discord.Guild,
+        message: int | discord.Message,
+        board: str | EmoteBoard,
         **kwargs: Any,
     ) -> EmoteBoardPost | None:
         guild_id = guild if isinstance(guild, int) else guild.id
@@ -142,7 +140,7 @@ class EmoteBoardRoute(BaseRoute):
         return EmoteBoardPost(**resp[0])
 
     async def delete_post(
-        self, guild: Union[int, discord.Guild], message: Union[int, discord.Message], **kwargs: Any
+        self, guild: int | discord.Guild, message: int | discord.Message, **kwargs: Any
     ) -> None:
         data = {
             "GuildId": guild if isinstance(guild, int) else guild.id,
@@ -153,9 +151,9 @@ class EmoteBoardRoute(BaseRoute):
 
     async def post_reactions(
         self,
-        guild: Union[int, discord.Guild],
-        board: Union[str, EmoteBoard],
-        message: Union[int, discord.Message],
+        guild: int | discord.Guild,
+        board: str | EmoteBoard,
+        message: int | discord.Message,
         reactions: list[discord.User | discord.Member] | list[int],
         **kwargs: Any,
     ) -> EmoteBoardReaction:
@@ -175,8 +173,8 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_popular_leaderboard(
         self,
-        guild: Union[int, discord.Guild],
-        board: Union[str, EmoteBoard, None] = None,
+        guild: int | discord.Guild,
+        board: str | EmoteBoard | None = None,
         *,
         limit: int = DEF_LIMIT,
         **kwargs: Any,
@@ -202,8 +200,8 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_posts_leaderboard(
         self,
-        guild: Union[int, discord.Guild],
-        board: Union[str, EmoteBoard, None] = None,
+        guild: int | discord.Guild,
+        board: str | EmoteBoard | None = None,
         *,
         limit: int = DEF_LIMIT,
         **kwargs: Any,
@@ -230,8 +228,8 @@ class EmoteBoardRoute(BaseRoute):
 
     async def get_reaction_leaderboard(
         self,
-        guild: Union[int, discord.Guild],
-        board: Union[str, EmoteBoard, None] = None,
+        guild: int | discord.Guild,
+        board: str | EmoteBoard | None = None,
         *,
         limit: int = DEF_LIMIT,
         **kwargs: Any,
