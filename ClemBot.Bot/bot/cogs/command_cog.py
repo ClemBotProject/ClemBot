@@ -21,6 +21,7 @@ class CommandCog(commands.Cog):
     @ext.long_help("Check if a command is enabled or disabled.")
     @ext.short_help("Check if a command is enabled.")
     @ext.example(["command slots", "command help"])
+    @ext.docs("CommandRestrictions", "command")
     async def command(
         self,
         ctx: ext.ClemBotCtx,
@@ -56,7 +57,7 @@ class CommandCog(commands.Cog):
             opp_mode = "enable" if model.guild_disabled else "disable"
             embed.set_footer(
                 text=f"You can {opp_mode} this command globally by typing "
-                f"`{await self.bot.current_prefix(ctx)}cmd {opp_mode} {cmd.name}`"
+                f"\"{await self.bot.current_prefix(ctx)}cmd {opp_mode} {cmd.name}\""
             )
         await ctx.send(embed=embed)
 
@@ -66,6 +67,7 @@ class CommandCog(commands.Cog):
     @ext.long_help("Enable a command server-wide or in a specific channel.")
     @ext.short_help("Enable a command.")
     @ext.example(["command enable search", "command enable slots #my-channel"])
+    @ext.docs("CommandRestrictions", "enable")
     async def enable(
         self,
         ctx: ext.ClemBotCtx,
@@ -120,6 +122,7 @@ class CommandCog(commands.Cog):
             "command disable info #my-channel true",
         ]
     )
+    @ext.docs("CommandRestrictions", "disable")
     async def disable(
         self,
         ctx: ext.ClemBotCtx,

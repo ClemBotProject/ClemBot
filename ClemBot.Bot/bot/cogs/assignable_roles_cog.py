@@ -1,5 +1,4 @@
 import asyncio
-import typing as t
 
 import discord
 import discord.ext.commands as commands
@@ -9,7 +8,6 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Claims, Colors
 from bot.messaging.events import Events
-from bot.models.role_models import Role
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
@@ -28,6 +26,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Lists all roles that have been marked as assignable in this server")
     @ext.short_help("Defines custom assignable roles")
     @ext.example("roles")
+    @ext.docs(["Roles", "UserAssignableRoles"], "roles")
     async def roles(self, ctx: ext.ClemBotCtx, *, input_role: str | None = None) -> None:
         if input_role is None:
             await self.send_role_list(ctx, "Assignable Roles")
@@ -250,6 +249,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to add a role as assignable in the current guild")
     @ext.short_help("Marks a role as user assignable")
     @ext.example("roles add @SomeExampleRole")
+    @ext.docs(["Roles", "UserAssignableRoles"], "add")
     async def add(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
         await self.bot.role_route.set_assignable(role.id, True, raise_on_error=True)
 
@@ -263,6 +263,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to remove a role as assignable in the current guild")
     @ext.short_help("Removes a role as user assignable")
     @ext.example("roles delete @SomeExampleRole")
+    @ext.docs(["Roles", "UserAssignableRoles"], "remove")
     async def remove(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
         await self.bot.role_route.set_assignable(role.id, False, raise_on_error=True)
 
@@ -275,6 +276,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to list all currently auto assigned roles in the guild")
     @ext.short_help("Removes a role as auto assigned")
     @ext.example("roles auto")
+    @ext.docs(["Roles", "AutoAssignableRoles"], "roles-auto")
     async def auto(self, ctx: ext.ClemBotCtx) -> None:
         roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
 
@@ -319,6 +321,7 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to add a role as auto assigned in the current guild")
     @ext.short_help("Marks a role as auto assigned")
     @ext.example("roles auto add @SomeExampleRole")
+    @ext.docs(["Roles", "AutoAssignableRoles"], "auto-add")
     async def auto_add(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
 
         roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
@@ -342,11 +345,12 @@ class AssignableRolesCog(commands.Cog):
     @ext.long_help("Command to remove a role as auto assigned in the current guild")
     @ext.short_help("Removes a role as auto assigned")
     @ext.example("roles auto remove @SomeExampleRole")
+    @ext.docs(["Roles", "AutoAssignableRoles"], "auto-remove")
     async def auto_remove(self, ctx: ext.ClemBotCtx, *, role: discord.Role) -> None:
 
         roles = await self.bot.role_route.get_guilds_auto_assigned_roles(ctx.guild.id)
 
-        if not role.id in [r.id for r in roles]:
+        if role.id not in [r.id for r in roles]:
             embed = discord.Embed(
                 title=f"Error: @{role.name} not set as auto assigned", color=Colors.Error
             )

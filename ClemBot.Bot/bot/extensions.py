@@ -5,6 +5,7 @@ from discord.ext.commands._types import BotT
 from discord.ext.commands.errors import BadArgument
 
 from bot.consts import Claims
+from bot.bot_secrets import secrets
 
 if t.TYPE_CHECKING:
     from bot.clem_bot import ClemBot
@@ -167,6 +168,20 @@ def ban_disabling() -> T_EXTBASE_DECO_WRAP:
     return wrapper
 
 
+def docs(page: str | list[str], header: str | None = None) -> T_EXTBASE_DECO_WRAP:
+    def wrapper(func: T_EXTBASE) -> T_EXTBASE:
+        if isinstance(func, ExtBase):
+            func.page = page if isinstance(page, str) else "/".join(page)
+            func.header = header
+        else:
+            setattr(func, "page", page if isinstance(page, str) else "/".join(page))
+            setattr(func, "header", header)
+
+        return func
+
+    return wrapper
+
+
 class ExtBase:
     def __init__(self, func: t.Any, **kwargs: t.Any) -> None:
         self.chainable_output = kwargs.get("chainable_output", False) or getattr(
@@ -189,6 +204,8 @@ class ExtBase:
         self.allow_disable = t.cast(
             bool, kwargs.get("allow_disable") or getattr(func, "allow_disable", True)
         )
+        self.page: str | None = getattr(func, "page", None)
+        self.header: str | None = getattr(func, "header", None)
 
     def claims_check(self, claims: t.Sequence[str | Claims]) -> bool:
         """
@@ -216,6 +233,20 @@ class ExtBase:
 
         # check for intersection of two sets of claims, if there is one we have a valid user
         return len(set(str_claims).intersection(self.claims)) > 0
+
+    def docs_url(self) -> str | None:
+        """
+        Gets the full URL of the documentation for the command.
+        Uses the `docs_url` string stored in BotSecrets and appends the page and header, if given.
+
+        Returns:
+            The full URL to the documentation of the command or None if `BotSecrets.docs_url` is None or `page` is None.
+        """
+        if not secrets.docs_url or not self.page:
+            return None
+
+        return f"{secrets.docs_url}{'/' if not secrets.docs_url.endswith('/') else ''}" \
+               f"{self.page}{f'#{self.header}' if self.header else ''}"
 
 
 class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase):

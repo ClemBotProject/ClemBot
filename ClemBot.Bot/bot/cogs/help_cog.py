@@ -47,9 +47,15 @@ class HelpCog(commands.Cog):
 
         embed = discord.Embed(
             title=f"```{prefix}{command.qualified_name}```",
-            description=f"for more info on a subcommand run `{prefix}help <SubCommandName>`",
+            description=f"For more info on a sub-command, run `{prefix}help {command.name} <subcommand>`",
             color=Colors.ClemsonOrange,
         )
+
+        assert embed.description is not None  # fuck you mypy...
+
+        if command.docs_url():
+            embed.description += f"\nFor further detailed documentation, click [here]({command.docs_url()})."
+
         embed.add_field(
             name="Description", value=command.long_help or "No description provided", inline=False
         )
@@ -97,6 +103,10 @@ class HelpCog(commands.Cog):
         embed = discord.Embed(
             title=f"```{prefix}{command.qualified_name}```", color=Colors.ClemsonOrange
         )
+
+        if command.docs_url():
+            embed.description = f"For further detailed documentation, click [here]({command.docs_url()})."
+
         embed.add_field(
             name="Description", value=command.long_help or "No description provided", inline=False
         )
@@ -158,7 +168,7 @@ class HelpCog(commands.Cog):
         for command in chunk_sequence(commands_str, HELP_EMBED_SIZE):
             embed = discord.Embed(
                 title=title,
-                description=f"for more info on a command run `{prefix}help <CommandName>`",
+                description=f"For more info on a command run `{prefix}help <CommandName>`",
                 color=Colors.ClemsonOrange,
             )
 
@@ -170,7 +180,7 @@ class HelpCog(commands.Cog):
             embed.add_field(name="Commands", value="\n".join(command))
             embed.add_field(
                 name="Website",
-                value=f"For more information on my commands please visit my website [clembot.io]({bot_secrets.secrets.site_url})",
+                value=f"For more information on my commands, please visit my website [clembot.io]({bot_secrets.secrets.site_url}).",
                 inline=False,
             )
 
