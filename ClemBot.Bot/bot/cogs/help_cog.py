@@ -54,7 +54,9 @@ class HelpCog(commands.Cog):
         assert embed.description is not None  # fuck you mypy...
 
         if command.docs_url():
-            embed.description += f"\nFor further detailed documentation, click [here]({command.docs_url()})."
+            embed.description += (
+                f"\nFor further detailed documentation, click [here]({command.docs_url()})."
+            )
 
         embed.add_field(
             name="Description", value=command.long_help or "No description provided", inline=False
@@ -105,7 +107,9 @@ class HelpCog(commands.Cog):
         )
 
         if command.docs_url():
-            embed.description = f"For further detailed documentation, click [here]({command.docs_url()})."
+            embed.description = (
+                f"For further detailed documentation, click [here]({command.docs_url()})."
+            )
 
         embed.add_field(
             name="Description", value=command.long_help or "No description provided", inline=False

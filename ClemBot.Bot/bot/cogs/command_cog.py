@@ -57,7 +57,7 @@ class CommandCog(commands.Cog):
             opp_mode = "enable" if model.guild_disabled else "disable"
             embed.set_footer(
                 text=f"You can {opp_mode} this command globally by typing "
-                f"\"{await self.bot.current_prefix(ctx)}cmd {opp_mode} {cmd.name}\""
+                f'"{await self.bot.current_prefix(ctx)}cmd {opp_mode} {cmd.name}"'
             )
         await ctx.send(embed=embed)
 

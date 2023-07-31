@@ -4,8 +4,8 @@ import discord
 from discord.ext.commands._types import BotT
 from discord.ext.commands.errors import BadArgument
 
-from bot.consts import Claims
 from bot.bot_secrets import secrets
+from bot.consts import Claims
 
 if t.TYPE_CHECKING:
     from bot.clem_bot import ClemBot
@@ -245,8 +245,10 @@ class ExtBase:
         if not secrets.docs_url or not self.page:
             return None
 
-        return f"{secrets.docs_url}{'/' if not secrets.docs_url.endswith('/') else ''}" \
-               f"{self.page}{f'#{self.header}' if self.header else ''}"
+        return (
+            f"{secrets.docs_url}{'/' if not secrets.docs_url.endswith('/') else ''}"
+            f"{self.page}{f'#{self.header}' if self.header else ''}"
+        )
 
 
 class ClemBotCommand(discord.ext.commands.Command[t.Any, t.Any, t.Any], ExtBase):
