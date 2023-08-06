@@ -17,7 +17,7 @@ ClemBot will log all moderation actions into a given channel if configured. See 
 
 ### Infractions
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](../Claims.md)
 * `moderation_infraction_view`
 * or 
 * `moderation_infraction_view_self`

@@ -14,7 +14,7 @@ The IP ban is done on Discords side, and can be easily circumvented.
 
 ### Ban
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](../Claims.md)
 * `moderation_ban`
 
 #### Format
