@@ -22,6 +22,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Claims authorization setup")
     @ext.example(("claims", "claims @some_role", "claims @some_user"))
+    @ext.docs("Claims", "claims")
     async def claims(
         self, ctx: ext.ClemBotCtx, listing: t.Union[discord.Role, discord.Member]
     ) -> None:
@@ -71,6 +72,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     )
     @ext.short_help("Add claims to a given role")
     @ext.example(("claims add emote_add @some_role", "claims add tag_add @some_other_role"))
+    @ext.docs("Claims", "add")
     async def add(self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role) -> None:
         claim: Claims = t.cast(Claims, claim_t)
 
@@ -97,6 +99,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.long_help("Removes a claim from a given role. ")
     @ext.short_help("Removes a claim from a given role")
     @ext.example(("claims remove emote_add @some_role", "claims delete tag_add @some_other_role"))
+    @ext.docs("Claims", "remove")
     async def remove(
         self, ctx: ext.ClemBotCtx, claim_t: ClaimsConverter, role: discord.Role
     ) -> None:
@@ -126,6 +129,7 @@ class ClaimsAuthorizationCog(commands.Cog):
     @ext.long_help("Lists the currently available bot claims that can be assigned")
     @ext.short_help("Lists the available bot claims")
     @ext.example("claim list")
+    @ext.docs("Claims", "list")
     async def list(self, ctx: ext.ClemBotCtx) -> None:
         claims_str = self.get_all_claims()
 
