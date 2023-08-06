@@ -49,11 +49,8 @@ The string needs to be in descending order, i.e., `1y4m1w2d5h2m30s`.
 
 ### Mute
 
-#### Required [Claims](./../Claims.md)
-
-```
-moderation_mute
-```
+#### Required [Claims](../Claims.md)
+* `moderation_mute`
 
 #### Format
 

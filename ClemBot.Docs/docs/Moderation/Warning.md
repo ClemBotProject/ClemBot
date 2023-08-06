@@ -15,7 +15,7 @@ You can find the infraction id by running the `!infractions` command on the user
 
 ### Warn
 
-#### Required [Claims](./Claims.md)
+#### Required [Claims](../Claims.md)
 * `moderation_warn`
 
 #### Format
