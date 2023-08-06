@@ -26,6 +26,7 @@ class MuteCog(commands.Cog):
     @ext.short_help("Mutes a user")
     @ext.example(("mute @SomeUser 1d Timeout", "mute @SomUser 2d1h5m A much longer timeout"))
     @ext.required_claims(Claims.moderation_mute)
+    @ext.docs(["Moderation", "Mute"], "mute-1")
     async def mute(
         self,
         ctx: ext.ClemBotCtx,
@@ -55,9 +56,8 @@ class MuteCog(commands.Cog):
             return
 
         mute_role = discord.utils.get(ctx.guild.roles, name=Moderation.mute_role_name)
-        if not mute_role:
-            if not await self._create_mute_role(ctx):
-                return
+        if not mute_role and not await self._create_mute_role(ctx):
+            return
 
         mutes = await self.bot.moderation_route.get_guild_mutes_user(ctx.guild.id, subject.id)
         if any(i.active for i in mutes):
@@ -134,6 +134,7 @@ class MuteCog(commands.Cog):
     @ext.short_help("Unmutes a user")
     @ext.example("Unmute @SomeUser Timeout")
     @ext.required_claims(Claims.moderation_mute)
+    @ext.docs(["Moderation", "Mute"], "unmute")
     async def unmute(
         self, ctx: ext.ClemBotCtx, subject: discord.Member, *, reason: str | None
     ) -> None:

@@ -1,6 +1,3 @@
-import typing as t
-from datetime import datetime
-
 import discord
 import discord.ext.commands as commands
 
@@ -29,6 +26,7 @@ class InfractionsCog(commands.Cog):
     @ext.short_help("Lists a users infractions")
     @ext.example(("infractions", "infractions @SomeUser"))
     @ext.required_claims(Claims.moderation_infraction_view, Claims.moderation_infraction_view_self)
+    @ext.docs(["Moderation", "Overview"], "infractions")
     async def infractions(self, ctx: ext.ClemBotCtx, user: discord.Member | None = None) -> None:
         user = user or ctx.author
         claims = await self.bot.claim_route.get_claims_user(ctx.author)
@@ -87,6 +85,7 @@ class InfractionsCog(commands.Cog):
     @ext.short_help("Removes an infraction")
     @ext.example(("infractions delete 1", "infractions remove 2"))
     @ext.required_claims(Claims.moderation_warn)
+    @ext.docs(["Moderation", "Overview"], "delete")
     async def delete(self, ctx: ext.ClemBotCtx, infraction_id: int) -> None:
         infraction = await self.bot.moderation_route.get_infraction(infraction_id)
         if not infraction or infraction.guild_id != ctx.guild.id:
@@ -102,7 +101,6 @@ class InfractionsCog(commands.Cog):
         embed.title = f"Infraction {infraction_id} deleted successfully  :white_check_mark:"
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
-        return
 
 
 async def setup(bot: ClemBot) -> None:

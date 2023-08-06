@@ -38,7 +38,9 @@ If no value is provided, the current in-use prefix is shown.
 
 #### Required [Claims](./Claims.md)
 
-* `custom_prefix_set`
+```
+custom_prefix_set
+```
 
 #### Format
 
@@ -58,4 +60,34 @@ If no value is provided, the current in-use prefix is shown.
 
 ```
 !prefix ?
+```
+
+### Reset
+
+Resets the bot prefix to the default, `!`.
+
+#### Aliases
+
+- `revert`
+
+#### Required [Claims](./Claims.md)
+
+```
+custom_prefix_set
+```
+
+#### Format
+
+```
+!prefix reset
+```
+
+#### Example
+
+```
+!prefix reset
+```
+
+```
+!prefix revert
 ```

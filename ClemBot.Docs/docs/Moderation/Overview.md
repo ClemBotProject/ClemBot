@@ -18,7 +18,7 @@ See [Designated Channels](../DesignatedChannels.md) for more information on how 
 
 ### Infractions
 
-#### Required [Claims](./../Claims.md)
+#### Required [Claims](../Claims.md)
 
 `moderation_infraction_view`
 or

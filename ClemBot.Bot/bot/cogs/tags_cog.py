@@ -34,6 +34,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Supports custom tag functionality")
     @ext.example(("tag", "tag mytag"))
+    @ext.docs("Tags", "tag")
     async def tag(self, ctx: ext.ClemBotCtx, tag_name: str | None = None) -> None:
         # check if a tag name was given
         if tag_name:
@@ -85,6 +86,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Lists owned tags")
     @ext.example(["tag owned", "tag owned @user"])
+    @ext.docs("Tags", "owned")
     # returns a list of all tags owned by the calling user or given user returned in pages
     async def owned(self, ctx: ext.ClemBotCtx, user: discord.Member | None = None) -> None:
         if not user:
@@ -127,6 +129,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Creates a tag")
     @ext.example("tag add mytagname mytagcontent")
+    @ext.docs("Tags", "add")
     async def add(self, ctx: ext.ClemBotCtx, name: str, *, content: str) -> None:
         name = name.lower()
 
@@ -160,6 +163,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Deletes a tag")
     @ext.example("tag delete mytagname")
+    @ext.docs("Tags", "remove")
     async def delete(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
@@ -186,6 +190,7 @@ class TagCog(commands.Cog):
     )
     @ext.short_help("Provides info about tag")
     @ext.example("tag info mytagname")
+    @ext.docs("Tags", "info")
     async def info(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name, do_fuzzy=True, do_suggestions=True)):
             return
@@ -210,6 +215,7 @@ class TagCog(commands.Cog):
     @ext.long_help("Searches for a tag in this guild using the inputted query")
     @ext.short_help("Searches for a tag")
     @ext.example("tag search pepepunch")
+    @ext.docs("Tags", "search")
     async def search(self, ctx: ext.ClemBotCtx, query: str) -> None:
         tags = await self.bot.tag_route.search_tags(ctx.guild.id, query)
 
@@ -223,7 +229,7 @@ class TagCog(commands.Cog):
                 [f"**{i+1}.** `{tag.name}`" for i, tag in enumerate(tags)]
             )
         else:
-            embed.description = "No results found... :/"
+            embed.description = "No results found."
 
         msg = await ctx.send(embed=embed)
         await self.bot.messenger.publish(Events.on_set_deletable, msg=msg, author=ctx.author)
@@ -233,6 +239,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Edits a tag")
     @ext.long_help("Edits the content of a tag")
     @ext.example("tag edit mytagname mynewtagcontent")
+    @ext.docs("Tags", "edit")
     async def edit(self, ctx: ext.ClemBotCtx, name: str, *, content: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
@@ -256,6 +263,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Claims a tag")
     @ext.long_help("Claims a tag with the given name as your own")
     @ext.example("tag claim mytagname")
+    @ext.docs("Tags", "claim")
     async def claim(self, ctx: ext.ClemBotCtx, name: str) -> None:
         if not (tag := await self._check_tag_exists(ctx, name, do_suggestions=True)):
             return
@@ -276,6 +284,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Lists all unclaimed tags")
     @ext.long_help("Gets a list of all unowned tags available to be claimed")
     @ext.example(["tag unclaimed", "tag unowned"])
+    @ext.docs("Tags", "unclaimed")
     async def unclaimed(self, ctx: ext.ClemBotCtx) -> None:
         guild_tags = await self.bot.tag_route.get_guilds_tags(ctx.guild.id)
         unclaimed_tags = []
@@ -313,6 +322,7 @@ class TagCog(commands.Cog):
     @ext.short_help("Gives your tag to someone else.")
     @ext.long_help("Transfers the tag to the given user.")
     @ext.example(["tag transfer tagname @user", "tag give tagname @user"])
+    @ext.docs("Tags", "transfer")
     async def transfer(self, ctx: ext.ClemBotCtx, name: str, user: discord.User) -> None:
         # check if user is a bot
         if user.bot:
@@ -346,6 +356,7 @@ class TagCog(commands.Cog):
     @ext.ignore_claims_pre_invoke()
     @ext.short_help("Configure a custom command tag prefix")
     @ext.example(("tag prefix", "tag prefix ?", "tag prefix >>"))
+    @ext.docs("Tags", "prefix")
     async def prefix(self, ctx: ext.ClemBotCtx, *, tag_prefix: str | None = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
@@ -386,6 +397,7 @@ class TagCog(commands.Cog):
     @ext.long_help("Resets the bot tag prefix to the default")
     @ext.short_help("Resets the custom tag prefix")
     @ext.example("tag prefix reset")
+    @ext.docs("Tags", "tag-reset")
     async def reset(self, ctx: ext.ClemBotCtx) -> None:
         if DEFAULT_TAG_PREFIX in await self.bot.get_tag_prefix(ctx):
             return await self._error_embed(ctx, f"{DEFAULT_TAG_PREFIX} is already the tag prefix.")

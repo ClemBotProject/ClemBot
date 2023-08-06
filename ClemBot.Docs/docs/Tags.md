@@ -167,6 +167,54 @@ Gets info about a given tag in a server.
 !tag info MyTag
 ```
 
+### Search
+
+Searches for a tag in the guild/server using the query provided.
+
+#### Aliases
+
+- `find`
+
+#### Format
+
+```
+!tag search <query>
+```
+
+#### Example
+
+```
+!tag find my_tag
+```
+
+```
+!tag search thingsyoucandohere
+```
+
+### Owned
+
+Lists all tags owned by you or a given user, if provided.
+
+#### Aliases
+
+- `claimed`
+
+#### Format
+
+```
+!tag owned [user]
+```
+
+#### Example
+
+```
+!tag owned
+```
+
+```
+!tag claimed @myfriend
+```
+
 ### Claim
 
 Claims a given unowned tag.

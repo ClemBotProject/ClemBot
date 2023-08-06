@@ -21,7 +21,7 @@ From there, select the user you wish to un-ban and click the `Revoke Ban` button
 
 ### Ban
 
-#### Required [Claims](.././Claims.md)
+#### Required [Claims](../Claims.md)
 
 * `moderation_ban`
 

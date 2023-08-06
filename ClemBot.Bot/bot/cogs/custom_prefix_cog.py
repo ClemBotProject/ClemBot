@@ -1,5 +1,3 @@
-import typing as t
-
 import discord
 import discord.ext.commands as commands
 
@@ -23,6 +21,7 @@ class CustomPrefixCog(commands.Cog):
     )
     @ext.short_help("Configure a custom command prefix")
     @ext.example(("prefix", "prefix ?", "prefix >>"))
+    @ext.docs("CustomPrefix", "prefix")
     async def prefix(self, ctx: ext.ClemBotCtx, *, prefix: str | None = None) -> None:
         # get_prefix returns two mentions as the first possible prefixes in the tuple,
         # those are global, so we don't care about them
@@ -66,6 +65,7 @@ class CustomPrefixCog(commands.Cog):
     @ext.long_help("resets the bot prefix to the default")
     @ext.short_help("resets a custom prefix")
     @ext.example("prefix reset")
+    @ext.docs("CustomPrefix", "reset")
     async def reset(self, ctx: ext.ClemBotCtx) -> None:
         default_prefix = bot_secrets.secrets.bot_prefix
 

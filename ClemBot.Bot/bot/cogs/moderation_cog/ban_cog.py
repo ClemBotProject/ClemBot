@@ -31,6 +31,7 @@ class BanCog(commands.Cog):
         )
     )
     @ext.required_claims(Claims.moderation_ban)
+    @ext.docs(["Moderation", "Ban"], "ban-1")
     async def ban(
         self,
         ctx: ext.ClemBotCtx,
@@ -120,7 +121,7 @@ class BanCog(commands.Cog):
         if purge_days != 0:
             embed.add_field(
                 name="Messages Purged :no_entry_sign:",
-                value=f'{purge_days} day{"s" if not purge_days == 1 else ""} of messages purged',
+                value=f'{purge_days} day{"s" if purge_days != 1 else ""} of messages purged',
             )
         embed.set_thumbnail(url=subject.display_avatar.url)
 

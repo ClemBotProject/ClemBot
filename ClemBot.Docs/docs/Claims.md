@@ -131,3 +131,23 @@ Removes a claim from a given role, everyone who has that role will no longer hav
 ```
 !claims add tag_add @MyCoolRole
 ```
+
+### List
+
+Lists the currently available bot claims that can be assigned.
+
+#### Aliases
+
+- `get`
+
+#### Format
+
+```
+!claim list
+```
+
+#### Example
+
+```
+!claims get
+```

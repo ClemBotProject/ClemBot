@@ -50,18 +50,47 @@ This duration string translates to `1 year, 4 months, 1 week, 2 days, 5 hours, 2
 
 ### Mute
 
-#### Required [Claims](./../Claims.md)
-
+#### Required [Claims](../Claims.md)
 * `moderation_mute`
 
 #### Format
 
 ```
-!mute @User <Duration> <Reason>
+!mute @User <duration> [reason]
 ```
 
 #### Example
 
 ```
 !mute @User 1d1h Spamming and trolling
+```
+
+### Unmute
+
+Remove an active mute from a user, with an optional reason.
+
+:::note
+Un-muting a user does not remove the [infraction](./Overview.md#infractions) from them.
+:::
+
+#### Required [Claims](./../Claims.md)
+
+```
+moderation_mute
+```
+
+#### Format
+
+```
+!unmute @user [reason]
+```
+
+#### Example
+
+```
+!unmute @myfriend
+```
+
+```
+!unmute @smatep Are you going to admit that C# is better than Java now?
 ```
