@@ -21,6 +21,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Designated channel configuration")
     @ext.example("channel")
+    @ext.docs("DesignatedChannels", "channel")
     async def channel(self, ctx: ext.ClemBotCtx) -> None:
         """
         Sends a formatted embed of the possible designated channels and their listeners to
@@ -66,6 +67,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Set a Designated channel")
     @ext.example("channel add user_join_log #some-channel")
+    @ext.docs("DesignatedChannels", "add")
     async def add(
         self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel
     ) -> None:
@@ -110,6 +112,7 @@ class DesignatedChannelsCog(commands.Cog):
     )
     @ext.short_help("Removes a Designated channel listing")
     @ext.example("channel delete user_join_log #some-channel")
+    @ext.docs("DesignatedChannels", "delete")
     async def delete(
         self, ctx: ext.ClemBotCtx, channel_type: str, channel: discord.TextChannel
     ) -> None:

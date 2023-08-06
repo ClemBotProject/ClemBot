@@ -20,6 +20,7 @@ class WelcomeMessageCog(commands.Cog):
     )
     @ext.short_help("Set a server welcome dm message")
     @ext.example("welcome")
+    @ext.docs("WelcomeMessage", "welcome")
     async def welcome(self, ctx: ext.ClemBotCtx) -> None:
         message = await self.bot.welcome_message_route.get_welcome_message(ctx.guild.id)
 
@@ -37,6 +38,7 @@ class WelcomeMessageCog(commands.Cog):
     @ext.long_help("Sets a welcome message to be dmd to every new member")
     @ext.short_help("Sets the welcome message")
     @ext.example("welcome set welcome to our amazing server")
+    @ext.docs("WelcomeMessage", "set")
     async def set(self, ctx: ext.ClemBotCtx, *, content: str) -> None:
         await self.bot.welcome_message_route.set_welcome_message(
             ctx.guild.id, content, raise_on_error=True
@@ -52,6 +54,7 @@ class WelcomeMessageCog(commands.Cog):
     @ext.long_help("Allows for server admins to remove a welcome message from their server")
     @ext.short_help("Removes the welcome message")
     @ext.example("welcome delete")
+    @ext.docs("WelcomeMessage", "delete")
     async def delete(self, ctx: ext.ClemBotCtx) -> None:
         message = await self.bot.welcome_message_route.get_welcome_message(ctx.guild.id)
         if not message:
