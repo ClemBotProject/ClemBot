@@ -15,7 +15,7 @@ from bot.models.emote_board_models import (
 from bot.utils.logging_utils import get_logger
 
 MIN_LIMIT = 1
-DEF_LIMIT = 5
+DEFAULT_LIMIT = 5
 MAX_LIMIT = 50
 
 log = get_logger(__name__)

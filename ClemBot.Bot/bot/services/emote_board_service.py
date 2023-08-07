@@ -58,7 +58,7 @@ class EmoteBoardService(BaseService):
         assert guild is not None
 
         channel = guild.get_channel(event.channel_id)
-        assert channel is not None and isinstance(channel, discord.TextChannel | discord.Thread)
+        assert channel is not None and isinstance(channel, discord.abc.Messageable)
 
         message = await channel.fetch_message(event.message_id)
 
@@ -82,14 +82,16 @@ class EmoteBoardService(BaseService):
         if len(users) < board.reaction_threshold:
             return
 
-        if not (
-            post := await self.bot.emote_board_route.get_post_from_board(guild, message, board)
-        ):
+        post = await self.bot.emote_board_route.get_post_from_board(guild, message, board)
+
+        if not post:
             await self._create_post(board, message, users)
-        else:
-            if not post.count_reaction(event.user_id):
-                return
-            await self._update_post(board, post, message, users)
+            return
+
+        if not post.count_reaction(event.user_id):
+            return
+
+        await self._update_post(board, post, message, users)
 
     @BaseService.listener(Events.on_raw_message_edit)
     async def on_message_edit(self, event: RawMessageUpdateEvent) -> None:
@@ -100,7 +102,7 @@ class EmoteBoardService(BaseService):
         assert guild is not None
 
         channel = guild.get_channel(event.channel_id)
-        assert channel is not None and isinstance(channel, discord.TextChannel | discord.Thread)
+        assert channel is not None and isinstance(channel, discord.abc.Messageable)
 
         message = await channel.fetch_message(event.message_id)
 
@@ -126,7 +128,7 @@ class EmoteBoardService(BaseService):
                     if not (channel := guild.get_channel(channel_id)):
                         continue
 
-                    assert isinstance(channel, discord.TextChannel | discord.Thread)
+                    assert isinstance(channel, discord.abc.Messageable)
                     embed_msg = await channel.fetch_message(message_id)
                     embed = await self._as_embed(
                         message, board.reaction_threshold, len(post.reactions), board.emote
@@ -151,7 +153,7 @@ class EmoteBoardService(BaseService):
                     if not (channel := guild.get_channel(channel_id)):
                         continue
 
-                    assert isinstance(channel, discord.TextChannel | discord.Thread)
+                    assert isinstance(channel, discord.abc.Messageable)
                     embed_msg = await channel.fetch_message(message_id)
                     await embed_msg.delete()
                 except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
@@ -187,7 +189,7 @@ class EmoteBoardService(BaseService):
         for channel_id in board.channels:
             if not (channel := guild.get_channel(channel_id)):
                 continue
-            assert isinstance(channel, discord.TextChannel | discord.Thread)
+            assert isinstance(channel, discord.abc.Messageable)
             message = await channel.send(embed=embed)
             post.channel_message_ids[channel_id] = message.id
 
@@ -222,7 +224,7 @@ class EmoteBoardService(BaseService):
                 if not (channel := guild.get_channel(channel_id)):
                     continue
 
-                if not isinstance(channel, discord.TextChannel | discord.Thread):
+                if not isinstance(channel, discord.abc.Messageable):
                     continue
 
                 embed_msg = await channel.fetch_message(message_id)
@@ -258,7 +260,10 @@ class EmoteBoardService(BaseService):
         """
         multiplier = min(math.floor((reactions - threshold) / threshold), len(RANKINGS) - 1)
         title = f"{emote} {RANKINGS[multiplier]} | {reactions} {emote}"
-        assert isinstance(message.channel, discord.TextChannel | discord.Thread)
+        assert isinstance(
+            message.channel,
+            discord.TextChannel | discord.VoiceChannel | discord.StageChannel | discord.Thread,
+        )
 
         embed = discord.Embed(
             title=title,
@@ -322,7 +327,7 @@ class EmoteBoardService(BaseService):
             # without going over the given `chunk_size`
             else:
                 current_chunk += word + " "
-                if len(current_chunk.strip()) > 0:
+                if current_chunk.strip():
                     chunks[-1] = current_chunk
 
         return chunks

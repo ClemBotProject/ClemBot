@@ -15,7 +15,7 @@ This might take a while, depending on how many channels your server has.
 To avoid a heavy startup load, the bot will prompt you to initialize the role when you run the mute command for the
 first
 time.
-After the initial setup is complete it will then apply the mute as normal.
+After the initial setup is complete, it will then apply the mute as normal.
 
 :::caution
 If you have a large server with many channels, this initial setup can take a minute or two due to Discord's rate-limits.
@@ -73,7 +73,7 @@ Remove an active mute from a user, with an optional reason.
 Un-muting a user does not remove the [infraction](./Overview.md#infractions) from them.
 :::
 
-#### Required [Claims](./../Claims.md)
+#### Required [Claims](../Claims.md)
 
 ```
 moderation_mute

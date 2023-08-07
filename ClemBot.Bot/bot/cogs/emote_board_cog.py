@@ -12,7 +12,7 @@ from bot.models.emote_board_models import EmoteBoard
 from bot.utils.converters import EmoteConverter
 from bot.utils.helpers import chunk_sequence, contains_whitespace
 
-EMOTEBOARD_TYPE = Union[str, discord.Emoji]
+EmoteBoard_T = Union[str, discord.Emoji]
 
 
 class EmoteBoardCog(commands.Cog):
@@ -27,9 +27,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Add, remove, edit, list, and view the leaderboard for emote board posts.")
     @ext.short_help("List the emote boards in the server.")
     @ext.example(["boards", "board :star:", "board starboard"])
-    async def emoteboard(
-        self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE | None = None
-    ) -> None:
+    async def emoteboard(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T | None = None) -> None:
         emote_boards = await self.bot.emote_board_route.get_emote_boards(
             ctx.guild, raise_on_error=True
         )
@@ -48,10 +46,12 @@ class EmoteBoardCog(commands.Cog):
 
         if not (board := await self._get_board(emoteboard, ctx)):
             return
+
         channel_mentions = []
         for channel_id in board.channels:
             if channel := ctx.guild.get_channel(channel_id):
                 channel_mentions.append(channel.mention)
+
         embed = discord.Embed(title=":placard: Emote Boards", color=Colors.ClemsonOrange)
         embed.description = f"Here is the information for **{board.emote} {board.name}**"
         embed.add_field(name="Reaction Threshold", value=board.reaction_threshold)
@@ -115,7 +115,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Remove an emote board from the server.")
     @ext.short_help("Remove an emote board.")
     @ext.example(["board remove starboard", "board remove :star:"])
-    async def remove_board(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE) -> None:
+    async def remove_board(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
 
@@ -133,7 +133,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help("View the leaderboard.")
     @ext.example(["board leaderboard", "board leaderboard :star:", "board leaderboard starboard"])
     async def leaderboard(
-        self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE | None = None
+        self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T | None = None
     ) -> None:
         board: EmoteBoard | None = None
 
@@ -190,7 +190,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help("Set the reaction threshold for an emote board.")
     @ext.example(["board set reactions starboard 4", "board set reactions :star: 5"])
     async def set_threshold(
-        self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, threshold: int
+        self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T, threshold: int
     ) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -217,7 +217,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Sets whether messages authored by bots can be posted to an emote board.")
     @ext.short_help("Set whether bots can post to an emote board.")
     @ext.example(["board set bots starboard false", "board set bots :star: true"])
-    async def set_bots(self, ctx: ext.ClemBotCtx, emoteboard: EMOTEBOARD_TYPE, bots: bool) -> None:
+    async def set_bots(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T, bots: bool) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
 
@@ -279,12 +279,12 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help("Add a channel for an emote board.")
     @ext.example(
         [
-            "board channel add :star: #my-cool-channel",
-            "board channel add starboard #another-channel",
+            "board channel add #my-cool-channel :star:",
+            "board channel add #another-channel starboard",
         ]
     )
     async def channel_add(
-        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EMOTEBOARD_TYPE
+        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EmoteBoard_T
     ) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -302,8 +302,12 @@ class EmoteBoardCog(commands.Cog):
         embed.description = "The channels for your board have been updated."
         embed.add_field(name="Name", value=board.name)
         embed.add_field(name="Emote", value=board.emote)
-        name, value = self._get_channels_values(ctx, board)
-        embed.add_field(name=name, value=value, inline=False)
+        channels = self._get_channels(ctx, board)
+        embed.add_field(
+            name=f"Channel{'s' if len(channels) > 1 else ''}",
+            value="\n".join(channels),
+            inline=False,
+        )
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
@@ -315,12 +319,12 @@ class EmoteBoardCog(commands.Cog):
     @ext.short_help("Remove a channel for an emote board.")
     @ext.example(
         [
-            "board channel remove :star: #my-cool-channel",
-            "board channel remove starboard #another-channel",
+            "board channel remove #my-cool-channel :star:",
+            "board channel remove #another-channel starboard",
         ]
     )
     async def channel_remove(
-        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EMOTEBOARD_TYPE
+        self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EmoteBoard_T
     ) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -338,32 +342,38 @@ class EmoteBoardCog(commands.Cog):
         embed.description = "The channels for your board have been updated."
         embed.add_field(name="Name", value=board.name)
         embed.add_field(name="Emote", value=board.emote)
-        name, value = self._get_channels_values(ctx, board)
-        embed.add_field(name=name, value=value, inline=False)
+        channels = self._get_channels(ctx, board)
+        embed.add_field(
+            name=f"Channel{'s' if len(channels) > 1 else ''}",
+            value="\n".join(channels),
+            inline=False,
+        )
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    def _get_channels_values(self, ctx: ext.ClemBotCtx, board: EmoteBoard) -> tuple[str, str]:
+    def _get_channels(self, ctx: ext.ClemBotCtx, board: EmoteBoard) -> list[str]:
         """
-        Compiles the given board's channels into an embed field name and value.
+        Compiles the given board's channels into a list of mentions.
         """
-        if len(board.channels) == 0:
-            return "Channels", "None"
-        elif len(board.channels) == 1:
+        if not board.channels:
+            return ["None"]
+
+        if len(board.channels) == 1:
             channel = ctx.guild.get_channel(board.channels[0])
             assert isinstance(channel, discord.TextChannel)
-            return "Channel", channel.mention
-        else:
-            channel_mentions = []
-            for channel_id in board.channels:
-                if not (c := ctx.guild.get_channel(channel_id)):
-                    continue
-                assert isinstance(c, discord.TextChannel)
-                channel_mentions.append(c.mention)
-            return "Channels", "\n".join(channel_mentions)
+            return [channel.mention]
+
+        channel_mentions = []
+        for channel_id in board.channels:
+            if not (c := ctx.guild.get_channel(channel_id)):
+                continue
+            assert isinstance(c, discord.TextChannel)
+            channel_mentions.append(c.mention)
+
+        return channel_mentions
 
     async def _get_board(
-        self, eb: EMOTEBOARD_TYPE, ctx: ext.ClemBotCtx, send_error: bool = True
+        self, eb: EmoteBoard_T, ctx: ext.ClemBotCtx, send_error: bool = True
     ) -> EmoteBoard | None:
         """
         Gets the emote board with the following name or emote that belongs to the guild.

@@ -67,19 +67,21 @@ class CommandConverter(Converter[ext.ClemBotCommand]):
         return t.cast(ext.ClemBotCommand, command)
 
 
-class EmoteConverter(Converter[t.Union[discord.Emoji, str]]):
+class EmoteConverter(Converter[discord.Emoji | str]):
     """
     Converts the given argument to either a `discord.Emoji` object or if the argument
     is a unicode-based Emoji, returns a string. Raises ConversionError if neither.
     """
 
-    async def convert(self, ctx: Context[BotT], argument: str) -> t.Union[discord.Emoji, str]:
+    async def convert(self, ctx: Context[BotT], argument: str) -> discord.Emoji | str:
         try:
             return await EmojiConverter().convert(ctx, argument)
         except EmojiNotFound:
             if emoji.is_emoji(argument):
                 return argument
-            raise ConversionError(f"The given argument `{argument}` is not a valid emote.")
+            raise ConversionError(
+                f"The given argument `{argument}` is not a valid emote or unicode emoji."
+            )
 
 
 class DurationDelta(Converter[T]):

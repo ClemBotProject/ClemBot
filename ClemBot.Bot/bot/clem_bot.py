@@ -9,7 +9,6 @@ import typing as t
 from types import ModuleType
 
 import discord
-from discord import RawReactionActionEvent
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 from discord.ext.commands._types import BotT
@@ -346,7 +345,7 @@ class ClemBot(commands.Bot):
                 Events.on_reaction_add, reaction.message.guild.id, reaction, user
             )
 
-    async def on_raw_reaction_add(self, reaction: RawReactionActionEvent) -> None:
+    async def on_raw_reaction_add(self, reaction: discord.RawReactionActionEvent) -> None:
         if reaction.user_id != self.user.id and reaction.guild_id:
             await self.publish_to_queue_with_error(
                 Events.on_raw_reaction_add, reaction.guild_id, reaction
