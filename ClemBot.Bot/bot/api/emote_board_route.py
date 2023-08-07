@@ -176,7 +176,7 @@ class EmoteBoardRoute(BaseRoute):
         guild: int | discord.Guild,
         board: str | EmoteBoard | None = None,
         *,
-        limit: int = DEF_LIMIT,
+        limit: int = DEFAULT_LIMIT,
         **kwargs: Any,
     ) -> list[PopularLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
@@ -203,7 +203,7 @@ class EmoteBoardRoute(BaseRoute):
         guild: int | discord.Guild,
         board: str | EmoteBoard | None = None,
         *,
-        limit: int = DEF_LIMIT,
+        limit: int = DEFAULT_LIMIT,
         **kwargs: Any,
     ) -> list[PostLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
@@ -231,7 +231,7 @@ class EmoteBoardRoute(BaseRoute):
         guild: int | discord.Guild,
         board: str | EmoteBoard | None = None,
         *,
-        limit: int = DEF_LIMIT,
+        limit: int = DEFAULT_LIMIT,
         **kwargs: Any,
     ) -> list[ReactionLeaderboardSlot]:
         limit = max(min(MAX_LIMIT, limit), MIN_LIMIT)
