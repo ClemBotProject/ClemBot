@@ -27,6 +27,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Add, remove, edit, list, and view the leaderboard for emote board posts.")
     @ext.short_help("List the emote boards in the server.")
     @ext.example(["boards", "board :star:", "board starboard"])
+    @ext.docs("EmoteBoards", "emoteboard")
     async def emoteboard(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T | None = None) -> None:
         emote_boards = await self.bot.emote_board_route.get_emote_boards(
             ctx.guild, raise_on_error=True
@@ -70,6 +71,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.example(
         ["board add :star: starboard #starboard", "board add :a_custom_emote: myboard #my-board"]
     )
+    @ext.docs("EmoteBoards", "add")
     async def add_board(
         self,
         ctx: ext.ClemBotCtx,
@@ -115,6 +117,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Remove an emote board from the server.")
     @ext.short_help("Remove an emote board.")
     @ext.example(["board remove starboard", "board remove :star:"])
+    @ext.docs("EmoteBoards", "remove")
     async def remove_board(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -132,6 +135,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("View the leaderboard for all emote boards or for a specific emote board.")
     @ext.short_help("View the leaderboard.")
     @ext.example(["board leaderboard", "board leaderboard :star:", "board leaderboard starboard"])
+    @ext.docs("EmoteBoards", "leaderboard")
     async def leaderboard(
         self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T | None = None
     ) -> None:
@@ -189,6 +193,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Set the number of reactions a message must get in order for a post to be made.")
     @ext.short_help("Set the reaction threshold for an emote board.")
     @ext.example(["board set reactions starboard 4", "board set reactions :star: 5"])
+    @ext.docs("EmoteBoards", "set-threshold")
     async def set_threshold(
         self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T, threshold: int
     ) -> None:
@@ -217,6 +222,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Sets whether messages authored by bots can be posted to an emote board.")
     @ext.short_help("Set whether bots can post to an emote board.")
     @ext.example(["board set bots starboard false", "board set bots :star: true"])
+    @ext.docs("EmoteBoards", "set-bots")
     async def set_bots(self, ctx: ext.ClemBotCtx, emoteboard: EmoteBoard_T, bots: bool) -> None:
         if not (board := await self._get_board(emoteboard, ctx)):
             return
@@ -237,6 +243,7 @@ class EmoteBoardCog(commands.Cog):
     @ext.long_help("Sets the emote that belongs to the given emote board.")
     @ext.short_help("Sets the emote for a board.")
     @ext.example(["board set emote starboard :star:", "board set emote starboard :a_custom_emote:"])
+    @ext.docs("EmoteBoards", "set-emote")
     async def set_emote(
         self,
         ctx: ext.ClemBotCtx,
@@ -283,6 +290,7 @@ class EmoteBoardCog(commands.Cog):
             "board channel add #another-channel starboard",
         ]
     )
+    @ext.docs("EmoteBoards", "channel-add")
     async def channel_add(
         self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EmoteBoard_T
     ) -> None:
@@ -323,6 +331,7 @@ class EmoteBoardCog(commands.Cog):
             "board channel remove #another-channel starboard",
         ]
     )
+    @ext.docs("EmoteBoards", "channel-remove")
     async def channel_remove(
         self, ctx: ext.ClemBotCtx, channel: discord.TextChannel, emoteboard: EmoteBoard_T
     ) -> None:
