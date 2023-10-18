@@ -364,7 +364,7 @@ class MessageHandlingService(BaseService):
             message (discord.Message): the original message containing the link
         """
 
-        pattern = r"(.+)?http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{0,20})\/(?P<channel_id>\d{0,20})\/(?P<message_id>\d{0,20})\n*(.+)?"  # noqa: E501
+        pattern = r"([\S\s]+)?http(s)?:\/\/(www.)?discord(app)?.com\/channels\/(?P<guild_id>\d{0,20})\/(?P<channel_id>\d{0,20})\/(?P<message_id>\d{0,20})\n*([\S\s]+)?"  # noqa: E501
 
         result = re.search(pattern, message.content)
 
