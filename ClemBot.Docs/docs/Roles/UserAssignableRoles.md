@@ -1,22 +1,29 @@
 ---
 sidebar_position: 6
 ---
+
 # User Assignable Roles
 
 ## Overview
 
-Servers often have many roles that regular users can have, but might not want to give all users access to all roles; however, it can be annoying to manually give people the roles they want. 
-ClemBot provides a way to mark roles as assignable so that normal users can add and remove them as they please with a simple command.
+Servers often have many roles that regular users can have, but might not want to give all users access to all roles;
+however, it can be annoying to manually give people the roles they want.
+ClemBot provides a way to mark roles as assignable so that normal users can add and remove them as they please with a
+simple command.
 
 ## Commands
 
 ### Roles
+
 Shows all currently assignable roles in the server, or adds an assignable role to yourself if one is specified.
+If you already have the given role specified, removes the role.
 
 #### Aliases
+
 * `role`
 
 #### Format
+
 ```txt title="List all assignable roles in the server"
 !roles
 ```
@@ -24,6 +31,7 @@ Shows all currently assignable roles in the server, or adds an assignable role t
 ```txt title="Assign a given role to yourself"
 !roles <rolename>
 ```
+
 #### Example
 
 ```
@@ -32,22 +40,27 @@ Shows all currently assignable roles in the server, or adds an assignable role t
 
 ```
 !role myrolename
+```
 
+```
 !role @myrole
-````
+```
 
 ### Add
-Mark a server role as assignable
+
+Mark a server role as assignable.
 
 :::note
-Note: This is the admin command to **MARK** a role as assignable. 
-If you would like to give yourself a role please see the above section on adding an assignable role to yourself.
+Note: This is the admin command to **MARK** a role as assignable.
+If you would like to give yourself a role, see the above section on adding an assignable role to yourself.
 :::
 
 #### Aliases
+
 * `create`
 
 #### Required [Claims](../Claims.md)
+
 * `assignable_role_add`
 
 #### Format
@@ -55,6 +68,7 @@ If you would like to give yourself a role please see the above section on adding
 ```
 !role add <RoleName>
 ```
+
 #### Example
 
 ```
@@ -62,17 +76,20 @@ If you would like to give yourself a role please see the above section on adding
 ```
 
 ### Remove
-Remove a server role as assignable
+
+Remove a server role as assignable.
 
 :::note
-This is the admin command to **REMOVE** a role as assignable. 
-If you would like to remove a role from yourself please see the above section on removing an assignable role from yourself.
+This is the admin command to **REMOVE** a role as assignable.
+If you would like to remove a role from yourself, see the above section on removing an assignable role from yourself.
 :::
 
 #### Aliases
+
 * `delete`
 
 #### Required [Claims](../Claims.md)
+
 * `assignable_role_delete`
 
 #### Format
@@ -80,6 +97,7 @@ If you would like to remove a role from yourself please see the above section on
 ```
 !role delete <RoleName>
 ```
+
 #### Example
 
 ```

@@ -25,6 +25,7 @@ from bot.api import (
     custom_prefix_route,
     custom_tag_prefix_route,
     designated_channel_route,
+    emote_board_route,
     guild_route,
     health_check_route,
     message_route,
@@ -109,6 +110,7 @@ class ClemBot(commands.Bot):
         self.slots_score_route = slots_score_route.SlotsScoreRoute(self.api_client)
         self.health_check_route = health_check_route.HealthCheckRoute(self.api_client)
         self.reminder_route = reminder_route.ReminderRoute(self.api_client)
+        self.emote_board_route = emote_board_route.EmoteBoardRoute(self.api_client)
 
         self.active_services: dict[str, base_service.BaseService] = {}
 
@@ -253,16 +255,14 @@ class ClemBot(commands.Bot):
 
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
         # if before.author.id != self.user.id and len(before.embeds) == 0:
-        if payload.cached_message is None:
-            await self.publish_with_error(Events.on_raw_message_edit, payload)
+        await self.publish_with_error(Events.on_raw_message_edit, payload)
 
     async def on_message_delete(self, message: discord.Message) -> None:
         if message.author.id != self.user.id:
             await self.publish_with_error(Events.on_message_delete, message)
 
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
-        if payload.cached_message is None:
-            await self.publish_with_error(Events.on_raw_message_delete, payload)
+        await self.publish_with_error(Events.on_raw_message_delete, payload)
 
     async def on_after_command_invoke(self, ctx: ext.ClemBotContext["ClemBot"]) -> None:
         await self.publish_with_error(Events.on_after_command_invoke, ctx)
@@ -345,8 +345,11 @@ class ClemBot(commands.Bot):
                 Events.on_reaction_add, reaction.message.guild.id, reaction, user
             )
 
-    async def on_raw_reaction_add(self, reaction: discord.Reaction) -> None:
-        pass
+    async def on_raw_reaction_add(self, reaction: discord.RawReactionActionEvent) -> None:
+        if reaction.user_id != self.user.id and reaction.guild_id:
+            await self.publish_to_queue_with_error(
+                Events.on_raw_reaction_add, reaction.guild_id, reaction
+            )
 
     async def on_reaction_remove(
         self, reaction: discord.Reaction, user: (discord.User | discord.Member)

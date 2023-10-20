@@ -14,7 +14,7 @@ class CustomPrefixCog(commands.Cog):
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
-    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=["prefixs"])
+    @ext.group(case_insensitive=True, invoke_without_command=True, aliases=["prefixes"])
     @ext.required_claims(Claims.custom_prefix_set)
     @ext.long_help(
         "Lists the current prefix or configures the command prefix that the bot will respond too"

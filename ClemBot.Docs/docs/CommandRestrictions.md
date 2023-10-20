@@ -7,11 +7,15 @@ sidebar_position: 4
 ## Overview
 
 Command restrictions give the ability to block certain ClemBot commands either in a specific channel or server-wide.
-When attempting to run a disabled command, ClemBot can either respond to the user that the command is disabled or will silently ignore the command.
-This is a useful feature for letting admins and mods block certain commands they don't think are useful to that specific channel or do not want a certain command to be used anywhere.
+When attempting to run a disabled command, ClemBot can either respond to the user that the command is disabled or will
+silently ignore the command.
+This is a useful feature for letting admins and mods block certain commands they don't think are useful to that specific
+channel or do not want a certain command to be used anywhere.
 
-## White Listing
-If you want to block a command in all places except a few channels you can white list channels by first globally disabling them. Then enabling them and passing a specified channel.
+## Whitelisting
+
+If you want to block a command in all places except a few channels, you can whitelist channels by first globally
+disabling them, then enabling them in a specified channel.
 
 :::tip
 Both top-level commands (such as `claims`) and sub-commands (such as `claims add`) can be disabled.
@@ -21,9 +25,18 @@ Both top-level commands (such as `claims`) and sub-commands (such as `claims add
 
 ### Command
 
-Views the status (command name, if it can be disabled, and whether it is disabled) of a command.
+View the status of a command.
+
+The following table explains what properties are included in the status of a command.
+
+| Title                               | Description                                                                                                  |
+|-------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| Name                                | The name of the command.                                                                                     |
+| Allows Disabling                    | Whether the command can be disabled. See [Disable](#disable) for a list of commands that cannot be disabled. |
+| Disabled / Disabled In / Enabled In | Whether the command is disabled. If disabled or enabled in specific channels, those channels will be listed. |
 
 #### Aliases
+
 - `cmd`
 
 #### Format
@@ -31,6 +44,10 @@ Views the status (command name, if it can be disabled, and whether it is disable
 ```
 !command <command name>
 ```
+
+:::tip
+The `command name` parameter also supports aliases of commands.
+:::
 
 #### Example
 
@@ -44,12 +61,17 @@ Views the status (command name, if it can be disabled, and whether it is disable
 
 ### Enable
 
-Enables the given command either server-wide or in the specified channel. If a channel enable command is invoked while a command has a server-wide restriction applied the command will be white listed for that specific channel. It can be redisabled with !command disable. 
+Enables the given command either server-wide or in the specified channel.
+If enabling a command in a specific channel, and the command has a server-wide restriction applied to it, the command
+will be whitelisted for that specific channel while blacklisted everywhere else.
+It can be disabled again with the [disable command](#disable).
 
 #### Required [Claims](./Claims.md)
+
 - `command_restrictions_edit`
 
 #### Aliases
+
 - `on`
 
 #### Format
@@ -70,22 +92,29 @@ Enables the given command either server-wide or in the specified channel. If a c
 
 ### Disable
 
-Disables the given command either server-wide or in the specified channel, with the option to ignore the command silently.
+Disables the given command either server-wide or in the specified channel, with the option to ignore the command
+silently.
 
 :::caution
 Any user or role that has the `bypass_disabled_commands` [claim](./Claims.md) can run disabled commands.
 :::
+
 :::note
 The following command(s) are currently not allowed to be disabled:
+
 - `help`
 - `command`
 - `command enable`
+
+This is to ensure that users cannot soft-lock integral parts of ClemBot.
 :::
 
 #### Required [Claims](./Claims.md)
+
 - `command_restrictions_edit`
 
 #### Aliases
+
 - `off`
 
 #### Format
@@ -95,7 +124,8 @@ The following command(s) are currently not allowed to be disabled:
 ```
 
 :::note
-By default, when disabling a command, it will respont to the user that the command is disabled if `silent` is not set to `true`.
+By default, when disabling a command, it will respond to the user that the command is disabled if `silent` is not set
+to `true`.
 :::
 
 #### Example
