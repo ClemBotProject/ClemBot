@@ -17,4 +17,6 @@ public class User
     public List<Tag> Tags { get; set; } = new();
 
     public List<Message> Messages { get; set; } = new();
+
+    public List<EmoteBoardPost> EmoteBoardPosts { get; set; } = new();
 }

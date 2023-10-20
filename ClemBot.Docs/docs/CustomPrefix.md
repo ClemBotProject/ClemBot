@@ -18,9 +18,9 @@ A command prefix is the character or phrase that notifies ClemBot that you wish 
 
 :::tip
 ClemBot's mention serves as a universal prefix.
-It can always be used to invoke the bots commands.
+It can always be used to invoke the bot's commands.
 
-Use `@ClemBot prefix` to find what prefix the bot has been set to in your server.
+Use `@ClemBot prefix` to find out what prefix ClemBot has in your server.
 :::
 
 ## Dashboard
@@ -34,7 +34,7 @@ If no value is provided, the current in-use prefix is shown.
 
 #### Aliases
 
-* `prefixs`
+* `prefixes`
 
 #### Required [Claims](./Claims.md)
 

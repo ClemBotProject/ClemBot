@@ -3,10 +3,12 @@ import typing
 import typing as t
 from datetime import datetime
 
+import discord
+import emoji
 from dateutil.relativedelta import relativedelta
-from discord.ext.commands import Context, Converter
+from discord.ext.commands import Context, Converter, EmojiConverter
 from discord.ext.commands._types import BotT
-from discord.ext.commands.errors import UserInputError
+from discord.ext.commands.errors import EmojiNotFound, UserInputError
 
 import bot.extensions as ext
 from bot.consts import Claims
@@ -63,6 +65,23 @@ class CommandConverter(Converter[ext.ClemBotCommand]):
 
         # All Clembot commands should be ClemBotCommands by default so this should never fail
         return t.cast(ext.ClemBotCommand, command)
+
+
+class EmoteConverter(Converter[discord.Emoji | str]):
+    """
+    Converts the given argument to either a `discord.Emoji` object or if the argument
+    is a unicode-based Emoji, returns a string. Raises ConversionError if neither.
+    """
+
+    async def convert(self, ctx: Context[BotT], argument: str) -> discord.Emoji | str:
+        try:
+            return await EmojiConverter().convert(ctx, argument)
+        except EmojiNotFound:
+            if emoji.is_emoji(argument):
+                return argument
+            raise ConversionError(
+                f"The given argument `{argument}` is not a valid emote or unicode emoji."
+            )
 
 
 class DurationDelta(Converter[T]):

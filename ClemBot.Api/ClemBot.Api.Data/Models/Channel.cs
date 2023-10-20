@@ -19,4 +19,6 @@ public class Channel
     public List<Message> Messages { get; set; } = new();
 
     public List<DesignatedChannelMapping> DesignatedChannels { get; set; } = new();
+
+    public List<EmoteBoard> EmoteBoards { get; set; } = new();
 }

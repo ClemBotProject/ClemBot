@@ -23,7 +23,6 @@ class DesignatedChannels(DesignatedChannelBase):
     moderation_log = auto()
     user_join_log = auto()
     user_leave_log = auto()
-    starboard = auto()
 
     @staticmethod
     def has(member: str) -> bool:
@@ -74,6 +73,7 @@ class Claims(Enum):
     custom_tag_prefix_set = auto()
     command_restrictions_edit = auto()
     bypass_disabled_commands = auto()
+    manage_emote_boards = auto()
 
     @staticmethod
     def get_claims_str() -> str:

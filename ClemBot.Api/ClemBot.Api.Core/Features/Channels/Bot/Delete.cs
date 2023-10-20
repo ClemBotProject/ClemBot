@@ -1,9 +1,5 @@
-using System.Threading;
-using System.Threading.Tasks;
-using ClemBot.Api.Common.Utilities;
 using ClemBot.Api.Data.Contexts;
 using ClemBot.Api.Services.Caching.Channels.Models;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClemBot.Api.Core.Features.Channels.Bot;

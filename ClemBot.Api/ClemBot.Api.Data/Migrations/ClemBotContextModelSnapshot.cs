@@ -22,12 +22,27 @@ namespace ClemBot.Api.Data.Migrations
                 .HasAnnotation("ProductVersion", "7.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "tag_transfer", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit", "custom_tag_prefix_set", "command_restrictions_edit", "bypass_disabled_commands" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bot_auth_claims", new[] { "designated_channel_view", "designated_channel_modify", "custom_prefix_set", "welcome_message_view", "welcome_message_modify", "tag_add", "tag_delete", "tag_transfer", "assignable_roles_add", "assignable_roles_delete", "delete_message", "emote_add", "claims_view", "claims_modify", "manage_class_add", "moderation_warn", "moderation_ban", "moderation_mute", "moderation_purge", "moderation_infraction_view", "moderation_infraction_view_self", "dashboard_view", "dashboard_edit", "guild_settings_view", "guild_settings_edit", "custom_tag_prefix_set", "command_restrictions_edit", "bypass_disabled_commands", "manage_emote_boards" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "command_restriction_type", new[] { "white_list", "black_list" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "config_settings", new[] { "allow_embed_links" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "designated_channels", new[] { "message_log", "moderation_log", "user_join_log", "user_leave_log", "starboard", "server_join_log", "bot_dm_log" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "infraction_type", new[] { "ban", "mute", "warn" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ChannelEmoteBoard", b =>
+                {
+                    b.Property<decimal>("ChannelsId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("EmoteBoardsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ChannelsId", "EmoteBoardsId");
+
+                    b.HasIndex("EmoteBoardsId");
+
+                    b.ToTable("ChannelEmoteBoard");
+                });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Channel", b =>
                 {
@@ -205,6 +220,99 @@ namespace ClemBot.Api.Data.Migrations
                     b.HasIndex("ChannelId");
 
                     b.ToTable("DesignatedChannelMappings");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AllowBotPosts")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Emote")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ReactionThreshold")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("EmoteBoards");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoardMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("EmoteBoardPostId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("MessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("EmoteBoardPostId");
+
+                    b.ToTable("EmoteBoardMessages");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoardPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("EmoteBoardId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("MessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal[]>("Reactions")
+                        .IsRequired()
+                        .HasColumnType("numeric(20,0)[]");
+
+                    b.Property<decimal>("UserId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("EmoteBoardId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmoteBoardPosts");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.Guild", b =>
@@ -546,6 +654,21 @@ namespace ClemBot.Api.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ChannelEmoteBoard", b =>
+                {
+                    b.HasOne("ClemBot.Api.Data.Models.Channel", null)
+                        .WithMany()
+                        .HasForeignKey("ChannelsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClemBot.Api.Data.Models.EmoteBoard", null)
+                        .WithMany()
+                        .HasForeignKey("EmoteBoardsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ClemBot.Api.Data.Models.Channel", b =>
                 {
                     b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
@@ -622,6 +745,63 @@ namespace ClemBot.Api.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoard", b =>
+                {
+                    b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoardMessage", b =>
+                {
+                    b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClemBot.Api.Data.Models.EmoteBoardPost", "EmoteBoardPost")
+                        .WithMany("Messages")
+                        .HasForeignKey("EmoteBoardPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("EmoteBoardPost");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoardPost", b =>
+                {
+                    b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClemBot.Api.Data.Models.EmoteBoard", "EmoteBoard")
+                        .WithMany("Posts")
+                        .HasForeignKey("EmoteBoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClemBot.Api.Data.Models.User", "User")
+                        .WithMany("EmoteBoardPosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("EmoteBoard");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.GuildSetting", b =>
@@ -832,6 +1012,16 @@ namespace ClemBot.Api.Data.Migrations
                     b.Navigation("Messages");
                 });
 
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoard", b =>
+                {
+                    b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("ClemBot.Api.Data.Models.EmoteBoardPost", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("ClemBot.Api.Data.Models.Guild", b =>
                 {
                     b.Navigation("Channels");
@@ -872,6 +1062,8 @@ namespace ClemBot.Api.Data.Migrations
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.User", b =>
                 {
+                    b.Navigation("EmoteBoardPosts");
+
                     b.Navigation("GuildUsers");
 
                     b.Navigation("Messages");
