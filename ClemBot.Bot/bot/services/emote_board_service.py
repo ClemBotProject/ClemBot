@@ -136,7 +136,7 @@ class EmoteBoardService(BaseService):
                     assert isinstance(channel, discord.abc.Messageable)
                     embed_msg = await channel.fetch_message(message_id)
                     embed = await self._as_embed(
-                        message, board.reaction_threshold, len(post.reaction_count), board.emote
+                        message, board.reaction_threshold, len(post.reactions), board.emote
                     )
                     await embed_msg.edit(embed=embed)
                 except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
@@ -276,7 +276,7 @@ class EmoteBoardService(BaseService):
             description=f"_Posted in {message.channel.mention} by_ {message.author.mention}",
         )
 
-        embed.add_field(name='Original Message', value=message.jump_url)
+        embed.add_field(name="Original Message", value=message.jump_url)
 
         if message.content:
             for i, chunk in enumerate(self._chunk_string(message.content)):

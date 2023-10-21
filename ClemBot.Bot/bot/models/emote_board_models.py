@@ -56,8 +56,10 @@ class PostLeaderboardSlot(ClemBotModel):
     post_count: int
 
     def format(self, index: int, board_name: str | None = None) -> str:
-        return (f"{index + 1}. **<@{self.user_id}> {self.post_count}{f' {board_name}' if board_name else ''} post"
-                f"{'s' if self.post_count > 1 else ''}**")
+        return (
+            f"{index + 1}. **<@{self.user_id}> {self.post_count}{f' {board_name}' if board_name else ''} post"
+            f"{'s' if self.post_count > 1 else ''}**"
+        )
 
 
 class ReactionLeaderboardSlot(ClemBotModel):
@@ -67,5 +69,7 @@ class ReactionLeaderboardSlot(ClemBotModel):
     def format(self, index: int, emote: str | discord.Emoji | None = None) -> str:
         if isinstance(emote, discord.Emoji):
             emote = str(emote)
-        return (f"{index + 1}. **<@{self.user_id}> {self.reaction_count}{f' {emote}' if emote else ''} reaction"
-                f"{'s' if self.reaction_count > 1 else ''}**")
+        return (
+            f"{index + 1}. **<@{self.user_id}> {self.reaction_count}{f' {emote}' if emote else ''} reaction"
+            f"{'s' if self.reaction_count > 1 else ''}**"
+        )
