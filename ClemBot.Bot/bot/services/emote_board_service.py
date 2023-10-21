@@ -113,7 +113,7 @@ class EmoteBoardService(BaseService):
                 "Fetching message {message_id} from channel {channel_id} in guild {guild_id} raised Forbidden on_message_edit",
                 message_id=event.message_id,
                 channel_id=event.channel_id,
-                guild_id=event.guild_id
+                guild_id=event.guild_id,
             )
             return
 
