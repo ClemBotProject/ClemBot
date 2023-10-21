@@ -31,6 +31,7 @@ public class ClemBotContext : DbContext
     public DbSet<EmoteBoard> EmoteBoards { get; set; } = null!;
     public DbSet<EmoteBoardMessage> EmoteBoardMessages { get; set; } = null!;
     public DbSet<EmoteBoardPost> EmoteBoardPosts { get; set; } = null!;
+    public DbSet<EmoteBoardPostReaction> EmoteBoardPostReactions { get; set; } = null!;
     public DbSet<Guild> Guilds { get; set; } = null!;
     public DbSet<GuildSetting> GuildSettings { get; set; } = null!;
     public DbSet<GuildUser> GuildUser { get; set; } = null!;

@@ -20,7 +20,7 @@ public class EmoteBoardPost
     public int EmoteBoardId { get; set; }
     public EmoteBoard EmoteBoard { get; set; } = null!;
 
-    public List<ulong> Reactions { get; set; } = null!;
+    public List<EmoteBoardPostReaction> Reactions { get; set; } = new();
 
     public List<EmoteBoardMessage> Messages { get; set; } = null!;
 }

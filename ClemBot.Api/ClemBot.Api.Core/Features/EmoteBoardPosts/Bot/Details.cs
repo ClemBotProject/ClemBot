@@ -90,14 +90,19 @@ public class Details
 
             foreach (var post in posts)
             {
-                var channelMessageIds = _context.EmoteBoardMessages
+                var channelMessageIds = await _context.EmoteBoardMessages
                     .Where(m => m.EmoteBoardPostId == post.Id)
                     .Select(m => new
                     {
                         m.ChannelId,
                         m.MessageId
                     })
-                    .ToDictionary(kvp => kvp.ChannelId, kvp => kvp.MessageId);
+                    .ToDictionaryAsync(kvp => kvp.ChannelId, kvp => kvp.MessageId);
+
+                var reactions = await _context.EmoteBoardPostReactions
+                    .Where(rp => rp.EmoteBoardPostId == post.Id)
+                    .Select(rp => rp.UserId)
+                    .ToListAsync();
 
                 dtos.Add(new EmoteBoardPostDto
                 {
@@ -105,7 +110,7 @@ public class Details
                     ChannelId = post.ChannelId,
                     MessageId = post.MessageId,
                     UserId = post.UserId,
-                    Reactions = post.Reactions,
+                    Reactions = reactions,
                     ChannelMessageIds = channelMessageIds
                 });
             }

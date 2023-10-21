@@ -77,13 +77,14 @@ public class Reactions
 
             var posts = await _context.EmoteBoardPosts
                 .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
+                .Include(p => p.Reactions)
                 .GroupBy(p => p.UserId)
                 .Select(group => new LeaderboardSlot
                 {
                     UserId = group.Key,
                     ReactionCount = group.Select(p => p.Reactions).Count()
                 })
-                .OrderBy(slot => slot.ReactionCount)
+                .OrderByDescending(slot => slot.ReactionCount)
                 .Take(request.Limit)
                 .ToListAsync();
 

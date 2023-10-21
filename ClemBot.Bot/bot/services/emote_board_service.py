@@ -57,7 +57,7 @@ class EmoteBoardService(BaseService):
         guild = self.bot.get_guild(event.guild_id)
         assert guild is not None
 
-        channel = guild.get_channel(event.channel_id)
+        channel = guild.get_channel_or_thread(event.channel_id)
         assert channel is not None and isinstance(channel, discord.abc.Messageable)
 
         message = await channel.fetch_message(event.message_id)
@@ -101,10 +101,21 @@ class EmoteBoardService(BaseService):
         guild = self.bot.get_guild(event.guild_id)
         assert guild is not None
 
-        channel = guild.get_channel(event.channel_id)
+        channel = guild.get_channel_or_thread(event.channel_id)
         assert channel is not None and isinstance(channel, discord.abc.Messageable)
 
-        message = await channel.fetch_message(event.message_id)
+        # Attempt to fetch the message, ignore if we do not have permissions.
+        message: discord.Message
+        try:
+            message = await channel.fetch_message(event.message_id)
+        except discord.Forbidden:
+            log.info(
+                "Fetching message {message_id} from channel {channel_id} in guild {guild_id} raised Forbidden on_message_edit",
+                message_id=event.message_id,
+                channel_id=event.channel_id,
+                guild_id=event.guild_id,
+            )
+            return
 
         posts = await self.bot.emote_board_route.get_posts(event.guild_id, event.message_id)
 
@@ -125,7 +136,7 @@ class EmoteBoardService(BaseService):
         for post, board in post_boards.items():
             for channel_id, message_id in post.channel_message_ids.items():
                 try:
-                    if not (channel := guild.get_channel(channel_id)):
+                    if not (channel := guild.get_channel_or_thread(channel_id)):
                         continue
 
                     assert isinstance(channel, discord.abc.Messageable)
@@ -150,7 +161,7 @@ class EmoteBoardService(BaseService):
         for post in posts:
             for channel_id, message_id in post.channel_message_ids.items():
                 try:
-                    if not (channel := guild.get_channel(channel_id)):
+                    if not (channel := guild.get_channel_or_thread(channel_id)):
                         continue
 
                     assert isinstance(channel, discord.abc.Messageable)
@@ -187,7 +198,7 @@ class EmoteBoardService(BaseService):
         )
 
         for channel_id in board.channels:
-            if not (channel := guild.get_channel(channel_id)):
+            if not (channel := guild.get_channel_or_thread(channel_id)):
                 continue
             assert isinstance(channel, discord.abc.Messageable)
             message = await channel.send(embed=embed)
@@ -212,16 +223,16 @@ class EmoteBoardService(BaseService):
 
         reaction_dto = await self.bot.emote_board_route.post_reactions(guild, board, message, users)
 
-        if not reaction_dto.update or reaction_dto.reactions is None:
+        if not reaction_dto.update or reaction_dto.reaction_count is None:
             return
 
         embed = await self._as_embed(
-            message, board.reaction_threshold, reaction_dto.reactions, board.emote
+            message, board.reaction_threshold, reaction_dto.reaction_count, board.emote
         )
 
         for channel_id, message_id in post.channel_message_ids.items():
             try:
-                if not (channel := guild.get_channel(channel_id)):
+                if not (channel := guild.get_channel_or_thread(channel_id)):
                     continue
 
                 if not isinstance(channel, discord.abc.Messageable):
@@ -229,7 +240,7 @@ class EmoteBoardService(BaseService):
 
                 embed_msg = await channel.fetch_message(message_id)
                 await embed_msg.edit(embed=embed)
-            except NotFound:
+            except discord.NotFound:
                 continue
 
     async def _get_board_from_emote(
@@ -268,8 +279,10 @@ class EmoteBoardService(BaseService):
         embed = discord.Embed(
             title=title,
             color=Colors.ClemsonOrange,
-            description=f"_Posted in {message.channel.mention} by_ {message.author.mention} [Link]({message.jump_url})",
+            description=f"_Posted in {message.channel.mention} by_ {message.author.mention}",
         )
+
+        embed.add_field(name="Original Message", value=message.jump_url)
 
         if message.content:
             for i, chunk in enumerate(self._chunk_string(message.content)):
@@ -277,7 +290,9 @@ class EmoteBoardService(BaseService):
 
         if message.attachments:
             for attachment in message.attachments:
-                if attachment.content_type == "image":
+                if not attachment.content_type:
+                    continue
+                if attachment.content_type.startswith("image"):
                     embed.set_image(url=attachment.url)
                     break
 

@@ -1,5 +1,6 @@
 ﻿using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
+using ClemBot.Api.Data.Models;
 using ClemBot.Api.Services.Caching.EmoteBoardPosts.Models;
 using ClemBot.Api.Services.Caching.Guilds.Models;
 using FluentValidation;
@@ -81,18 +82,21 @@ public class React
                 return QueryResult<EmoteBoardReactionDto>.NotFound();
             }
 
-            var post = _context.EmoteBoardPosts
-                .Include(p => p.Reactions)
-                .Include(p => p.Messages)
-                .FirstOrDefault(p => p.EmoteBoardId == board.Id && p.MessageId == request.MessageId);
+            var post = await _context.EmoteBoardPosts
+                .FirstOrDefaultAsync(p => p.EmoteBoardId == board.Id && p.MessageId == request.MessageId);
 
             if (post is null)
             {
                 return QueryResult<EmoteBoardReactionDto>.Conflict();
             }
 
+            var currentReactions = await _context.EmoteBoardPostReactions
+                .Where(rp => rp.EmoteBoardPostId == post.Id)
+                .Select(rp => rp.UserId)
+                .ToListAsync();
+
             var newReactions = request.UserReactions
-                .Where(id => id != post.UserId && !post.Reactions.Contains(id))
+                .Where(id => !currentReactions.Contains(id))
                 .ToList();
 
             if (newReactions.Count == 0)
@@ -103,13 +107,18 @@ public class React
                 });
             }
 
-            post.Reactions.AddRange(newReactions);
+            post.Reactions.AddRange(newReactions.Select(id => new EmoteBoardPostReaction
+                {
+                    UserId = id
+                })
+            );
+
             await _context.SaveChangesAsync();
 
             return QueryResult<EmoteBoardReactionDto>.Success(new EmoteBoardReactionDto
             {
                 Update = true,
-                ReactionCount = post.Reactions.Count
+                ReactionCount = currentReactions.Count + newReactions.Count
             });
         }
     }
