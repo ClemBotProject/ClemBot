@@ -109,6 +109,12 @@ class EmoteBoardService(BaseService):
         try:
             message = await channel.fetch_message(event.message_id)
         except discord.Forbidden:
+            log.info(
+                "Fetching message {message_id} from channel {channel_id} in guild {guild_id} raised Forbidden on_message_edit",
+                message_id=event.message_id,
+                channel_id=event.channel_id,
+                guild_id=event.guild_id
+            )
             return
 
         posts = await self.bot.emote_board_route.get_posts(event.guild_id, event.message_id)
