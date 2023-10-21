@@ -83,7 +83,8 @@ public class Popular
 
             var posts = await _context.EmoteBoardPosts
                 .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
-                .OrderBy(p => p.Reactions.Count)
+                .Include(p => p.Reactions)
+                .OrderByDescending(p => p.Reactions.Count)
                 .Take(request.Limit)
                 .Select(p => new LeaderboardSlot
                 {

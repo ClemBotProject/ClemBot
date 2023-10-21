@@ -118,9 +118,10 @@ public class Create
                 ChannelId = request.ChannelId,
                 MessageId = request.MessageId,
                 UserId = request.UserId,
-                Reactions = request.Reactions,
+                Reactions = request.Reactions.Select(id => new EmoteBoardPostReaction { UserId = id }).ToList(),
                 Messages = messages
             });
+
             await _context.SaveChangesAsync();
 
             await _mediator.Send(new ClearEmoteBoardPostRequest

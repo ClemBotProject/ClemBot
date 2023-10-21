@@ -78,7 +78,7 @@ public class Posts
             var posts = await _context.EmoteBoardPosts
                 .Where(p => board != null ? p.EmoteBoardId == board.Id : p.EmoteBoard.GuildId == request.GuildId)
                 .GroupBy(p => p.UserId)
-                .OrderBy(group => group.Count())
+                .OrderByDescending(group => group.Count())
                 .Take(request.Limit)
                 .Select(g => new LeaderboardSlot
                 {

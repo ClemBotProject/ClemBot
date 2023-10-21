@@ -169,7 +169,7 @@ class EmoteBoardCog(commands.Cog):
             name="Number of Posts", value="\n".join(posts) if posts else "None", inline=False
         )
         embed.add_field(
-            name="Number of Reactions",
+            name="Reactions Received",
             value="\n".join(reactions) if reactions else "None",
             inline=False,
         )
