@@ -142,7 +142,10 @@ class EmoteBoardService(BaseService):
                     assert isinstance(channel, discord.abc.Messageable)
                     embed_msg = await channel.fetch_message(message_id)
                     embed = await self._as_embed(
-                        message, emote_board.reaction_threshold, len(post.reactions), emote_board.emote
+                        message,
+                        emote_board.reaction_threshold,
+                        len(post.reactions),
+                        emote_board.emote,
                     )
                     await embed_msg.edit(embed=embed)
                 except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
