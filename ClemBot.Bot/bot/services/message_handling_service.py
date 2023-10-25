@@ -205,6 +205,10 @@ class MessageHandlingService(BaseService):
     # noinspection PyArgumentList
     @BaseService.listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
+        # ignore any cached messages - this will be handled by on_message_edit instead
+        if payload.cached_message:
+            return
+
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
@@ -293,6 +297,9 @@ class MessageHandlingService(BaseService):
 
     @BaseService.listener(Events.on_message_delete)
     async def on_message_delete(self, message: discord.Message) -> None:
+        if not message.guild:
+            return
+
         log.info(
             "Uncached message deleted in #{channel} by {author}: {content}",
             channel=serializers.log_channel(message.channel),
@@ -324,6 +331,9 @@ class MessageHandlingService(BaseService):
 
     @BaseService.listener(Events.on_raw_message_delete)
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
+        if not payload.guild_id:
+            return
+
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
