@@ -36,20 +36,21 @@ class ModerationService(BaseService):
         guild: discord.Guild,
         author: discord.Member,
         purge_days: int,
-        subject: discord.Member,
+        subject: discord.Member | discord.User,
         reason: str | None,
     ) -> None:
         await guild.ban(
             t.cast(discord.abc.Snowflake, subject), reason=reason, delete_message_days=purge_days
         )
 
-        await self.bot.moderation_route.insert_ban(
-            guild_id=guild.id,
-            author_id=author.id,
-            subject_id=subject.id,
-            reason=reason,
-            raise_on_error=True,
-        )
+        if isinstance(subject, discord.Member):
+            await self.bot.moderation_route.insert_ban(
+                guild_id=guild.id,
+                author_id=author.id,
+                subject_id=subject.id,
+                reason=reason,
+                raise_on_error=True,
+            )
 
     @BaseService.listener(Events.on_bot_mute)
     async def on_bot_mute(
