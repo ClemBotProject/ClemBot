@@ -63,7 +63,10 @@ class BanCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        if hasattr(subject, 'roles') and ctx.author.roles[-1].position <= subject.roles[-1].position:
+        if (
+            hasattr(subject, "roles")
+            and ctx.author.roles[-1].position <= subject.roles[-1].position
+        ):
             embed = discord.Embed(color=Colors.Error)
             embed.title = "Error: Invalid Permissions"
             embed.add_field(
