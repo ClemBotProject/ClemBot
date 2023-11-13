@@ -53,7 +53,11 @@ class PingPongCog(commands.Cog):
                 status = "conn_error"
             except requests.ConnectTimeout:
                 status = "conn_timeout"
-            except (requests.exceptions.InvalidURL, requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema):
+            except (
+                requests.exceptions.InvalidURL,
+                requests.exceptions.MissingSchema,
+                requests.exceptions.InvalidSchema,
+            ):
                 status = "invalid"
             elapsed = time.perf_counter() - start
 
@@ -61,10 +65,13 @@ class PingPongCog(commands.Cog):
                 "success": f"The request to '{url}' returned successfully in {elapsed * 1000 : 1.2f}ms.",
                 "conn_error": f"The server at '{url}' did not respond.",
                 "conn_timeout": f"The server at '{url}' did not respond within {timeout} seconds.",
-                "invalid": f"The URL '{url}' is invalid."
+                "invalid": f"The URL '{url}' is invalid.",
             }
 
-            embed = discord.Embed(color=Colors.ClemsonOrange if status == 'success' else Colors.Error, title="Ping Result")
+            embed = discord.Embed(
+                color=Colors.ClemsonOrange if status == "success" else Colors.Error,
+                title="Ping Result",
+            )
             embed.add_field(name="Outcome", value=messages[status])
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
             await ctx.send(embed=embed)
