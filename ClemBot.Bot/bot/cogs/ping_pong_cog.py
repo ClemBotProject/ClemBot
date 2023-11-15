@@ -2,9 +2,9 @@ import asyncio.exceptions
 import time
 from typing import Optional
 
+import aiohttp
 import discord
 import discord.ext.commands as commands
-import aiohttp
 
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
