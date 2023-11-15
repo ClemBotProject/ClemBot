@@ -21,7 +21,7 @@ class PingPongCog(commands.Cog):
     )
     @ext.short_help("shows bot latency / ping a URL")
     @ext.example("ping")
-    async def ping(self, ctx: ext.ClemBotCtx, url: str = None) -> None:
+    async def ping(self, ctx: ext.ClemBotCtx, url: str = "") -> None:
         if not url:
             start = time.perf_counter()
             await self.bot.health_check_route.ping()
