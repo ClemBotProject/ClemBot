@@ -22,7 +22,7 @@ emoji = "^2.4.0"
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
 black = "^22.6.0"
-mypy = "^0.971"
+mypy = "^0.981"
 pytest-asyncio = "^0.19.0"
 pytest = "^7.1.2"
 flake8 = "^4.0.1"

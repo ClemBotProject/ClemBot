@@ -35,7 +35,7 @@ class BanCog(commands.Cog):
     async def ban(
         self,
         ctx: ext.ClemBotCtx,
-        subject: discord.Member | int,
+        subject: discord.Member | discord.User | int,
         purge_days: t.Annotated[int, t.Optional[int]] = 0,
         *,
         reason: str,
@@ -64,7 +64,7 @@ class BanCog(commands.Cog):
             return
 
         if (
-            hasattr(subject, "roles")
+            isinstance(subject, discord.Member)
             and ctx.author.roles[-1].position <= subject.roles[-1].position
         ):
             embed = discord.Embed(color=Colors.Error)
