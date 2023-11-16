@@ -1,6 +1,7 @@
 using ClemBot.Api.Common;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace ClemBot.Api.Core.Features.Guilds.Bot;
 
@@ -25,6 +26,9 @@ public class GetSlotsScores
         public ulong HighScore { get; init; }
 
         public ulong UserId { get; init; }
+        public LocalDateTime TimeOccurred { get; init; }
+        public ulong? MessageId { get; init; }
+        public ulong? ChannelId { get; init; }
     }
 
     public class QueryHandler : IRequestHandler<Query, QueryResult<Model>>
@@ -43,7 +47,7 @@ public class GetSlotsScores
                 .QueryIfElse(() => request.Leader,
                     q => q.OrderByDescending(y => y.Score),
                     q => q.OrderBy(y => y.Score))
-                .Select(z => new { z.Score, z.UserId })
+                .Select(z => new { z.Score, z.UserId, z.Time, z.MessageId, z.ChannelId })
                 .Take(request.Limit)
                 .ToListAsync();
 
@@ -52,7 +56,10 @@ public class GetSlotsScores
                 Scores = scores.Select(x => new Score
                 {
                     HighScore = x.Score,
-                    UserId = x.UserId
+                    UserId = x.UserId,
+                    TimeOccurred = x.Time,
+                    MessageId = x.MessageId,
+                    ChannelId = x.ChannelId
                 })
             });
         }
