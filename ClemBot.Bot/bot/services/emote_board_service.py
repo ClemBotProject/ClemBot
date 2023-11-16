@@ -119,7 +119,7 @@ class EmoteBoardService(BaseService):
 
         posts = await self.bot.emote_board_route.get_posts(event.guild_id, event.message_id)
 
-        post_boards = {}
+        post_boards: list[tuple[EmoteBoardPost, EmoteBoard]] = []
 
         for post in posts:
             board = await self.bot.emote_board_route.get_emote_board(
@@ -131,9 +131,9 @@ class EmoteBoardService(BaseService):
                     board=post.name,
                 )
                 continue
-            post_boards[post] = board
+            post_boards.append((post, board))
 
-        for post, board in post_boards.items():
+        for post, emote_board in post_boards:
             for channel_id, message_id in post.channel_message_ids.items():
                 try:
                     if not (channel := guild.get_channel_or_thread(channel_id)):
@@ -142,7 +142,10 @@ class EmoteBoardService(BaseService):
                     assert isinstance(channel, discord.abc.Messageable)
                     embed_msg = await channel.fetch_message(message_id)
                     embed = await self._as_embed(
-                        message, board.reaction_threshold, len(post.reactions), board.emote
+                        message,
+                        emote_board.reaction_threshold,
+                        len(post.reactions),
+                        emote_board.emote,
                     )
                     await embed_msg.edit(embed=embed)
                 except NotFound:  # Skips over the item if fetch_message() raises `NotFound`

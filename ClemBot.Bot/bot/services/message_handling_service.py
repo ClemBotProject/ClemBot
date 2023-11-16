@@ -205,6 +205,10 @@ class MessageHandlingService(BaseService):
     # noinspection PyArgumentList
     @BaseService.listener(Events.on_raw_message_edit)
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
+        # ignore any cached messages - this will be handled by on_message_edit instead
+        if payload.cached_message:
+            return
+
         message = await self.bot.message_route.get_message(payload.message_id)
         channel = self.bot.get_channel(payload.channel_id)
 
