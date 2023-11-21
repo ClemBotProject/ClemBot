@@ -122,7 +122,7 @@ class SlotsCog(commands.Cog):
 
     async def format_board_embed(
         self, ctx: ext.ClemBotCtx, scores: List[SlotScore], title: str, emoji: str
-    ):
+    ) -> discord.Embed:
         embed = discord.Embed(title=title, colour=Colors.ClemsonOrange)
 
         if len(scores) == 0:
