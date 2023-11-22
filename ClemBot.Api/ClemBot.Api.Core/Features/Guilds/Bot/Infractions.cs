@@ -27,7 +27,7 @@ public class Infractions
 
         public ulong AuthorId { get; set; }
 
-        public ulong SubjectId { get; set; }
+        public ulong? SubjectId { get; set; }
 
         public InfractionType Type { get; set; }
 
