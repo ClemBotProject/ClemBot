@@ -24,6 +24,6 @@ public class Infraction
     public ulong AuthorId { get; set; }
     public User Author { get; set; } = null!;
 
-    public ulong SubjectId { get; set; }
-    public User Subject { get; set; } = null!;
+    public ulong? SubjectId { get; set; }
+    public User? Subject { get; set; }
 }
