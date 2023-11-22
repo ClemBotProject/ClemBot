@@ -35,11 +35,23 @@ class BanCog(commands.Cog):
     async def ban(
         self,
         ctx: ext.ClemBotCtx,
-        subject: discord.Member,
+        subject: discord.Member | discord.User | int,
         purge_days: t.Annotated[int, t.Optional[int]] = 0,
         *,
         reason: str,
     ) -> None:
+        if isinstance(subject, int):
+            try:
+                subject = await ctx.bot.fetch_user(subject)
+            except (discord.errors.NotFound, discord.errors.HTTPException):
+                embed = discord.Embed(title="Error", color=Colors.Error)
+                embed.add_field(
+                    name="Invalid ID",
+                    value=f"There is no discord user with that ID.",
+                )
+                embed.set_author(name=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+                await ctx.send(embed=embed)
+                return
 
         if reason and len(reason) > Moderation.max_reason_length:
             embed = discord.Embed(title="Error", color=Colors.Error)
@@ -51,7 +63,10 @@ class BanCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        if ctx.author.roles[-1].position <= subject.roles[-1].position:
+        if (
+            isinstance(subject, discord.Member)
+            and ctx.author.roles[-1].position <= subject.roles[-1].position
+        ):
             embed = discord.Embed(color=Colors.Error)
             embed.title = "Error: Invalid Permissions"
             embed.add_field(
