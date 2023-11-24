@@ -33,26 +33,34 @@ class ChooseCog(commands.Cog):
         error_title = False
         error_message = False
         options = []
+
         # split string on comma to get separate options
         options = choices_list.split(',')
+
         # remove leading/trailing spaces to ensure no whitespace from original formatting
         options = [x.lstrip() for x in options]
+
         # check that there are at least 2 arguments
         if len(options) < 2:
             error_title = "Invalid argument(s)"
             error_message = f"Are you sure you used the correct format? See `{await self.bot.current_prefix(ctx)}help choose` for info."
+
         # check whether any spaces remain in the options
         elif any(bool(re.search(r"\s", ele)) for ele in options):
             error_title = "Invalid argument(s)"
             error_message = f"Ensure all list members are separated with commas and do not contain whitespace"
+
         # if there are any errors send the error message and end the function
         if error_title:
             embed = discord.Embed(title="Choose", color=Colors.Error)
             embed.add_field(name="ERROR: " + error_title, value=error_message, inline=False)
             return await ctx.send(embed=embed)
+
         # otherwise choose one of the values and return it in a message
         chosen_value = choice(options)
+
         cog_embeds = []
+
         embed = discord.Embed(
             title="Choice",
             color=Colors.ClemsonOrange,
