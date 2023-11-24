@@ -1,4 +1,6 @@
+import re
 import typing as t
+from random import choice
 
 import discord
 import discord.ext.commands as commands
@@ -7,9 +9,6 @@ import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
 from bot.utils.logging_utils import get_logger
-
-from random import choice
-import re
 
 log = get_logger(__name__)
 
@@ -23,8 +22,8 @@ class ChooseCog(commands.Cog):
     @ext.short_help("Chooses an item from the given list randomly")
     @ext.example(
         (
-                "choose a,b,c,d,e",
-                "choose a, b, c, d, e",
+            "choose a,b,c,d,e",
+            "choose a, b, c, d, e",
         )
     )
     async def choose(self, ctx: ext.ClemBotCtx, *, choices_list: str) -> None:
@@ -35,7 +34,7 @@ class ChooseCog(commands.Cog):
         options = []
 
         # split string on comma to get separate options
-        options = choices_list.split(',')
+        options = choices_list.split(",")
 
         # remove leading/trailing spaces to ensure no whitespace from original formatting
         options = [x.lstrip() for x in options]
@@ -48,7 +47,9 @@ class ChooseCog(commands.Cog):
         # check whether any spaces remain in the options
         elif any(bool(re.search(r"\s", ele)) for ele in options):
             error_title = "Invalid argument(s)"
-            error_message = f"Ensure all list members are separated with commas and do not contain whitespace"
+            error_message = (
+                f"Ensure all list members are separated with commas and do not contain whitespace"
+            )
 
         # if there are any errors send the error message and end the function
         if error_title:
