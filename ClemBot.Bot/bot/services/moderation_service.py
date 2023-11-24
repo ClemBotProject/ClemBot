@@ -36,7 +36,7 @@ class ModerationService(BaseService):
         guild: discord.Guild,
         author: discord.Member,
         purge_days: int,
-        subject: discord.Member,
+        subject: discord.Member | discord.User,
         reason: str | None,
     ) -> None:
         await guild.ban(
