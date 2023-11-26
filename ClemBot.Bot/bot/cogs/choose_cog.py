@@ -29,9 +29,8 @@ class ChooseCog(commands.Cog):
     async def choose(self, ctx: ext.ClemBotCtx, *, choices_list: str) -> None:
         choices_list = choices_list
 
-        error_title = False
-        error_message = False
-        options = []
+        error_title = ""
+        error_message = ""
 
         # split string on comma to get separate options
         options = choices_list.split(",")
@@ -52,10 +51,11 @@ class ChooseCog(commands.Cog):
             )
 
         # if there are any errors send the error message and end the function
-        if error_title:
+        if error_title != "":
             embed = discord.Embed(title="Choose", color=Colors.Error)
             embed.add_field(name="ERROR: " + error_title, value=error_message, inline=False)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         # otherwise choose one of the values and return it in a message
         chosen_value = choice(options)
