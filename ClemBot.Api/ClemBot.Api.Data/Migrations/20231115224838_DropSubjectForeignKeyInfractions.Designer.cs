@@ -4,6 +4,7 @@ using ClemBot.Api.Common.Enums;
 using ClemBot.Api.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClemBot.Api.Data.Migrations
 {
     [DbContext(typeof(ClemBotContext))]
-    partial class ClemBotContextModelSnapshot : ModelSnapshot
+    [Migration("20231115224838_DropSubjectForeignKeyInfractions")]
+    partial class DropSubjectForeignKeyInfractions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -570,13 +573,7 @@ namespace ClemBot.Api.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("ChannelId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<decimal?>("MessageId")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("Score")
@@ -589,8 +586,6 @@ namespace ClemBot.Api.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChannelId");
 
                     b.HasIndex("GuildId");
 
@@ -976,10 +971,6 @@ namespace ClemBot.Api.Data.Migrations
 
             modelBuilder.Entity("ClemBot.Api.Data.Models.SlotScore", b =>
                 {
-                    b.HasOne("ClemBot.Api.Data.Models.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId");
-
                     b.HasOne("ClemBot.Api.Data.Models.Guild", "Guild")
                         .WithMany()
                         .HasForeignKey("GuildId")
@@ -991,8 +982,6 @@ namespace ClemBot.Api.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Channel");
 
                     b.Navigation("Guild");
 
