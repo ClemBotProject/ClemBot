@@ -1,5 +1,4 @@
 import re
-import typing as t
 from random import choice
 
 import discord
@@ -27,8 +26,6 @@ class ChooseCog(commands.Cog):
         )
     )
     async def choose(self, ctx: ext.ClemBotCtx, *, choices_list: str) -> None:
-        choices_list = choices_list
-
         error_title = ""
         error_message = ""
 
@@ -43,13 +40,6 @@ class ChooseCog(commands.Cog):
             error_title = "Invalid argument(s)"
             error_message = f"Are you sure you used the correct format? See `{await self.bot.current_prefix(ctx)}help choose` for info."
 
-        # check whether any spaces remain in the options
-        elif any(bool(re.search(r"\s", ele)) for ele in options):
-            error_title = "Invalid argument(s)"
-            error_message = (
-                f"Ensure all list members are separated with commas and do not contain whitespace"
-            )
-
         # if there are any errors send the error message and end the function
         if error_title != "":
             embed = discord.Embed(title="Choose", color=Colors.Error)
@@ -59,9 +49,6 @@ class ChooseCog(commands.Cog):
 
         # otherwise choose one of the values and return it in a message
         chosen_value = choice(options)
-
-        cog_embeds = []
-
         embed = discord.Embed(
             title="Choice",
             color=Colors.ClemsonOrange,
@@ -76,7 +63,6 @@ class ChooseCog(commands.Cog):
             value=chosen_value,
             inline=False,
         )
-        cog_embeds.append(embed)
         await ctx.send(embed=embed)
 
 
