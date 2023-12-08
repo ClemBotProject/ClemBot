@@ -44,7 +44,7 @@ class GuildRoute(BaseRoute):
 
     async def get_guild_slot_scores(
         self, guild_id: int, limit: int, leader: bool
-    ) -> t.List[SlotScore]:
+    ) -> list[SlotScore]:
         resp = await self._client.get(
             f"bot/Guilds/{guild_id}/SlotScores", params={"leader": str(leader), "limit": limit}
         )
