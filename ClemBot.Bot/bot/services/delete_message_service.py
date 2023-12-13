@@ -66,6 +66,8 @@ class DeleteMessageService(BaseService):
 
         if timeout:
             self.bot.scheduler.schedule_in(message_delete_timeout(), time=timeout)
+        else:
+            self.bot.scheduler.schedule_in(message_delete_timeout(), time=300)
 
     @BaseService.listener(Events.on_reaction_add)
     async def delete_message(
