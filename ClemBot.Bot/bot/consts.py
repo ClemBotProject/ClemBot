@@ -17,6 +17,7 @@ class invalidPrefix:
 
     invalidPrefixList = ["<"]
 
+
 class DesignatedChannelBase(Enum):
     pass
 

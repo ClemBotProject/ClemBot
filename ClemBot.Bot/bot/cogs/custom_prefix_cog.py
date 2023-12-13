@@ -47,7 +47,10 @@ class CustomPrefixCog(commands.Cog):
 
         if prefix in invalidPrefix.invalidPrefixList:
             embed = discord.Embed(title="Error", color=Colors.Error)
-            embed.add_field(name="Invalid prefix", value=f"Prefix can not contain any prefix in {invalidPrefix.invalidPrefixList}")
+            embed.add_field(
+                name="Invalid prefix",
+                value=f"Prefix can not contain any prefix in {invalidPrefix.invalidPrefixList}",
+            )
             await ctx.send(embed=embed)
             return
 

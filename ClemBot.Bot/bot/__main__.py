@@ -7,10 +7,10 @@ import discord
 
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
+from bot.consts import invalidPrefix
 from bot.custom_prefix import CustomPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
-from bot.consts import invalidPrefix
 
 
 async def main() -> None:
