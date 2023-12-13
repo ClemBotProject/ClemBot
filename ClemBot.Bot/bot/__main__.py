@@ -10,6 +10,7 @@ from bot.clem_bot import ClemBot
 from bot.custom_prefix import CustomPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
+from bot.consts import invalidPrefix
 
 
 async def main() -> None:
@@ -36,7 +37,7 @@ async def main() -> None:
 
     # get the default prefix for the bot instance
     prefix = bot_secrets.secrets.bot_prefix
-    if prefix == "<":
+    if prefix in invalidPrefix.invalidPrefixList:
         bot_log.fatal(f"Invalid bot prefix")
         sys.exit(0)
 

@@ -12,6 +12,11 @@ class Colors:
     ClemsonOrange = 0xF56600
 
 
+class invalidPrefix:
+    """List of Invalid Prefixes"""
+
+    invalidPrefixList = ["<"]
+
 class DesignatedChannelBase(Enum):
     pass
 
