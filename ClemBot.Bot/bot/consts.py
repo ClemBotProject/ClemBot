@@ -12,12 +12,6 @@ class Colors:
     ClemsonOrange = 0xF56600
 
 
-class invalidPrefix:
-    """List of Invalid Prefixes"""
-
-    invalidPrefixList = ["<"]
-
-
 class DesignatedChannelBase(Enum):
     pass
 
@@ -103,3 +97,4 @@ class Moderation:
 
 
 TAG_INVOKE_REGEX = r"{tag_prefix}([^\s]+)"
+INVALID_PREFIXES = ["<"]

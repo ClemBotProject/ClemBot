@@ -4,7 +4,7 @@ import discord.ext.commands as commands
 import bot.bot_secrets as bot_secrets
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
-from bot.consts import Claims, Colors, invalidPrefix
+from bot.consts import INVALID_PREFIXES, Claims, Colors
 from bot.utils.logging_utils import get_logger
 
 log = get_logger(__name__)
@@ -45,11 +45,11 @@ class CustomPrefixCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        if prefix in invalidPrefix.invalidPrefixList:
+        if prefix in INVALID_PREFIXES:
             embed = discord.Embed(title="Error", color=Colors.Error)
             embed.add_field(
                 name="Invalid prefix",
-                value=f"Prefix can not contain any prefix in {invalidPrefix.invalidPrefixList}",
+                value=f"The given prefix `{prefix}` is not supported.",
             )
             await ctx.send(embed=embed)
             return
