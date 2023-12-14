@@ -7,6 +7,7 @@ import discord
 
 import bot.bot_secrets as bot_secrets
 from bot.clem_bot import ClemBot
+from bot.consts import INVALID_PREFIXES
 from bot.custom_prefix import CustomPrefix
 from bot.messaging.messenger import Messenger
 from bot.utils.scheduler import Scheduler
@@ -36,6 +37,9 @@ async def main() -> None:
 
     # get the default prefix for the bot instance
     prefix = bot_secrets.secrets.bot_prefix
+    if prefix in INVALID_PREFIXES:
+        bot_log.fatal(f"Invalid bot prefix")
+        sys.exit(0)
 
     # Initialize the messenger here and inject it into the base bot class,
     # this is so it can be reused later on

@@ -97,3 +97,4 @@ class Moderation:
 
 
 TAG_INVOKE_REGEX = r"{tag_prefix}([^\s]+)"
+INVALID_PREFIXES = ["<"]
