@@ -33,10 +33,10 @@ public class CustomPrefixHandler :
                 .ToListAsync(),
             TimeSpan.FromHours(12));
 
-    public Task<Unit> Handle(ClearCustomPrefixRequest request, CancellationToken cancellationToken)
+    public Task Handle(ClearCustomPrefixRequest request, CancellationToken cancellationToken)
     {
         _cache.Remove(GetCacheKey(request.Id));
-        return Unit.Task;
+        return Task.CompletedTask;
     }
 
     private static string GetCacheKey(ulong id)

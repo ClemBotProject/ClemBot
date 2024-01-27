@@ -33,10 +33,10 @@ public class CustomTagPrefixHandlers :
                 .ToListAsync(),
             TimeSpan.FromHours(12));
 
-    public Task<Unit> Handle(ClearCustomTagPrefixRequest request, CancellationToken cancellationToken)
+    public Task Handle(ClearCustomTagPrefixRequest request, CancellationToken cancellationToken)
     {
         _cache.Remove(GetCacheKey(request.Id));
-        return Unit.Task;
+        return Task.CompletedTask;
     }
 
     private static string GetCacheKey(ulong id)

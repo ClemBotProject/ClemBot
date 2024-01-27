@@ -108,10 +108,14 @@ builder.Services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 builder.Services.AddScoped<IDiscordAuthManager, DiscordAuthManager>();
 
 // Configure Mediatr and the pipelines
-builder.Services.AddMediatR(typeof(Program), typeof(GuildSandboxAuthorizeService));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(GuildSandboxAuthorizeBehavior<,>));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CacheRequestBehavior<,>));
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssemblyContaining<Program>();
+    config.RegisterServicesFromAssemblyContaining<GuildSandboxAuthorizeService>();
+    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    config.AddOpenBehavior(typeof(GuildSandboxAuthorizeBehavior<,>));
+    config.AddOpenBehavior(typeof(CacheRequestBehavior<,>));
+});
 
 // Specify Swagger startup options
 builder.Services.AddSwaggerGen(o => {

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <UserSecretsId>9f2f92d0-9337-40e6-94dc-d7874e885acf</UserSecretsId>
         <EnablePreviewFeatures>True</EnablePreviewFeatures>
-        <LangVersion>11</LangVersion>
+        <LangVersion>12</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
