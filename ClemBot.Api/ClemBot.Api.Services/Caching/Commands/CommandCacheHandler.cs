@@ -25,10 +25,10 @@ public class CommandCacheHandler : IRequestHandler<ClearCommandRestrictionReques
         _context = context;
     }
 
-    public Task<Unit> Handle(ClearCommandRestrictionRequest request, CancellationToken cancellationToken)
+    public Task Handle(ClearCommandRestrictionRequest request, CancellationToken cancellationToken)
     {
         _cache.Remove(GetCacheKey(request.Id, request.CommandName));
-        return Unit.Task;
+        return Task.CompletedTask;
     }
 
     public async Task<List<CommandRestriction>> Handle(GetCommandRestrictionRequest request, CancellationToken cancellationToken) =>

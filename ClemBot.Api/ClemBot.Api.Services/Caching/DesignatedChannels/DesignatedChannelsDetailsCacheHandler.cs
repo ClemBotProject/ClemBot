@@ -29,10 +29,10 @@ public class DesignatedChannelsCacheHandler : IRequestHandler<ClearDesignatedCha
                 .Where(x => x.Channel.Guild.Id == request.Id && x.Type == request.Designation)
                 .ToListAsync(), TimeSpan.FromHours(1));
 
-    public Task<Unit> Handle(ClearDesignatedChannelDetailRequest request, CancellationToken cancellationToken)
+    public Task Handle(ClearDesignatedChannelDetailRequest request, CancellationToken cancellationToken)
     {
         _cache.Remove(GetCacheKey(request.Id, request.Designation));
-        return Unit.Task;
+        return Task.CompletedTask;
     }
 
     private static string GetCacheKey(ulong id, Common.Enums.DesignatedChannels designation) =>
