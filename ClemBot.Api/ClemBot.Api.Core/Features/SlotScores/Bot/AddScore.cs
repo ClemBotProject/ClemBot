@@ -19,6 +19,10 @@ public class AddScore
         public ulong GuildId { get; set; }
 
         public ulong UserId { get; set; }
+
+        public ulong MessageId { get; set; }
+
+        public ulong ChannelId { get; set; }
     }
 
     public record Handler(ClemBotContext _context, IMediator _mediator)
@@ -32,6 +36,8 @@ public class AddScore
                 GuildId = request.GuildId,
                 UserId = request.UserId,
                 Time = SystemClock.Instance.InZone(DateTimeZone.Utc).GetCurrentLocalDateTime(),
+                MessageId = request.MessageId,
+                ChannelId = request.ChannelId
             };
 
             _context.SlotScores.Add(score);
