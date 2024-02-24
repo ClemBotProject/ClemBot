@@ -84,6 +84,20 @@ class EmoteBoardService(BaseService):
 
         post = await self.bot.emote_board_route.get_post_from_board(guild, message, board)
 
+        # if the user is a bot, it's very likely we did not store their message in the db...
+        if message.author.bot:
+            stored_message = await self.bot.message_route.get_message(message.id)
+            if stored_message is None:
+                await self.bot.message_route.create_message(
+                    message.id,
+                    message.content,
+                    guild.id,
+                    message.author.id,
+                    channel.id,
+                    message.created_at,
+                    raise_on_error=True,
+                )
+
         if not post:
             await self._create_post(board, message, users)
             return

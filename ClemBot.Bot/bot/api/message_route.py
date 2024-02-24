@@ -1,4 +1,5 @@
 import typing as t
+from datetime import datetime
 
 from bot.api.api_client import ApiClient
 from bot.api.base_route import BaseRoute
@@ -16,6 +17,7 @@ class MessageRoute(BaseRoute):
         guild_id: int,
         author_id: int,
         channel_id: int,
+        time: datetime,
         **kwargs: t.Any,
     ) -> None:
         json = {
@@ -26,6 +28,7 @@ class MessageRoute(BaseRoute):
                     "GuildId": guild_id,
                     "UserId": author_id,
                     "ChannelId": channel_id,
+                    "Time": time.strftime("%Y-%m-%dT%H:%M:%S.%f"),
                 }
             ]
         }
