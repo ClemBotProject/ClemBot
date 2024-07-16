@@ -29,7 +29,7 @@ Make sure you can run these commands and install them if not present.
 
 ### Database
 
-* [PostgreSQL 14](https://www.postgresql.org/download/)
+* [PostgreSQL 16](https://www.postgresql.org/download/)
 * [PgAdmin4](https://www.pgadmin.org/download/)
 
 ## Get a Discord bot token and enable intents
