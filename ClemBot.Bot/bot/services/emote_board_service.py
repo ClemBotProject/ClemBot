@@ -58,7 +58,10 @@ class EmoteBoardService(BaseService):
         assert guild is not None
 
         channel = guild.get_channel_or_thread(event.channel_id)
-        assert channel is not None and isinstance(channel, discord.abc.Messageable)
+        assert channel is not None
+
+        if not isinstance(channel, discord.abc.MessageableChannel):
+            return
 
         message = await channel.fetch_message(event.message_id)
 
