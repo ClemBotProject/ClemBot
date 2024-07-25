@@ -28,6 +28,13 @@ RANKINGS = [
     "***GOD-TIER***",
 ]
 
+VALID_CHANNEL_TYPES = (
+    discord.Thread,
+    discord.TextChannel,
+    discord.VoiceChannel,
+    discord.StageChannel,
+)
+
 
 class EmoteBoardService(BaseService):
     """
@@ -60,7 +67,7 @@ class EmoteBoardService(BaseService):
         channel = guild.get_channel_or_thread(event.channel_id)
         assert channel is not None
 
-        if not isinstance(channel, discord.abc.MessageableChannel):
+        if not isinstance(channel, VALID_CHANNEL_TYPES):
             return
 
         message = await channel.fetch_message(event.message_id)
@@ -119,7 +126,10 @@ class EmoteBoardService(BaseService):
         assert guild is not None
 
         channel = guild.get_channel_or_thread(event.channel_id)
-        assert channel is not None and isinstance(channel, discord.abc.Messageable)
+        assert channel is not None
+
+        if not isinstance(channel, VALID_CHANNEL_TYPES):
+            return
 
         # Attempt to fetch the message, ignore if we do not have permissions.
         message: discord.Message
@@ -156,7 +166,7 @@ class EmoteBoardService(BaseService):
                     if not (channel := guild.get_channel_or_thread(channel_id)):
                         continue
 
-                    assert isinstance(channel, discord.abc.Messageable)
+                    assert isinstance(channel, VALID_CHANNEL_TYPES)
                     embed_msg = await channel.fetch_message(message_id)
                     embed = await self._as_embed(
                         message,
@@ -184,7 +194,7 @@ class EmoteBoardService(BaseService):
                     if not (channel := guild.get_channel_or_thread(channel_id)):
                         continue
 
-                    assert isinstance(channel, discord.abc.Messageable)
+                    assert isinstance(channel, VALID_CHANNEL_TYPES)
                     embed_msg = await channel.fetch_message(message_id)
                     await embed_msg.delete()
                 except NotFound:  # Skips over the item if fetch_message() raises `NotFound`
@@ -220,7 +230,7 @@ class EmoteBoardService(BaseService):
         for channel_id in board.channels:
             if not (channel := guild.get_channel_or_thread(channel_id)):
                 continue
-            assert isinstance(channel, discord.abc.Messageable)
+            assert isinstance(channel, VALID_CHANNEL_TYPES)
             message = await channel.send(embed=embed)
             post.channel_message_ids[channel_id] = message.id
 
@@ -255,7 +265,7 @@ class EmoteBoardService(BaseService):
                 if not (channel := guild.get_channel_or_thread(channel_id)):
                     continue
 
-                if not isinstance(channel, discord.abc.Messageable):
+                if not isinstance(channel, VALID_CHANNEL_TYPES):
                     continue
 
                 embed_msg = await channel.fetch_message(message_id)
