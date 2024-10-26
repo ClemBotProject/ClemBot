@@ -19,7 +19,7 @@ jobs:
         shell: bash
         working-directory: ClemBot.Bot
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v4

@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -62,7 +62,7 @@ jobs:
     runs-on: [self-hosted]
     needs: ['build-push-clembot-api']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Copy Secrets
         run: |
           cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
