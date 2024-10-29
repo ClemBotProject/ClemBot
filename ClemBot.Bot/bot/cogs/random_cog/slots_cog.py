@@ -3,6 +3,7 @@ import dataclasses
 import random
 import typing as t
 from collections import Counter
+from datetime import datetime
 from typing import List, Tuple, Union
 
 import discord
@@ -12,6 +13,8 @@ import numpy as np
 import bot.extensions as ext
 from bot.clem_bot import ClemBot
 from bot.consts import Colors
+from bot.models.guild_models import SlotScore
+from bot.utils import helpers
 from bot.utils.helpers import chunk_sequence
 from bot.utils.logging_utils import get_logger
 
@@ -117,6 +120,30 @@ class SlotsCog(commands.Cog):
     def __init__(self, bot: ClemBot) -> None:
         self.bot = bot
 
+    async def format_board_embed(
+        self, ctx: ext.ClemBotCtx, scores: List[SlotScore], title: str, emoji: str
+    ) -> discord.Embed:
+        embed = discord.Embed(title=title, colour=Colors.ClemsonOrange)
+
+        if len(scores) == 0:
+            embed.add_field(name="Scores", value="No scores found.")
+        for i, score in enumerate(scores):
+            user = await self.bot.fetch_user(score.user_id)
+
+            if not user:
+                continue
+            msg = f"Achieved on {score.time_occurred.strftime('%B %d, %Y')}"
+            if score.message_id and score.channel_id:
+                msg += f" [here](https://discord.com/channels/{ctx.guild.id}/{score.channel_id}/{score.message_id})"
+            embed.add_field(
+                name=f"{emoji} {i + 1: >3}. {user.name} - {score.high_score}",
+                value=msg + "\n",
+                inline=False,
+            )
+
+        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+        return embed
+
     @ext.group(aliases=["slotmachine"], invoke_without_command=True, case_insensitive=True)
     @commands.cooldown(1, SLOTS_COMMAND_COOLDOWN, commands.BucketType.user)
     @ext.long_help("A slot machine inside discord with a chance to win fame and fortune")
@@ -134,57 +161,29 @@ class SlotsCog(commands.Cog):
         embed.add_field(name="**SCORE!!**", value=score[1], inline=False)
         await msg.edit(embed=embed)
 
-        await self.bot.slots_score_route.add_slot_score(score[1], ctx.guild.id, ctx.author.id)
+        await self.bot.slots_score_route.add_slot_score(
+            score[1], ctx.guild.id, ctx.author.id, msg.id, msg.channel.id
+        )
 
     @slots.command(aliases=["top", "winners"])
     async def leaderboard(self, ctx: ext.ClemBotCtx) -> None:
         scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, True)
 
-        scores_str = ""
-        if len(scores) == 0:
-            scores_str = "No scores found"
-
-        for i, score in enumerate(scores):
-            user = self.bot.get_user(score.user_id)
-
-            if not user:
-                continue
-
-            scores_str += f"{i+1: >3}. {user.name}: {score.high_score}\n"
-
-        embed = discord.Embed(
-            title="💎 ClemBot Slot Machine Leaderboard 💎", colour=Colors.ClemsonOrange
+        await ctx.send(
+            embed=await self.format_board_embed(
+                ctx, scores, "💎 ClemBot Slot Machine Leaderboard 💎", "👑"
+            )
         )
-
-        embed.add_field(name="Leaderboard", value=f"```{scores_str}```")
-        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-
-        await ctx.send(embed=embed)
 
     @slots.command(aliases=["bottom", "losers"])
     async def loserboard(self, ctx: ext.ClemBotCtx) -> None:
         scores = await self.bot.guild_route.get_guild_slot_scores(ctx.guild.id, 10, False)
 
-        scores_str = ""
-        if len(scores) == 0:
-            scores_str = "No scores found"
-
-        for i, score in enumerate(scores):
-            user = self.bot.get_user(score.user_id)
-
-            if not user:
-                continue
-
-            scores_str += f"{i+1: >3}. {user.name}: {score.high_score}\n"
-
-        embed = discord.Embed(
-            title="💩 ClemBot Slot Machine Loserboard 💩", colour=Colors.ClemsonOrange
+        await ctx.send(
+            embed=await self.format_board_embed(
+                ctx, scores, "💩 ClemBot Slot Machine Loserboard 💩", "🤡"
+            )
         )
-
-        embed.add_field(name="Loserboard", value=f"```{scores_str}```")
-        embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-
-        await ctx.send(embed=embed)
 
     def _calculate_score(
         self, paylines: np.ndarray[t.Any, t.Any]
