@@ -219,10 +219,10 @@ class BotSecrets:
     def load_production_secrets(self) -> None:
 
         # Ignore these type errors, mypy doesn't know how to handle properties that return narrower types then they are assigned too
-        self.client_token = os.environ.get("CLIENT_TOKEN")  
-        self.client_secret = os.environ.get("CLIENT_SECRET")  
-        self.bot_token = os.environ.get("BOT_TOKEN")  
-        self.bot_prefix = os.environ.get("BOT_PREFIX")  
+        self.client_token = os.environ.get("CLIENT_TOKEN")
+        self.client_secret = os.environ.get("CLIENT_SECRET")
+        self.bot_token = os.environ.get("BOT_TOKEN")
+        self.bot_prefix = os.environ.get("BOT_PREFIX")
         self.startup_log_channel_ids = [
             int(n) for n in os.environ.get("STARTUP_LOG_CHANNEL_IDS").split(",")  # type: ignore
         ]
@@ -230,12 +230,12 @@ class BotSecrets:
             int(n) for n in os.environ.get("ERROR_LOG_CHANNEL_IDS").split(",")  # type: ignore
         ]
         self.bot_only = os.environ.get("BOT_ONLY")  # type: ignore
-        self.repl_url = os.environ.get("REPL_URL")  
-        self.github_url = os.environ.get("GITHUB_URL")  
-        self.api_url = os.environ.get("API_URL")  
-        self.api_key = os.environ.get("API_KEY")  
-        self.site_url = os.environ.get("SITE_URL")  
-        self.docs_url = os.environ.get("DOCS_URL")  
+        self.repl_url = os.environ.get("REPL_URL")
+        self.github_url = os.environ.get("GITHUB_URL")
+        self.api_url = os.environ.get("API_URL")
+        self.api_key = os.environ.get("API_KEY")
+        self.site_url = os.environ.get("SITE_URL")
+        self.docs_url = os.environ.get("DOCS_URL")
         self.allow_bot_input_ids = [
             int(n) for n in os.environ.get("ALLOW_BOT_INPUT_IDS").split(",")  # type: ignore
         ]
