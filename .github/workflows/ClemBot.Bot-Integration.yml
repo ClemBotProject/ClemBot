@@ -86,7 +86,7 @@ jobs:
         path: ClemBot.Bot/lint_errors
 
     - name: Fail PR if linting failed
-      uses: actions/github-script@v3
+      uses: actions/github-script@v7
       if: (steps.isort-ci.outcome != 'success' || steps.black-ci.outcome != 'success' || steps.static-typing-ci.outcome != 'success') && github.event_name == 'pull_request'
       with:
         script: |
