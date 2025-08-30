@@ -108,18 +108,15 @@ configured PostgreSQL with your desired username and password, you need to set t
 
 ## Setting up the ClemBot.Bot build environment
 
-Installing Poetry:  
-`pip3 install poetry` (Windows: `py -m pip install poetry`)
+Installing uv:  
+`pip3 install uv` (Windows: `py -m pip install uv`)
 
-Tell Poetry to put the venv in the project folder
-`poetry config virtualenvs.in-project true`
-
-Installing dependencies with Poetry:
-`poetry install`
+Installing dependencies with uv:
+`uv sync`
 
 You can then test-run the bot with the command...
 
-`poetry run python3 -m bot` (Windows: `poetry run py -m bot`)
+`uv run python -m bot`
 
 ...when you are in the directory `ClemBot/ClemBot.Bot`.
 

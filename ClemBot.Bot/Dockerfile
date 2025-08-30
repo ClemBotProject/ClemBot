@@ -9,18 +9,17 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y git
 
-# Install poetry
-RUN python -m pip install poetry
+# Install uv
+RUN python -m pip install uv
 
-# Install dependencies with Poetry
+# Install dependencies with uv
 WORKDIR /ClemBot.Bot
 ADD pyproject.toml .
-ADD poetry.lock .
+ADD uv.lock .
 
-RUN poetry config virtualenvs.in-project true
-RUN poetry install --no-dev --no-interaction
+RUN uv sync --no-dev
 
 ADD . /ClemBot.Bot
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["poetry", "run", "python3", "-m", "bot"]
+CMD ["uv", "run", "python", "-m", "bot"]

@@ -26,29 +26,24 @@ jobs:
       with:
         python-version: "3.10.6"
         
-    - name: install poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.1.14
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-        virtualenvs-path: .venv
+    - name: install uv
+      run: pip install uv
 
     - name: load cached venv
-      id: cached-poetry-dependencies
+      id: cached-uv-dependencies
       uses: actions/cache@v3
       with:
         path: ClemBot.Bot/.venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/ClemBot.Bot-Integration.yml') }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}-${{ hashFiles('**/ClemBot.Bot-Integration.yml') }}
 
     - name: install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install 
+      if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
+      run: uv sync 
 
     - name: Validate static typing
       id: static-typing-ci
       continue-on-error: true
-      run: poetry run python -m mypy
+      run: uv run python -m mypy
 
     - name: Create lint error folder
       shell: bash
@@ -64,7 +59,7 @@ jobs:
     - name: Check if Black would make any changes
       id: black-ci
       continue-on-error: true
-      run: poetry run python -m black bot --check 
+      run: uv run python -m black bot --check 
 
     - name: Check if isort would make any changes
       id: isort-ci
@@ -75,13 +70,13 @@ jobs:
       shell: bash
       if: steps.black-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|**Black linting failed:** Please run \`\`\`poetry run black bot\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/black-error.txt
+        echo "${{github.event.number}}|**Black linting failed:** Please run \`\`\`uv run black bot\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/black-error.txt
 
     - name: Isort lint failure comment
       shell: bash
       if: steps.isort-ci.outcome != 'success' && github.event_name == 'pull_request'
       run: |
-        echo "${{github.event.number}}|**isort linting failed:** Please run \`\`\`poetry run isort .\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/isort-error.txt
+        echo "${{github.event.number}}|**isort linting failed:** Please run \`\`\`uv run isort .\`\`\` from the \`ClemBot.Bot\` folder" >> lint_errors/isort-error.txt
 
     - name: Upload lint errors 
       uses: actions/upload-artifact@v3
@@ -99,8 +94,8 @@ jobs:
 
     - name: Lint with pylint
       run: |
-        poetry run python -m pylint bot -E -r y
+        uv run python -m pylint bot -E -r y
 
     - name: Test with pytest
       run: |
-        poetry run python -m pytest
+        uv run python -m pytest
