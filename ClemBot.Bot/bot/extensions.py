@@ -39,7 +39,7 @@ def command(
             ClemBotCommand
             | t.Callable[..., t.Any]
             | discord.ext.commands.Command[t.Any, t.Any, t.Any]
-        )
+        ),
     ) -> ClemBotCommand:
         if isinstance(func, ClemBotCommand):
             raise TypeError("Callback is already a command.")

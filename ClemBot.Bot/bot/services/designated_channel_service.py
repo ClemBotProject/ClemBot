@@ -21,7 +21,7 @@ class DesignatedChannelService(BaseService):
         self,
         designated_name: DesignatedChannelBase,
         guild_id: int,
-        content: (str | discord.Embed),
+        content: str | discord.Embed,
         dc_id: int | uuid.UUID | None = None,
     ) -> None:
         """
@@ -50,7 +50,7 @@ class DesignatedChannelService(BaseService):
 
     @BaseService.listener(Events.on_broadcast_designated_channel)
     async def broadcast_designated_message(
-        self, designated_name: DesignatedChannels, content: (str | discord.Embed)
+        self, designated_name: DesignatedChannels, content: str | discord.Embed
     ) -> None:
         """
         Event call back to broadcast a given string or embed message to all registered designated channels

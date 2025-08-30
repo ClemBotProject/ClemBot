@@ -51,7 +51,7 @@ class ClaimsAuthorizationCog(commands.Cog):
         self,
         ctx: ext.ClemBotCtx,
         claims: list[Claims],
-        subject: (discord.Role | discord.Member),
+        subject: discord.Role | discord.Member,
     ) -> discord.Embed:
 
         claims_str = "\n".join(sorted([c.name for c in claims])) if claims else "No current claims"

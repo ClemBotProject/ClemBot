@@ -7,7 +7,7 @@ def log_guild(guild: discord.Guild) -> dict[str, t.Any]:
     return {"id": guild.id, "name": guild.name}
 
 
-def log_user(member: (discord.Member | discord.User | discord.ClientUser)) -> dict[str, t.Any]:
+def log_user(member: discord.Member | discord.User | discord.ClientUser) -> dict[str, t.Any]:
     return (
         {"id": member.id, "name": member.name, "guild": log_guild(member.guild)}
         if isinstance(member, discord.Member)

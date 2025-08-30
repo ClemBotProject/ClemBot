@@ -196,7 +196,7 @@ class Messenger:
             ):
                 return
 
-    def __get_weak_ref(self, obj: t.Any) -> (wr.WeakMethod[t.Any] | wr.ReferenceType[t.Any]):
+    def __get_weak_ref(self, obj: t.Any) -> wr.WeakMethod[t.Any] | wr.ReferenceType[t.Any]:
         """
         Get a weak reference to obj. If obj is a bound method, a WeakMethod
         object, that behaves like a WeakRef, is returned; if it is

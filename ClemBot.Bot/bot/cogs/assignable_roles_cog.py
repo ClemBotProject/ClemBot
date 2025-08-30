@@ -103,13 +103,13 @@ class AssignableRolesCog(commands.Cog):
             "\u0037\ufe0f\u20e3",
             "\u0038\ufe0f\u20e3",
             "\u0039\ufe0f\u20e3",
-            "\U0001F51F",
+            "\U0001f51f",
         ]
         """
             USING EMOJIS WITH EMBEDDED TEXT
                 What I know works:
                     1. Discord emoji name (e.g. ':pensive:')
-                    2. Unicode emoji name (e.g. '\u0031\ufe0f\u20e3' or '\U0001F3D3')
+                    2. Unicode emoji name (e.g. '\u0031\ufe0f\u20e3' or '\U0001f3d3')
 
                 More info on using unicode emojis is provided below.
         """
@@ -142,7 +142,7 @@ class AssignableRolesCog(commands.Cog):
 
                 Method 1:
                 say you want :ping_pong:, you would use the unicode charcter U+1F3D3 and change it to U0001F3D3.
-                    thus, '\U0001F3D3' would be your string for ping pong
+                    thus, '\U0001f3d3' would be your string for ping pong
                 as another example, if you wanted to use :skull_crossbones:, 
                 you would use unicode character U+2620 and change it to U00002620
                     thus, '\U00002620' would be your string for skull and crossbones

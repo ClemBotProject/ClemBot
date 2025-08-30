@@ -27,7 +27,7 @@ def format_datetime(time: datetime) -> str:
 
 
 def format_duration(
-    duration: Annotated[datetime | relativedelta, FutureDuration | PastDuration]
+    duration: Annotated[datetime | relativedelta, FutureDuration | PastDuration],
 ) -> str:
     """
     Formats the given datetime to a string.

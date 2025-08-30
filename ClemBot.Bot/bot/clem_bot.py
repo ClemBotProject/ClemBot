@@ -341,7 +341,7 @@ class ClemBot(commands.Bot):
         await self.publish_to_queue_with_error(Events.on_member_ban, guild.id, guild, user)
 
     async def on_reaction_add(
-        self, reaction: discord.Reaction, user: (discord.User | discord.Member)
+        self, reaction: discord.Reaction, user: discord.User | discord.Member
     ) -> None:
         if user.id != self.user.id:
             assert reaction.message.guild is not None
@@ -356,7 +356,7 @@ class ClemBot(commands.Bot):
             )
 
     async def on_reaction_remove(
-        self, reaction: discord.Reaction, user: (discord.User | discord.Member)
+        self, reaction: discord.Reaction, user: discord.User | discord.Member
     ) -> None:
         if user.id != self.user.id:
             assert reaction.message.guild is not None

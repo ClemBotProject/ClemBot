@@ -19,7 +19,7 @@ class UserChoice:
         *,
         content: str | None = None,
         embed: discord.Embed | None = None,
-        is_error: bool = False
+        is_error: bool = False,
     ) -> bool:
         if embed and content:
             raise TypeError("Only specify the embed or the content, not both")

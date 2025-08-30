@@ -120,9 +120,11 @@ class FutureDuration(DurationDelta[relativedelta | datetime]):
     ) -> relativedelta | datetime:
         delta = t.cast(
             relativedelta,
-            duration
-            if isinstance(duration, relativedelta)
-            else await super().convert(ctx, duration),
+            (
+                duration
+                if isinstance(duration, relativedelta)
+                else await super().convert(ctx, duration)
+            ),
         )
         now = datetime.utcnow()
         try:
@@ -141,9 +143,11 @@ class PastDuration(DurationDelta[relativedelta | datetime]):
     ) -> relativedelta | datetime:
         delta = t.cast(
             relativedelta,
-            duration
-            if isinstance(duration, relativedelta)
-            else await super().convert(ctx, duration),
+            (
+                duration
+                if isinstance(duration, relativedelta)
+                else await super().convert(ctx, duration)
+            ),
         )
         now = datetime.utcnow()
         try:

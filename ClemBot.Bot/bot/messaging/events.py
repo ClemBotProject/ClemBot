@@ -1,5 +1,5 @@
 """
-This module is to define all application level events in one place 
+This module is to define all application level events in one place
 to avoid attempting to remember string event names
 """
 

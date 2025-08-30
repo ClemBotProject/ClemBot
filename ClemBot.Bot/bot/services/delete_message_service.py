@@ -38,7 +38,7 @@ class DeleteMessageService(BaseService):
         msg: discord.Message | list[discord.Message],
         roles: discord.Role | list[discord.Role] | None = None,
         author: discord.Member | None = None,
-        timeout: int | None = None
+        timeout: int | None = None,
     ) -> None:
 
         msg_to_delete = [msg] if not isinstance(msg, list) else msg
