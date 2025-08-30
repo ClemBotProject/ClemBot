@@ -64,7 +64,7 @@ jobs:
     - name: Check if isort would make any changes
       id: isort-ci
       continue-on-error: true
-      run: poetry run python -m isort --check-only .
+      run: uv run python -m isort --check-only .
 
     - name: Black lint failure comment
       shell: bash
