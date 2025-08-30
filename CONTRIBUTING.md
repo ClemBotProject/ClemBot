@@ -8,7 +8,7 @@ Make sure you can run these commands and install them if not present.
 
 ### ClemBot.Bot
 
-* [Python 3.10](https://www.python.org/downloads/release/python-3100/)
+* [Python 3.13](https://www.python.org/downloads/release/python-3130/)
 * pip3 (packaged as python3-pip)
 * A Python IDE
     * Anything will work, but people generally use [Visual Studio Code](https://code.visualstudio.com/)
