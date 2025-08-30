@@ -38,7 +38,7 @@ jobs:
 
     - name: install dependencies
       if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
-      run: uv sync 
+      run: uv sync --extra dev 
 
     - name: Validate static typing
       id: static-typing-ci
