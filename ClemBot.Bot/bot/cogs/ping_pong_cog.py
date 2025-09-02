@@ -42,6 +42,8 @@ class PingPongCog(commands.Cog):
         start = time.perf_counter()
         color = Colors.Error
         message = None
+        if not url.startswith("http"):
+            url = "https://" + url
         try:
             async with aiohttp.ClientSession() as session:
                 await session.get(url, timeout=timeout)
