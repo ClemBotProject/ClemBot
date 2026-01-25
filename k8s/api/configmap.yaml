@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: clembot-api-config
-  namespace: clembot
-data:
-  JwtTokenConfig__Issuer: "https://api.clembot.io"
-  JwtTokenConfig__Audience: "https://api.clembot.io"

@@ -49,6 +49,7 @@ class OwnerCog(commands.Cog):
         await ctx.send("Server left successfully")
 
     @ext.group(invoke_without_command=True, hidden=True)
+    @ext.ban_disabling()
     @commands.is_owner()
     async def reload(self, ctx: ext.ClemBotCtx, id: int):
         guild = self.bot.get_guild(id)

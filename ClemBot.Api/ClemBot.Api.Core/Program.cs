@@ -63,7 +63,7 @@ builder.Host.UseSerilog((context, provider, config) => {
     }
     else
     {
-        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information) 
+        config.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
             .WriteTo.Console();
     }

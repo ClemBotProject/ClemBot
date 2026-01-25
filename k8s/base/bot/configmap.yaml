@@ -2,13 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: clembot-bot-config
-  namespace: clembot
 data:
-  PROD: "true"
-  API_URL: "http://clembot-api.clembot.svc.cluster.local:5000/"
-  SITE_URL: "https://clembot.io"
-  DOCS_URL: "https://docs.clembot.io"
-  REPL_URL: "http://clembot-snekbox.clembot.svc.cluster.local:8060/eval"
   GITHUB_URL: "https://github.com/ClemBotProject/ClemBot"
   BOT_PREFIX: "-"
   STARTUP_LOG_CHANNEL_IDS: "1023765938488741908"

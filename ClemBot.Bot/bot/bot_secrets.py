@@ -198,10 +198,7 @@ class BotSecrets:
         self._allow_bot_input_ids = value
 
     def _convert_value(self, value: str, type_hint: type) -> Any:
-        """Convert a string value from environment variable to the appropriate type."""
-
         def convert_scalar(val: str, target_type: type) -> Any:
-            """Convert a single scalar value to the target type."""
             match target_type:
                 case t if t is bool:
                     return bool(val)
@@ -227,29 +224,17 @@ class BotSecrets:
         type_hint: type = str,
         default: Any = None,
     ) -> Any:
-        """
-        Load a secret from environment variable first, then fall back to JSON file, then default.
-
-        Args:
-            key: The configuration key name
-            json_data: Merged JSON configuration data
-            type_hint: The expected type (e.g., str, int, bool, list[int])
-            default: Default value if not found in env or json
-        """
-        # Try environment variable first
         env_value = os.environ.get(key)
         if env_value is not None:
             value = self._convert_value(env_value, type_hint)
             log.info(f"{key}: loaded from environment")
             return value
 
-        # Fall back to JSON file
         if json_data and key in json_data:
             value = json_data[key]
             log.info(f"{key}: loaded from json file")
             return value
 
-        # Use default if available
         if default is not None:
             log.info(f"{key}: loaded from default")
             return default
@@ -257,20 +242,12 @@ class BotSecrets:
         raise ConfigAccessError(f"No value for configuration: '{key}' found")
 
     def load_secrets(self, *sources: str) -> None:
-        """
-        Load secrets with priority: environment variables > rightmost source > ... > leftmost source > defaults.
-        Logs the source of each secret at INFO level.
-
-        Args:
-            *sources: Paths to JSON configuration files. Files are merged with rightmost having highest priority.
-                     If no sources provided, only environment variables and defaults will be used.
-        """
         json_data = {}
         for source_path in sources:
             try:
                 with open(source_path) as f:
                     file_data = json.loads(f.read())
-                    # Merge with rightmost having priority (overwrites existing keys)
+                    # Merge with rightmost having priority
                     json_data.update(file_data)
                     log.info(f"Loaded configuration from {source_path}")
             except FileNotFoundError:

@@ -30,5 +30,6 @@ spec:
           limits:
             cpu: "1000m"
             memory: "1Gi"
+      restartPolicy: Always
       imagePullSecrets:
       - name: ghcriocreds
