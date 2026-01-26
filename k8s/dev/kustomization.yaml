@@ -6,6 +6,8 @@ namespace: clembot-dev
 resources:
   - ../base
   - namespace.yaml
+  # We only run snekbox in the homelab in dev, we will run it over wireguard in prod
+  - snekbox
 
 patches:
   - path: configmap-patch.yaml

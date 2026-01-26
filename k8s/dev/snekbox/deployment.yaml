@@ -15,6 +15,10 @@ spec:
       labels:
         app: clembot-snekbox
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: snekbox
         image: ghcr.io/python-discord/snekbox:latest
@@ -24,6 +28,9 @@ spec:
           protocol: TCP
         securityContext:
           privileged: true
+          capabilities:
+            drop:
+              - ALL
         resources:
           requests:
             cpu: "250m"

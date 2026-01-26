@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: clembot-bot-config
 data:
-  # Run in prod mode for dev cuz its on live infra
-  PROD: "true"
+  # run in dev mode (empty string = truthy)
+  PROD: ""
   API_URL: "http://clembot-api.clembot-dev.svc.cluster.local:8080/"
   SITE_URL: "https://dev.clembot.io"
   DOCS_URL: "https://docs.clembot.io"
