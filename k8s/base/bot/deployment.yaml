@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: bot
-        image: ghcr.io/jay-madden/clembot.bot:disableowner
+        image: ghcr.io/jay-madden/clembot.bot:latest
         envFrom:
         - secretRef:
             name: clembot-bot-secrets

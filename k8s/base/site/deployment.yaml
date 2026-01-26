@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: site
-        image: ghcr.io/clembotproject/clembot.site:master
+        image: ghcr.io/clembotproject/clembot.site:latest
         ports:
         - containerPort: 3000
           name: http
