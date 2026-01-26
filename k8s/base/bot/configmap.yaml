@@ -7,4 +7,5 @@ data:
   BOT_PREFIX: "-"
   STARTUP_LOG_CHANNEL_IDS: "1023765938488741908"
   ERROR_LOG_CHANNEL_IDS: "1023765938488741908"
-  ALLOW_BOT_INPUT_IDS: "1"
+  SITE_URL: "https://clembot.io"
+  DOCS_URL: "https://docs.clembot.io"

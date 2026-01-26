@@ -3,13 +3,13 @@ kind: Cluster
 metadata:
   name: clembot-db
 spec:
-  instances: 1
+  instances: 2
   bootstrap:
     initdb:
       database: clembotdb
       owner: clembot
   storage:
-    size: 5Gi
+    size: 10Gi
   monitoring:
     enablePodMonitor: true
   resources:

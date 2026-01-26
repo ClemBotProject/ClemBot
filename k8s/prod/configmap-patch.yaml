@@ -4,10 +4,10 @@ metadata:
   name: clembot-bot-config
 data:
   PROD: "true"
+  BOT_PREFIX: "!"
   API_URL: "http://clembot-api.clembot-prod.svc.cluster.local:8080/"
-  SITE_URL: "https://clembot.io"
-  DOCS_URL: "https://docs.clembot.io"
   REPL_URL: "http://clembot-snekbox.clembot-prod.svc.cluster.local:8060/eval"
+  ALLOW_BOT_INPUT_IDS: "1"
 ---
 apiVersion: v1
 kind: ConfigMap
