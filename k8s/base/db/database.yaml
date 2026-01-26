@@ -2,7 +2,6 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: clembot-db
-  namespace: clembot
 spec:
   instances: 1
   bootstrap:

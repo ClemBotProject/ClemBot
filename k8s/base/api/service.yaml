@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: clembot-api
-  namespace: clembot
   labels:
     app: clembot-api
 spec:

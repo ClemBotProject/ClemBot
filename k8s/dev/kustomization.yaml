@@ -11,3 +11,6 @@ resources:
 
 patches:
   - path: configmap-patch.yaml
+  - path: bot-deployment-patch.yaml
+  - path: api-deployment-patch.yaml
+  - path: db-patch.yaml

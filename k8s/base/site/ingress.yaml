@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: clembot-site
-  namespace: clembot
   annotations:
     external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
     external-dns.alpha.kubernetes.io/hostname: clembot.io
