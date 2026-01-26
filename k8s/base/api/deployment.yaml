@@ -31,11 +31,11 @@ spec:
             name: clembot-api-secrets
         resources:
           requests:
+            cpu: "125m"
+            memory: "256Mi"
+          limits:
             cpu: "250m"
             memory: "512Mi"
-          limits:
-            cpu: "1000m"
-            memory: "1Gi"
         livenessProbe:
           httpGet:
             path: /livez
