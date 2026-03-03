@@ -73,12 +73,10 @@ class DesignatedChannelsCog(commands.Cog):
     ) -> None:
 
         if OwnerDesignatedChannels.has(channel_type):
-            await ctx.send(
-                f"""
+            await ctx.send(f"""
                 The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
                 If you are the owner of the instance please reference owner_cog.py for more information
-                """
-            )
+                """)
             return
 
         if not DesignatedChannels.has(channel_type):
@@ -125,12 +123,10 @@ class DesignatedChannelsCog(commands.Cog):
             channel (discord.TextChannel): Channel to unregister
         """
         if OwnerDesignatedChannels.has(channel_type):
-            await ctx.send(
-                f"""
+            await ctx.send(f"""
                 The requested designated channel `{channel_type}` can only be managed by the owner of the bot instance
                 If you are the owner of the instance please reference owner_cog.py for more information
-                """
-            )
+                """)
             return
 
         if not DesignatedChannels.has(channel_type):

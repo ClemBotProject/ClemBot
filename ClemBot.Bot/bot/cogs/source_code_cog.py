@@ -79,11 +79,9 @@ class SourceCodeCog(commands.Cog):
                     self.bot_files[f] = FilePaths(path, path.split(f"/{root_dir}/")[1])
 
     @ext.group(case_insensitive=True, invoke_without_command=True, aliases=["src"])
-    @ext.long_help(
-        """
+    @ext.long_help("""
         Links the bots repository or optionally a specific file within the bots source tree
-        """
-    )
+        """)
     @ext.short_help("Links the bots source repo")
     @ext.example(("source", "source clem_bot.py"))
     async def source(self, ctx: ext.ClemBotCtx, file: str | None = None) -> None:
@@ -115,12 +113,10 @@ class SourceCodeCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @source.command(aliases=["directory", "tree"])
-    @ext.long_help(
-        """
+    @ext.long_help("""
         Prints out the bots full source directory structure in discord, you may use this to know what
         files the source command has access too
-        """
-    )
+        """)
     @ext.short_help("Prints the source directory")
     @ext.example("source list")
     async def list(self, ctx: ext.ClemBotCtx) -> None:

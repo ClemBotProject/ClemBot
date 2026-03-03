@@ -140,8 +140,7 @@ class GradesCog(commands.Cog):
         return "```" + "\n".join(parts) + "```"
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
-    @ext.long_help(
-        """
+    @ext.long_help("""
         Attempts to give more information about courses at Clemson University.
 
         General usage:
@@ -155,8 +154,7 @@ class GradesCog(commands.Cog):
         DISCLAIMER:
         Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
         Data source: https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
-        """
-    )
+        """)
     @ext.short_help("Attempts to give more information about courses at Clemson University")
     @ext.example(
         (
@@ -281,8 +279,7 @@ class GradesCog(commands.Cog):
         )
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
-    @ext.long_help(
-        """
+    @ext.long_help("""
         Attempts to give more information about courses at Clemson University.
 
         General usage:
@@ -296,8 +293,7 @@ class GradesCog(commands.Cog):
         DISCLAIMER:
         Due to incomplete or bad data from the university, multiple professors may be listed with the same name or missing altogether.
         Data source: https://www.clemson.edu/institutional-effectiveness/oir/data-reports/
-        """
-    )
+        """)
     @ext.short_help("Provides info about a given professor")
     @ext.example(
         (
@@ -334,9 +330,7 @@ class GradesCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        df = self.grades_df[
-            (self.grades_df.Instructor.str.lower() == prof.lower())
-        ]
+        df = self.grades_df[(self.grades_df.Instructor.str.lower() == prof.lower())]
 
         # Honors/Non-honors logic
         if honors == "honors":
