@@ -22,7 +22,8 @@ class RemindCog(commands.Cog):
         self.bot = bot
 
     @ext.group(aliases=["remindme", "remind"], case_insensitive=True, invoke_without_command=True)
-    @ext.long_help("""
+    @ext.long_help(
+        """
         This command will direct message the user with their message at specified time in the future.
 
         This command supports many different time specifiers as listed below.
@@ -35,7 +36,8 @@ class RemindCog(commands.Cog):
             - minutes: `m`, `min`, `minute`, `minutes`
             - seconds: `S`, `sec`, `s`, `second`, `seconds`
 
-        """)
+        """
+    )
     @ext.short_help("Creates a reminder")
     @ext.example(
         (
