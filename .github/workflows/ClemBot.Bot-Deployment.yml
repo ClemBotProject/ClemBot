@@ -56,31 +56,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: type=gha, scope=${{github.repository}}
           cache-from: type=gha, scope=${{github.repository}}
-
-
-  deploy-clembot-bot:
-    runs-on: [self-hosted]
-    needs: ['build-push-clembot-bot']
-    steps:
-      - uses: actions/checkout@v4
-      - name: Copy Secrets
-        run: |
-          cp ~/ClemBot.Api_env.env ./ClemBot.Api/ClemBot.Api_env.env
-          cp ~/ClemBot.Bot_env.env ./ClemBot.Bot/ClemBot.Bot_env.env
-          cp ~/ClemBot.Site_env.env ./ClemBot.Site/ClemBot.Site_env.env
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy updated images
-        run: |
-          docker-compose pull clembot.bot
-          docker-compose up -d clembot.bot
-      - name: Discord notification
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_URL }}
-        uses: "Ilshidur/action-discord@0.3.0"
-        with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }}/ClemBot.Bot has been deployed.'
