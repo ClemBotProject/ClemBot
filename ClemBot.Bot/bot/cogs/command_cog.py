@@ -36,7 +36,7 @@ class CommandCog(commands.Cog):
         model = await self.bot.commands_route.get_details(ctx.guild.id, cmd.qualified_name)
         assert model is not None
 
-        (name, value) = self._disabled_in_field(model)
+        name, value = self._disabled_in_field(model)
         embed = discord.Embed(title="⚙️ Command Details", color=Colors.ClemsonOrange)
         embed.add_field(name="Name", value=f"`{cmd.qualified_name}`")
         embed.add_field(name="Allows Disabling", value=cmd.allow_disable, inline=False)
