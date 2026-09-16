@@ -4,24 +4,9 @@
 
 # ClemBot
 
-<p align="center">
-    <br/>
-    <a href="https://discord.gg/QNRbC6k">
-        <img src="https://img.shields.io/discord/515071617815019520.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge" alt="Support">
-    </a>
-    <a href="https://www.python.org/downloads/">
-        <img src="https://img.shields.io/badge/Made%20With-Python%203.10-blue.svg?style=for-the-badge&logo=Python" alt="Made with Python 3.10">
-    </a>
-    <a href="https://github.com/ClemsonCPSC-Discord/ClemBot/blob/master/LICENSE">
-        <img src="https://img.shields.io/badge/license-mit-e74c3c.svg?style=for-the-badge&logo=appveyor" alt="MIT License">
-    </a>
-</p>
-
-<p align="center">
-    <a href="https://top.gg/bot/710672266245177365">
-        <img src="https://top.gg/api/widget/710672266245177365.svg" alt="ClemBot" />
-    </a>
-</p>
+> [!CAUTION]
+> Discords fuckass has denied our intents requests after granting them for 7 years and shut the public instance of this bot down.
+> It can still be self hosted.
 
 ## Website, Documentation and Configuration Dashboard
 
@@ -59,10 +44,6 @@ A Discord bot for server and community management with a focus on school/program
 
 ClemBot is in current active development so check back often to see what's new!!
 
-# Bot Invite
-
-To invite ClemBot to your server,
-click [here](https://discord.com/api/oauth2/authorize?client_id=710672266245177365&permissions=398828104950&scope=bot).
 
 ## Community
 
@@ -75,7 +56,7 @@ To start developing and contributing to this project, please see [CONTRIBUTING.m
 
 # Architecture overview
 
-ClemBot utilizes a standard three tier architecture. 
+ClemBot utilizes a standard three tier architecture.
 The **ClemBot.Bot** project makes requests to the **ClemBot.Api** project, which then subsequently queries the PostgreSQL database.
 
 ## ClemBot.Bot
