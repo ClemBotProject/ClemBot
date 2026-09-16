@@ -42,6 +42,21 @@ class GradesCog(commands.Cog):
         for file in os.listdir(ASSET_LOCATION):
             self.grades_df = pd.concat([self.grades_df, pd.read_csv(f"{ASSET_LOCATION}{file}")])
 
+        # clean some p/f data data
+        for col in ("P", "F(P)"):
+            self.grades_df[col] = (
+                self.grades_df[col]
+                .astype(str)
+                .str.replace("####", "100%", regex=False)  # #### means 100% pass
+                .str.replace("%", "", regex=False)
+                .pipe(pd.to_numeric, errors="coerce")
+                .fillna(0)
+            )
+
+            self.grades_df.loc[self.grades_df[col] > 1, col] = (
+                self.grades_df.loc[self.grades_df[col] > 1, col] / 100
+            )
+
         self.grades_df.info()
 
         self.all_profs = self.get_profs()
@@ -68,6 +83,61 @@ class GradesCog(commands.Cog):
 
         if best_match.similarity > 0.3:
             return best_match.item
+
+    LETTER_GRADE_COLS = ["A", "B", "C", "D", "F"]
+
+    @staticmethod
+    def _split_graded_and_pf(
+        df: pd.DataFrame,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        # rule for is_pf is if (A-F) == 0 and (P OR F(P)) > 0
+        is_pf = (df[GradesCog.LETTER_GRADE_COLS].sum(axis=1) == 0) & (
+            (df["P"] > 0) | (df["F(P)"] > 0)
+        )
+        graded_df = df[~is_pf]
+        pf_df = df[is_pf]
+
+        # drop one random p/f or graded year (e.g. covid semester)
+        pf_years = pf_df["Year"].nunique()
+        graded_years = graded_df["Year"].nunique()
+
+        if not pf_df.empty and not graded_df.empty:
+            if pf_years <= 1 and graded_years > 1:
+                pf_df = pf_df.iloc[0:0]
+            elif graded_years <= 1 and pf_years > 1:
+                graded_df = graded_df.iloc[0:0]
+
+        return graded_df, pf_df
+
+    @staticmethod
+    def _format_distribution(df: pd.DataFrame) -> str:
+        graded_df, pf_df = GradesCog._split_graded_and_pf(df)
+        has_graded = not graded_df.empty
+        has_pf = not pf_df.empty
+
+        parts = []
+
+        if has_graded:
+            mean = graded_df.mean(numeric_only=True)
+            A = f"{int(mean['A'].round(2) * 100)}%"
+            B = f"{int(mean['B'].round(2) * 100)}%"
+            C = f"{int(mean['C'].round(2) * 100)}%"
+            D = f"{int(mean['D'].round(2) * 100)}%"
+            F = f"{int(mean['F'].round(2) * 100)}%"
+            W = f"{int(mean['W'].round(2) * 100)}%"
+            parts.extend([f"A: {A}", f"B: {B}", f"C: {C}", f"D: {D}", f"F: {F}", f"W: {W}"])
+
+        if has_pf:
+            mean = pf_df.mean(numeric_only=True)
+            P = f"{int(mean['P'].round(2) * 100)}%"
+            FP = f"{int(mean['F(P)'].round(2) * 100)}%"
+            if not has_graded:
+                W = f"{int(mean['W'].round(2) * 100)}%"
+            parts.extend([f"P: {P}", f"FP: {FP}"])
+            if not has_graded:
+                parts.append(f"W: {W}")
+
+        return "```" + "\n".join(parts) + "```"
 
     @ext.group(invoke_without_command=True, case_insensitive=True)
     @ext.long_help(
@@ -151,24 +221,20 @@ class GradesCog(commands.Cog):
 
         description = df.Title.tolist()[0]
 
-        A = f"{int(df.A.mean().round(2) * 100)}%"
-        B = f"{int(df.B.mean().round(2) * 100)}%"
-        C = f"{int(df.C.mean().round(2) * 100)}%"
-        D = f"{int(df.D.mean().round(2) * 100)}%"
-        F = f"{int(df.F.mean().round(2) * 100)}%"
-        W = f"{int(df.W.mean().round(2) * 100)}%"
-
         title = f"Grades for {course} ({honors.title()}) since {year}"
 
         embeds = []
 
+        # grouup overall
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
         embed.description = description
+
         embed.add_field(
             name="Overall Distribution",
-            value=f"```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```",
+            value=self._format_distribution(df),
         )
+
         embed.add_field(name="Total Number of Classes Analyzed", value=str(len(df)), inline=False)
         embed.add_field(
             name="Total Number of Professors Found",
@@ -182,20 +248,16 @@ class GradesCog(commands.Cog):
         embeds.append(embed)
 
         # group by the prof
-
-        for i, row in df.groupby(["Instructor"]).mean().iterrows():
+        for instructor, group in df.groupby("Instructor"):
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.description = description
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            A = f"{int(row.A.round(2) * 100)}%"
-            B = f"{int(row.B.round(2) * 100)}%"
-            C = f"{int(row.C.round(2) * 100)}%"
-            D = f"{int(row.D.round(2) * 100)}%"
-            F = f"{int(row.F.round(2) * 100)}%"
-            W = f"{int(row.W.round(2) * 100)}%"
 
-            val = f"```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```"
-            embed.add_field(name=f"{row.name}'s distribution", value=val)
+            embed.add_field(
+                name=f"{instructor}'s distribution",
+                value=self._format_distribution(group),
+            )
+
             embed.add_field(
                 name="Total Number of Classes Analyzed", value=str(len(df)), inline=False
             )
@@ -272,10 +334,7 @@ class GradesCog(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        # check for if there is a 0% A rate, that means it was a pass fail class and we dont handle those
-        df = self.grades_df[
-            (self.grades_df.Instructor.str.lower() == prof.lower()) & (self.grades_df.A > 0)
-        ]
+        df = self.grades_df[(self.grades_df.Instructor.str.lower() == prof.lower())]
 
         # Honors/Non-honors logic
         if honors == "honors":
@@ -299,31 +358,25 @@ class GradesCog(commands.Cog):
             )
             return await ctx.send(embed=embed)
 
-        A = f"{int(df.A.mean().round(2) * 100)}%"
-        B = f"{int(df.B.mean().round(2) * 100)}%"
-        C = f"{int(df.C.mean().round(2) * 100)}%"
-        D = f"{int(df.D.mean().round(2) * 100)}%"
-        F = f"{int(df.F.mean().round(2) * 100)}%"
-        W = f"{int(df.W.mean().round(2) * 100)}%"
-        normalized_name = df.Instructor.any()
+        normalized_name = df.Instructor.iloc[0]
 
-        title = f"Overall Grade Distribution for {normalized_name} across all classes taught"
+        title = f"Grade Distribution for {normalized_name}"
 
         if honors == "honors":
-            title = (
-                f"Overall Grade Distribution for {normalized_name} across all honors classes taught"
-            )
+            title += " (Honors)"
         elif honors == "non-honors":
-            title = f"Overall Grade Distribution for {normalized_name} across all non-honors classes taught"
+            title += " (Non-Honors)"
 
         embeds = []
 
         embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
         embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
+
         embed.add_field(
             name="Overall Distribution",
-            value=f"```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```",
+            value=self._format_distribution(df),
         )
+
         embed.add_field(
             name="Total Number of Classes Analyzed",
             value=str(len(df.groupby(["CourseId"]))),
@@ -335,25 +388,15 @@ class GradesCog(commands.Cog):
         )
         embeds.append(embed)
 
-        title = f"Grade Distribution for {normalized_name}"
-
-        if honors == "honors":
-            title += " (Honors)"
-        elif honors == "non-honors":
-            title += " (Non-Honors)"
-
-        for i, row in df.groupby(["CourseId"]).mean().iterrows():
+        for course_id, group in df.groupby("CourseId"):
             embed = discord.Embed(title=title, color=Colors.ClemsonOrange)
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar.url)
-            A = f"{int(row.A.round(2) * 100)}%"
-            B = f"{int(row.B.round(2) * 100)}%"
-            C = f"{int(row.C.round(2) * 100)}%"
-            D = f"{int(row.D.round(2) * 100)}%"
-            F = f"{int(row.F.round(2) * 100)}%"
-            W = f"{int(row.W.round(2) * 100)}%"
 
-            val = f"```A: {A}\nB: {B}\nC: {C}\nD: {D}\nF: {F}\nW: {W}```"
-            embed.add_field(name=f"{row.name}'s distribution", value=val)
+            embed.add_field(
+                name=f"{course_id}'s distribution",
+                value=self._format_distribution(group),
+            )
+
             embed.add_field(
                 name="Total Number of Classes Analyzed", value=str(len(df)), inline=False
             )
