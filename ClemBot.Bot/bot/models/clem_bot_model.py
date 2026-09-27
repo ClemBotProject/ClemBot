@@ -1,11 +1,12 @@
 from humps import camel
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ClemBotModel(BaseModel):
     """Base model which adds support for camelCase"""
 
-    class Config:
-        alias_generator = camel.case
-        allow_population_by_field_name = True
-        use_enum_values = True
+    model_config = ConfigDict(
+        alias_generator=camel.case,
+        populate_by_name=True,
+        use_enum_values=True,
+    )
